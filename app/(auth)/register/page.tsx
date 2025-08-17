@@ -1,11 +1,25 @@
-import React from 'react'
+"use client";
+
+import RegisterForm, {
+  RegisterFormInputs,
+} from "@/app/components/forms/auth/register-form";
+import { useRouter } from "next/navigation";
+import React from "react";
+import FormLayout from "../form-layout";
 
 const RegisterPage = () => {
-  return (
-    <div>
-      Register
-    </div>
-  )
-}
+  const router = useRouter();
 
-export default RegisterPage
+  const handleRegisterSuccess = (values: RegisterFormInputs) => {
+    sessionStorage.setItem("userEmail", values.email);
+    router.push("/email-verification");
+  };
+
+  return (
+    <FormLayout>
+      <RegisterForm onFinish={handleRegisterSuccess} />
+    </FormLayout>
+  );
+};
+
+export default RegisterPage;

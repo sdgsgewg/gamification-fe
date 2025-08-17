@@ -1,15 +1,17 @@
+import React from "react";
 import Header from "../components/layout/AuthLayout/Header";
+import { Toaster } from "react-hot-toast";
 
 export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main className="font-work-sans bg-white text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
+    <>
       <Header />
-
-      <div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center pt-32 pb-24 transition-colors duration-300">
+      <main className="bg-[#556FD7] dark:bg-[#556FD7] min-h-screen flex items-center justify-center pt-35 pb-20 transition-colors duration-300">
+        <Toaster position="top-right" />
         {children}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

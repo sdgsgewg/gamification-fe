@@ -1,0 +1,31 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import React from "react";
+
+interface OAuthButtonProps {
+  message: string;
+  onClick: () => void;
+}
+
+const OAuthButton = ({ message, onClick }: OAuthButtonProps) => {
+  return (
+    <div
+      className="w-full flex items-center justify-between gap-2 border border-[#C5C5C5] rounded-lg shadow-xs px-4 py-2 cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-2">
+        <Image src="/img/google.png" alt="Google" width={30} height={30} />
+        <span className="text-base font-medium">{message}</span>
+      </div>
+      <div>
+        <FontAwesomeIcon
+          icon={faArrowRight}
+          className="text-[#C5C5C5] text-xs"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default OAuthButton;

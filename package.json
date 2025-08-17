@@ -14,13 +14,18 @@
     "@fortawesome/free-regular-svg-icons": "^7.0.0",
     "@fortawesome/free-solid-svg-icons": "^7.0.0",
     "@fortawesome/react-fontawesome": "^0.2.3",
+    "@hookform/resolvers": "^5.2.1",
     "@supabase/supabase-js": "^2.52.1",
-    "antd": "^5.26.7",
+    "antd": "^5.13.0",
     "axios": "^1.11.0",
+    "jwt-decode": "^4.0.0",
     "next": "15.4.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-spinners": "^0.17.0"
+    "react-hook-form": "^7.62.0",
+    "react-hot-toast": "^2.5.2",
+    "react-spinners": "^0.17.0",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

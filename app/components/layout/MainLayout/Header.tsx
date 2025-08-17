@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,10 +11,11 @@ import {
 import {
   mainMenuItems,
   userDropdownMenuItems,
-  Role,
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Role, User } from "@/app/interface/users/IUser";
+import { auth, authEventTarget } from "@/app/functions/AuthProvider";
 
 interface MainMenuItemProps {
   url: string;
@@ -89,13 +90,13 @@ const AuthActionButtons = () => {
     <div className="flex flex-row gap-4">
       <button
         onClick={() => router.push("/login")}
-        className="bg-[#EAE9FF] text-[#556FD7] font-bold rounded-2xl px-6 py-2 hover:bg-[#d9d8f2] transition"
+        className="bg-[#EAE9FF] text-[#556FD7] font-bold rounded-2xl px-6 py-2 hover:bg-[#d9d8f2] transition cursor-pointer"
       >
         Masuk
       </button>
       <button
         onClick={() => router.push("/register")}
-        className="bg-[#556FD7] text-white font-bold rounded-2xl px-6 py-2 hover:bg-[#445cc0] transition"
+        className="bg-[#556FD7] text-white font-bold rounded-2xl px-6 py-2 hover:bg-[#445cc0] transition cursor-pointer"
       >
         Daftar
       </button>
@@ -104,10 +105,17 @@ const AuthActionButtons = () => {
 };
 
 const UserDropdownMenu = ({ role }: { role: Role }) => {
+  const router = useRouter();
+
   const userMenus = userDropdownMenuItems[role] || [];
 
+  const handleLogout = async () => {
+    await auth.logout();
+    router.push("/");
+  };
+
   return (
-    <div className="ms-auto flex items-center gap-4">
+    <div className="ms-0 lg:ms-auto flex items-center gap-4">
       <Dropdown
         trigger={["click"]}
         menu={{
@@ -117,6 +125,9 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
               <a
                 href={item.url}
                 className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={
+                  item.menu === "Keluar" ? () => handleLogout() : undefined
+                }
               >
                 {item.icon && (
                   <FontAwesomeIcon
@@ -160,13 +171,47 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
 };
 
 const Header = () => {
+  const [user, setUser] = useState<User>();
   const [userRole, setUserRole] = useState<Role>("guest");
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const router = useRouter();
+
+  const handleNavigateToHomePage = () => {
+    router.push("/");
+  };
+
+  useEffect(() => {
+    const updateUser = async () => {
+      const user = await auth.getCachedUserProfile();
+      if (user) {
+        setUser(user);
+        setUserRole(user.role);
+      } else {
+        setUser(undefined);
+        setUserRole("guest");
+      }
+    };
+
+    updateUser(); // Initial
+
+    const handleAuthChange = () => {
+      updateUser(); // Re-fetch profile on logout/login
+    };
+
+    authEventTarget.addEventListener("authChanged", handleAuthChange);
+    return () => {
+      authEventTarget.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, []);
+
   return (
-    <header className="bg-white px-6 py-4 shadow-md relative">
+    <header className="bg-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
       <div className="flex items-center justify-between">
-        <h1 className="text-[#556FD7] text-2xl font-bold uppercase">
+        <h1
+          className="text-[#556FD7] text-2xl font-bold uppercase cursor-pointer"
+          onClick={handleNavigateToHomePage}
+        >
           Gamification
         </h1>
 

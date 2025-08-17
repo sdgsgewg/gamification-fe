@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User } from "@/app/interface/user/IUser";
-import { get } from "@/lib/apiClient";
+import { User } from "@/app/interface/users/IUser";
+import { getAxios } from "@/app/utils/AxiosFunction";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -10,7 +10,7 @@ export default function UsersPage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const data = await get("/users");
+        const data = await getAxios("users/get-all-users");
         setUsers(data);
       } catch (err) {
         console.error("Failed to fetch users:", err);
@@ -21,7 +21,7 @@ export default function UsersPage() {
   }, []);
 
   return (
-    <div>
+    <div className="text-black">
       <h1>Users List</h1>
       <ul>
         {users.map((user: User) => (

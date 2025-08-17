@@ -10,8 +10,7 @@ import {
   faBook,
   faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
-
-export type Role = "guest" | "student" | "teacher" | "admin";
+import { Role } from "../interface/users/IUser";
 
 export interface MenuItem {
   menu: string;
@@ -87,7 +86,7 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
     },
     {
       menu: "Keluar",
-      url: "/logout",
+      url: "/",
       icon: faRightFromBracket,
       roles: ["student"],
     },
@@ -101,7 +100,7 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
     },
     {
       menu: "Keluar",
-      url: "/logout",
+      url: "/",
       icon: faRightFromBracket,
       roles: ["teacher"],
     },
@@ -115,7 +114,7 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
     },
     {
       menu: "Keluar",
-      url: "/logout",
+      url: "/",
       icon: faRightFromBracket,
       roles: ["admin"],
     },
@@ -139,7 +138,7 @@ export const footerMainMenuItems: MenuItem[] = [
   },
   {
     menu: "Keluar",
-    url: "#",
+    url: "/",
     roles: ["student", "teacher", "admin"],
   },
   { menu: "Tugas", url: "/dashboard/task", roles: ["teacher"] },

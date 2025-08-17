@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Role,
   sidebarAdminMenuItems,
   sidebarMainMenuItems,
 } from "@/app/constants/menuItems";
@@ -12,18 +11,19 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
+import { Role } from "@/app/interface/users/IUser";
+import { auth } from "@/app/functions/AuthProvider";
 
 interface MainMenuItemProps {
   menu: string;
   icon: IconDefinition;
   url: string;
+  onClick?: () => void;
 }
 
-const MainMenuItem = ({ menu, icon, url }: MainMenuItemProps) => {
+const MainMenuItem = ({ menu, icon, url, onClick }: MainMenuItemProps) => {
   const pathname = usePathname();
 
-  // Untuk URL '/dashboard', hanya aktif jika pathname tepat '/dashboard'
-  // Untuk URL lainnya, aktif jika pathname dimulai dengan URL + '/'
   const isActive =
     url === "/dashboard"
       ? pathname === url
@@ -31,15 +31,27 @@ const MainMenuItem = ({ menu, icon, url }: MainMenuItemProps) => {
 
   return (
     <li>
-      <Link
-        href={url}
-        className={`flex items-center gap-2 px-4 py-3 transition ${
-          isActive ? "bg-[#D3D0FF] font-semibold" : ""
-        } text-black`}
-      >
-        <FontAwesomeIcon icon={icon} className="text-base" />
-        <span className="text-sm">{menu}</span>
-      </Link>
+      {onClick ? (
+        <button
+          onClick={onClick}
+          className={`flex items-center gap-2 px-4 py-3 transition w-full text-left ${
+            isActive ? "bg-[#D3D0FF] font-semibold" : ""
+          } text-black cursor-pointer`}
+        >
+          <FontAwesomeIcon icon={icon} className="text-base" />
+          <span className="text-sm">{menu}</span>
+        </button>
+      ) : (
+        <Link
+          href={url}
+          className={`flex items-center gap-2 px-4 py-3 transition ${
+            isActive ? "bg-[#D3D0FF] font-semibold" : ""
+          } text-black`}
+        >
+          <FontAwesomeIcon icon={icon} className="text-base" />
+          <span className="text-sm">{menu}</span>
+        </Link>
+      )}
     </li>
   );
 };
@@ -56,14 +68,12 @@ const MainMenuItemWrapper = ({ role }: MainMenuItemWrapperProps) => {
   return (
     <ul className={`flex flex-col gap-2`}>
       {filteredItems.map((item) => (
-        <li key={item.menu} className="text-black">
-          <MainMenuItem
-            key={item.url}
-            menu={item.menu}
-            url={item.url}
-            icon={item.icon ?? faQuestionCircle}
-          />
-        </li>
+        <MainMenuItem
+          key={item.url}
+          menu={item.menu}
+          url={item.url}
+          icon={item.icon ?? faQuestionCircle}
+        />
       ))}
     </ul>
   );
@@ -83,14 +93,12 @@ const AdminMenuItemWrapper = ({ role }: AdminMenuItemWrapperProps) => {
       <p className="text-xs font-semibold px-4 mb-1">Administrator</p>
       <ul className={`flex flex-col gap-2`}>
         {filteredItems.map((item) => (
-          <li key={item.menu} className="text-black">
-            <MainMenuItem
-              key={item.url}
-              menu={item.menu}
-              url={item.url}
-              icon={item.icon ?? faQuestionCircle}
-            />
-          </li>
+          <MainMenuItem
+            key={item.url}
+            menu={item.menu}
+            url={item.url}
+            icon={item.icon ?? faQuestionCircle}
+          />
         ))}
       </ul>
     </div>
@@ -102,22 +110,40 @@ const Sidebar = () => {
 
   const [userRole, setUserRole] = useState<Role>("admin");
 
-  const handleLogout = () => {
+  const handleNavigateToHomePage = () => {
     router.push("/");
   };
+
+  const handleLogout = async () => {
+    await auth.logout();
+    router.push("/");
+  };
+
+  useEffect(() => {
+    const user = auth.getCachedUserProfile();
+    if (user) setUserRole(user.role);
+  }, []);
 
   return (
     <aside className="w-64 bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
       <div className="h-16 flex items-center">
-        <h1 className="text-2xl font-bold uppercase px-4">Gamification</h1>
+        <h1
+          className="text-2xl font-bold uppercase px-4 cursor-pointer"
+          onClick={handleNavigateToHomePage}
+        >
+          Gamification
+        </h1>
       </div>
       <nav className="flex flex-col gap-4">
         <MainMenuItemWrapper role={userRole} />
         {userRole === "admin" && <AdminMenuItemWrapper role={userRole} />}
         <ul className="pt-4 border-t-2 border-[#BCB4FF]">
-          <li className="text-black" onClick={handleLogout}>
-            <MainMenuItem menu="Keluar" icon={faRightFromBracket} url="#" />
-          </li>
+          <MainMenuItem
+            menu="Keluar"
+            icon={faRightFromBracket}
+            url="#"
+            onClick={() => handleLogout()}
+          />
         </ul>
       </nav>
     </aside>

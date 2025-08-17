@@ -1,0 +1,83 @@
+import axios from "axios";
+// import Constants from "expo-constants";
+import { getToken, setItem } from "./storage";
+
+const BASE_URL = "http://localhost:3001/api/";
+
+export const getUrl = (url: string) => {
+  return `${BASE_URL}${url}`;
+};
+
+// Helper functions
+export const getAxios = async (url: string, props?: any) => {
+  try {
+    const token = await getToken();
+
+    const response = await axios.get(getUrl(url), {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+        // "cache-control": "no-store",
+      },
+      withCredentials: true, // wajib untuk refresh token
+      ...props,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const postAxios = async (url: string, body?: any, props?: any) => {
+  try {
+    const token = await getToken();
+    const response = await axios.post(getUrl(url), body, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: token ? `Bearer ${token}` : "" } : {}),
+        // "cache-control": "no-store",
+      },
+      withCredentials: true,
+      ...props,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Detailed POST error:", {
+      url,
+      requestBody: body,
+      errorResponse: error.response?.data,
+      errorMessage: error.message,
+    });
+
+    // Propagate the error with more context
+    const errorToThrow = new Error(
+      error.response?.data?.message || error.message || "Request failed"
+    );
+    (errorToThrow as any).status = error.response?.status;
+    throw errorToThrow;
+  }
+};
+
+export const putAxios = async (url: string, body?: any, props?: any) => {
+  try {
+    const response = await axios.put(getUrl(url), body, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: await getToken(),
+        "cache-control": "no-store",
+      },
+      ...props,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in putAxios:", error);
+    throw error;
+  }
+};
+
+export const del = async <T = any,>(url: string) => {
+  const response = await api.delete<T>(url);
+  return response.data;
+};

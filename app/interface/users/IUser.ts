@@ -13,5 +13,5 @@ export interface User {
   role: Role;
   xp: number;
   level: number;
-  created_at: string;
+  createdAt: string;
 }

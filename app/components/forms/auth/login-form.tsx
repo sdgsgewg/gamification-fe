@@ -127,8 +127,9 @@ export default function LoginForm({
             type="link"
             onClick={onForgotPasswordClick}
             className="!text-[#4F68F8]"
-            label="Lupa Password"
-          />
+          >
+            Lupa Password?
+          </Button>
         </div>
 
         <Form.Item>
@@ -138,8 +139,9 @@ export default function LoginForm({
             block
             size="large"
             variant="primary"
-            label="Masuk"
-          />
+          >
+            Masuk
+          </Button>
         </Form.Item>
 
         <Divider

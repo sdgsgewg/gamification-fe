@@ -210,8 +210,9 @@ export default function RegisterForm({ onFinish }: RegisterFormProps) {
             block
             size="large"
             variant="primary"
-            label="Daftar"
-          />
+          >
+            Daftar
+          </Button>
         </Form.Item>
 
         <Divider

@@ -7,6 +7,7 @@ import {
 } from "@/app/constants/menuItems";
 import { usePathname, useRouter } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -19,9 +20,16 @@ interface MainMenuItemProps {
   icon: IconDefinition;
   url: string;
   onClick?: () => void;
+  onCloseSidebar?: () => void;
 }
 
-const MainMenuItem = ({ menu, icon, url, onClick }: MainMenuItemProps) => {
+const MainMenuItem = ({
+  menu,
+  icon,
+  url,
+  onClick,
+  onCloseSidebar,
+}: MainMenuItemProps) => {
   const pathname = usePathname();
 
   const isActive =
@@ -29,11 +37,16 @@ const MainMenuItem = ({ menu, icon, url, onClick }: MainMenuItemProps) => {
       ? pathname === url
       : pathname === url || pathname.startsWith(url + "/");
 
+  const handleClick = () => {
+    if (onClick) onClick();
+    if (onCloseSidebar) onCloseSidebar();
+  };
+
   return (
     <li>
       {onClick ? (
         <button
-          onClick={onClick}
+          onClick={handleClick}
           className={`flex items-center gap-2 px-4 py-3 transition w-full text-left ${
             isActive ? "bg-[#D3D0FF] font-semibold" : ""
           } text-black cursor-pointer`}
@@ -44,6 +57,7 @@ const MainMenuItem = ({ menu, icon, url, onClick }: MainMenuItemProps) => {
       ) : (
         <Link
           href={url}
+          onClick={handleClick}
           className={`flex items-center gap-2 px-4 py-3 transition ${
             isActive ? "bg-[#D3D0FF] font-semibold" : ""
           } text-black`}
@@ -58,9 +72,10 @@ const MainMenuItem = ({ menu, icon, url, onClick }: MainMenuItemProps) => {
 
 interface MainMenuItemWrapperProps {
   role: Role;
+  onClose: () => void;
 }
 
-const MainMenuItemWrapper = ({ role }: MainMenuItemWrapperProps) => {
+const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
   const filteredItems = sidebarMainMenuItems.filter((item) =>
     item.roles.includes(role)
   );
@@ -73,6 +88,7 @@ const MainMenuItemWrapper = ({ role }: MainMenuItemWrapperProps) => {
           menu={item.menu}
           url={item.url}
           icon={item.icon ?? faQuestionCircle}
+          onCloseSidebar={onClose} // ✅ Tutup sidebar setelah klik menu
         />
       ))}
     </ul>
@@ -81,9 +97,10 @@ const MainMenuItemWrapper = ({ role }: MainMenuItemWrapperProps) => {
 
 interface AdminMenuItemWrapperProps {
   role: Role;
+  onClose: () => void;
 }
 
-const AdminMenuItemWrapper = ({ role }: AdminMenuItemWrapperProps) => {
+const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
   const filteredItems = sidebarAdminMenuItems.filter((item) =>
     item.roles.includes(role)
   );
@@ -98,6 +115,7 @@ const AdminMenuItemWrapper = ({ role }: AdminMenuItemWrapperProps) => {
             menu={item.menu}
             url={item.url}
             icon={item.icon ?? faQuestionCircle}
+            onCloseSidebar={onClose} // ✅ Tutup sidebar juga
           />
         ))}
       </ul>
@@ -105,7 +123,11 @@ const AdminMenuItemWrapper = ({ role }: AdminMenuItemWrapperProps) => {
   );
 };
 
-const Sidebar = () => {
+interface SidebarProps {
+  onClose: () => void;
+}
+
+const Sidebar = ({ onClose }: SidebarProps) => {
   const router = useRouter();
 
   const [userRole, setUserRole] = useState<Role>("admin");
@@ -126,23 +148,32 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
-      <div className="h-16 flex items-center">
+      <div className="h-16 flex items-center justify-between ps-4 pe-2">
         <h1
-          className="text-2xl font-bold uppercase px-4 cursor-pointer"
+          className="text-2xl font-bold uppercase cursor-pointer"
           onClick={handleNavigateToHomePage}
         >
           Gamification
         </h1>
+        <button
+          onClick={onClose}
+          className="block lg:hidden text-gray-700 hover:text-gray-900 cursor-pointer"
+        >
+          <FontAwesomeIcon icon={faXmark} className="text-xl" />
+        </button>
       </div>
       <nav className="flex flex-col gap-4">
-        <MainMenuItemWrapper role={userRole} />
-        {userRole === "admin" && <AdminMenuItemWrapper role={userRole} />}
+        <MainMenuItemWrapper role={userRole} onClose={onClose} />
+        {userRole === "admin" && (
+          <AdminMenuItemWrapper role={userRole} onClose={onClose} />
+        )}
         <ul className="pt-4 border-t-2 border-[#BCB4FF]">
           <MainMenuItem
             menu="Keluar"
             icon={faRightFromBracket}
             url="#"
             onClick={() => handleLogout()}
+            onCloseSidebar={onClose}
           />
         </ul>
       </nav>

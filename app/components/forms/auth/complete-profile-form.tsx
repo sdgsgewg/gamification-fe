@@ -215,8 +215,9 @@ export default function CompleteProfileForm({
             block
             size="large"
             variant="primary"
-            label="Submit"
-          />
+          >
+            Submit
+          </Button>
         </Form.Item>
       </div>
     </Form>

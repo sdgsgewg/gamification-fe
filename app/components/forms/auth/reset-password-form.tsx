@@ -114,8 +114,9 @@ export default function ResetPasswordForm({
             block
             size="large"
             variant="primary"
-            label="Reset Password"
-          />
+          >
+            Reset Password
+          </Button>
         </Form.Item>
       </div>
     </Form>

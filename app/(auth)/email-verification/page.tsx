@@ -1,0 +1,120 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
+import { auth } from "@/app/functions/AuthProvider";
+
+type ViewState = "prompt" | "verifying" | "success" | "error";
+
+const EmailVerificationPage = () => {
+  const [email, setEmail] = useState<string | null>(null);
+  const [view, setView] = useState<ViewState>("prompt");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const uid = searchParams.get("uid");
+  const token = searchParams.get("token");
+
+  // Load email from sessionStorage
+  useEffect(() => {
+    const storedEmail = sessionStorage.getItem("userEmail");
+    if (storedEmail) setEmail(storedEmail);
+  }, []);
+
+  // Handle token verification
+  useEffect(() => {
+    if (token) {
+      setView("verifying");
+      auth.verifyEmail(token).then((res) => {
+        if (res.ok && res.userId) {
+          router.replace(`/email-verification?uid=${res.userId}`); // clean URL
+          setView("success");
+        } else {
+          setView("error");
+        }
+      });
+    }
+  }, [token, router]);
+
+  const handleGoToGmail = () => {
+    window.open("https://mail.google.com", "_blank");
+  };
+
+  const handleContinue = () => {
+    router.push(`/complete-profile?uid=${uid}`);
+  };
+
+  const handleBack = () => {
+    setView("prompt");
+  };
+
+  const PromptView = () => {
+    return (
+      <ShowInformationSection
+        imageUrl="/img/email-verification-success.png"
+        imageAlt="Email Verification"
+        title="Verifikasi Alamat Email Anda"
+        subtitle1={
+          <p>
+            Kamu telah memasukkan <strong>{email}</strong> sebagai alamat email
+            untuk akun Anda.
+          </p>
+        }
+        subtitle2="Mohon lakukan verifikasi email dengan menekan tombol di bawah ini."
+        onButtonClick={handleGoToGmail}
+        buttonText="Verifikasi Email"
+      />
+    );
+  };
+
+  const VerifyingView = () => {
+    return (
+      <div>
+        <p className="text-center">Memverifikasi email...</p>
+      </div>
+    );
+  };
+
+  const SuccessView = () => {
+    return (
+      <ShowInformationSection
+        imageUrl="/img/email-verification-success.png"
+        imageAlt="Email Verification"
+        title="Verifikasi Berhasil"
+        subtitle1="Email Anda berhasil diverifikasi."
+        onButtonClick={handleContinue}
+        buttonText="Lanjut Isi Profil"
+      />
+    );
+  };
+
+  const ErrorView = () => {
+    return (
+      <ShowInformationSection
+        imageUrl="/img/email-verification-error.png"
+        imageAlt="Email Verification"
+        title="Verifikasi Gagal"
+        subtitle1="Link verifikasi tidak valid atau telah kedaluwarsa."
+        onButtonClick={handleBack}
+        buttonText="Kembali"
+      />
+    );
+  };
+
+  return (
+    <>
+      {view === "prompt" ? (
+        <PromptView />
+      ) : view === "verifying" ? (
+        <VerifyingView />
+      ) : view === "success" ? (
+        <SuccessView />
+      ) : (
+        <ErrorView />
+      )}
+    </>
+  );
+};
+
+export default EmailVerificationPage;

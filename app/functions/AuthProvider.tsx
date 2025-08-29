@@ -102,7 +102,6 @@ export default class AuthProvider {
     this.isLoading = true;
     try {
       const response = await postAxios(`auth/register`, values);
-
       return { ok: true, user: response.user || null };
     } catch (error: any) {
       console.error("Registration error:", error);

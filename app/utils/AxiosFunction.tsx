@@ -17,7 +17,7 @@ export const getAxios = async (url: string, props?: any) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
-        // "cache-control": "no-store",
+        "cache-control": "no-store",
       },
       withCredentials: true, // wajib untuk refresh token
       ...props,
@@ -36,7 +36,7 @@ export const postAxios = async (url: string, body?: any, props?: any) => {
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: token ? `Bearer ${token}` : "" } : {}),
-        // "cache-control": "no-store",
+        "cache-control": "no-store",
       },
       withCredentials: true,
       ...props,
@@ -68,6 +68,7 @@ export const putAxios = async (url: string, body?: any, props?: any) => {
         Authorization: await getToken(),
         "cache-control": "no-store",
       },
+      withCredentials: true,
       ...props,
     });
     return response.data;
@@ -77,7 +78,23 @@ export const putAxios = async (url: string, body?: any, props?: any) => {
   }
 };
 
-export const del = async <T = any,>(url: string) => {
-  const response = await api.delete<T>(url);
-  return response.data;
+export const deleteAxios = async <T = any,>(
+  url: string,
+  props?: any
+): Promise<T> => {
+  try {
+    const response = await axios.delete(getUrl(url), {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: await getToken(),
+        "cache-control": "no-store",
+      },
+      withCredentials: true,
+      ...props,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteAxios:", error);
+    throw error;
+  }
 };

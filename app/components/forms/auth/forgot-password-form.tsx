@@ -88,8 +88,9 @@ export default function ForgotPasswordForm({
             block
             size="large"
             variant="primary"
-            label="Lanjut"
-          />
+          >
+            Lanjut
+          </Button>
         </Form.Item>
       </div>
     </Form>

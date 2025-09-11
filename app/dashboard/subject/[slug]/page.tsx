@@ -26,7 +26,7 @@ const SubjectDetailPage = () => {
   const fetchSubjectDetail = async () => {
     setIsLoading(true);
     const res = await subjectProvider.getSubject(params.slug);
-    if (res.ok && res.data) {
+    if (res.isSuccess && res.data) {
       const s = res.data;
       setSubjectData({
         subjectId: s.subjectId,
@@ -73,11 +73,11 @@ const SubjectDetailPage = () => {
   const handleDelete = async (id: string) => {
     try {
       const res = await subjectProvider.deleteSubject(id);
-      if (res.ok) {
+      if (res.isSuccess) {
         toast.success("Mata pelajaran berhasil dihapus");
         router.push("/dashboard/subject");
       } else {
-        toast.error(res.error || "Gagal menghapus mata pelajaran");
+        toast.error(res.message || "Gagal menghapus mata pelajaran");
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

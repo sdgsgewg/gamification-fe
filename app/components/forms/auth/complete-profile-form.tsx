@@ -13,6 +13,8 @@ import { User } from "@/app/interface/users/IUser";
 import { userProvider } from "@/app/functions/UserProvider";
 import { auth } from "@/app/functions/AuthProvider";
 import Button from "../../shared/Button";
+import SelectField from "../../fields/SelectField";
+import { gradeProvider } from "@/app/functions/GradeProvider";
 
 // --- Zod Schema ---
 const completeProfileSchema = z
@@ -88,10 +90,10 @@ export default function CompleteProfileForm({
   useEffect(() => {
     const fetchGrades = async () => {
       try {
-        const data = await getAxios("grades/get-all-grades");
-        if (data) setGrades(data);
+        const res = await gradeProvider.getGrades();
+        if (res.isSuccess && res.data) setGrades(res.data);
       } catch (error) {
-        console.error("Failed to fetch users:", error);
+        console.error("Failed to fetch grades: ", error);
       }
     };
 
@@ -179,33 +181,47 @@ export default function CompleteProfileForm({
 
         {/* Grade Select Field */}
         {user?.role === "student" && (
-          <Form.Item
-            label={
-              <span className="font-medium">Kelas Berapa Kamu Saat Ini?</span>
-            }
-            validateStatus={errors.gradeId ? "error" : ""}
-            help={errors.gradeId?.message}
-            style={{ marginBottom: errors.gradeId ? "2.5rem" : "2rem" }}
-          >
-            <Controller
-              name="gradeId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  placeholder="Pilih Kelas"
-                  size="large"
-                  loading={grades.length === 0}
-                  disabled={grades.length === 0}
-                  value={field.value || undefined}
-                  options={grades.map((grade) => ({
-                    value: grade.gradeId,
-                    label: grade.name,
-                  }))}
-                />
-              )}
-            />
-          </Form.Item>
+          // <Form.Item
+          //   label={
+          //     <span className="font-medium">Kelas Berapa Kamu Saat Ini?</span>
+          //   }
+          //   validateStatus={errors.gradeId ? "error" : ""}
+          //   help={errors.gradeId?.message}
+          //   style={{ marginBottom: errors.gradeId ? "2.5rem" : "2rem" }}
+          // >
+          //   <Controller
+          //     name="gradeId"
+          //     control={control}
+          //     render={({ field }) => (
+          //       <Select
+          //         {...field}
+          //         placeholder="Pilih Kelas"
+          //         size="large"
+          //         loading={grades.length === 0}
+          //         disabled={grades.length === 0}
+          //         value={field.value || undefined}
+          //         options={grades.map((grade) => ({
+          //           value: grade.gradeId,
+          //           label: grade.name,
+          //         }))}
+          //       />
+          //     )}
+          //   />
+          // </Form.Item>
+
+          <SelectField
+            name="gradeId"
+            control={control}
+            label="Kelas Berapa Kamu Saat Ini?"
+            placeholder="Pilih Kelas"
+            options={grades.map((grade) => ({
+              value: grade.gradeId,
+              label: grade.name,
+            }))}
+            errors={errors.gradeId}
+            loading={grades.length === 0}
+            disabled={grades.length === 0}
+          />
         )}
 
         <Form.Item>

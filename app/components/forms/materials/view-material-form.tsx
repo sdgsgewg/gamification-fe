@@ -1,42 +1,45 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Form } from "antd";
 import { UploadFile } from "antd/es/upload";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Button from "../../shared/Button";
-import { useEffect, useState } from "react";
-import { Subject } from "@/app/interface/subjects/ISubject";
+import { Material } from "@/app/interface/materials/IMaterial";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
 
 // --- Zod Schema ---
-const viewSubjectSchema = z.object({
+const viewMaterialSchema = z.object({
   name: z.string().nonempty("Nama wajib diisi"),
+  subjectId: z.string().nonempty("Mata pelajaran wajib dipilih"),
   description: z.string().optional(),
+  gradeIds: z.array(z.string()).optional(),
   image: z.string().optional(),
 });
 
-export type ViewSubjectFormInputs = z.infer<typeof viewSubjectSchema>;
-interface ViewSubjectFormProps {
-  defaultValues?: Subject;
+export type ViewMaterialFormInputs = z.infer<typeof viewMaterialSchema>;
+interface ViewMaterialFormProps {
+  defaultValues?: Material;
 }
 
-export default function ViewSubjectForm({
+export default function ViewMaterialForm({
   defaultValues,
-}: ViewSubjectFormProps) {
+}: ViewMaterialFormProps) {
   const {
     control,
     formState: { errors },
     setValue,
-  } = useForm<ViewSubjectFormInputs>({
-    resolver: zodResolver(viewSubjectSchema),
+  } = useForm<ViewMaterialFormInputs>({
+    resolver: zodResolver(viewMaterialSchema),
     defaultValues: {
       name: "",
+      subjectId: "",
       description: "",
+      gradeIds: [],
       image: "",
     },
   });
@@ -65,7 +68,7 @@ export default function ViewSubjectForm({
   }, [defaultValues, setValue]);
 
   return (
-    <Form name="view-subject" layout="vertical" requiredMark={false}>
+    <Form name="view-material" layout="vertical" requiredMark={false}>
       <FormLayout
         left={
           <>

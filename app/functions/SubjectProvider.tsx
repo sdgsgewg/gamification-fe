@@ -18,7 +18,7 @@ export const subjectProvider = {
         ? `?searchText=${encodeURIComponent(searchText)}`
         : "";
       const data = await getAxios(`${API_URL}${params}`);
-      return { ok: true, data };
+      return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<Subject[]>(error);
     }
@@ -27,7 +27,7 @@ export const subjectProvider = {
   async getSubject(id: string): Promise<ApiResponse<Subject>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
-      return { ok: true, data };
+      return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<Subject>(error);
     }
@@ -38,7 +38,7 @@ export const subjectProvider = {
   ): Promise<ApiResponse<Subject>> {
     try {
       const data = await postAxios(API_URL, payload);
-      return { ok: true, data };
+      return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<Subject>(error);
     }
@@ -50,7 +50,7 @@ export const subjectProvider = {
   ): Promise<ApiResponse<Subject>> {
     try {
       const data = await putAxios(`${API_URL}/${id}`, payload);
-      return { ok: true, data };
+      return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<Subject>(error);
     }
@@ -59,7 +59,7 @@ export const subjectProvider = {
   async deleteSubject(id: string): Promise<ApiResponse<null>> {
     try {
       await deleteAxios(`${API_URL}/${id}`);
-      return { ok: true };
+      return { isSuccess: true };
     } catch (error) {
       return handleAxiosError<null>(error);
     }

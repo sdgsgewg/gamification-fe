@@ -2,7 +2,16 @@ import axios from "axios";
 // import Constants from "expo-constants";
 import { getToken, setItem } from "./storage";
 
-const BASE_URL = "http://localhost:3001/api/";
+const getBaseUrl = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    console.warn("NEXT_PUBLIC_API_URL is not defined, using default");
+    return "http://localhost:3001/api";
+  }
+  return `${apiUrl}/api`;
+};
+
+const BASE_URL = getBaseUrl();
 
 export const getUrl = (url: string) => {
   return `${BASE_URL}${url}`;

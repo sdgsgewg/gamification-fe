@@ -9,7 +9,7 @@ import {
 import { CreateMaterialFormInputs } from "../components/forms/materials/create-material-form";
 import { EditMaterialFormInputs } from "../components/forms/materials/edit-material-form";
 
-const API_URL = "materials";
+const API_URL = "/materials";
 
 export const materialProvider = {
   async getMaterials(params?: {

@@ -29,11 +29,9 @@ const MaterialPage = () => {
 
   const router = useRouter();
 
-  const fetchMaterials = async (searchText?: string, subjectId?: string) => {
+  const fetchMaterials = async (searchText?: string) => {
     setIsLoading(true);
-    const res = await materialProvider.getMaterials({ searchText, subjectId });
-
-    console.log("Data: ", JSON.stringify(res.data, null, 2));
+    const res = await materialProvider.getMaterials({ searchText });
 
     if (res.isSuccess && res.data) {
       setMaterials(

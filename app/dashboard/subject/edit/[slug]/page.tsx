@@ -7,7 +7,7 @@ import EditSubjectForm, {
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { Spin, message } from "antd";
+import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
 import { Subject } from "@/app/interface/subjects/ISubject";
 import Loading from "@/app/components/shared/Loading";
@@ -21,7 +21,7 @@ const EditSubjectPage = () => {
   const fetchSubjectDetail = async () => {
     setIsLoading(true);
     const res = await subjectProvider.getSubject(params.slug);
-    if (res.ok && res.data) {
+    if (res.isSuccess && res.data) {
       const s = res.data;
       setSubjectData({
         subjectId: s.subjectId,

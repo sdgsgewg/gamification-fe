@@ -70,7 +70,11 @@ function DataTable<T extends object>({
 
   return (
     <div className="w-full max-w-[85dvw] xs:max-w-[90dvw] sm:max-w-[90dvw] md:max-w-[92dvw] lg:max-w-[70dvw] xl:max-w-[76dvw] rounded-xl border border-gray-200 bg-white p-4 shadow-sm mx-auto">
-      {(title || searchable || extra || onRefresh) && (
+      {title && (
+        <h2 className="text-lg font-semibold text-black mb-2">{title}</h2>
+      )}
+
+      {(searchable || extra || onRefresh) && (
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Button

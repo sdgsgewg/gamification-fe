@@ -32,7 +32,7 @@ const SubjectPage = () => {
   const fetchSubjects = async (searchText?: string) => {
     setIsLoading(true);
     const res = await subjectProvider.getSubjects(searchText);
-    if (res.ok && res.data) {
+    if (res.isSuccess && res.data) {
       setSubjects(
         res.data.map((s: Subject, idx: number) => ({
           key: s.subjectId ?? idx,
@@ -85,7 +85,7 @@ const SubjectPage = () => {
       const subject = subjects.find((s) => s.subjectId === id);
 
       const res = await subjectProvider.deleteSubject(id);
-      if (res.ok) {
+      if (res.isSuccess) {
         // kalau subject punya image lama, hapus dari Supabase Storage
         if (subject?.image) {
           await imageProvider.deleteImage(subject.image, "subjects");
@@ -94,7 +94,7 @@ const SubjectPage = () => {
         toast.success("Mata pelajaran berhasil dihapus");
         fetchSubjects();
       } else {
-        toast.error(res.error || "Gagal menghapus mata pelajaran");
+        toast.error(res.message || "Gagal menghapus mata pelajaran");
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

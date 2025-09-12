@@ -109,10 +109,10 @@ const MaterialDetailPage = () => {
         <Image
           src={materialData?.image ?? ""}
           alt={materialData?.name ?? "Material"}
-          width={100}
-          height={100}
+          width={200}
+          height={200}
         />
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-4">
           <div className="flex flex-row items-center gap-2">
             <Image
               src={"/img/description.png"}
@@ -122,7 +122,7 @@ const MaterialDetailPage = () => {
             />
             <p className="text-base font-medium">Deskripsi</p>
           </div>
-          <p className="text-sm">{materialData?.description}</p>
+          <p className="text-sm text-justify">{materialData?.description}</p>
         </div>
       </div>
     );

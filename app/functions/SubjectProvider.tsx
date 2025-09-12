@@ -9,7 +9,7 @@ import {
   deleteAxios,
 } from "../utils/AxiosFunction";
 
-const API_URL = "subjects";
+const API_URL = "/subjects";
 
 export const subjectProvider = {
   async getSubjects(searchText?: string): Promise<ApiResponse<Subject[]>> {

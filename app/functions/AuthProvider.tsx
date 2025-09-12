@@ -7,6 +7,8 @@ import { RegisterFormInputs } from "../components/forms/auth/register-form";
 import { ForgotPasswordInputs } from "../components/forms/auth/forgot-password-form";
 import { CompleteProfileFormInputs } from "../components/forms/auth/complete-profile-form";
 
+const API_URL = "/auth";
+
 export const authEventTarget = new EventTarget();
 
 export default class AuthProvider {
@@ -30,7 +32,7 @@ export default class AuthProvider {
     // 🔁 Jika tidak ada token atau token tidak valid, coba refresh token
     if (!this.sessionToken || !this.isTokenValid(this.sessionToken)) {
       try {
-        const refresh = await postAxios("auth/refresh");
+        const refresh = await postAxios(`${API_URL}/refresh`);
 
         if (refresh?.accessToken) {
           this.sessionToken = refresh.accessToken;
@@ -101,7 +103,7 @@ export default class AuthProvider {
   async register(values: RegisterFormInputs) {
     this.isLoading = true;
     try {
-      const response = await postAxios(`auth/register`, values);
+      const response = await postAxios(`${API_URL}/register`, values);
       return { ok: true, user: response.user || null };
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -121,7 +123,7 @@ export default class AuthProvider {
   async verifyEmail(token: string) {
     this.isLoading = true;
     try {
-      const response = await postAxios(`auth/verify-email`, { token });
+      const response = await postAxios(`${API_URL}/register`, { token });
       return { ok: true, userId: response.userId };
     } catch (error: any) {
       console.error("Email verification error:", error);
@@ -142,7 +144,7 @@ export default class AuthProvider {
     this.isLoading = true;
     try {
       const response = await postAxios(
-        `auth/complete-profile?uid=${uid}`,
+        `${API_URL}/complete-profile?uid=${uid}`,
         values
       );
 
@@ -165,7 +167,7 @@ export default class AuthProvider {
   async login(values: LoginFormInputs) {
     this.isLoading = true;
     try {
-      const response = await postAxios(`auth/login`, values);
+      const response = await postAxios(`${API_URL}/login`, values);
 
       if (!response.accessToken) {
         throw new Error("Invalid response structure - missing access token");
@@ -200,7 +202,7 @@ export default class AuthProvider {
   async forgotPassword(values: ForgotPasswordInputs) {
     this.isLoading = true;
     try {
-      const response = await postAxios(`auth/forgot-password`, values);
+      const response = await postAxios(`${API_URL}/forgot-password`, values);
 
       return { ok: true, message: response.message };
     } catch (error: any) {
@@ -217,7 +219,7 @@ export default class AuthProvider {
   async resetPassword(token: string, password: string) {
     this.isLoading = true;
     try {
-      const response = await postAxios("auth/reset-password", {
+      const response = await postAxios(`${API_URL}/reset-password`, {
         token,
         password,
       });
@@ -236,7 +238,7 @@ export default class AuthProvider {
 
   async logout() {
     try {
-      await postAxios("auth/logout");
+      await postAxios(`${API_URL}/logout`);
     } catch (error: any) {
       console.error("Logout API error:", {
         status: error?.response?.status,
@@ -276,7 +278,7 @@ export default class AuthProvider {
 
   async getLoggedInUser() {
     try {
-      const data = await getAxios("users/get-logged-in-user");
+      const data = await getAxios("/users/get-logged-in-user");
       return data;
     } catch (error: any) {
       console.error("Failed to fetch logged-in user:", error);

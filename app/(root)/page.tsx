@@ -103,42 +103,6 @@ const HomePage: React.FC = () => {
           </table>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-indigo-900 text-white px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <h4 className="font-bold mb-3">GAMIFICATION</h4>
-            <p>Platform belajar interaktif berbasis game untuk siswa dan guru.</p>
-          </div>
-          <div>
-            <h4 className="font-bold mb-3">Navigasi</h4>
-            <ul>
-              <li>Aktivitas</li>
-              <li>Leaderboard</li>
-              <li>Masuk/Daftar</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-3">Bantuan</h4>
-            <ul>
-              <li>FAQ</li>
-              <li>Kontak Kami</li>
-              <li>Privasi</li>
-              <li>Syarat & Ketentuan</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-3">Ikuti Kami</h4>
-            <div className="flex gap-3">
-              <a href="#">IG</a>
-              <a href="#">TikTok</a>
-              <a href="#">YouTube</a>
-            </div>
-          </div>
-        </div>
-        <p className="mt-8 text-center text-gray-400 text-sm">© Copyright 2025. All rights reserved.</p>
-      </footer>
     </div>
   );
 };

@@ -42,12 +42,12 @@ const RowActions: React.FC<RowActionsProps> = ({
         </RowActionButton>
       )}
       {onEdit && (
-        <RowActionButton variant="edit" onClick={onEdit}>
+        <RowActionButton variant="warning" onClick={onEdit}>
           <FontAwesomeIcon icon={faPenToSquare} />
         </RowActionButton>
       )}
       {onDelete && (
-        <RowActionButton variant="delete" onClick={onDelete}>
+        <RowActionButton variant="danger" onClick={onDelete}>
           <FontAwesomeIcon icon={faTrashAlt} />
         </RowActionButton>
       )}

@@ -5,38 +5,29 @@ import { Form } from "antd";
 import { RcFile, UploadFile } from "antd/es/upload";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import {
+  EditMaterialFormInputs,
+  editMaterialSchema,
+} from "@/app/schemas/materials/editMaterial";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Button from "../../shared/Button";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import { auth } from "@/app/functions/AuthProvider";
-import { Material } from "@/app/interface/materials/IMaterial";
+import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
 import { imageProvider } from "@/app/functions/ImageProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
-import { Grade } from "@/app/interface/grades/IGrade";
 import SelectField from "../../fields/SelectField";
 import Loading from "../../shared/Loading";
 
-// --- Zod Schema ---
-const editMaterialSchema = z.object({
-  name: z.string().nonempty("Nama wajib diisi"),
-  subjectId: z.string().nonempty("Mata pelajaran wajib dipilih"),
-  description: z.string().optional(),
-  gradeIds: z.array(z.string()).nonempty("Tingkat kelas wajib dipilih"),
-  image: z.string().optional(),
-  updatedBy: z.string().nonempty("Pengguna wajib diisi"),
-});
-
-export type EditMaterialFormInputs = z.infer<typeof editMaterialSchema>;
-
 interface EditMaterialFormProps {
-  defaultValues?: Material;
-  subjectData: Subject[];
-  gradeData: Grade[];
+  defaultValues?: MaterialDetailResponse;
+  subjectData: SubjectOverviewResponse[];
+  gradeData: GradeOverviewResponse[];
   onFinish: (values: EditMaterialFormInputs) => void;
 }
 
@@ -130,7 +121,7 @@ export default function EditMaterialForm({
       setValue("name", defaultValues?.name || "");
       setValue("subjectId", defaultValues?.subject?.subjectId || "");
       setValue("description", defaultValues?.description || "");
-      setValue("gradeIds", defaultValues?.gradeIds || []);
+      setValue("gradeIds", defaultValues?.materialGradeIds || []);
       setValue("image", defaultValues?.image || "");
       setMaterialId(defaultValues.materialId);
       setOldImageUrl(defaultValues.image || "");
@@ -185,7 +176,7 @@ export default function EditMaterialForm({
               label="Mata Pelajaran"
               placeholder="Pilih mata pelajaran"
               options={subjectOptions}
-              errors={errors.subjectId}
+              errors={errors}
               loading={subjectOptions.length === 0}
               disabled={subjectOptions.length === 0}
               required
@@ -205,7 +196,7 @@ export default function EditMaterialForm({
               label="Tingkat Kelas"
               placeholder="Pilih tingkat kelas"
               options={gradeOptions}
-              errors={errors.gradeIds}
+              errors={errors}
               loading={gradeOptions.length === 0}
               disabled={gradeOptions.length === 0}
               mode="multiple"
@@ -221,6 +212,7 @@ export default function EditMaterialForm({
             setFileList={setFileList}
             errors={errors}
             setOldImageUrl={setOldImageUrl}
+            mode="url"
           />
         }
         bottom={

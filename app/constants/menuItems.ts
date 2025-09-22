@@ -9,6 +9,7 @@ import {
   faHome,
   faBook,
   faBookOpen,
+  faListCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { Role } from "../interface/users/IUser";
 
@@ -204,6 +205,12 @@ export const sidebarAdminMenuItems: MenuItem[] = [
     menu: "Materi",
     url: "/dashboard/material",
     icon: faBookOpen,
+    roles: ["admin"],
+  },
+  {
+    menu: "Tipe Tugas",
+    url: "/dashboard/task-type",
+    icon: faListCheck,
     roles: ["admin"],
   },
 ];

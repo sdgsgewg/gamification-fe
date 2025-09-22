@@ -2,15 +2,17 @@
 
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
+import get from "lodash.get";
 
 interface TextFieldProps {
   control: any;
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   errors?: Record<string, any>;
   required?: boolean;
   readonly?: boolean;
+  onChange?: (value: string) => void;
 }
 
 const TextField = ({
@@ -21,7 +23,10 @@ const TextField = ({
   errors,
   required,
   readonly,
+  onChange,
 }: TextFieldProps) => {
+  const error = get(errors, name);
+
   return (
     <Form.Item
       label={
@@ -35,8 +40,10 @@ const TextField = ({
             ))}
         </span>
       }
-      validateStatus={errors?.[name] ? "error" : ""}
-      help={errors?.[name]?.message}
+      name={name}
+      validateStatus={error ? "error" : ""}
+      help={error?.message}
+      style={{ marginBottom: error ? "1rem" : "0rem" }}
     >
       <Controller
         name={name}
@@ -47,6 +54,10 @@ const TextField = ({
             placeholder={placeholder}
             size="large"
             readOnly={readonly}
+            // onChange={(e) => {
+            //   field.onChange(e);
+            //   onChange?.(field.value);
+            // }}
           />
         )}
       />

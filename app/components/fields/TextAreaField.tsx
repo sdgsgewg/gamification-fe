@@ -2,6 +2,7 @@
 
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
+import get from "lodash.get";
 
 interface TextAreaFieldProps {
   control: any;
@@ -13,6 +14,7 @@ interface TextAreaFieldProps {
   readonly?: boolean;
   minRows?: number;
   maxRows?: number;
+  onChange?: (value: string) => void;
 }
 
 const TextAreaField = ({
@@ -25,7 +27,10 @@ const TextAreaField = ({
   readonly,
   minRows = 3,
   maxRows = 6,
+  onChange,
 }: TextAreaFieldProps) => {
+  const error = get(errors, name);
+
   return (
     <Form.Item
       label={
@@ -39,8 +44,10 @@ const TextAreaField = ({
             ))}
         </span>
       }
-      validateStatus={errors?.[name] ? "error" : ""}
-      help={errors?.[name]?.message}
+      name={name}
+      validateStatus={error ? "error" : ""}
+      help={error?.message}
+      style={{ marginBottom: error ? "1rem" : "0rem" }}
     >
       <Controller
         name={name}
@@ -52,6 +59,10 @@ const TextAreaField = ({
             size="large"
             autoSize={{ minRows, maxRows }}
             readOnly={readonly}
+            onChange={(e) => {
+              field.onChange(e);
+              onChange?.(e.target.value);
+            }}
           />
         )}
       />

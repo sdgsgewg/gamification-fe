@@ -42,26 +42,22 @@ const MainMenuItem = ({
     if (onCloseSidebar) onCloseSidebar();
   };
 
+  const baseClasses =
+    "bg-[#E9E8FF] flex items-center gap-2 px-4 py-3 w-full text-left text-black cursor-pointer transition duration-300 ease-in-out";
+  const activeClasses = "!bg-[#D3D0FF] font-semibold";
+  const hoverClasses = "hover:bg-[#DCD9FF] hover:font-medium";
+
+  const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
+
   return (
     <li>
       {onClick ? (
-        <button
-          onClick={handleClick}
-          className={`flex items-center gap-2 px-4 py-3 transition w-full text-left ${
-            isActive ? "bg-[#D3D0FF] font-semibold" : ""
-          } text-black cursor-pointer`}
-        >
+        <button onClick={handleClick} className={classes}>
           <FontAwesomeIcon icon={icon} className="text-base" />
           <span className="text-sm">{menu}</span>
         </button>
       ) : (
-        <Link
-          href={url}
-          onClick={handleClick}
-          className={`flex items-center gap-2 px-4 py-3 transition ${
-            isActive ? "bg-[#D3D0FF] font-semibold" : ""
-          } text-black`}
-        >
+        <Link href={url} onClick={handleClick} className={classes}>
           <FontAwesomeIcon icon={icon} className="text-base" />
           <span className="text-sm">{menu}</span>
         </Link>
@@ -147,7 +143,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   }, []);
 
   return (
-    <aside className="w-64 bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
+    <aside className="bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
       <div className="h-16 flex items-center justify-between ps-4 pe-2">
         <h1
           className="text-2xl font-bold uppercase cursor-pointer"

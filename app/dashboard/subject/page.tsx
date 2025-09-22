@@ -1,26 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { message, Modal } from "antd";
+import { message } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Subject } from "@/app/interface/subjects/ISubject";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { imageProvider } from "@/app/functions/ImageProvider";
+import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const SubjectPage = () => {
   const { toast } = useToast();
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<SubjectOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
+  const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(
+    null
+  );
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
@@ -31,10 +34,10 @@ const SubjectPage = () => {
 
   const fetchSubjects = async (searchText?: string) => {
     setIsLoading(true);
-    const res = await subjectProvider.getSubjects(searchText);
+    const res = await subjectProvider.getSubjects({ searchText });
     if (res.isSuccess && res.data) {
       setSubjects(
-        res.data.map((s: Subject, idx: number) => ({
+        res.data.map((s: SubjectOverviewResponse, idx: number) => ({
           key: s.subjectId ?? idx,
           ...s,
         }))
@@ -61,8 +64,9 @@ const SubjectPage = () => {
     router.push(`/dashboard/subject/edit/${slug}`);
   };
 
-  const showDeleteModal = (subjectId: string) => {
+  const showDeleteModal = (subjectId: string, name: string) => {
     setDeleteSubjectId(subjectId);
+    setDeleteSubjectName(name);
     setIsDeleteConfirmationModalVisible(true);
   };
 
@@ -70,27 +74,21 @@ const SubjectPage = () => {
     if (deleteSubjectId !== null) {
       handleDelete(deleteSubjectId);
       setDeleteSubjectId(null);
+      setDeleteSubjectName(null);
       setIsDeleteConfirmationModalVisible(false);
     }
   };
 
   const cancelDelete = () => {
     setDeleteSubjectId(null);
+    setDeleteSubjectName(null);
     setIsDeleteConfirmationModalVisible(false);
   };
 
   const handleDelete = async (id: string) => {
     try {
-      // Ambil dulu detail subject sebelum delete, supaya tahu image URL-nya
-      const subject = subjects.find((s) => s.subjectId === id);
-
       const res = await subjectProvider.deleteSubject(id);
       if (res.isSuccess) {
-        // kalau subject punya image lama, hapus dari Supabase Storage
-        if (subject?.image) {
-          await imageProvider.deleteImage(subject.image, "subjects");
-        }
-
         toast.success("Mata pelajaran berhasil dihapus");
         fetchSubjects();
       } else {
@@ -100,20 +98,20 @@ const SubjectPage = () => {
       if (err instanceof Error) {
         toast.error(err.message);
       } else {
-        toast.error("Terjadi kesalahan saat menghapus");
+        toast.error("Terjadi kesalahan saat menghapus mata pelajaran");
       }
     }
   };
 
   // Kolom tabel
-  const columns: ColumnType<Subject>[] = [
+  const columns: ColumnType<SubjectOverviewResponse>[] = [
     {
       title: "No",
       key: "index",
       width: 50,
       align: "center",
       fixed: "left",
-      render: (_: unknown, __: Subject, index: number) =>
+      render: (_: unknown, __: SubjectOverviewResponse, index: number) =>
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
@@ -133,7 +131,7 @@ const SubjectPage = () => {
         <RowActions
           onView={() => handleView(record.slug)}
           onEdit={() => handleEdit(record.slug)}
-          onDelete={() => showDeleteModal(record.subjectId)}
+          onDelete={() => showDeleteModal(record.subjectId, record.name)}
         />
       ),
     },
@@ -163,17 +161,12 @@ const SubjectPage = () => {
         onRefresh={() => fetchSubjects()}
       />
 
-      <Modal
-        title="Konfirmasi Penghapusan"
+      <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        onOk={confirmDeleteSubject}
+        modalText={`Apakah kamu yakin ingin menghapus mata pelajaran dengan nama '${deleteSubjectName}'?`}
+        onConfirm={confirmDeleteSubject}
         onCancel={cancelDelete}
-        okText="Iya"
-        cancelText="Tidak"
-        okButtonProps={{ danger: true }}
-      >
-        <p>Apakah kamu yakin ingin menghapus mata pelajaran ini?</p>
-      </Modal>
+      />
     </>
   );
 };

@@ -25,7 +25,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Tambahkan ke file CSS global Anda */
 .ant-table-wrapper .ant-table {
   min-width: 100%;
 }
@@ -35,22 +34,42 @@ body {
 }
 
 /* ===== Custom scrollbar style ===== */
+/* Global scrollbar */
 ::-webkit-scrollbar {
   height: 8px;
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9; /* slate-100 */
+  background: #f1f5f9;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* slate-300 */
+  background: #cbd5e1;
   border-radius: 8px;
   transition: background 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8; /* slate-400 */
+}
+
+/* Thin scrollbar */
+.custom-thin-scrollbar::-webkit-scrollbar {
+  width: 6px; /* perkecil lebar */
+}
+
+.custom-thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* transparan biar gak ganggu */
+}
+
+.custom-thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px; /* bikin bulat */
+}
+
+.custom-thin-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }

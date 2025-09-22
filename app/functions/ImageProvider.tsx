@@ -13,7 +13,7 @@ export const imageProvider = {
     }
   },
 
-  async uploadImage(file: RcFile, bucket = "subjects"): Promise<string> {
+  async uploadImage(file: RcFile, bucket: string): Promise<string> {
     const uniqueId = crypto.randomUUID(); // bikin UUID
     const ext = file.name.split(".").pop(); // ambil ekstensi file
     const fileName = `${uniqueId}.${ext}`;
@@ -31,7 +31,7 @@ export const imageProvider = {
     return publicData.publicUrl;
   },
 
-  async deleteImage(publicUrl: string, bucket = "subjects"): Promise<void> {
+  async deleteImage(publicUrl: string, bucket: string): Promise<void> {
     try {
       const filePath = imageProvider.getFilePathFromPublicUrl(
         publicUrl,

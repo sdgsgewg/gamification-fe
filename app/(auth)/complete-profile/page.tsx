@@ -7,8 +7,6 @@ import CompleteProfileForm, {
 } from "@/app/components/forms/auth/complete-profile-form";
 import FormLayout from "../form-layout";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
-import { userProvider } from "@/app/functions/UserProvider";
-import { User } from "@/app/interface/users/IUser";
 
 type ViewState = "form" | "success" | "error";
 

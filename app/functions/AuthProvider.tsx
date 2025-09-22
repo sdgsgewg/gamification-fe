@@ -71,7 +71,9 @@ export default class AuthProvider {
   getUserProfile() {
     const user = getItem(this.userProfileKey);
     if (user) {
-      this.userProfile = JSON.parse(user);
+      const parsed = JSON.parse(user);
+      const { user_id, ...rest } = parsed;
+      this.userProfile = { userId: user_id, ...rest };
     }
   }
 
@@ -269,8 +271,13 @@ export default class AuthProvider {
     if (this.userProfile) return this.userProfile;
 
     const cached = getItem(this.userProfileKey);
+
     if (cached) {
-      this.userProfile = JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+
+      const { user_id, ...rest } = parsed;
+      this.userProfile = { userId: user_id, ...rest };
+
       return this.userProfile;
     }
     return null;

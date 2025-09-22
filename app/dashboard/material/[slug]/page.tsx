@@ -3,23 +3,32 @@
 import React, { useEffect, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { message, Modal } from "antd";
+import { message } from "antd";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
-import { Material } from "@/app/interface/materials/IMaterial";
+import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
 import Loading from "@/app/components/shared/Loading";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
 import Image from "next/image";
+import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
-  DetailPageTableContent,
-  DetailPageTableHeader,
-} from "@/app/components/pages/Dashboard/DetailPageTable";
+  GradeRow,
+  SubjectRow,
+} from "@/app/components/shared/table/detail-page/TableRowData";
+import {
+  DetailInformationTable,
+  HistoryTable,
+} from "@/app/components/shared/table/detail-page/TableTemplate";
 
 const MaterialDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [materialData, setMaterialData] = useState<Material | null>(null);
+  const [materialData, setMaterialData] =
+    useState<MaterialDetailResponse | null>(null);
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
+  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
+    null
+  );
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
@@ -38,12 +47,14 @@ const MaterialDetailPage = () => {
         setMaterialData({
           materialId: m.materialId,
           name: m.name,
-          slug: m.slug || "",
-          description: m.description || "",
-          image: m.image || "",
-          subject: m.subject || { subjectId: "", name: "" },
-          gradeIds: m.gradeIds || [],
-          grade: m.grade || "",
+          slug: m.slug,
+          description: m.description ?? "",
+          image: m.image ?? "",
+          subject: m.subject ?? { subjectId: "", name: "" },
+          materialGradeIds: m.materialGradeIds ?? [],
+          materialGrade: m.materialGrade ?? "-",
+          createdBy: m.createdBy,
+          updatedBy: m.updatedBy ?? "-",
         });
       } else {
         message.error("Gagal memuat detail materi");
@@ -66,8 +77,9 @@ const MaterialDetailPage = () => {
     router.push(`/dashboard/material/edit/${slug}`);
   };
 
-  const showDeleteModal = (materialId: string) => {
+  const showDeleteModal = (materialId: string, name: string) => {
     setDeleteMaterialId(materialId);
+    setDeleteMaterialName(name);
     setIsDeleteConfirmationModalVisible(true);
   };
 
@@ -75,12 +87,14 @@ const MaterialDetailPage = () => {
     if (deleteMaterialId !== null) {
       handleDelete(deleteMaterialId);
       setDeleteMaterialId(null);
+      setDeleteMaterialName(null);
       setIsDeleteConfirmationModalVisible(false);
     }
   };
 
   const cancelDelete = () => {
     setDeleteMaterialId(null);
+    setDeleteMaterialName(null);
     setIsDeleteConfirmationModalVisible(false);
   };
 
@@ -88,27 +102,31 @@ const MaterialDetailPage = () => {
     try {
       const res = await materialProvider.deleteMaterial(id);
       if (res.isSuccess) {
-        toast.success("Materi berhasil dihapus");
+        toast.success("Materi pelajaran berhasil dihapus");
         router.push("/dashboard/material");
       } else {
-        toast.error(res.message || "Gagal menghapus materi");
+        toast.error(res.message ?? "Gagal menghapus materi pelajaran");
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error(err.message);
       } else {
-        toast.error("Terjadi kesalahan saat menghapus");
+        toast.error("Terjadi kesalahan saat menghapus materi pelajaran");
       }
     }
   };
 
+  if (isLoading || !materialData) {
+    return <Loading />;
+  }
+
   const LeftSideContent = () => {
     return (
       <div className="flex flex-col gap-4 text-black">
-        <h2 className="text-2xl font-semibold">{materialData?.name}</h2>
+        <h2 className="text-2xl font-semibold">{materialData.name}</h2>
         <Image
-          src={materialData?.image ?? ""}
-          alt={materialData?.name ?? "Material"}
+          src={materialData.image ?? ""}
+          alt={materialData.name}
           width={200}
           height={200}
         />
@@ -122,7 +140,7 @@ const MaterialDetailPage = () => {
             />
             <p className="text-base font-medium">Deskripsi</p>
           </div>
-          <p className="text-sm text-justify">{materialData?.description}</p>
+          <p className="text-sm text-justify">{materialData.description}</p>
         </div>
       </div>
     );
@@ -130,42 +148,34 @@ const MaterialDetailPage = () => {
 
   const RightSideContent = () => {
     return (
-      <div className="rounded-md border border-[#BCB4FF] overflow-hidden">
-        {/* Header */}
-        <DetailPageTableHeader
-          imageSrc="/img/detail-information.png"
-          imageAlt="Detail Information"
-          label="Informasi Detail"
-        />
+      <>
+        {/* Informasi Detail */}
+        <DetailInformationTable>
+          <SubjectRow value={materialData.subject.name} />
+          <GradeRow value={materialData.materialGrade ?? ""} />
+        </DetailInformationTable>
 
-        {/* Isi */}
-        <DetailPageTableContent
-          imageSrc="/img/subject.png"
-          imageAlt="Mata Pelajaran"
-          label="Mata Pelajaran"
-          value={materialData?.subject?.name || ""}
+        {/* Riwayat */}
+        <HistoryTable
+          createdBy={materialData.createdBy}
+          updatedBy={materialData.updatedBy}
         />
-        <DetailPageTableContent
-          imageSrc="/img/class.png"
-          imageAlt="Tingkatan Kelas"
-          label="Ditujukan Untuk Kelas"
-          value={materialData?.grade || ""}
-        />
-      </div>
+      </>
     );
   };
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <>
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}
-        onEdit={() => handleEdit(materialData?.slug || "")}
-        onDelete={() => showDeleteModal(materialData?.materialId || "")}
+        onEdit={() => {
+          if (materialData) handleEdit(materialData.slug);
+        }}
+        onDelete={() => {
+          if (materialData)
+            showDeleteModal(materialData.materialId, materialData.name);
+        }}
       />
       {materialData && (
         <DetailPageWrapper
@@ -174,17 +184,12 @@ const MaterialDetailPage = () => {
         />
       )}
 
-      <Modal
-        title="Konfirmasi Penghapusan"
+      <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        onOk={confirmDeleteMaterial}
+        modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
+        onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
-        okText="Iya"
-        cancelText="Tidak"
-        okButtonProps={{ danger: true }}
-      >
-        <p>Apakah kamu yakin ingin menghapus materi ini?</p>
-      </Modal>
+      />
     </>
   );
 };

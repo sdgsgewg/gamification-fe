@@ -1,26 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { message, Modal } from "antd";
+import { message } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Material } from "@/app/interface/materials/IMaterial";
+import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { imageProvider } from "@/app/functions/ImageProvider";
 import { materialProvider } from "@/app/functions/MaterialProvider";
+import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const MaterialPage = () => {
   const { toast } = useToast();
-  const [materials, setMaterials] = useState<Material[]>([]);
+  const [materials, setMaterials] = useState<MaterialOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
+  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
+    null
+  );
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
@@ -32,10 +35,10 @@ const MaterialPage = () => {
   const fetchMaterials = async (searchText?: string) => {
     setIsLoading(true);
     const res = await materialProvider.getMaterials({ searchText });
-
+ 
     if (res.isSuccess && res.data) {
       setMaterials(
-        res.data.map((m: Material, idx: number) => ({
+        res.data.map((m: MaterialOverviewResponse, idx: number) => ({
           key: m.materialId ?? idx,
           ...m,
         }))
@@ -62,8 +65,9 @@ const MaterialPage = () => {
     router.push(`/dashboard/material/edit/${slug}`);
   };
 
-  const showDeleteModal = (materialId: string) => {
+  const showDeleteModal = (materialId: string, name: string) => {
     setDeleteMaterialId(materialId);
+    setDeleteMaterialName(name);
     setIsDeleteConfirmationModalVisible(true);
   };
 
@@ -71,27 +75,21 @@ const MaterialPage = () => {
     if (deleteMaterialId !== null) {
       handleDelete(deleteMaterialId);
       setDeleteMaterialId(null);
+      setDeleteMaterialName(null);
       setIsDeleteConfirmationModalVisible(false);
     }
   };
 
   const cancelDelete = () => {
     setDeleteMaterialId(null);
+    setDeleteMaterialName(null);
     setIsDeleteConfirmationModalVisible(false);
   };
 
   const handleDelete = async (id: string) => {
     try {
-      // Ambil dulu detail materi sebelum delete, supaya tahu image URL-nya
-      const material = materials.find((s) => s.materialId === id);
-
       const res = await materialProvider.deleteMaterial(id);
       if (res.isSuccess) {
-        // kalau material punya image lama, hapus dari Supabase Storage
-        if (material?.image) {
-          await imageProvider.deleteImage(material.image, "materials");
-        }
-
         toast.success("Materi berhasil dihapus");
         fetchMaterials();
       } else {
@@ -101,20 +99,20 @@ const MaterialPage = () => {
       if (err instanceof Error) {
         toast.error(err.message);
       } else {
-        toast.error("Terjadi kesalahan saat menghapus");
+        toast.error("Terjadi kesalahan saat menghapus materi");
       }
     }
   };
 
   // Kolom tabel
-  const columns: ColumnType<Material>[] = [
+  const columns: ColumnType<MaterialOverviewResponse>[] = [
     {
       title: "No",
       key: "index",
       width: 50,
       align: "center",
       fixed: "left",
-      render: (_: unknown, __: Material, index: number) =>
+      render: (_: unknown, __: MaterialOverviewResponse, index: number) =>
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
@@ -130,7 +128,7 @@ const MaterialPage = () => {
       title: "Mata Pelajaran",
       key: "subject",
       width: 300,
-      render: (_, record) => record.subject?.name || "-",
+      render: (_, record) => record.subject || "-",
       onCell: () => ({
         style: { minWidth: 300 },
       }),
@@ -139,7 +137,7 @@ const MaterialPage = () => {
       title: "Kelas",
       key: "grade",
       width: 200,
-      render: (_, record) => record.grade || "-",
+      render: (_, record) => record.materialGrade || "-",
       onCell: () => ({
         style: { minWidth: 300 },
       }),
@@ -152,7 +150,7 @@ const MaterialPage = () => {
         <RowActions
           onView={() => handleView(record.slug)}
           onEdit={() => handleEdit(record.slug)}
-          onDelete={() => showDeleteModal(record.materialId)}
+          onDelete={() => showDeleteModal(record.materialId, record.name)}
         />
       ),
     },
@@ -182,17 +180,12 @@ const MaterialPage = () => {
         onRefresh={() => fetchMaterials()}
       />
 
-      <Modal
-        title="Konfirmasi Penghapusan"
+      <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        onOk={confirmDeleteMaterial}
+        modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
+        onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
-        okText="Iya"
-        cancelText="Tidak"
-        okButtonProps={{ danger: true }}
-      >
-        <p>Apakah kamu yakin ingin menghapus materi pelajaran ini?</p>
-      </Modal>
+      />
     </>
   );
 };

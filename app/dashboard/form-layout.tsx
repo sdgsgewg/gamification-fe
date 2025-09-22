@@ -11,10 +11,10 @@ interface FormLayoutProps {
 
 export default function FormLayout({ left, right, bottom }: FormLayoutProps) {
   return (
-    <div className="w-full space-y-0 md:space-y-8">
-      <div className="w-full flex flex-col md:flex-row gap-0 md:gap-12 xl:gap-20">
-        <div className="md:w-3/5 space-y-8">{left}</div>
-        <div className="md:w-2/5 space-y-8">{right}</div>
+    <div className="w-full space-y-0 md:space-y-12">
+      <div className="w-full flex flex-col md:flex-row gap-10 md:gap-12 xl:gap-20">
+        <div className="md:w-3/5 flex flex-col gap-10">{left}</div>
+        <div className="md:w-2/5 flex flex-col gap-10">{right}</div>
       </div>
 
       {bottom && (

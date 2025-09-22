@@ -11,6 +11,7 @@ import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
 interface DashboardTitleProps {
   title?: string;
   showBackButton?: boolean;
+  onBack?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   onShare?: () => void;
@@ -19,6 +20,7 @@ interface DashboardTitleProps {
 const DashboardTitle = ({
   title,
   showBackButton,
+  onBack,
   onEdit,
   onDelete,
   onShare,
@@ -26,13 +28,17 @@ const DashboardTitle = ({
   const router = useRouter();
 
   const handleBack = () => {
+    if (onBack) {
+      onBack();
+      return;
+    }
     router.back();
   };
 
   return (
     <div className="flex items-center justify-between pb-2 border-b-1 border-b-black">
       <div className="flex items-center gap-4">
-        {showBackButton && (
+        {(showBackButton || onBack) && (
           <Button
             type="primary"
             size="middle"
@@ -44,7 +50,7 @@ const DashboardTitle = ({
           </Button>
         )}
         {onEdit && (
-          <Button type="primary" size="middle" variant="edit" onClick={onEdit}>
+          <Button type="primary" size="middle" variant="warning" onClick={onEdit}>
             <FontAwesomeIcon icon={faPenToSquare} className="mr-1" />
             <span className="text-base font-semibold">Edit</span>
           </Button>
@@ -53,7 +59,7 @@ const DashboardTitle = ({
           <Button
             type="primary"
             size="middle"
-            variant="delete"
+            variant="danger"
             onClick={onDelete}
           >
             <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />

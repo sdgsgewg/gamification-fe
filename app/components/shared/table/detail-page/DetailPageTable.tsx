@@ -29,7 +29,7 @@ interface DetailPageTableContentProps {
   imageSrc: string;
   imageAlt: string;
   label: string;
-  value: string;
+  value?: string | null;
 }
 
 export const DetailPageTableContent = ({
@@ -52,7 +52,9 @@ export const DetailPageTableContent = ({
       {/* Label & Value */}
       <div className="grid grid-cols-2 w-full">
         <p className="text-base font-medium">{label}</p>
-        <p className="text-base font-normal">{value}</p>
+        <p className="text-base font-normal">
+          {value && value.trim() !== "" ? value : "-"}
+        </p>
       </div>
     </div>
   );

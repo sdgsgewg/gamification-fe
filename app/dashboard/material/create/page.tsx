@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Subject } from "@/app/interface/subjects/ISubject";
-import { Grade } from "@/app/interface/grades/IGrade";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
 import CreateMaterialForm, {
@@ -14,8 +14,8 @@ import CreateMaterialForm, {
 
 const CreateMaterialPage = () => {
   const router = useRouter();
-  const [subjectData, setSubjectData] = useState<Subject[]>([]);
-  const [gradeData, setGradeData] = useState<Grade[]>([]);
+  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
 
   const fetchSubjects = async () => {
     try {

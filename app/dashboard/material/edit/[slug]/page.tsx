@@ -1,27 +1,27 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import EditMaterialForm, {
-  EditMaterialFormInputs,
-} from "@/app/components/forms/materials/edit-material-form";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
+import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Material } from "@/app/interface/materials/IMaterial";
 import Loading from "@/app/components/shared/Loading";
 import { gradeProvider } from "@/app/functions/GradeProvider";
-import { Grade } from "@/app/interface/grades/IGrade";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
+import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
+import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
 
 const EditMaterialPage = () => {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
-  const [materialData, setMaterialData] = useState<Material | null>(null);
-  const [subjectData, setSubjectData] = useState<Subject[]>([]);
-  const [gradeData, setGradeData] = useState<Grade[]>([]);
+  const [materialData, setMaterialData] =
+    useState<MaterialDetailResponse | null>(null);
+  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchMaterialDetail = async () => {
@@ -34,12 +34,13 @@ const EditMaterialPage = () => {
         setMaterialData({
           materialId: m.materialId,
           name: m.name,
-          slug: m.slug || "",
-          description: m.description || "",
-          image: m.image || "",
-          updatedBy: "", // akan diisi otomatis dari useEffect di form
+          slug: m.slug,
+          description: m.description ?? "",
+          image: m.image,
           subject: m.subject || { subjectId: "", name: "" },
-          gradeIds: m.gradeIds || [],
+          materialGradeIds: m.materialGradeIds,
+          materialGrade: m.materialGrade,
+          updatedBy: "",
         });
       } else {
         message.error("Gagal memuat detail materi");

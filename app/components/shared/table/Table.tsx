@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Table as AntdTable, Input, TableProps } from "antd";
 import {
+  FilterOutlined,
   PlusCircleOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -25,6 +26,7 @@ type DataTableProps<T extends object> = {
   searchable?: boolean;
   searchPlaceholder?: string;
   onSearch?: (value: string) => void;
+  onOpenFilter?: () => void;
   onRefresh?: () => void;
 };
 
@@ -44,6 +46,7 @@ function DataTable<T extends object>({
   searchable = false,
   searchPlaceholder = "Search…",
   onSearch,
+  onOpenFilter,
   onRefresh,
 }: DataTableProps<T>) {
   const [query, setQuery] = useState("");
@@ -97,7 +100,7 @@ function DataTable<T extends object>({
           </div>
 
           <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
-            {searchable && (
+            {onSearch && (
               <Input
                 allowClear
                 value={query}
@@ -106,6 +109,15 @@ function DataTable<T extends object>({
                 prefix={<SearchOutlined />}
                 className="sm:w-64"
               />
+            )}
+            {onOpenFilter && (
+              <Button
+                icon={<FilterOutlined />}
+                onClick={onOpenFilter} // <- callback ke parent
+                className="border"
+              >
+                {""}
+              </Button>
             )}
           </div>
         </div>

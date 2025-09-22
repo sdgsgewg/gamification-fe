@@ -4,8 +4,11 @@ import { Form } from "antd";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import {
+  CreateMaterialFormInputs,
+  createMaterialSchema,
+} from "@/app/schemas/materials/createMaterial";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Button from "../../shared/Button";
 import { useEffect, useState } from "react";
 import { auth } from "@/app/functions/AuthProvider";
@@ -14,27 +17,15 @@ import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
 import { imageProvider } from "@/app/functions/ImageProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
-import { Grade } from "@/app/interface/grades/IGrade";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import Loading from "../../shared/Loading";
 import SelectField from "../../fields/SelectField";
-
-// --- Zod Schema ---
-const createMaterialSchema = z.object({
-  name: z.string().nonempty("Nama wajib diisi"),
-  subjectId: z.string().nonempty("Mata pelajaran wajib dipilih"),
-  description: z.string().optional(),
-  gradeIds: z.array(z.string()).nonempty("Tingkat kelas wajib dipilih"),
-  image: z.string().optional(),
-  createdBy: z.string().nonempty("Pengguna wajib diisi"),
-});
-
-export type CreateMaterialFormInputs = z.infer<typeof createMaterialSchema>;
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 
 interface CreateMaterialFormProps {
-  subjectData: Subject[];
-  gradeData: Grade[];
+  subjectData: SubjectOverviewResponse[];
+  gradeData: GradeOverviewResponse[];
   onFinish: (values: CreateMaterialFormInputs) => void;
 }
 
@@ -146,7 +137,7 @@ export default function CreateMaterialForm({
               label="Mata Pelajaran"
               placeholder="Pilih mata pelajaran"
               options={subjectOptions}
-              errors={errors.subjectId}
+              errors={errors}
               loading={subjectOptions.length === 0}
               disabled={subjectOptions.length === 0}
               required
@@ -166,7 +157,7 @@ export default function CreateMaterialForm({
               label="Tingkat Kelas"
               placeholder="Pilih tingkat kelas"
               options={gradeOptions}
-              errors={errors.gradeIds}
+              errors={errors}
               loading={gradeOptions.length === 0}
               disabled={gradeOptions.length === 0}
               mode="multiple"
@@ -181,6 +172,7 @@ export default function CreateMaterialForm({
             fileList={fileList}
             setFileList={setFileList}
             errors={errors}
+            mode="url"
           />
         }
         bottom={

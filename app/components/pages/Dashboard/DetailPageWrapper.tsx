@@ -1,5 +1,6 @@
 "use client";
 
+import { Divider } from "antd";
 import React from "react";
 
 interface DetailPageWrapperProps {
@@ -19,7 +20,12 @@ export default function DetailPageWrapper({
         <div className="md:w-2/5 space-y-8">{left}</div>
         <div className="md:w-3/5 space-y-8">{right}</div>
       </div>
-      {bottom && <div>{bottom}</div>}
+      {bottom && (
+        <div>
+          <Divider className="!border-black !my-12" />
+          {bottom}
+        </div>
+      )}
     </div>
   );
 }

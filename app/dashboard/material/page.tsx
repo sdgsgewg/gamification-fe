@@ -136,10 +136,10 @@ const MaterialPage = () => {
     {
       title: "Kelas",
       key: "grade",
-      width: 200,
+      width: 150,
       render: (_, record) => record.materialGrade || "-",
       onCell: () => ({
-        style: { minWidth: 300 },
+        style: { minWidth: 150 },
       }),
     },
     {

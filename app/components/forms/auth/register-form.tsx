@@ -48,8 +48,6 @@ export default function RegisterForm({
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    console.log("Submit register data: ", JSON.stringify(data, null, 2));
-
     setIsLoading(true);
 
     // Kirim hanya field yang dibutuhkan BE

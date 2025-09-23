@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { getItem, setItem, clearStorage, removeItem } from "../utils/storage";
+import { getItem, setItem, clearStorage } from "../utils/storage";
 import { getAxios, postAxios } from "../utils/AxiosFunction";
 import { jwtDecode } from "jwt-decode";
 import { RegisterRequest } from "../schemas/auth/register";
@@ -58,6 +58,8 @@ export default class AuthProvider {
         });
       }
     } else {
+      console.log("Fetch user profile...");
+
       await this.fetchUserProfile(); // token valid → fetch user
     }
   }
@@ -211,35 +213,7 @@ export default class AuthProvider {
   }
 
   async logout(): Promise<ApiResponse<null>> {
-    console.log("Masuk auth provider...");
     try {
-      console.log("Masuk try block...");
-
-      // Simulasi call API logout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("API logout selesai");
-
-      return {
-        isSuccess: true,
-        message: "Logout berhasil",
-        data: null,
-      };
-    } catch (error) {
-      console.log("Masuk catch block...");
-      return handleAxiosError<null>(error);
-    } finally {
-      console.log("Masuk finally block...");
-
-      // Clear storage
-      setItem(this.sessionTokenKey, "");
-      setItem(this.isLoggedInKey, JSON.stringify(false));
-      setItem(this.userProfileKey, JSON.stringify(null));
-
-      removeItem(this.sessionTokenKey);
-      removeItem(this.isLoggedInKey);
-      removeItem(this.userProfileKey);
-
       clearStorage();
 
       this.sessionToken = "";
@@ -247,6 +221,12 @@ export default class AuthProvider {
       this.userProfile = null;
 
       authEventTarget.dispatchEvent(new Event("authChanged"));
+
+      const res: BaseResponseDto = await postAxios(`${API_URL}/logout`);
+
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   }
 

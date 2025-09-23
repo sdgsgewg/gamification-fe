@@ -11,8 +11,8 @@ import {
 import {
   footerHelpMenuItems,
   footerMainMenuItems,
-  Role,
 } from "@/app/constants/menuItems";
+import { Role } from "@/app/enums/Role";
 
 const AboutSection = () => {
   return (
@@ -111,7 +111,7 @@ const CopyrightSection = () => {
 };
 
 const Footer = () => {
-  const [userRole, setUserRole] = useState<Role>("guest");
+  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
 
   return (
     <footer className="bg-[#556FD7] px-6 py-8 mt-auto">

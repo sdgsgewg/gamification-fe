@@ -1,37 +1,39 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import EditSubjectForm, {
-  EditSubjectFormRef,
-} from "@/app/components/forms/subjects/edit-subject-form";
+import EditSubjectForm from "@/app/components/forms/subjects/edit-subject-form";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import { EditSubjectFormInputs } from "@/app/schemas/subjects/editSubject";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { removeItem } from "@/app/utils/storage";
 import { getImageSrc } from "@/app/utils/image";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 const EditSubjectPage = () => {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
-  const [isLoading, setIsLoading] = useState(true);
   const [subjectData, setSubjectData] = useState<EditSubjectFormInputs | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
 
-  const formRef = useRef<EditSubjectFormRef>(null);
+  const formRef = useRef<FormRef>(null);
 
   const fetchSubjectDetail = async () => {
     setIsLoading(true);
+
     const res = await subjectProvider.getSubject(params.slug);
-    if (res.isSuccess && res.data) {
-      const s = res.data;
+
+    const { isSuccess, message, data } = res;
+
+    if (isSuccess && data) {
+      const s = data;
       setSubjectData({
         subjectId: s.subjectId,
         name: s.name,
@@ -41,16 +43,15 @@ const EditSubjectPage = () => {
         imageFile: null,
       });
     } else {
-      message.error("Gagal memuat detail mata pelajaran");
+      console.error(message ?? "Gagal memuat detail mata pelajaran");
       router.push("/dashboard/subject");
     }
+
     setIsLoading(false);
   };
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
-
-    console.log("Is dirty status: ", isDirty);
 
     if (!isDirty) {
       router.push("/dashboard/subject");
@@ -87,8 +88,8 @@ const EditSubjectPage = () => {
       {subjectData && (
         <EditSubjectForm
           ref={formRef}
-          onFinish={handleEditSubjectSuccess}
           subjectData={subjectData}
+          onFinish={handleEditSubjectSuccess}
         />
       )}
 

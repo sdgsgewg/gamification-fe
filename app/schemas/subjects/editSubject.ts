@@ -17,5 +17,5 @@ export const editSubjectDefaultValues: EditSubjectFormInputs = {
   description: "",
   updatedBy: "",
   image: "",
-  imageFile: "",
+  imageFile: null,
 };

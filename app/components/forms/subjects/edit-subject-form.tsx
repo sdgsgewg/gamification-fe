@@ -26,17 +26,14 @@ import {
   useInitializeForm,
 } from "@/app/utils/form";
 import Loading from "../../shared/Loading";
-
-export interface EditSubjectFormRef {
-  isDirty: boolean;
-}
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 interface EditSubjectFormProps {
   subjectData?: EditSubjectFormInputs;
   onFinish: (values: EditSubjectFormInputs) => void;
 }
 
-const EditSubjectForm = forwardRef<EditSubjectFormRef, EditSubjectFormProps>(
+const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
   ({ subjectData, onFinish }, ref) => {
     const { toast } = useToast();
 
@@ -62,6 +59,18 @@ const EditSubjectForm = forwardRef<EditSubjectFormRef, EditSubjectFormProps>(
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    useInitializeForm<EditSubjectFormInputs>(reset, subjectData, (d) => ({
+      ...d,
+      updatedBy: auth.getCachedUserProfile()?.name,
+    }));
+    useInitializeFileList(subjectData, setFileList);
+    useAutoSaveDraft(watchedValues, "subjectDraft");
+    const isDirty = useDirtyCheckWithDefaults(
+      watchedValues,
+      subjectData || editSubjectDefaultValues,
+      ["updatedBy"]
+    );
+
     // Handler untuk perubahan upload
     const handleImageChange = (info: any) => {
       let fileList = [...info.fileList];
@@ -84,55 +93,35 @@ const EditSubjectForm = forwardRef<EditSubjectFormRef, EditSubjectFormProps>(
     };
 
     const onSubmit = async (data: EditSubjectFormInputs) => {
-      if (!subjectData) return;
+      if (!subjectData || !subjectData.subjectId) return;
 
       const subjectId = subjectData.subjectId;
 
-      if (!subjectId) return;
-
       setIsLoading(true);
 
-      try {
-        const formData = new FormData();
-        formData.append("data", JSON.stringify(data));
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
 
-        // Append file images
-        if (data.imageFile instanceof File) {
-          formData.append("imageFile", data.imageFile);
-        }
-
-        const result = await subjectProvider.updateSubject(subjectId, formData);
-
-        if (result.isSuccess) {
-          toast.success("Mata pelajaran berhasil diperbarui!");
-          removeItem("subjectDraft");
-          onFinish(data);
-          setFileList([]); // reset preview
-        } else {
-          toast.error(result.message || "Pembaruan mata pelajaran gagal.");
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          toast.error(err.message);
-        } else {
-          toast.error("Gagal memperbarui mata pelajaran.");
-        }
-      } finally {
-        setIsLoading(false);
+      // Append file images
+      if (data.imageFile instanceof File) {
+        formData.append("imageFile", data.imageFile);
       }
-    };
 
-    useInitializeForm<EditSubjectFormInputs>(reset, subjectData, (d) => ({
-      ...d,
-      updatedBy: auth.getCachedUserProfile()?.name,
-    }));
-    useInitializeFileList(subjectData, setFileList);
-    useAutoSaveDraft(watchedValues, "subjectDraft");
-    const isDirty = useDirtyCheckWithDefaults(
-      watchedValues,
-      subjectData || editSubjectDefaultValues,
-      ["updatedBy"]
-    );
+      const result = await subjectProvider.updateSubject(subjectId, formData);
+
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Mata pelajaran berhasil diperbarui!");
+        removeItem("subjectDraft");
+        onFinish(data);
+        setFileList([]);
+      } else {
+        toast.error(message ?? "Pembaruan mata pelajaran gagal.");
+      }
+
+      setIsLoading(false);
+    };
 
     // Expose ke parent
     useImperativeHandle(ref, () => ({
@@ -178,7 +167,7 @@ const EditSubjectForm = forwardRef<EditSubjectFormRef, EditSubjectFormProps>(
                 label="Upload Gambar"
                 fileList={fileList}
                 setFileList={setFileList}
-                onChange={handleImageChange} // Tambahkan onChange handler
+                onChange={handleImageChange}
                 errors={errors}
                 mode="file"
               />

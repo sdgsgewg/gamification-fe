@@ -5,8 +5,17 @@ export const createMaterialSchema = z.object({
   subjectId: z.string().nonempty("Mata pelajaran wajib dipilih"),
   description: z.string().optional(),
   gradeIds: z.array(z.string()).nonempty("Tingkat kelas wajib dipilih"),
-  image: z.string().optional(),
   createdBy: z.string().nonempty("Pengguna wajib diisi"),
+  imageFile: z.any().optional(),
 });
 
 export type CreateMaterialFormInputs = z.infer<typeof createMaterialSchema>;
+
+export const createMaterialDefaultValues = {
+  name: "",
+  subjectId: "",
+  description: "",
+  gradeIds: [],
+  createdBy: "",
+  imageFile: "",
+};

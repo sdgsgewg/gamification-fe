@@ -4,18 +4,15 @@ import {
   DetailResponseDto,
   handleAxiosError,
 } from "../utils/axiosHelper";
+import { FilterMaterialRequest } from "../interface/materials/requests/IFilterMaterialRequest";
 import { MaterialOverviewResponse } from "../interface/materials/responses/IMaterialOverviewResponse";
-
+import { MaterialDetailResponse } from "../interface/materials/responses/IMaterialDetailResponse";
 import {
   getAxios,
   postAxios,
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
-import { CreateMaterialFormInputs } from "../schemas/materials/createMaterial";
-import { EditMaterialFormInputs } from "../schemas/materials/editMaterial";
-import { MaterialDetailResponse } from "../interface/materials/responses/IMaterialDetailResponse";
-import { FilterMaterialRequest } from "../interface/materials/requests/IFilterMaterialRequest";
 
 const API_URL = "/materials";
 
@@ -51,12 +48,12 @@ export const materialProvider = {
   },
 
   async createMaterial(
-    payload: CreateMaterialFormInputs
+    formData: FormData
   ): Promise<ApiResponse<MaterialDetailResponse>> {
     try {
       const res: DetailResponseDto<MaterialDetailResponse> = await postAxios(
         API_URL,
-        payload
+        formData
       );
       return res;
     } catch (error) {
@@ -66,12 +63,12 @@ export const materialProvider = {
 
   async updateMaterial(
     id: string,
-    payload: EditMaterialFormInputs
+    formData: FormData
   ): Promise<ApiResponse<MaterialDetailResponse>> {
     try {
       const res: DetailResponseDto<MaterialDetailResponse> = await putAxios(
         `${API_URL}/${id}`,
-        payload
+        formData
       );
       return res;
     } catch (error) {

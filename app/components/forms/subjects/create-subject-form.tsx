@@ -24,50 +24,44 @@ import {
   useAutoSaveDraft,
   useDirtyCheck,
 } from "@/app/utils/form";
-
-export interface CreateSubjectFormRef {
-  isDirty: boolean;
-}
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 interface CreateSubjectFormProps {
   onFinish: (values: CreateSubjectFormInputs) => void;
 }
 
-const CreateSubjectForm = forwardRef<
-  CreateSubjectFormRef,
-  CreateSubjectFormProps
->(({ onFinish }, ref) => {
-  const { toast } = useToast();
+const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
+  ({ onFinish }, ref) => {
+    const { toast } = useToast();
 
-  const savedDraft =
-    typeof window !== "undefined" ? getItem("subjectDraft") : null;
+    const savedDraft =
+      typeof window !== "undefined" ? getItem("subjectDraft") : null;
 
-  const defaultValues = savedDraft
-    ? JSON.parse(savedDraft)
-    : createSubjectDefaultValues;
+    const defaultValues = savedDraft
+      ? JSON.parse(savedDraft)
+      : createSubjectDefaultValues;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<CreateSubjectFormInputs>({
-    resolver: zodResolver(createSubjectSchema),
-    defaultValues,
-  });
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+      setValue,
+    } = useForm<CreateSubjectFormInputs>({
+      resolver: zodResolver(createSubjectSchema),
+      defaultValues,
+    });
 
-  const watchedValues = useWatch({ control });
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+    const watchedValues = useWatch({ control });
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-  useInjectUser(setValue, ["createdBy"]);
-  useAutoSaveDraft(watchedValues, "subjectDraft");
-  const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
+    useInjectUser(setValue, ["createdBy"]);
+    useAutoSaveDraft(watchedValues, "subjectDraft");
+    const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
 
-  const onSubmit = async (data: CreateSubjectFormInputs) => {
-    setIsLoading(true);
+    const onSubmit = async (data: CreateSubjectFormInputs) => {
+      setIsLoading(true);
 
-    try {
       const formData = new FormData();
       formData.append("data", JSON.stringify(data));
 
@@ -76,97 +70,87 @@ const CreateSubjectForm = forwardRef<
         formData.append("imageFile", data.imageFile);
       }
 
-      // Kalau mau lihat isi FormData:
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
       const result = await subjectProvider.createSubject(formData);
 
-      if (result.isSuccess) {
-        toast.success(result.message ?? "Mata pelajaran berhasil dibuat!");
-        // Hapus draft sebelum onFinish
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Mata pelajaran berhasil dibuat!");
         removeItem("subjectDraft");
         onFinish(data);
-        setFileList([]); // reset file list
+        setFileList([]);
       } else {
-        toast.error(result.message ?? "Pembuatan mata pelajaran gagal.");
+        toast.error(message ?? "Pembuatan mata pelajaran gagal.");
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Gagal membuat mata pelajaran");
-      }
-    } finally {
+
       setIsLoading(false);
-    }
-  };
+    };
 
-  // Expose ke parent
-  useImperativeHandle(ref, () => ({
-    isDirty,
-  }));
+    // Expose ke parent
+    useImperativeHandle(ref, () => ({
+      isDirty,
+    }));
 
-  return (
-    <>
-      {isLoading && <Loading />}
+    return (
+      <>
+        {isLoading && <Loading />}
 
-      <Form
-        id="create-subject-form"
-        name="create-subject"
-        onFinish={handleSubmit(onSubmit)}
-        layout="vertical"
-        requiredMark={false}
-      >
-        <FormLayout
-          left={
-            <>
-              <TextField
+        <Form
+          id="create-subject-form"
+          name="create-subject"
+          onFinish={handleSubmit(onSubmit)}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <FormLayout
+            left={
+              <>
+                <TextField
+                  control={control}
+                  name="name"
+                  label="Nama"
+                  placeholder="Masukkan nama mata pelajaran"
+                  errors={errors}
+                  required
+                />
+
+                <TextAreaField
+                  control={control}
+                  name="description"
+                  label="Deskripsi"
+                  placeholder="Masukkan deskripsi mata pelajaran"
+                  errors={errors}
+                />
+              </>
+            }
+            right={
+              <ImageField
                 control={control}
-                name="name"
-                label="Nama"
-                placeholder="Masukkan nama mata pelajaran"
+                name="imageFile"
+                label="Upload Gambar"
+                fileList={fileList}
+                setFileList={setFileList}
                 errors={errors}
-                required
+                mode="file"
               />
-
-              <TextAreaField
-                control={control}
-                name="description"
-                label="Deskripsi"
-                placeholder="Masukkan deskripsi mata pelajaran"
-                errors={errors}
-              />
-            </>
-          }
-          right={
-            <ImageField
-              control={control}
-              name="imageFile"
-              label="Upload Gambar"
-              fileList={fileList}
-              setFileList={setFileList}
-              errors={errors}
-              mode="file"
-            />
-          }
-          bottom={
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              variant="primary"
-              className="!px-8"
-            >
-              Submit
-            </Button>
-          }
-        />
-      </Form>
-    </>
-  );
-});
+            }
+            bottom={
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                variant="primary"
+                className="!px-8"
+              >
+                Submit
+              </Button>
+            }
+          />
+        </Form>
+      </>
+    );
+  }
+);
 
 CreateSubjectForm.displayName = "CreateSubjectForm";
 export default CreateSubjectForm;

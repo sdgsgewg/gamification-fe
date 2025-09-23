@@ -27,8 +27,8 @@ const EmailVerificationPage = () => {
     if (token) {
       setView("verifying");
       auth.verifyEmail(token).then((res) => {
-        if (res.ok && res.userId) {
-          router.replace(`/email-verification?uid=${res.userId}`); // clean URL
+        if (res.isSuccess && res.data) {
+          router.replace(`/email-verification?uid=${res.data}`); // clean URL
           setView("success");
         } else {
           setView("error");

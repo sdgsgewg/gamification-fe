@@ -1,17 +1,8 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Form } from "antd";
-import { LockOutlined } from "@ant-design/icons";
-import { useToast } from "@/app/hooks/use-toast";
-import { postAxios } from "@/app/utils/AxiosFunction";
-import ResetPasswordForm, {
-  ResetPasswordFormInputs,
-} from "@/app/components/forms/auth/reset-password-form";
-import FormLayout from "../form-layout";
+import { ResetPasswordFormInputs } from "@/app/schemas/auth/resetPassword";
+import ResetPasswordForm from "@/app/components/forms/auth/reset-password-form";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -24,11 +15,9 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <FormLayout>
-      <ResetPasswordForm
-        token={token ?? ""}
-        onFinish={handleResetPasswordRequest}
-      />
-    </FormLayout>
+    <ResetPasswordForm
+      token={token ?? ""}
+      onFinish={handleResetPasswordRequest}
+    />
   );
 }

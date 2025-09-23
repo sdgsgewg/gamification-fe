@@ -11,8 +11,8 @@ import {
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
-import { CreateTaskTypeFormInputs } from "../components/forms/task-types/create-task-type-form";
-import { EditTaskTypeFormInputs } from "../components/forms/task-types/edit-task-type-form";
+import { CreateTaskTypeFormInputs } from "../schemas/task-types/createTaskType";
+import { EditTaskTypeFormInputs } from "../schemas/task-types/editTaskType";
 import { FilterTaskTypeRequest } from "../interface/task-types/requests/IFilterTaskTypeRequest";
 import { TaskTypeDetailResponse } from "../interface/task-types/responses/ITaskTypeDetailResponse";
 

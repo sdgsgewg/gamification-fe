@@ -12,8 +12,8 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
-import { Role } from "@/app/interface/users/IUser";
 import { auth } from "@/app/functions/AuthProvider";
+import { Role } from "@/app/enums/Role";
 
 interface MainMenuItemProps {
   menu: string;
@@ -126,20 +126,25 @@ interface SidebarProps {
 const Sidebar = ({ onClose }: SidebarProps) => {
   const router = useRouter();
 
-  const [userRole, setUserRole] = useState<Role>("admin");
+  const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
 
   const handleNavigateToHomePage = () => {
     router.push("/");
   };
 
-  const handleLogout = async () => {
-    await auth.logout();
+  const handleLogout = () => {
+    const logout = async () => {
+      await auth.logout();
+    };
+
+    logout();
+
     router.push("/");
   };
 
   useEffect(() => {
     const user = auth.getCachedUserProfile();
-    if (user) setUserRole(user.role);
+    if (user) setUserRole(user.role.name);
   }, []);
 
   return (
@@ -160,7 +165,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
       </div>
       <nav className="flex flex-col gap-4">
         <MainMenuItemWrapper role={userRole} onClose={onClose} />
-        {userRole === "admin" && (
+        {userRole === Role.ADMIN && (
           <AdminMenuItemWrapper role={userRole} onClose={onClose} />
         )}
         <ul className="pt-4 border-t-2 border-[#BCB4FF]">
@@ -168,7 +173,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
             menu="Keluar"
             icon={faRightFromBracket}
             url="#"
-            onClick={() => handleLogout()}
+            onClick={handleLogout}
             onCloseSidebar={onClose}
           />
         </ul>

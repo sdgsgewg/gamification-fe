@@ -12,8 +12,8 @@ import {
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
-import { CreateMaterialFormInputs } from "../components/forms/materials/create-material-form";
-import { EditMaterialFormInputs } from "../components/forms/materials/edit-material-form";
+import { CreateMaterialFormInputs } from "../schemas/materials/createMaterial";
+import { EditMaterialFormInputs } from "../schemas/materials/editMaterial";
 import { MaterialDetailResponse } from "../interface/materials/responses/IMaterialDetailResponse";
 import { FilterMaterialRequest } from "../interface/materials/requests/IFilterMaterialRequest";
 

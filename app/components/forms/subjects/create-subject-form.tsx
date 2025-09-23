@@ -96,7 +96,7 @@ const CreateSubjectForm = forwardRef<
       if (err instanceof Error) {
         toast.error(err.message);
       } else {
-        toast.error("Gagal upload gambar");
+        toast.error("Gagal membuat mata pelajaran");
       }
     } finally {
       setIsLoading(false);

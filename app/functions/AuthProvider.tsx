@@ -1,11 +1,19 @@
-import { getItem, setItem, clearStorage } from "../utils/storage";
+import { AxiosError } from "axios";
+import { getItem, setItem, clearStorage, removeItem } from "../utils/storage";
 import { getAxios, postAxios } from "../utils/AxiosFunction";
-import { LoginFormInputs } from "../components/forms/auth/login-form";
 import { jwtDecode } from "jwt-decode";
-import { User } from "../interface/users/IUser";
-import { RegisterFormInputs } from "../components/forms/auth/register-form";
-import { ForgotPasswordInputs } from "../components/forms/auth/forgot-password-form";
-import { CompleteProfileFormInputs } from "../components/forms/auth/complete-profile-form";
+import { RegisterRequest } from "../schemas/auth/register";
+import { CompleteProfileFormInputs } from "../schemas/auth/completeProfile";
+import { LoginFormInputs } from "../schemas/auth/login";
+import { ForgotPasswordInputs } from "../schemas/auth/forgotPassword";
+import {
+  ApiResponse,
+  BaseResponseDto,
+  DetailResponseDto,
+  handleAxiosError,
+} from "../utils/axiosHelper";
+import { LoginDetailResponse } from "../interface/auth/responses/ILoginDetailResponse";
+import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
 
 const API_URL = "/auth";
 
@@ -18,10 +26,9 @@ export default class AuthProvider {
 
   sessionToken = "";
   isLoggedIn = false;
-  isLoading = false;
   isFirstTime = false;
   isGuest = true;
-  userProfile: User | null = null;
+  userProfile: UserDetailResponse | null = null;
 
   async init() {
     this.getSessionToken();
@@ -43,10 +50,11 @@ export default class AuthProvider {
           this.isLoggedIn = true;
           return;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const axiosErr = err as AxiosError;
         console.warn("Refresh token failed during init:", {
-          status: err?.response?.status,
-          data: err?.response?.data,
+          status: axiosErr?.response?.status,
+          data: axiosErr?.response?.data,
         });
       }
     } else {
@@ -98,172 +106,169 @@ export default class AuthProvider {
     return decodedToken.uid;
   }
 
-  toggleLoading(status: boolean) {
-    this.isLoading = typeof status === "boolean" ? status : !this.isLoading;
-  }
-
-  async register(values: RegisterFormInputs) {
-    this.isLoading = true;
+  async register(payload: RegisterRequest): Promise<ApiResponse<null>> {
     try {
-      const response = await postAxios(`${API_URL}/register`, values);
-      return { ok: true, user: response.user || null };
-    } catch (error: any) {
-      console.error("Registration error:", error);
-
-      return {
-        ok: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Registration failed. Please try again.",
-      };
-    } finally {
-      this.isLoading = false;
+      const res: BaseResponseDto = await postAxios(
+        `${API_URL}/register`,
+        payload
+      );
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   }
 
-  async verifyEmail(token: string) {
-    this.isLoading = true;
+  async verifyEmail(token: string): Promise<ApiResponse<string>> {
     try {
-      const response = await postAxios(`${API_URL}/register`, { token });
-      return { ok: true, userId: response.userId };
-    } catch (error: any) {
-      console.error("Email verification error:", error);
-
-      return {
-        ok: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Email verification failed. Please try again.",
-      };
-    } finally {
-      this.isLoading = false;
+      const res: DetailResponseDto<string> = await postAxios(
+        `${API_URL}/verify-email`,
+        { token }
+      );
+      return res;
+    } catch (error) {
+      return handleAxiosError<string>(error);
     }
   }
 
-  async completeProfile(values: CompleteProfileFormInputs, uid: string) {
-    this.isLoading = true;
+  async completeProfile(
+    uid: string,
+    values: CompleteProfileFormInputs
+  ): Promise<ApiResponse<null>> {
     try {
-      const response = await postAxios(
+      const res: BaseResponseDto = await postAxios(
         `${API_URL}/complete-profile?uid=${uid}`,
         values
       );
-
-      return { ok: true, user: response.user || null };
-    } catch (error: any) {
-      console.error("Profile completion error:", error);
-
-      return {
-        ok: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Profile completion failed. Please try again.",
-      };
-    } finally {
-      this.isLoading = false;
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   }
 
-  async login(values: LoginFormInputs) {
-    this.isLoading = true;
+  async login(
+    values: LoginFormInputs
+  ): Promise<ApiResponse<LoginDetailResponse>> {
     try {
-      const response = await postAxios(`${API_URL}/login`, values);
+      const res: DetailResponseDto<LoginDetailResponse> = await postAxios(
+        `${API_URL}/login`,
+        values
+      );
 
-      if (!response.accessToken) {
+      console.log("Res: ", JSON.stringify(res, null, 2));
+
+      const data = res.data;
+
+      if (!data || !data.accessToken) {
         throw new Error("Invalid response structure - missing access token");
       }
 
       // Simpan ke localStorage
-      setItem(this.sessionTokenKey, response.accessToken);
+      setItem(this.sessionTokenKey, data.accessToken);
       setItem(this.isLoggedInKey, JSON.stringify(true));
-      setItem(this.userProfileKey, JSON.stringify(response.user));
+      setItem(this.userProfileKey, JSON.stringify(data.user));
 
       // Simpan ke memory
-      this.sessionToken = response.accessToken;
+      this.sessionToken = data.accessToken;
       this.isLoggedIn = true;
-      this.userProfile = response.user;
+      this.userProfile = data.user;
 
-      return { ok: true, user: response.user || null };
-    } catch (error: any) {
-      console.error("Login error:", error);
-
-      return {
-        ok: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Login failed. Please try again.",
-      };
-    } finally {
-      this.isLoading = false;
+      return res;
+    } catch (error) {
+      return handleAxiosError<LoginDetailResponse>(error);
     }
   }
 
-  async forgotPassword(values: ForgotPasswordInputs) {
-    this.isLoading = true;
+  async forgotPassword(
+    values: ForgotPasswordInputs
+  ): Promise<ApiResponse<null>> {
     try {
-      const response = await postAxios(`${API_URL}/forgot-password`, values);
-
-      return { ok: true, message: response.message };
-    } catch (error: any) {
-      console.error("Reset link error:", error);
-      return {
-        ok: false,
-        message: error.message || "Failed to send reset link.",
-      };
-    } finally {
-      this.isLoading = false;
+      const res: BaseResponseDto = await postAxios(
+        `${API_URL}/forgot-password`,
+        values
+      );
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   }
 
-  async resetPassword(token: string, password: string) {
-    this.isLoading = true;
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<ApiResponse<null>> {
     try {
-      const response = await postAxios(`${API_URL}/reset-password`, {
-        token,
-        password,
-      });
-
-      return { ok: true, message: response.message };
-    } catch (error: any) {
-      console.error("Reset link error:", error);
-      return {
-        ok: false,
-        message: error.message || "Failed to send reset link.",
-      };
-    } finally {
-      this.isLoading = false;
+      const res: BaseResponseDto = await postAxios(
+        `${API_URL}/reset-password`,
+        {
+          token,
+          password,
+        }
+      );
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   }
 
-  async logout() {
+  async logout(): Promise<ApiResponse<null>> {
+    console.log("Masuk auth provider...");
     try {
-      await postAxios(`${API_URL}/logout`);
-    } catch (error: any) {
-      console.error("Logout API error:", {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      });
+      console.log("Masuk try block...");
+
+      // Simulasi call API logout
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      console.log("API logout selesai");
+
+      return {
+        isSuccess: true,
+        message: "Logout berhasil",
+        data: null,
+      };
+    } catch (error) {
+      console.log("Masuk catch block...");
+      return handleAxiosError<null>(error);
     } finally {
+      console.log("Masuk finally block...");
+
+      // Clear storage
+      setItem(this.sessionTokenKey, "");
+      setItem(this.isLoggedInKey, JSON.stringify(false));
+      setItem(this.userProfileKey, JSON.stringify(null));
+
+      removeItem(this.sessionTokenKey);
+      removeItem(this.isLoggedInKey);
+      removeItem(this.userProfileKey);
+
       clearStorage();
 
       this.sessionToken = "";
       this.isLoggedIn = false;
       this.userProfile = null;
 
-      authEventTarget.dispatchEvent(new Event("authChanged")); // Trigger update
+      authEventTarget.dispatchEvent(new Event("authChanged"));
     }
   }
 
-  // ===== Profile ====
+  async getLoggedInUser(): Promise<ApiResponse<UserDetailResponse>> {
+    try {
+      const data = await getAxios("/users/me");
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserDetailResponse>(error);
+    }
+  }
 
   async fetchUserProfile() {
     try {
-      this.userProfile = await this.getLoggedInUser();
+      const res = await this.getLoggedInUser();
+      const { data } = res;
+
+      if (data) {
+        this.userProfile = data;
+      }
     } catch (err) {
-      console.error("User profile not available");
+      console.error("User profile not available: ", err);
     }
   }
 
@@ -281,16 +286,6 @@ export default class AuthProvider {
       return this.userProfile;
     }
     return null;
-  }
-
-  async getLoggedInUser() {
-    try {
-      const data = await getAxios("/users/get-logged-in-user");
-      return data;
-    } catch (error: any) {
-      console.error("Failed to fetch logged-in user:", error);
-      return null;
-    }
   }
 }
 

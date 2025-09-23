@@ -14,8 +14,8 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Role, User } from "@/app/interface/users/IUser";
 import { auth, authEventTarget } from "@/app/functions/AuthProvider";
+import { Role } from "@/app/enums/Role";
 
 interface MainMenuItemProps {
   url: string;
@@ -109,8 +109,13 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
 
   const userMenus = userDropdownMenuItems[role] || [];
 
-  const handleLogout = async () => {
-    await auth.logout();
+  const handleLogout = () => {
+    const logout = async () => {
+      await auth.logout();
+    };
+
+    logout();
+
     router.push("/");
   };
 
@@ -125,9 +130,7 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
               <a
                 href={item.url}
                 className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={
-                  item.menu === "Keluar" ? () => handleLogout() : undefined
-                }
+                onClick={handleLogout}
               >
                 {item.icon && (
                   <FontAwesomeIcon
@@ -154,7 +157,7 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
             <p className="text-base font-medium">
               Halo, {role.charAt(0).toUpperCase() + role.slice(1)}
             </p>
-            {role === "student" && (
+            {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-[#EAE9FF] text-[0.625rem] rounded-lg px-3">
                   25
@@ -171,8 +174,7 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
 };
 
 const Header = () => {
-  const [user, setUser] = useState<User>();
-  const [userRole, setUserRole] = useState<Role>("guest");
+  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const router = useRouter();
@@ -182,14 +184,12 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const updateUser = async () => {
-      const user = await auth.getCachedUserProfile();
+    const updateUser = () => {
+      const user = auth.getCachedUserProfile();
       if (user) {
-        setUser(user);
-        setUserRole(user.role);
+        setUserRole(user.role.name);
       } else {
-        setUser(undefined);
-        setUserRole("guest");
+        setUserRole(Role.GUEST);
       }
     };
 
@@ -218,7 +218,7 @@ const Header = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={userRole} />
-          {userRole === "guest" ? (
+          {userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
             <UserDropdownMenu role={userRole} />
@@ -241,7 +241,7 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={userRole} isMobile />
-          {userRole === "guest" ? (
+          {userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
             <UserDropdownMenu role={userRole} />

@@ -2,9 +2,10 @@
 
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
+import { LockOutlined } from "@ant-design/icons";
 import get from "lodash.get";
 
-interface TextFieldProps {
+interface PasswordFieldProps {
   control: any;
   name: string;
   label?: string;
@@ -15,7 +16,7 @@ interface TextFieldProps {
   prefixIcon?: React.ReactNode;
 }
 
-const TextField = ({
+const PasswordField = ({
   control,
   name,
   label,
@@ -23,14 +24,14 @@ const TextField = ({
   errors,
   required,
   readonly,
-  prefixIcon,
-}: TextFieldProps) => {
+  prefixIcon = <LockOutlined style={{ marginRight: 8 }} />,
+}: PasswordFieldProps) => {
   const error = get(errors, name);
 
   return (
     <Form.Item
       label={
-        label && (
+        label ? (
           <span className="text-base font-medium">
             {label}{" "}
             {!readonly &&
@@ -40,7 +41,7 @@ const TextField = ({
                 <span className="text-gray-500">(opsional)</span>
               ))}
           </span>
-        )
+        ) : null
       }
       name={name}
       validateStatus={error ? "error" : ""}
@@ -51,7 +52,7 @@ const TextField = ({
         name={name}
         control={control}
         render={({ field }) => (
-          <Input
+          <Input.Password
             {...field}
             prefix={prefixIcon}
             placeholder={placeholder}
@@ -64,4 +65,4 @@ const TextField = ({
   );
 };
 
-export default TextField;
+export default PasswordField;

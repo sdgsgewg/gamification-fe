@@ -8,9 +8,8 @@ import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISub
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
-import CreateMaterialForm, {
-  CreateMaterialFormInputs,
-} from "@/app/components/forms/materials/create-material-form";
+import CreateMaterialForm from "@/app/components/forms/materials/create-material-form";
+import { CreateMaterialFormInputs } from "@/app/schemas/materials/createMaterial";
 
 const CreateMaterialPage = () => {
   const router = useRouter();

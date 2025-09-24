@@ -1,21 +1,22 @@
-import { Form, Input } from "antd";
+import { Form } from "antd";
 import { MailOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { auth } from "@/app/functions/AuthProvider";
 import Button from "../../shared/Button";
-
-// --- Zod Schema for Validation ---
-const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .nonempty("Email is required")
-    .email("Please enter a valid email!"),
-});
-
-export type ForgotPasswordInputs = z.infer<typeof forgotPasswordSchema>;
+import {
+  forgotPasswordDefaultValues,
+  ForgotPasswordInputs,
+  forgotPasswordSchema,
+} from "@/app/schemas/auth/forgotPassword";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import FormTitle from "../../pages/Auth/FormTitle";
+import Loading from "../../shared/Loading";
+import FormLayout from "@/app/(auth)/form-layout";
+import TextField from "../../fields/TextField";
+import AuthRedirect from "../../pages/Auth/AuthRedirect";
 
 interface ForgotPasswordFormProps {
   onFinish: (values: ForgotPasswordInputs) => void;
@@ -24,6 +25,7 @@ interface ForgotPasswordFormProps {
 export default function ForgotPasswordForm({
   onFinish,
 }: ForgotPasswordFormProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const {
     control,
@@ -31,68 +33,83 @@ export default function ForgotPasswordForm({
     formState: { errors },
   } = useForm<ForgotPasswordInputs>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: forgotPasswordDefaultValues,
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data: ForgotPasswordInputs) => {
+    setIsLoading(true);
+
     const result = await auth.forgotPassword(data);
-    if (result.ok) {
-      toast.success("If an account exists, a reset link has been sent.");
+
+    const { isSuccess, message } = result;
+
+    if (isSuccess) {
+      toast.success(
+        message ?? "Jika email Anda terdaftar, tautan reset telah dikirim."
+      );
       onFinish(data);
     } else {
-      toast.error("Failed to send reset link. Please try again.");
+      toast.error(message ?? "Gagal mengirim tautan reset. Mohon coba lagi.");
     }
+
+    setIsLoading(false);
+  };
+
+  const handleNavigateToLogin = () => {
+    router.push("/login");
   };
 
   return (
-    <Form
-      name="forgotPassword"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <div className="p-8 space-y-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold">Lupa Password</h1>
-          <p className="text-base font-medium">
-            Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk
-            mengatur ulang kata sandi Anda.
-          </p>
-        </div>
+    <>
+      {isLoading && <Loading />}
 
-        <Form.Item
-          validateStatus={errors.email ? "error" : ""}
-          help={errors.email?.message}
-          style={{ marginBottom: errors.email ? "3rem" : "2.5rem" }}
-        >
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                prefix={<MailOutlined style={{ marginRight: 8 }} />}
-                placeholder="Email"
-                size="large"
+      <Form
+        name="forgotPassword"
+        onFinish={handleSubmit(onSubmit)}
+        layout="vertical"
+        requiredMark={false}
+      >
+        <FormLayout
+          top={
+            <>
+              <FormTitle
+                title="Lupa Password"
+                subtitle="Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda."
               />
-            )}
-          />
-        </Form.Item>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            variant="primary"
-          >
-            Lanjut
-          </Button>
-        </Form.Item>
-      </div>
-    </Form>
+              <TextField
+                control={control}
+                name="email"
+                placeholder="Masukkan email"
+                errors={errors}
+                required
+                prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
+              />
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  size="large"
+                  variant="primary"
+                >
+                  Lanjut
+                </Button>
+              </Form.Item>
+            </>
+          }
+          bottom={
+            <AuthRedirect
+              message="Sudah ingat password Anda?"
+              linkText="Masuk sekarang"
+              onClick={handleNavigateToLogin}
+            />
+          }
+        />
+      </Form>
+    </>
   );
 }

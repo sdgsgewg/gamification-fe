@@ -25,12 +25,10 @@ const DashboardHomePage = () => {
     return () => clearTimeout(timer);
   }, [token]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <>
+      {isLoading && <Loading />}
+
       <DashboardTitle title="Dashboard" showBackButton={false} />
       <h2 className="text-2xl font-bold">Dashboard Home</h2>
       <p className="text-gray-700">

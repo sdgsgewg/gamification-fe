@@ -18,7 +18,9 @@
     "@supabase/supabase-js": "^2.52.1",
     "antd": "^5.13.0",
     "axios": "^1.11.0",
+    "dayjs": "^1.11.18",
     "jwt-decode": "^4.0.0",
+    "lodash.get": "^4.4.2",
     "next": "15.4.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/lodash.get": "^4.4.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -42,14 +42,19 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Desktop Sidebar (selalu tampil) */}
+      {/* DESKTOP: fixed sidebar */}
       <div className="hidden lg:block">
-        <Sidebar onClose={() => setIsSidebarOpen(false)} />
+        {/* wrapper fixed supaya sidebar tetap diam */}
+        <div className="fixed left-0 top-0 h-screen w-64">
+          <Sidebar onClose={() => setIsSidebarOpen(false)} />
+        </div>
       </div>
 
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 lg:ml-64 min-h-screen">
         <Header onToggle={handleToggleSidebar} />
-        <main className="py-6 px-8 space-y-6">{children}</main>
+        <main className="flex-1 overflow-auto pt-6 pb-12 px-8 space-y-6">
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -41,10 +41,15 @@ export const getAxios = async (url: string, props?: any) => {
 export const postAxios = async (url: string, body?: any, props?: any) => {
   try {
     const token = await getToken();
+
+    const isFormData = body instanceof FormData;
+
     const response = await axios.post(getUrl(url), body, {
       headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: token ? `Bearer ${token}` : "" } : {}),
+        ...(isFormData
+          ? {} // axios akan set multipart otomatis
+          : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         "cache-control": "no-store",
       },
       withCredentials: true,
@@ -60,7 +65,6 @@ export const postAxios = async (url: string, body?: any, props?: any) => {
       errorMessage: error.message,
     });
 
-    // Propagate the error with more context
     const errorToThrow = new Error(
       error.response?.data?.message || error.message || "Request failed"
     );
@@ -71,15 +75,20 @@ export const postAxios = async (url: string, body?: any, props?: any) => {
 
 export const putAxios = async (url: string, body?: any, props?: any) => {
   try {
+    const token = await getToken();
+
+    const isFormData = body instanceof FormData;
+
     const response = await axios.put(getUrl(url), body, {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: await getToken(),
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         "cache-control": "no-store",
       },
       withCredentials: true,
       ...props,
     });
+
     return response.data;
   } catch (error) {
     console.error("Error in putAxios:", error);

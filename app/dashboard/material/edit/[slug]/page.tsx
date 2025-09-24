@@ -1,55 +1,58 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import EditMaterialForm, {
-  EditMaterialFormInputs,
-} from "@/app/components/forms/materials/edit-material-form";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Material } from "@/app/interface/materials/IMaterial";
 import Loading from "@/app/components/shared/Loading";
 import { gradeProvider } from "@/app/functions/GradeProvider";
-import { Grade } from "@/app/interface/grades/IGrade";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
+import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
+import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const EditMaterialPage = () => {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
-  const [materialData, setMaterialData] = useState<Material | null>(null);
-  const [subjectData, setSubjectData] = useState<Subject[]>([]);
-  const [gradeData, setGradeData] = useState<Grade[]>([]);
+  const [materialData, setMaterialData] =
+    useState<EditMaterialFormInputs | null>(null);
+  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
+    useState(false);
+
+  const formRef = useRef<FormRef>(null);
 
   const fetchMaterialDetail = async () => {
     setIsLoading(true);
 
-    try {
-      const res = await materialProvider.getMaterial(params.slug);
-      if (res.isSuccess && res.data) {
-        const m = res.data;
-        setMaterialData({
-          materialId: m.materialId,
-          name: m.name,
-          slug: m.slug || "",
-          description: m.description || "",
-          image: m.image || "",
-          updatedBy: "", // akan diisi otomatis dari useEffect di form
-          subject: m.subject || { subjectId: "", name: "" },
-          gradeIds: m.gradeIds || [],
-        });
-      } else {
-        message.error("Gagal memuat detail materi");
-        router.push("/dashboard/material");
-      }
-    } catch (error) {
-      console.error("Failed to fetch material details: ", error);
-    } finally {
-      setIsLoading(false);
+    const res = await materialProvider.getMaterial(params.slug);
+
+    const { isSuccess, message, data } = res;
+
+    if (isSuccess && data) {
+      const m = data;
+      setMaterialData({
+        materialId: m.materialId,
+        name: m.name,
+        description: m.description ?? "",
+        subjectId: m.subject.subjectId,
+        gradeIds: m.materialGradeIds,
+        updatedBy: "",
+        image: m.image,
+        imageFile: null,
+      });
+    } else {
+      console.error(message ?? "Gagal memuat detail materi pelajaran");
+      router.push("/dashboard/material");
     }
+
+    setIsLoading(false);
   };
 
   const fetchSubjects = async () => {
@@ -70,6 +73,27 @@ const EditMaterialPage = () => {
     }
   };
 
+  const handleBack = () => {
+    const isDirty = formRef.current?.isDirty;
+
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    setIsBackConfirmationModalVisible(true);
+  };
+
+  const handleBackConfirmation = () => {
+    setIsBackConfirmationModalVisible(false);
+    router.back();
+  };
+
+  const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
+    console.log("Edit material successful with:", values);
+    router.push("/dashboard/material");
+  };
+
   useEffect(() => {
     if (params.slug) {
       fetchMaterialDetail();
@@ -81,25 +105,27 @@ const EditMaterialPage = () => {
     fetchGrades();
   }, []);
 
-  const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
-    console.log("Edit material successful with:", values);
-    router.push("/dashboard/material");
-  };
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Materi Pelajaran" showBackButton={true} />
+      <DashboardTitle title="Edit Materi Pelajaran" onBack={handleBack} />
       {materialData && (
         <EditMaterialForm
-          defaultValues={materialData}
+          ref={formRef}
+          materialData={materialData}
           subjectData={subjectData}
           gradeData={gradeData}
           onFinish={handleEditMaterialSuccess}
+        />
+      )}
+
+      {isBackConfirmationModalVisible && (
+        <BackConfirmationModal
+          visible={isBackConfirmationModalVisible}
+          onConfirm={handleBackConfirmation}
+          onCancel={() => setIsBackConfirmationModalVisible(false)}
         />
       )}
     </>

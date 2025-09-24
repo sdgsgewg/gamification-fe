@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import React from "react";
+import { IMAGES } from "@/app/constants/images";
 
 interface OAuthButtonProps {
   message: string;
@@ -15,7 +16,7 @@ const OAuthButton = ({ message, onClick }: OAuthButtonProps) => {
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
-        <Image src="/img/google.png" alt="Google" width={30} height={30} />
+        <Image src={IMAGES.GOOGLE} alt="Google" width={30} height={30} />
         <span className="text-base font-medium">{message}</span>
       </div>
       <div>

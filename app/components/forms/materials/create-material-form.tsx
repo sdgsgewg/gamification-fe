@@ -1,200 +1,182 @@
 "use client";
 
 import { Form } from "antd";
-import type { RcFile, UploadFile } from "antd/es/upload/interface";
+import type { UploadFile } from "antd/es/upload/interface";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
+import {
+  createMaterialDefaultValues,
+  CreateMaterialFormInputs,
+  createMaterialSchema,
+} from "@/app/schemas/materials/createMaterial";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Button from "../../shared/Button";
-import { useEffect, useState } from "react";
-import { auth } from "@/app/functions/AuthProvider";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
-import { imageProvider } from "@/app/functions/ImageProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
-import { Grade } from "@/app/interface/grades/IGrade";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import Loading from "../../shared/Loading";
 import SelectField from "../../fields/SelectField";
-
-// --- Zod Schema ---
-const createMaterialSchema = z.object({
-  name: z.string().nonempty("Nama wajib diisi"),
-  subjectId: z.string().nonempty("Mata pelajaran wajib dipilih"),
-  description: z.string().optional(),
-  gradeIds: z.array(z.string()).nonempty("Tingkat kelas wajib dipilih"),
-  image: z.string().optional(),
-  createdBy: z.string().nonempty("Pengguna wajib diisi"),
-});
-
-export type CreateMaterialFormInputs = z.infer<typeof createMaterialSchema>;
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import { useDirtyCheck, useInjectUser } from "@/app/utils/form";
 
 interface CreateMaterialFormProps {
-  subjectData: Subject[];
-  gradeData: Grade[];
+  subjectData: SubjectOverviewResponse[];
+  gradeData: GradeOverviewResponse[];
   onFinish: (values: CreateMaterialFormInputs) => void;
 }
 
-export default function CreateMaterialForm({
-  subjectData,
-  gradeData,
-  onFinish,
-}: CreateMaterialFormProps) {
-  const { toast } = useToast();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<CreateMaterialFormInputs>({
-    resolver: zodResolver(createMaterialSchema),
-    defaultValues: {
-      name: "",
-      subjectId: "",
-      description: "",
-      gradeIds: [],
-      image: "",
-      createdBy: "",
-    },
-  });
+const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
+  ({ subjectData, gradeData, onFinish }, ref) => {
+    const { toast } = useToast();
 
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+      setValue,
+    } = useForm<CreateMaterialFormInputs>({
+      resolver: zodResolver(createMaterialSchema),
+      defaultValues: createMaterialDefaultValues,
+    });
 
-  // Prepare options for select fields
-  const subjectOptions = subjectData.map((subject) => ({
-    value: subject.subjectId,
-    label: subject.name,
-  }));
+    const watchedValues = useWatch({ control });
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-  const gradeOptions = gradeData.map((grade) => ({
-    value: grade.gradeId,
-    label: grade.name,
-  }));
+    // Prepare options for select fields
+    const subjectOptions = subjectData.map((subject) => ({
+      value: subject.subjectId,
+      label: subject.name,
+    }));
 
-  const onSubmit = async (data: CreateMaterialFormInputs) => {
-    setIsLoading(true);
+    const gradeOptions = gradeData.map((grade) => ({
+      value: grade.gradeId,
+      label: grade.name,
+    }));
 
-    try {
-      let finalImageUrl = data.image;
+    useInjectUser(setValue, ["createdBy"]);
+    const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
 
-      // Jika user upload file baru (preview blob), upload dulu ke Supabase
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        const file = fileList[0].originFileObj as RcFile;
-        finalImageUrl = await imageProvider.uploadImage(file, "materials");
+    const onSubmit = async (data: CreateMaterialFormInputs) => {
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+
+      // Append file images
+      if (data.imageFile instanceof File) {
+        formData.append("imageFile", data.imageFile);
       }
 
-      const result = await materialProvider.createMaterial({
-        ...data,
-        image: finalImageUrl,
-      });
+      const result = await materialProvider.createMaterial(formData);
 
-      if (result.isSuccess) {
-        toast.success("Materi pelajaran berhasil dibuat!");
-        onFinish({ ...data, image: finalImageUrl });
-        setFileList([]); // reset file list
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Materi pelajaran berhasil dibuat!");
+        onFinish(data);
+        setFileList([]);
       } else {
-        toast.error(result.message || "Pembuatan materi pelajaran gagal.");
+        toast.error(message ?? "Pembuatan materi pelajaran gagal.");
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Gagal upload gambar");
-      }
-    } finally {
+
       setIsLoading(false);
-    }
-  };
+    };
 
-  useEffect(() => {
-    const user = auth.getCachedUserProfile();
-    if (user) {
-      setValue("createdBy", user.name);
-    }
-  }, [setValue]);
+    // Expose ke parent
+    useImperativeHandle(ref, () => ({
+      isDirty,
+    }));
 
-  if (isLoading) {
-    return <Loading />;
-  }
+    return (
+      <>
+        {isLoading && <Loading />}
 
-  return (
-    <Form
-      name="create-material"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <FormLayout
-        left={
-          <>
-            <TextField
-              control={control}
-              name="name"
-              label="Nama"
-              placeholder="Masukkan nama materi pelajaran"
-              errors={errors}
-              required
-            />
+        <Form
+          id="create-material-form"
+          name="create-material"
+          onFinish={handleSubmit(onSubmit)}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <FormLayout
+            left={
+              <>
+                <TextField
+                  control={control}
+                  name="name"
+                  label="Nama"
+                  placeholder="Masukkan nama materi pelajaran"
+                  errors={errors}
+                  required
+                />
 
-            <SelectField
-              control={control}
-              name="subjectId"
-              label="Mata Pelajaran"
-              placeholder="Pilih mata pelajaran"
-              options={subjectOptions}
-              errors={errors.subjectId}
-              loading={subjectOptions.length === 0}
-              disabled={subjectOptions.length === 0}
-              required
-            />
+                <SelectField
+                  control={control}
+                  name="subjectId"
+                  label="Mata Pelajaran"
+                  placeholder="Pilih mata pelajaran"
+                  options={subjectOptions}
+                  errors={errors}
+                  loading={subjectOptions.length === 0}
+                  disabled={subjectOptions.length === 0}
+                  required
+                />
 
-            <TextAreaField
-              control={control}
-              name="description"
-              label="Deskripsi"
-              placeholder="Masukkan deskripsi materi pelajaran"
-              errors={errors}
-            />
+                <TextAreaField
+                  control={control}
+                  name="description"
+                  label="Deskripsi"
+                  placeholder="Masukkan deskripsi materi pelajaran"
+                  errors={errors}
+                />
 
-            <SelectField
-              control={control}
-              name="gradeIds"
-              label="Tingkat Kelas"
-              placeholder="Pilih tingkat kelas"
-              options={gradeOptions}
-              errors={errors.gradeIds}
-              loading={gradeOptions.length === 0}
-              disabled={gradeOptions.length === 0}
-              mode="multiple"
-            />
-          </>
-        }
-        right={
-          <ImageField
-            control={control}
-            name="image"
-            label="Upload Gambar"
-            fileList={fileList}
-            setFileList={setFileList}
-            errors={errors}
+                <SelectField
+                  control={control}
+                  name="gradeIds"
+                  label="Tingkat Kelas"
+                  placeholder="Pilih tingkat kelas"
+                  options={gradeOptions}
+                  errors={errors}
+                  loading={gradeOptions.length === 0}
+                  disabled={gradeOptions.length === 0}
+                  mode="multiple"
+                />
+              </>
+            }
+            right={
+              <ImageField
+                control={control}
+                name="imageFile"
+                label="Upload Gambar"
+                fileList={fileList}
+                setFileList={setFileList}
+                errors={errors}
+                mode="file"
+              />
+            }
+            bottom={
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                variant="primary"
+                className="!px-8"
+              >
+                Submit
+              </Button>
+            }
           />
-        }
-        bottom={
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            variant="primary"
-            className="!px-8"
-          >
-            Submit
-          </Button>
-        }
-      />
-    </Form>
-  );
-}
+        </Form>
+      </>
+    );
+  }
+);
+
+CreateMaterialForm.displayName = "CreateMaterialForm";
+export default CreateMaterialForm;

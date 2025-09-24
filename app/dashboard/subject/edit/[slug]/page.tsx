@@ -1,41 +1,76 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import EditSubjectForm, {
-  EditSubjectFormInputs,
-} from "@/app/components/forms/subjects/edit-subject-form";
+import React, { useEffect, useRef, useState } from "react";
+import EditSubjectForm from "@/app/components/forms/subjects/edit-subject-form";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
-import { Subject } from "@/app/interface/subjects/ISubject";
 import Loading from "@/app/components/shared/Loading";
+import { EditSubjectFormInputs } from "@/app/schemas/subjects/editSubject";
+import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { removeItem } from "@/app/utils/storage";
+import { getImageSrc } from "@/app/utils/image";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 const EditSubjectPage = () => {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
+  const [subjectData, setSubjectData] = useState<EditSubjectFormInputs | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
-  const [subjectData, setSubjectData] = useState<Subject | null>(null);
+  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
+    useState(false);
+
+  const formRef = useRef<FormRef>(null);
 
   const fetchSubjectDetail = async () => {
     setIsLoading(true);
+
     const res = await subjectProvider.getSubject(params.slug);
-    if (res.isSuccess && res.data) {
-      const s = res.data;
+
+    const { isSuccess, message, data } = res;
+
+    if (isSuccess && data) {
+      const s = data;
       setSubjectData({
         subjectId: s.subjectId,
         name: s.name,
-        slug: s.slug || "",
-        description: s.description || "",
-        image: s.image || "",
-        updatedBy: "", // akan diisi otomatis dari useEffect di form
+        description: s.description ?? "",
+        updatedBy: "",
+        image: s.image ? getImageSrc(s.image) : "",
+        imageFile: null,
       });
     } else {
-      message.error("Gagal memuat detail mata pelajaran");
+      console.error(message ?? "Gagal memuat detail mata pelajaran");
       router.push("/dashboard/subject");
     }
+
     setIsLoading(false);
+  };
+
+  const handleBack = () => {
+    const isDirty = formRef.current?.isDirty;
+
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    setIsBackConfirmationModalVisible(true);
+  };
+
+  const handleBackConfirmation = () => {
+    removeItem("subjectDraft");
+
+    setIsBackConfirmationModalVisible(false);
+    router.back();
+  };
+
+  const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {
+    console.log("Edit subject successful with:", values);
+    router.push("/dashboard/subject");
   };
 
   useEffect(() => {
@@ -44,23 +79,25 @@ const EditSubjectPage = () => {
     }
   }, [params.slug]);
 
-  const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {
-    console.log("Edit subject successful with:", values);
-    router.push("/dashboard/subject");
-  };
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Mata Pelajaran" showBackButton={true} />
+      <DashboardTitle title="Edit Mata Pelajaran" onBack={handleBack} />
       {subjectData && (
         <EditSubjectForm
+          ref={formRef}
+          subjectData={subjectData}
           onFinish={handleEditSubjectSuccess}
-          defaultValues={subjectData}
+        />
+      )}
+
+      {isBackConfirmationModalVisible && (
+        <BackConfirmationModal
+          visible={isBackConfirmationModalVisible}
+          onConfirm={handleBackConfirmation}
+          onCancel={() => setIsBackConfirmationModalVisible(false)}
         />
       )}
     </>

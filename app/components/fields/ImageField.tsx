@@ -2,10 +2,11 @@
 
 import { Form, Upload } from "antd";
 import { Controller } from "react-hook-form";
-import { UploadFile } from "antd/es/upload/interface";
+import { RcFile, UploadFile } from "antd/es/upload/interface";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useState } from "react";
+import { getImageSrc } from "@/app/utils/image";
 
 interface ImageFieldProps {
   control: any;
@@ -16,7 +17,10 @@ interface ImageFieldProps {
   errors?: Record<string, any>;
   required?: boolean;
   readonly?: boolean;
-  setOldImageUrl?: (url?: string) => void; // optional untuk edit form
+  setOldImageUrl?: (url?: string | undefined) => void;
+  mode?: "file" | "url";
+  beforeUpload?: (file: File) => boolean | Promise<boolean>;
+  onChange?: (value: File | string | null) => void;
 }
 
 const ImageField = ({
@@ -29,8 +33,62 @@ const ImageField = ({
   required,
   readonly,
   setOldImageUrl,
+  mode = "file",
+  beforeUpload,
+  onChange,
 }: ImageFieldProps) => {
   const [hovered, setHovered] = useState(false);
+
+  // semua logika beforeUpload ditaruh di sini
+  const handleBeforeUpload = async (
+    file: RcFile,
+    fieldOnChange: (value: any) => void
+  ) => {
+    if (readonly) return false;
+
+    if (beforeUpload) {
+      // Jalankan handler parent dulu
+      const shouldUpload = await beforeUpload(file);
+
+      // Kalau parent return false (prevent auto upload) tetap update preview
+      setFileList([
+        {
+          uid: file.uid,
+          name: file.name,
+          status: "done",
+          url: URL.createObjectURL(file),
+          originFileObj: file,
+        },
+      ]);
+      fieldOnChange(file);
+      onChange?.(file);
+
+      return shouldUpload;
+    }
+
+    // Default behaviour kalau tidak ada custom handler
+    if (mode === "file") {
+      setFileList([
+        {
+          uid: file.uid,
+          name: file.name,
+          status: "done",
+          url: URL.createObjectURL(file),
+          originFileObj: file,
+        },
+      ]);
+      fieldOnChange(file);
+      onChange?.(file);
+    }
+
+    return false; // prevent auto upload ke server
+  };
+
+  const handleChange = (info: any) => {
+    if (onChange) {
+      onChange(info);
+    }
+  };
 
   return (
     <Form.Item
@@ -45,6 +103,7 @@ const ImageField = ({
             ))}
         </span>
       }
+      name={name}
       validateStatus={errors?.[name] ? "error" : ""}
       help={errors?.[name]?.message}
     >
@@ -56,24 +115,13 @@ const ImageField = ({
             accept="image/*"
             listType="picture-card"
             maxCount={1}
-            showUploadList={false} // kita custom sendiri preview
+            showUploadList={false}
             fileList={fileList}
             disabled={readonly}
-            beforeUpload={(file) => {
-              if (readonly) return false;
-              const previewUrl = URL.createObjectURL(file);
-              setFileList([
-                {
-                  uid: file.uid,
-                  name: file.name,
-                  status: "done",
-                  url: previewUrl,
-                  originFileObj: file,
-                },
-              ]);
-              field.onChange(previewUrl);
-              return false; // cegah auto upload
-            }}
+            beforeUpload={(file: RcFile) =>
+              handleBeforeUpload(file, field.onChange)
+            }
+            onChange={handleChange}
           >
             {fileList.length > 0 ? (
               <div
@@ -82,25 +130,20 @@ const ImageField = ({
                 onMouseLeave={() => setHovered(false)}
               >
                 <Image
-                  src={
-                    fileList[0].url ||
-                    URL.createObjectURL(fileList[0].originFileObj!)
-                  }
+                  src={getImageSrc(fileList[0]) ?? ""}
                   alt={fileList[0].name}
                   width={200}
                   height={200}
                   className="rounded-lg object-cover w-full h-full"
                 />
-
-                {/* Overlay saat hover */}
                 {hovered && !readonly && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
                     <button
                       type="button"
                       onClick={(e) => {
-                        e.stopPropagation(); // jangan trigger input file
+                        e.stopPropagation();
                         setFileList([]);
-                        field.onChange("");
+                        field.onChange(mode === "file" ? null : "");
                         if (setOldImageUrl) setOldImageUrl(undefined);
                       }}
                       className="flex items-center gap-2 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg shadow cursor-pointer"
@@ -111,7 +154,6 @@ const ImageField = ({
                 )}
               </div>
             ) : (
-              // Default state (belum ada gambar / setelah hapus)
               <div className="flex flex-col items-center justify-center w-60 aspect-square border-2 border-dashed rounded-lg hover:border-blue-500 hover:text-blue-500 transition cursor-pointer">
                 <PlusOutlined className="text-2xl mb-2" />
                 <span className="text-sm">

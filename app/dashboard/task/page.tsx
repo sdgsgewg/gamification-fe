@@ -1,16 +1,295 @@
-import { withMetadata } from "@/app/utils/withMetadata";
-import React from "react";
+"use client";
 
-export const metadata = withMetadata("Tugas", "Halaman tentang tugas siswa");
+import React, { useRef, useEffect, useState } from "react";
+import { useToast } from "@/app/hooks/use-toast";
+import Table from "@/app/components/shared/table/Table";
+import { useRouter } from "next/navigation";
+import { Toaster } from "@/app/hooks/use-toast";
+import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
+import RowActions from "@/app/components/shared/table/RowActions";
+import { ColumnType } from "antd/es/table";
+import { taskProvider } from "@/app/functions/TaskProvider";
+import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
+import FilterTaskForm, {
+  FilterTaskFormRef,
+} from "@/app/components/forms/tasks/filter-task-form";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
+import { FilterModal } from "@/app/components/modals/FilterModal";
+import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
+import { subjectProvider } from "@/app/functions/SubjectProvider";
+import { materialProvider } from "@/app/functions/MaterialProvider";
+import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
+import { gradeProvider } from "@/app/functions/GradeProvider";
+import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { FilterTaskInputs } from "@/app/schemas/tasks/filterTask";
+import { removeItem } from "@/app/utils/storage";
 
 const TaskPage = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [tasks, setTasks] = useState<TaskOverviewResponse[]>([]);
+  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [materialData, setMaterialData] = useState<MaterialOverviewResponse[]>(
+    []
+  );
+  const [taskTypeData, setTaskTypeData] = useState<TaskTypeOverviewResponse[]>(
+    []
+  );
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+  });
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
+  const [deleteTaskTitle, setDeleteTaskTitle] = useState<string | null>(null);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [
+    isDeleteConfirmationModalVisible,
+    setIsDeleteConfirmationModalVisible,
+  ] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const formRef = useRef<FilterTaskFormRef>(null);
+
+  const fetchTasks = async (values?: FilterTaskInputs) => {
+    setIsLoading(true);
+    const res = await taskProvider.getTasks(values);
+    const { isSuccess, data, message } = res;
+    if (isSuccess && data) {
+      setTasks(
+        data.map((t: TaskOverviewResponse, idx: number) => ({
+          key: t.taskId ?? idx,
+          ...t,
+        }))
+      );
+    } else {
+      console.error(message ?? "Gagal memuat tugas");
+    }
+    setIsLoading(false);
+  };
+
+  const fetchSubjects = async () => {
+    const res = await subjectProvider.getSubjects();
+    if (res.isSuccess && res.data) setSubjectData(res.data);
+  };
+
+  const fetchMaterials = async () => {
+    const res = await materialProvider.getMaterials();
+    if (res.isSuccess && res.data) setMaterialData(res.data);
+  };
+
+  const fetchTaskTypes = async () => {
+    const res = await taskTypeProvider.getTaskTypes();
+    if (res.isSuccess && res.data) setTaskTypeData(res.data);
+  };
+
+  const fetchGrades = async () => {
+    const res = await gradeProvider.getGrades();
+    if (res.isSuccess && res.data) setGradeData(res.data);
+  };
+
+  const handleOpenFilter = () => setIsFilterModalVisible(true);
+  const handleCloseFilter = () => setIsFilterModalVisible(false);
+
+  const handleApplyFilter = (values: FilterTaskInputs) => {
+    fetchTasks(values);
+    setIsFilterModalVisible(false);
+  };
+
+  const handleNavigateToCreateTaskPage = () => {
+    router.push("/dashboard/task/create");
+  };
+
+  const handleView = (slug: string) => {
+    router.push(`/dashboard/task/${slug}`);
+  };
+
+  const handleEdit = (slug: string) => {
+    router.push(`/dashboard/task/edit/${slug}`);
+  };
+
+  const showDeleteModal = (taskId: string, title: string) => {
+    setDeleteTaskId(taskId);
+    setDeleteTaskTitle(title);
+    setIsDeleteConfirmationModalVisible(true);
+  };
+
+  const confirmDeleteTask = () => {
+    if (deleteTaskId !== null) {
+      handleDelete(deleteTaskId);
+      setDeleteTaskId(null);
+      setDeleteTaskTitle(null);
+      setIsDeleteConfirmationModalVisible(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteTaskId(null);
+    setIsDeleteConfirmationModalVisible(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await taskProvider.deleteTask(id);
+      if (res.isSuccess) {
+        toast.success("Tugas berhasil dihapus");
+        fetchTasks();
+      } else {
+        toast.error(res.message || "Gagal menghapus tugas");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Terjadi kesalahan saat menghapus tugas");
+      }
+    }
+  };
+
+  useEffect(() => {
+    removeItem("taskOverviewDraft");
+  }, []);
+
+  useEffect(() => {
+    fetchTasks();
+    fetchSubjects();
+    fetchMaterials();
+    fetchTaskTypes();
+    fetchGrades();
+  }, []);
+
+  // Kolom tabel
+  const columns: ColumnType<TaskOverviewResponse>[] = [
+    {
+      title: "No",
+      key: "index",
+      width: 50,
+      align: "center",
+      fixed: "left",
+      render: (_: unknown, __: TaskOverviewResponse, index: number) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: "Judul",
+      dataIndex: "title",
+      key: "title",
+      width: 300,
+      onCell: () => ({
+        style: { minWidth: 300 },
+      }),
+    },
+    {
+      title: "Tipe",
+      key: "taskType",
+      width: 250,
+      render: (_, record) => record.taskType || "-",
+      onCell: () => ({
+        style: { minWidth: 250 },
+      }),
+    },
+    {
+      title: "Mata Pelajaran",
+      key: "subject",
+      width: 250,
+      render: (_, record) => record.subject || "-",
+      onCell: () => ({
+        style: { minWidth: 250 },
+      }),
+    },
+    {
+      title: "Materi Pelajaran",
+      key: "material",
+      width: 250,
+      render: (_, record) => record.material || "-",
+      onCell: () => ({
+        style: { minWidth: 250 },
+      }),
+    },
+    {
+      title: "Kelas",
+      key: "taskGrade",
+      width: 150,
+      render: (_, record) => record.taskGrade || "-",
+      onCell: () => ({
+        style: { minWidth: 150 },
+      }),
+    },
+    {
+      title: "Jumlah Soal",
+      key: "questionCount",
+      width: 150,
+      render: (_, record) => record.questionCount || "-",
+      onCell: () => ({
+        style: { minWidth: 150 },
+      }),
+    },
+    {
+      title: "Aksi",
+      key: "actions",
+      width: 200,
+      render: (_, record) => (
+        <RowActions
+          onView={() => handleView(record.slug)}
+          onEdit={() => handleEdit(record.slug)}
+          onDelete={() => showDeleteModal(record.taskId, record.title)}
+        />
+      ),
+    },
+  ];
+
   return (
-    <div>
-      <section className="container mx-auto py-12">
-        <h1 className="text-3xl font-bold mb-4">Tugas</h1>
-        <p>Welcome to our website! This is the task page.</p>
-      </section>
-    </div>
+    <>
+      <Toaster position="top-right" />
+      <DashboardTitle title="Daftar Tugas" showBackButton={false} />
+
+      <Table
+        columns={columns}
+        data={tasks}
+        rowKey="key"
+        loading={isLoading}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          onChange: (page, pageSize) => {
+            setPagination({ current: page, pageSize });
+          },
+        }}
+        onAddButtonClick={handleNavigateToCreateTaskPage}
+        searchable
+        searchPlaceholder="Cari tugas…"
+        onSearch={(value) => fetchTasks({ searchText: value })}
+        onOpenFilter={handleOpenFilter}
+        onRefresh={() => fetchTasks()}
+      />
+
+      <FilterModal
+        visible={isFilterModalVisible}
+        title="Filter Tugas"
+        formId="filter-task-form"
+        onCancel={handleCloseFilter}
+        onResetFilters={() => {
+          formRef.current?.resetForm(); // reset form pakai ref
+        }}
+      >
+        <FilterTaskForm
+          ref={formRef}
+          subjectData={subjectData}
+          materialData={materialData}
+          taskTypeData={taskTypeData}
+          gradeData={gradeData}
+          onFinish={handleApplyFilter}
+        />
+      </FilterModal>
+
+      <DeleteConfirmationModal
+        visible={isDeleteConfirmationModalVisible}
+        modalText={`Apakah kamu yakin ingin menghapus tugas dengan judul '${deleteTaskTitle}'?`}
+        onConfirm={confirmDeleteTask}
+        onCancel={cancelDelete}
+      />
+    </>
   );
 };
 

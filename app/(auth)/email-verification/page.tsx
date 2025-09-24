@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
 import { auth } from "@/app/functions/AuthProvider";
+import { IMAGES } from "@/app/constants/images";
 
 type ViewState = "prompt" | "verifying" | "success" | "error";
 
@@ -27,8 +28,8 @@ const EmailVerificationPage = () => {
     if (token) {
       setView("verifying");
       auth.verifyEmail(token).then((res) => {
-        if (res.ok && res.userId) {
-          router.replace(`/email-verification?uid=${res.userId}`); // clean URL
+        if (res.isSuccess && res.data) {
+          router.replace(`/email-verification?uid=${res.data}`); // clean URL
           setView("success");
         } else {
           setView("error");
@@ -52,7 +53,7 @@ const EmailVerificationPage = () => {
   const PromptView = () => {
     return (
       <ShowInformationSection
-        imageUrl="/img/email-verification-success.png"
+        imageUrl={IMAGES.EMAIL_VERIFCATION_SUCCESS}
         imageAlt="Email Verification"
         title="Verifikasi Alamat Email Anda"
         subtitle1={
@@ -79,8 +80,8 @@ const EmailVerificationPage = () => {
   const SuccessView = () => {
     return (
       <ShowInformationSection
-        imageUrl="/img/email-verification-success.png"
-        imageAlt="Email Verification"
+        imageUrl={IMAGES.EMAIL_VERIFCATION_SUCCESS}
+        imageAlt="Email Verification Success"
         title="Verifikasi Berhasil"
         subtitle1="Email Anda berhasil diverifikasi."
         onButtonClick={handleContinue}
@@ -92,8 +93,8 @@ const EmailVerificationPage = () => {
   const ErrorView = () => {
     return (
       <ShowInformationSection
-        imageUrl="/img/email-verification-error.png"
-        imageAlt="Email Verification"
+        imageUrl={IMAGES.EMAIL_VERIFCATION_ERROR}
+        imageAlt="Email Verification Error"
         title="Verifikasi Gagal"
         subtitle1="Link verifikasi tidak valid atau telah kedaluwarsa."
         onButtonClick={handleBack}

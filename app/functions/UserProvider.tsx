@@ -1,17 +1,27 @@
+import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
 import { getAxios } from "../utils/AxiosFunction";
+import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
 
 const API_URL = "/users";
 
-export default class UserProvider {
-  async getUserDetail(uid: string) {
+export const userProvider = {
+  async getUserById(id: string): Promise<ApiResponse<UserDetailResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/get-user-detail/${uid}`);
-      return { ok: true, user: data };
-    } catch (error: any) {
-      console.error("Failed to fetch logged-in user:", error);
-      return { ok: false, error: error.message };
+      const data = await getAxios(`${API_URL}/${id}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserDetailResponse>(error);
     }
-  }
-}
+  },
 
-export const userProvider = new UserProvider();
+  async getUserByUsername(
+    username: string
+  ): Promise<ApiResponse<UserDetailResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/username/${username}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserDetailResponse>(error);
+    }
+  },
+};

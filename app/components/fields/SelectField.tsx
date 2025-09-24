@@ -3,9 +3,10 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { Form, Select } from "antd";
+import get from "lodash.get";
 
 interface Option {
-  value: string | number;
+  value: string | number | boolean;
   label: string;
 }
 
@@ -21,6 +22,7 @@ interface SelectFieldProps {
   disabled?: boolean;
   mode?: "multiple" | "tags";
   required?: boolean;
+  onChange?: (value: string | number | boolean) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -35,18 +37,20 @@ const SelectField: React.FC<SelectFieldProps> = ({
   disabled = false,
   mode = undefined, // Default to single select
   required = false,
+  onChange,
 }) => {
+  const error = get(errors, name);
+
   return (
     <Form.Item
       label={
-        <span className="font-medium">
-          {label}
-          {required && <span className="text-red-500">*</span>}
+        <span className="text-base font-medium">
+          {label} {required && <span className="text-red-500">*</span>}
         </span>
       }
-      validateStatus={errors ? "error" : ""}
-      help={errors?.message}
-      style={{ marginBottom: errors ? "2.5rem" : "2rem" }}
+      validateStatus={error ? "error" : ""}
+      help={error?.message}
+      style={{ marginBottom: error ? "1rem" : "0rem" }}
       required={required}
     >
       <Controller
@@ -70,6 +74,10 @@ const SelectField: React.FC<SelectFieldProps> = ({
                 .toLowerCase()
                 .includes(input.toLowerCase())
             }
+            onChange={(value) => {
+              field.onChange(value);
+              onChange?.(value);
+            }}
           />
         )}
       />

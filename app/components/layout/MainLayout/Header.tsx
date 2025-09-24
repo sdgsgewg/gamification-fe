@@ -14,8 +14,9 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Role, User } from "@/app/interface/users/IUser";
 import { auth, authEventTarget } from "@/app/functions/AuthProvider";
+import { Role } from "@/app/enums/Role";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 
 interface MainMenuItemProps {
   url: string;
@@ -104,13 +105,26 @@ const AuthActionButtons = () => {
   );
 };
 
-const UserDropdownMenu = ({ role }: { role: Role }) => {
+interface UserDropdownMenuProps {
+  name: string;
+  role: Role;
+  level?: number;
+  xp?: number;
+}
+
+const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
   const router = useRouter();
 
   const userMenus = userDropdownMenuItems[role] || [];
+  const [nextLevelXp, setNextLevelXp] = useState<number>(100); // default next level: 2
 
-  const handleLogout = async () => {
-    await auth.logout();
+  const handleLogout = () => {
+    const logout = async () => {
+      await auth.logout();
+    };
+
+    logout();
+
     router.push("/");
   };
 
@@ -125,9 +139,7 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
               <a
                 href={item.url}
                 className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={
-                  item.menu === "Keluar" ? () => handleLogout() : undefined
-                }
+                onClick={handleLogout}
               >
                 {item.icon && (
                   <FontAwesomeIcon
@@ -152,14 +164,14 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
           />
           <div className="flex flex-col gap-1">
             <p className="text-base font-medium">
-              Halo, {role.charAt(0).toUpperCase() + role.slice(1)}
+              Halo, {name}
             </p>
-            {role === "student" && (
+            {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-[#EAE9FF] text-[0.625rem] rounded-lg px-3">
-                  25
+                  {level}
                 </span>
-                <p className="text-[0.625rem]">20000/33800XP</p>
+                <p className="text-[0.625rem]">{xp}/{nextLevelXp}</p>
               </div>
             )}
           </div>
@@ -171,8 +183,8 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
 };
 
 const Header = () => {
-  const [user, setUser] = useState<User>();
-  const [userRole, setUserRole] = useState<Role>("guest");
+  const [user, setUser] = useState<UserDetailResponse | null>(null);
+  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const router = useRouter();
@@ -182,14 +194,13 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const updateUser = async () => {
-      const user = await auth.getCachedUserProfile();
+    const updateUser = () => {
+      const user = auth.getCachedUserProfile();
       if (user) {
         setUser(user);
-        setUserRole(user.role);
+        setUserRole(user.role.name);
       } else {
-        setUser(undefined);
-        setUserRole("guest");
+        setUserRole(Role.GUEST);
       }
     };
 
@@ -218,10 +229,10 @@ const Header = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={userRole} />
-          {userRole === "guest" ? (
+          {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu role={userRole} />
+            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
           )}
         </div>
 
@@ -241,10 +252,10 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={userRole} isMobile />
-          {userRole === "guest" ? (
+          {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu role={userRole} />
+            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
           )}
         </div>
       )}

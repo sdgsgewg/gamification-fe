@@ -1,11 +1,9 @@
 "use client";
 
-import LoginForm, {
-  LoginFormInputs,
-} from "@/app/components/forms/auth/login-form";
-import { useRouter } from "next/navigation";
 import React from "react";
-import FormLayout from "../form-layout";
+import { useRouter } from "next/navigation";
+import { LoginFormInputs } from "@/app/schemas/auth/login";
+import LoginForm from "@/app/components/forms/auth/login-form";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -20,12 +18,10 @@ const LoginPage = () => {
   };
 
   return (
-    <FormLayout>
-      <LoginForm
-        onFinish={handleLoginSuccess}
-        onForgotPasswordClick={handleNavigateToForgotPassword}
-      />
-    </FormLayout>
+    <LoginForm
+      onFinish={handleLoginSuccess}
+      onForgotPasswordClick={handleNavigateToForgotPassword}
+    />
   );
 };
 

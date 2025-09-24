@@ -1,11 +1,9 @@
 "use client";
 
-import ForgotPasswordForm, {
-  ForgotPasswordInputs,
-} from "@/app/components/forms/auth/forgot-password-form";
-import { useRouter } from "next/navigation";
 import React from "react";
-import FormLayout from "../form-layout";
+import { useRouter } from "next/navigation";
+import { ForgotPasswordInputs } from "@/app/schemas/auth/forgotPassword";
+import ForgotPasswordForm from "@/app/components/forms/auth/forgot-password-form";
 
 const ForgotPasswordPage = () => {
   const router = useRouter();
@@ -15,11 +13,7 @@ const ForgotPasswordPage = () => {
     router.push("/login");
   };
 
-  return (
-    <FormLayout>
-      <ForgotPasswordForm onFinish={handleForgotPasswordRequest} />
-    </FormLayout>
-  );
+  return <ForgotPasswordForm onFinish={handleForgotPasswordRequest} />;
 };
 
 export default ForgotPasswordPage;

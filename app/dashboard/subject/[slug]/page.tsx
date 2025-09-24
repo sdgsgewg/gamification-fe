@@ -9,11 +9,6 @@ import { Toaster, useToast } from "@/app/hooks/use-toast";
 import { SubjectDetailResponse } from "@/app/interface/subjects/responses/ISubjectDetailResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import Loading from "@/app/components/shared/Loading";
-import Image from "next/image";
-import {
-  DetailPageTableContent,
-  DetailPageTableHeader,
-} from "@/app/components/shared/table/detail-page/DetailPageTable";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import { ColumnType } from "antd/es/table";
@@ -25,6 +20,7 @@ import {
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { SubjectRow } from "@/app/components/shared/table/detail-page/TableRowData";
 import { getImageSrc } from "@/app/utils/image";
+import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 
 const SubjectDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -143,28 +139,14 @@ const SubjectDetailPage = () => {
   }
 
   const LeftSideContent = () => {
+    const { name, image, description } = subjectData;
+
     return (
-      <div className="flex flex-col gap-4 text-black">
-        <h2 className="text-2xl font-semibold">{subjectData?.name}</h2>
-        <Image
-          src={subjectData.image ?? ""}
-          alt={subjectData?.name ?? "Subject"}
-          width={200}
-          height={200}
-        />
-        <div className="flex flex-col gap-4 mt-4">
-          <div className="flex flex-row items-center gap-2">
-            <Image
-              src={"/img/description.png"}
-              alt="description"
-              width={24}
-              height={24}
-            />
-            <p className="text-base font-medium">Deskripsi</p>
-          </div>
-          <p className="text-sm text-justify">{subjectData.description}</p>
-        </div>
-      </div>
+      <DetailPageLeftSideContent
+        name={name}
+        image={image}
+        description={description}
+      />
     );
   };
 

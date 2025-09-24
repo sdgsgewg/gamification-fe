@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { auth, authEventTarget } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 
 interface MainMenuItemProps {
   url: string;
@@ -104,10 +105,18 @@ const AuthActionButtons = () => {
   );
 };
 
-const UserDropdownMenu = ({ role }: { role: Role }) => {
+interface UserDropdownMenuProps {
+  name: string;
+  role: Role;
+  level?: number;
+  xp?: number;
+}
+
+const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
   const router = useRouter();
 
   const userMenus = userDropdownMenuItems[role] || [];
+  const [nextLevelXp, setNextLevelXp] = useState<number>(100); // default next level: 2
 
   const handleLogout = () => {
     const logout = async () => {
@@ -155,14 +164,14 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
           />
           <div className="flex flex-col gap-1">
             <p className="text-base font-medium">
-              Halo, {role.charAt(0).toUpperCase() + role.slice(1)}
+              Halo, {name}
             </p>
             {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-[#EAE9FF] text-[0.625rem] rounded-lg px-3">
-                  25
+                  {level}
                 </span>
-                <p className="text-[0.625rem]">20000/33800XP</p>
+                <p className="text-[0.625rem]">{xp}/{nextLevelXp}</p>
               </div>
             )}
           </div>
@@ -174,6 +183,7 @@ const UserDropdownMenu = ({ role }: { role: Role }) => {
 };
 
 const Header = () => {
+  const [user, setUser] = useState<UserDetailResponse | null>(null);
   const [userRole, setUserRole] = useState<Role>(Role.GUEST);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -187,6 +197,7 @@ const Header = () => {
     const updateUser = () => {
       const user = auth.getCachedUserProfile();
       if (user) {
+        setUser(user);
         setUserRole(user.role.name);
       } else {
         setUserRole(Role.GUEST);
@@ -218,10 +229,10 @@ const Header = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={userRole} />
-          {userRole === Role.GUEST ? (
+          {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu role={userRole} />
+            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
           )}
         </div>
 
@@ -241,10 +252,10 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={userRole} isMobile />
-          {userRole === Role.GUEST ? (
+          {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu role={userRole} />
+            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
           )}
         </div>
       )}

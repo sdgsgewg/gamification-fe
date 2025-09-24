@@ -21,12 +21,9 @@ import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { setItem } from "@/app/utils/storage";
-import {
-  createTaskOverviewDefaultValues,
-  CreateTaskOverviewFormInputs,
-} from "@/app/schemas/tasks/task-overview/createTaskOverview";
+import { CreateTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/createTaskOverview";
 import { CreateTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/createTaskQuestion";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 type ViewState = "task-overview" | "task-question" | "task-summary";
 
@@ -49,42 +46,26 @@ const CreateTaskPage = () => {
   const [taskQuestions, setTaskQuestions] =
     useState<CreateTaskQuestionFormInputs | null>(null);
 
-  const formRef = useRef<CreateTaskOverviewFormRef>(null);
+  const formRef = useRef<FormRef>(null);
 
   const fetchSubjects = async () => {
-    try {
-      const res = await subjectProvider.getSubjects();
-      if (res.isSuccess && res.data) setSubjectData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch subjects: ", error);
-    }
+    const res = await subjectProvider.getSubjects();
+    if (res.isSuccess && res.data) setSubjectData(res.data);
   };
 
   const fetchMaterials = async () => {
-    try {
-      const res = await materialProvider.getMaterials();
-      if (res.isSuccess && res.data) setMaterialData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch materials: ", error);
-    }
+    const res = await materialProvider.getMaterials();
+    if (res.isSuccess && res.data) setMaterialData(res.data);
   };
 
   const fetchTaskTypes = async () => {
-    try {
-      const res = await taskTypeProvider.getTaskTypes();
-      if (res.isSuccess && res.data) setTaskTypeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch task types: ", error);
-    }
+    const res = await taskTypeProvider.getTaskTypes();
+    if (res.isSuccess && res.data) setTaskTypeData(res.data);
   };
 
   const fetchGrades = async () => {
-    try {
-      const res = await gradeProvider.getGrades();
-      if (res.isSuccess && res.data) setGradeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch grades: ", error);
-    }
+    const res = await gradeProvider.getGrades();
+    if (res.isSuccess && res.data) setGradeData(res.data);
   };
 
   const handleBack = () => {
@@ -92,23 +73,16 @@ const CreateTaskPage = () => {
     const hasData = Boolean(taskOverview) || isDirty;
 
     if (!hasData) {
-      router.push("/dashboard/task");
+      router.back();
       return;
     }
 
-    console.log("Tetap di task overview: ", isDirty);
     setIsBackConfirmationModalVisible(true);
   };
 
   const handleBackConfirmation = () => {
-    // Simpan draft kosong
-    setItem(
-      "taskOverviewDraft",
-      JSON.stringify(createTaskOverviewDefaultValues)
-    );
-
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/task");
+    router.back();
   };
 
   // STEP 1: Overview
@@ -199,11 +173,7 @@ const CreateTaskPage = () => {
   const TaskOverviewView = () => {
     return (
       <>
-        <DashboardTitle
-          title="Buat Tugas"
-          showBackButton={true}
-          onBack={handleBack}
-        />
+        <DashboardTitle title="Buat Tugas" onBack={handleBack} />
         <CreateTaskOverviewForm
           ref={formRef}
           taskOverview={taskOverview}

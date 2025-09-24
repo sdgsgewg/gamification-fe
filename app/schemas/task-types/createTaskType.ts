@@ -15,3 +15,14 @@ export const createTaskTypeSchema = z.object({
 });
 
 export type CreateTaskTypeFormInputs = z.infer<typeof createTaskTypeSchema>;
+
+export const createTaskTypeDefaultValues: CreateTaskTypeFormInputs = {
+  name: "",
+  description: "",
+  scope: "",
+  hasDeadline: "",
+  isCompetitive: "",
+  isRepeatable: "",
+  pointMultiplier: 1,
+  createdBy: "",
+};

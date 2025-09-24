@@ -3,13 +3,11 @@
 import React, { useEffect, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { message } from "antd";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
 import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
 import Loading from "@/app/components/shared/Loading";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
-import Image from "next/image";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   GradeRow,
@@ -19,6 +17,7 @@ import {
   DetailInformationTable,
   HistoryTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
+import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 
 const MaterialDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -37,13 +36,18 @@ const MaterialDetailPage = () => {
 
   const router = useRouter();
 
-  const fetchMaterialDetail = async () => {
-    setIsLoading(true);
+  useEffect(() => {
+    if (!params.slug) return;
 
-    try {
+    const fetchMaterialDetail = async () => {
+      setIsLoading(true);
+
       const res = await materialProvider.getMaterial(params.slug);
-      if (res.isSuccess && res.data) {
-        const m = res.data;
+
+      const { isSuccess, message, data } = res;
+
+      if (isSuccess && data) {
+        const m = data;
         setMaterialData({
           materialId: m.materialId,
           name: m.name,
@@ -57,20 +61,14 @@ const MaterialDetailPage = () => {
           updatedBy: m.updatedBy ?? "-",
         });
       } else {
-        message.error("Gagal memuat detail materi");
+        console.error(message ?? "Gagal memuat detail materi");
         router.push("/dashboard/material");
       }
-    } catch (error) {
-      console.error("Failed to fetch material details: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    if (params.slug) {
-      fetchMaterialDetail();
-    }
+      setIsLoading(false);
+    };
+
+    fetchMaterialDetail();
   }, [params.slug]);
 
   const handleEdit = (slug: string) => {
@@ -116,33 +114,19 @@ const MaterialDetailPage = () => {
     }
   };
 
-  if (isLoading || !materialData) {
+  if (!materialData) {
     return <Loading />;
   }
 
   const LeftSideContent = () => {
+    const { name, image, description } = materialData;
+
     return (
-      <div className="flex flex-col gap-4 text-black">
-        <h2 className="text-2xl font-semibold">{materialData.name}</h2>
-        <Image
-          src={materialData.image ?? ""}
-          alt={materialData.name}
-          width={200}
-          height={200}
-        />
-        <div className="flex flex-col gap-4 mt-4">
-          <div className="flex flex-row items-center gap-2">
-            <Image
-              src={"/img/description.png"}
-              alt="description"
-              width={24}
-              height={24}
-            />
-            <p className="text-base font-medium">Deskripsi</p>
-          </div>
-          <p className="text-sm text-justify">{materialData.description}</p>
-        </div>
-      </div>
+      <DetailPageLeftSideContent
+        name={name}
+        image={image}
+        description={description}
+      />
     );
   };
 
@@ -166,6 +150,8 @@ const MaterialDetailPage = () => {
 
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}

@@ -145,11 +145,6 @@ export const footerMainMenuItems: MenuItem[] = [
     url: "/profile",
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  {
-    menu: "Keluar",
-    url: "/",
-    roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
-  },
   { menu: "Tugas", url: "/dashboard/task", roles: [Role.TEACHER] },
   {
     menu: "Leaderboard Kelas",
@@ -158,6 +153,11 @@ export const footerMainMenuItems: MenuItem[] = [
   },
   { menu: "Dashboard", url: "/dashboard", roles: [Role.ADMIN] },
   { menu: "Pengaturan Akun", url: "/account-settings", roles: [Role.ADMIN] },
+  {
+    menu: "Keluar",
+    url: "/",
+    roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
+  },
 ];
 
 export const footerHelpMenuItems: MenuItem[] = [

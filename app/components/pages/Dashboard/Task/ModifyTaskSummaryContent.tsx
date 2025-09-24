@@ -1,10 +1,5 @@
 import Button from "@/app/components/shared/Button";
-import {
-  CreateTaskQuestionOptionRequest,
-  CreateTaskQuestionRequest,
-  CreateTaskRequest,
-} from "@/app/interface/tasks/requests/ICreateTaskRequest";
-import DashboardTitle from "../DashboardTitle";
+import { CreateTaskRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
 import { ModifyTaskNavigationBar } from "./ModifyTaskNavigationBar";
 import Image from "next/image";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -17,7 +12,7 @@ import {
 import {
   GradeRow,
   MaterialRow,
-  QuestionCountRow,
+  NumberRow,
   SubjectRow,
   TaskTypeRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
@@ -133,7 +128,7 @@ const ModifyTaskSummaryContent = ({
           <SubjectRow value={subjectName} />
           <MaterialRow value={materialName} />
           <TaskTypeRow value={taskTypeName} />
-          <QuestionCountRow value={payload.questions.length.toString()} />
+          <NumberRow label="Jumlah Soal" value={payload.questions.length} />
           <GradeRow value={taskGrade} />
         </DetailInformationTable>
 
@@ -157,12 +152,7 @@ const ModifyTaskSummaryContent = ({
 
         <div className="flex flex-col gap-8">
           {payload.questions.map((q, idx) => (
-            <QuestionCard
-              key={idx}
-              index={idx}
-              question={q}
-              fromPage="edit"
-            />
+            <QuestionCard key={idx} index={idx} question={q} fromPage="edit" />
           ))}
         </div>
       </>

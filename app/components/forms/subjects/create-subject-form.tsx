@@ -56,7 +56,6 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
     const [isLoading, setIsLoading] = useState(false);
 
     useInjectUser(setValue, ["createdBy"]);
-    useAutoSaveDraft(watchedValues, "subjectDraft");
     const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
 
     const onSubmit = async (data: CreateSubjectFormInputs) => {

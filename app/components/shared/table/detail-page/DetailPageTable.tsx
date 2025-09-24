@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { Tag } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 interface DetailPageTableHeaderProps {
   imageSrc: string;
@@ -29,7 +31,7 @@ interface DetailPageTableContentProps {
   imageSrc: string;
   imageAlt: string;
   label: string;
-  value?: string | null;
+  value?: string | boolean | null;
 }
 
 export const DetailPageTableContent = ({
@@ -38,6 +40,26 @@ export const DetailPageTableContent = ({
   label,
   value,
 }: DetailPageTableContentProps) => {
+  const renderValue = () => {
+    if (typeof value === "boolean") {
+      return value ? (
+        <Tag icon={<CheckOutlined />} color="green">
+          Ya
+        </Tag>
+      ) : (
+        <Tag icon={<CloseOutlined />} color="red">
+          Tidak
+        </Tag>
+      );
+    }
+
+    if (typeof value === "string") {
+      return value.trim() !== "" ? value : "-";
+    }
+
+    return "-";
+  };
+
   return (
     <div className="grid grid-cols-[3rem_1fr] items-center text-black px-4 py-2">
       {/* Icon */}
@@ -52,9 +74,7 @@ export const DetailPageTableContent = ({
       {/* Label & Value */}
       <div className="grid grid-cols-2 w-full">
         <p className="text-base font-medium">{label}</p>
-        <p className="text-base font-normal">
-          {value && value.trim() !== "" ? value : "-"}
-        </p>
+        <div className="text-base font-normal">{renderValue()}</div>
       </div>
     </div>
   );

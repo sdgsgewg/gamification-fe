@@ -14,7 +14,7 @@ import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationMod
 import {
   GradeRow,
   MaterialRow,
-  QuestionCountRow,
+  NumberRow,
   SubjectRow,
   TaskTypeRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
@@ -25,6 +25,7 @@ import {
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
+import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 
 const TaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -151,32 +152,14 @@ const TaskDetailPage = () => {
   }
 
   const LeftSideContent = () => {
+    const { title, image, description } = taskData;
+
     return (
-      <div className="flex flex-col gap-4 text-black">
-        <h2 className="text-2xl font-semibold">{taskData.title}</h2>
-        <Image
-          src={
-            taskData.image && taskData.image.trim() !== ""
-              ? taskData.image
-              : "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/tasks/task.png"
-          }
-          alt={taskData.title}
-          width={200}
-          height={200}
-        />
-        <div className="flex flex-col gap-4 mt-4">
-          <div className="flex flex-row items-center gap-2">
-            <Image
-              src={"/img/description.png"}
-              alt="description"
-              width={24}
-              height={24}
-            />
-            <p className="text-base font-medium">Deskripsi</p>
-          </div>
-          <p className="text-sm text-justify">{taskData.description}</p>
-        </div>
-      </div>
+      <DetailPageLeftSideContent
+        name={title}
+        image={image}
+        description={description}
+      />
     );
   };
 
@@ -188,7 +171,7 @@ const TaskDetailPage = () => {
           <SubjectRow value={taskData.subject.name} />
           <MaterialRow value={taskData.material?.name ?? ""} />
           <TaskTypeRow value={taskData.taskType.name} />
-          <QuestionCountRow value={taskData.questionCount.toString()} />
+          <NumberRow label="Jumlah Soal" value={taskData.questionCount} />
           <GradeRow value={taskData.taskGrade} />
         </DetailInformationTable>
 

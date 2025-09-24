@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -13,6 +13,7 @@ import {
   footerMainMenuItems,
 } from "@/app/constants/menuItems";
 import { Role } from "@/app/enums/Role";
+import { auth, authEventTarget } from "@/app/functions/AuthProvider";
 
 const AboutSection = () => {
   return (
@@ -112,6 +113,28 @@ const CopyrightSection = () => {
 
 const Footer = () => {
   const [userRole, setUserRole] = useState<Role>(Role.GUEST);
+
+  useEffect(() => {
+    const updateUser = () => {
+      const user = auth.getCachedUserProfile();
+      if (user) {
+        setUserRole(user.role.name);
+      } else {
+        setUserRole(Role.GUEST);
+      }
+    };
+
+    updateUser(); // Initial
+
+    const handleAuthChange = () => {
+      updateUser(); // Re-fetch profile on logout/login
+    };
+
+    authEventTarget.addEventListener("authChanged", handleAuthChange);
+    return () => {
+      authEventTarget.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, []);
 
   return (
     <footer className="bg-[#556FD7] px-6 py-8 mt-auto">

@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  useEffect,
+  useMemo,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Form } from "antd";
-import { z } from "zod";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "../../fields/TextField";
@@ -10,25 +16,11 @@ import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISub
 import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
-import { materialProvider } from "@/app/functions/MaterialProvider";
 import {
-  useEffect,
-  useMemo,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
-
-// --- Zod Schema ---
-const filterTaskSchema = z.object({
-  searchText: z.string().optional(),
-  subjectId: z.string().optional(),
-  materialId: z.string().optional(),
-  taskTypeId: z.string().optional(),
-  gradeIds: z.array(z.string()).optional(),
-});
-
-export type FilterTaskInputs = z.infer<typeof filterTaskSchema>;
+  filterTaskDefaultValues,
+  FilterTaskInputs,
+  filterTaskSchema,
+} from "@/app/schemas/tasks/filterTask";
 
 export interface FilterTaskFormRef {
   resetForm: () => void;
@@ -36,13 +28,14 @@ export interface FilterTaskFormRef {
 
 interface FilterTaskFormProps {
   subjectData: SubjectOverviewResponse[];
+  materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
   gradeData: GradeOverviewResponse[];
   onFinish: (values: FilterTaskInputs) => void;
 }
 
 const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
-  ({ subjectData, taskTypeData, gradeData, onFinish }, ref) => {
+  ({ subjectData, materialData, taskTypeData, gradeData, onFinish }, ref) => {
     const {
       control,
       handleSubmit,
@@ -51,33 +44,13 @@ const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
       reset,
     } = useForm<FilterTaskInputs>({
       resolver: zodResolver(filterTaskSchema),
-      defaultValues: {
-        searchText: "",
-        subjectId: "",
-        materialId: "",
-        taskTypeId: "",
-        gradeIds: [],
-      },
+      defaultValues: filterTaskDefaultValues,
     });
 
     const selectedSubjectId = useWatch({ control, name: "subjectId" });
-
-    const [materialData, setMaterialData] = useState<
+    const [filtertedMaterials, setFiltertedMaterials] = useState<
       MaterialOverviewResponse[]
     >([]);
-
-    const fetchMaterials = async (subjectName?: string) => {
-      try {
-        const res = await materialProvider.getMaterials({
-          searchText: subjectName,
-        });
-        if (res.isSuccess && res.data) setMaterialData(res.data);
-        else setMaterialData([]);
-      } catch (error) {
-        console.error("Failed to fetch materials: ", error);
-        setMaterialData([]);
-      }
-    };
 
     const subjectOptions = useMemo(
       () =>
@@ -90,23 +63,32 @@ const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
 
     const materialOptions = useMemo(
       () =>
-        materialData.map((material) => ({
+        filtertedMaterials.map((material) => ({
           value: material.materialId,
           label: material.name,
         })),
-      [materialData]
+      [filtertedMaterials]
     );
 
-    const taskTypeOptions = taskTypeData.map((taskType) => ({
-      value: taskType.taskTypeId,
-      label: taskType.name,
-    }));
+    const taskTypeOptions = useMemo(
+      () =>
+        taskTypeData.map((taskType) => ({
+          value: taskType.taskTypeId,
+          label: taskType.name,
+        })),
+      [taskTypeData]
+    );
 
-    const gradeOptions = gradeData.map((grade) => ({
-      value: grade.gradeId,
-      label: grade.name,
-    }));
+    const gradeOptions = useMemo(
+      () =>
+        gradeData.map((grade) => ({
+          value: grade.gradeId,
+          label: grade.name,
+        })),
+      [gradeData]
+    );
 
+    // Reset opsi material field berdasarkan subject yang dipilih
     useEffect(() => {
       if (selectedSubjectId) {
         const subject = subjectData.find(
@@ -114,10 +96,14 @@ const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
         );
         if (subject) {
           resetField("materialId");
-          fetchMaterials(subject.name);
+
+          const filteredMaterials = materialData.filter(
+            (m) => m.subject === subject.name
+          );
+          setFiltertedMaterials(filteredMaterials);
         }
       }
-    }, [selectedSubjectId]);
+    }, [selectedSubjectId, subjectData, materialData, resetField]);
 
     // Expose resetForm ke parent via ref
     useImperativeHandle(ref, () => ({

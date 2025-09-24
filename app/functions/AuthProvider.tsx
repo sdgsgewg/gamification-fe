@@ -58,8 +58,6 @@ export default class AuthProvider {
         });
       }
     } else {
-      console.log("Fetch user profile...");
-
       await this.fetchUserProfile(); // token valid → fetch user
     }
   }
@@ -156,8 +154,6 @@ export default class AuthProvider {
         values
       );
 
-      console.log("Res: ", JSON.stringify(res, null, 2));
-
       const data = res.data;
 
       if (!data || !data.accessToken) {
@@ -173,6 +169,9 @@ export default class AuthProvider {
       this.sessionToken = data.accessToken;
       this.isLoggedIn = true;
       this.userProfile = data.user;
+
+      // Set cookie role untuk middleware
+      document.cookie = `role=${data.user.role.name}; path=/;`;
 
       return res;
     } catch (error) {
@@ -222,6 +221,9 @@ export default class AuthProvider {
 
       authEventTarget.dispatchEvent(new Event("authChanged"));
 
+      // Hapus cookie role
+      document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
       const res: BaseResponseDto = await postAxios(`${API_URL}/logout`);
 
       return res;
@@ -233,6 +235,9 @@ export default class AuthProvider {
   async getLoggedInUser(): Promise<ApiResponse<UserDetailResponse>> {
     try {
       const data = await getAxios("/users/me");
+
+      console.log("Data logged in user: ", JSON.stringify(data, null, 2));
+
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserDetailResponse>(error);
@@ -245,6 +250,7 @@ export default class AuthProvider {
       const { data } = res;
 
       if (data) {
+        setItem(this.userProfileKey, JSON.stringify(data));
         this.userProfile = data;
       }
     } catch (err) {

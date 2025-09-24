@@ -11,7 +11,6 @@ import { gradeProvider } from "@/app/functions/GradeProvider";
 import CreateMaterialForm from "@/app/components/forms/materials/create-material-form";
 import { CreateMaterialFormInputs } from "@/app/schemas/materials/createMaterial";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { removeItem } from "@/app/utils/storage";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const CreateMaterialPage = () => {
@@ -45,7 +44,7 @@ const CreateMaterialPage = () => {
     const isDirty = formRef.current?.isDirty;
 
     if (!isDirty) {
-      router.push("/dashboard/material");
+      router.back();
       return;
     }
 
@@ -53,10 +52,8 @@ const CreateMaterialPage = () => {
   };
 
   const handleBackConfirmation = () => {
-    removeItem("materialDraft");
-
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/material");
+    router.back();
   };
 
   const handleCreateMaterialSuccess = (values: CreateMaterialFormInputs) => {
@@ -74,6 +71,7 @@ const CreateMaterialPage = () => {
       <Toaster position="top-right" />
       <DashboardTitle title="Buat Materi Pelajaran Baru" onBack={handleBack} />
       <CreateMaterialForm
+        ref={formRef}
         subjectData={subjectData}
         gradeData={gradeData}
         onFinish={handleCreateMaterialSuccess}

@@ -9,6 +9,7 @@ import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOv
 import { gradeProvider } from "@/app/functions/GradeProvider";
 import { userProvider } from "@/app/functions/UserProvider";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
+import { IMAGES } from "@/app/constants/images";
 
 type ViewState = "form" | "success" | "error";
 
@@ -80,7 +81,7 @@ const CompleteProfilePage = () => {
 
   const SuccessView = () => (
     <ShowInformationSection
-      imageUrl="/img/success-solid-icon.png"
+      imageUrl={IMAGES.SUCCESS_SOLID_ICON}
       imageAlt="Sukses"
       title="Pendaftaran Berhasil"
       subtitle1="Akun Anda telah berhasil dibuat."
@@ -91,7 +92,7 @@ const CompleteProfilePage = () => {
 
   const ErrorView = () => (
     <ShowInformationSection
-      imageUrl="/img/error-regular-icon.png"
+      imageUrl={IMAGES.ERROR_REGULAR_ICON}
       imageAlt="Error"
       title="Terjadi Kesalahan"
       subtitle1="User ID tidak ditemukan."

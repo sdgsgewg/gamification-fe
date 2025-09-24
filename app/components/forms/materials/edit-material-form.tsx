@@ -23,9 +23,7 @@ import FormLayout from "@/app/dashboard/form-layout";
 import SelectField from "../../fields/SelectField";
 import Loading from "../../shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { getItem, removeItem } from "@/app/utils/storage";
 import {
-  useAutoSaveDraft,
   useDirtyCheckWithDefaults,
   useInitializeFileList,
   useInitializeForm,
@@ -42,13 +40,6 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
   ({ materialData, subjectData, gradeData, onFinish }, ref) => {
     const { toast } = useToast();
 
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("materialDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : subjectData || editMaterialDefaultValues;
-
     const {
       control,
       handleSubmit,
@@ -57,7 +48,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       reset,
     } = useForm<EditMaterialFormInputs>({
       resolver: zodResolver(editMaterialSchema),
-      defaultValues,
+      defaultValues: materialData || editMaterialDefaultValues,
     });
 
     const watchedValues = useWatch({ control });
@@ -80,7 +71,6 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
     useInitializeFileList(materialData, setFileList);
-    useAutoSaveDraft(watchedValues, "materialDraft");
     const isDirty = useDirtyCheckWithDefaults(
       watchedValues,
       materialData || editMaterialDefaultValues,
@@ -132,7 +122,6 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
 
       if (isSuccess) {
         toast.success(message ?? "Materi pelajaran berhasil diperbarui!");
-        removeItem("materialDraft");
         onFinish(data);
         setFileList([]);
       } else {

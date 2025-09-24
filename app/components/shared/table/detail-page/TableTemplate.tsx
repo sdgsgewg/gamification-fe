@@ -1,6 +1,7 @@
 import TableWrapper from "./TableWrapper";
 import { DetailPageTableHeader } from "./DetailPageTable";
-import { DurationRow, TimeRow } from "./TableRowData";
+import { DateRow, TimeRow } from "./TableRowData";
+import { IMAGES } from "@/app/constants/images";
 
 interface DetailInformationTableProps {
   children: React.ReactNode;
@@ -39,15 +40,15 @@ export const DurationTable = ({
     <TableWrapper>
       {/* Header */}
       <DetailPageTableHeader
-        imageSrc="/img/time.png"
+        imageSrc={IMAGES.TIME}
         imageAlt="Waktu Pengerjaan"
         label="Waktu Pengerjaan"
       />
 
       {/* Isi */}
-      <TimeRow label="Waktu Mulai" value={startTime} />
-      <TimeRow label="Waktu Selesai" value={endTime ?? ""} />
-      <DurationRow value={duration} />
+      <DateRow label="Waktu Mulai" value={startTime} />
+      <DateRow label="Waktu Selesai" value={endTime ?? ""} />
+      <TimeRow label="Durasi" value={duration} />
     </TableWrapper>
   );
 };
@@ -62,14 +63,14 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
     <TableWrapper>
       {/* Header */}
       <DetailPageTableHeader
-        imageSrc="/img/date.png"
+        imageSrc={IMAGES.DATE}
         imageAlt="Riwayat"
         label="Riwayat"
       />
 
       {/* Isi */}
-      <TimeRow label="Dibuat Oleh" value={createdBy} />
-      <TimeRow label="Terkahir Diperbarui" value={updatedBy ?? ""} />
+      <DateRow label="Dibuat Oleh" value={createdBy} />
+      <DateRow label="Terkahir Diperbarui" value={updatedBy ?? ""} />
     </TableWrapper>
   );
 };

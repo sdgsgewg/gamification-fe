@@ -21,7 +21,7 @@ const CreateSubjectPage = () => {
     const isDirty = formRef.current?.isDirty;
 
     if (!isDirty) {
-      router.push("/dashboard/subject");
+      router.back();
       return;
     }
 
@@ -32,7 +32,7 @@ const CreateSubjectPage = () => {
     removeItem("subjectDraft");
 
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/subject");
+    router.back();
   };
 
   const handleCreateSubjectSuccess = (values: CreateSubjectFormInputs) => {

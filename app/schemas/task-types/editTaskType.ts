@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const editTaskTypeSchema = z.object({
+  taskTypeId: z.string().nonempty("Id wajib diisi"),
   name: z.string().nonempty("Nama wajib diisi"),
   description: z.string().optional(),
   scope: z.string().nonempty(),
@@ -15,3 +16,15 @@ export const editTaskTypeSchema = z.object({
 });
 
 export type EditTaskTypeFormInputs = z.infer<typeof editTaskTypeSchema>;
+
+export const editTaskTypeDefaultValues: EditTaskTypeFormInputs = {
+  taskTypeId: "",
+  name: "",
+  description: "",
+  scope: "",
+  hasDeadline: "",
+  isCompetitive: "",
+  isRepeatable: "",
+  pointMultiplier: 1,
+  updatedBy: "",
+};

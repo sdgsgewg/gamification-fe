@@ -9,6 +9,15 @@ export const fileToRcFile = (file: File): RcFile => {
   } as RcFile;
 };
 
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
+
 export const urlToUploadFile = (
   url: string,
   filename: string = "image"

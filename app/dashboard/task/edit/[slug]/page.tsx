@@ -16,19 +16,20 @@ import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { setItem } from "@/app/utils/storage";
 import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
 import { message } from "antd";
-import { EditTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/editTaskOverview";
+import {
+  editTaskOverviewDefaultValues,
+  EditTaskOverviewFormInputs,
+} from "@/app/schemas/tasks/task-overview/editTaskOverview";
 import { EditTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/editTaskQuestion";
-import EditTaskOverviewForm, {
-  EditTaskOverviewFormRef,
-} from "@/app/components/forms/tasks/task-overview/edit-task-overview-form";
+import EditTaskOverviewForm from "@/app/components/forms/tasks/task-overview/edit-task-overview-form";
 import { UpdateTaskRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
 import EditTaskQuestionForm from "@/app/components/forms/tasks/task-question/edit-task-question-form";
 import { QuestionType } from "@/app/enums/QuestionType";
 import { parseDate } from "@/app/utils/date";
 import Loading from "@/app/components/shared/Loading";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 type ViewState = "task-overview" | "task-question" | "task-summary";
 
@@ -49,12 +50,13 @@ const EditTaskPage = () => {
     useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [taskOverview, setTaskOverview] =
-    useState<EditTaskOverviewFormInputs | null>(null);
+  const [taskOverview, setTaskOverview] = useState<EditTaskOverviewFormInputs>(
+    editTaskOverviewDefaultValues
+  );
   const [taskQuestions, setTaskQuestions] =
     useState<EditTaskQuestionFormInputs | null>(null);
 
-  const formRef = useRef<EditTaskOverviewFormRef>(null);
+  const formRef = useRef<FormRef>(null);
 
   const fetchTaskDetail = async () => {
     setIsLoading(true);
@@ -144,8 +146,6 @@ const EditTaskPage = () => {
 
   // STEP 1: Overview
   const handleTaskOverviewSubmit = (values: EditTaskOverviewFormInputs) => {
-    console.log("Task overview submit data: ", JSON.stringify(values, null, 2));
-
     setTaskOverview(values);
     setView("task-question");
   };
@@ -182,10 +182,9 @@ const EditTaskPage = () => {
           type: q.type,
           timeLimit: q.timeLimit,
           options:
-            q.options?.map((opt, idx) => ({
+            q.options?.map((opt) => ({
               optionId: opt.optionId ?? "",
               text: opt.text,
-              // isCorrect: q.correctAnswer === idx.toString(),
               isCorrect: opt.isCorrect,
             })) || [],
         })),
@@ -234,40 +233,18 @@ const EditTaskPage = () => {
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
-    const hasData = Boolean(taskOverview) || isDirty;
 
-    if (!hasData) {
-      router.push("/dashboard/task");
+    if (!isDirty) {
+      router.back();
       return;
     }
 
-    console.log("Tetap di task overview: ", isDirty);
     setIsBackConfirmationModalVisible(true);
   };
 
   const handleBackConfirmation = () => {
-    // Simpan draft kosong
-    setItem(
-      "taskOverviewDraft",
-      JSON.stringify({
-        title: "",
-        description: "",
-        creatorId: "",
-        createdBy: "",
-        subjectId: "",
-        materialId: "",
-        taskTypeId: "",
-        gradeIds: [],
-        startDate: undefined,
-        startTime: undefined,
-        endDate: undefined,
-        endTime: undefined,
-        imageFile: undefined,
-      })
-    );
-
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/task");
+    router.back();
   };
 
   const TaskOverviewView = () => {
@@ -328,7 +305,7 @@ const EditTaskPage = () => {
         timeLimit: q.timeLimit,
         imageFile: q.imageFile ?? q.image,
         options:
-          q.options?.map((opt, idx) => ({
+          q.options?.map((opt) => ({
             optionId: opt.optionId ?? "",
             text: opt.text,
             isCorrect: opt.isCorrect,

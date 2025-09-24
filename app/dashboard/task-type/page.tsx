@@ -58,6 +58,10 @@ const TaskTypePage = () => {
     router.push("/dashboard/task-type/create");
   };
 
+  const handleView = (slug: string) => {
+    router.push(`/dashboard/task-type/${slug}`);
+  };
+
   const handleEdit = (slug: string) => {
     router.push(`/dashboard/task-type/edit/${slug}`);
   };
@@ -194,29 +198,12 @@ const TaskTypePage = () => {
       }),
     },
     {
-      title: "Dibuat Oleh",
-      key: "createdBy",
-      width: 250,
-      render: (_, record) => record.createdBy ?? "-",
-      onCell: () => ({
-        style: { minWidth: 250 },
-      }),
-    },
-    {
-      title: "Terakhir Diperbarui",
-      key: "updatedBy",
-      width: 250,
-      render: (_, record) => record.updatedBy ?? "-",
-      onCell: () => ({
-        style: { minWidth: 250 },
-      }),
-    },
-    {
       title: "Aksi",
       key: "actions",
-      width: 150,
+      width: 200,
       render: (_, record) => (
         <RowActions
+          onView={() => handleView(record.slug)}
           onEdit={() => handleEdit(record.slug)}
           onDelete={() => showDeleteModal(record.taskTypeId, record.name)}
         />

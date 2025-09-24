@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { IMAGES } from "../constants/images";
 
 interface FormLayoutProps {
   top?: React.ReactNode; // form
@@ -15,7 +16,7 @@ export default function FormLayout({ top, bottom }: FormLayoutProps) {
       </div>
       <div className="w-0 lg:w-1/2">
         <Image
-          src={"/img/auth-bg.jpg"}
+          src={IMAGES.AUTH_BG}
           alt={"auth background"}
           width={500}
           height={500}

@@ -22,12 +22,7 @@ import SelectField from "../../fields/SelectField";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { getItem, removeItem } from "@/app/utils/storage";
-import {
-  useAutoSaveDraft,
-  useDirtyCheck,
-  useInjectUser,
-} from "@/app/utils/form";
+import { useDirtyCheck, useInjectUser } from "@/app/utils/form";
 
 interface CreateMaterialFormProps {
   subjectData: SubjectOverviewResponse[];
@@ -39,13 +34,6 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
   ({ subjectData, gradeData, onFinish }, ref) => {
     const { toast } = useToast();
 
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("materialDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : createMaterialDefaultValues;
-
     const {
       control,
       handleSubmit,
@@ -53,7 +41,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
       setValue,
     } = useForm<CreateMaterialFormInputs>({
       resolver: zodResolver(createMaterialSchema),
-      defaultValues,
+      defaultValues: createMaterialDefaultValues,
     });
 
     const watchedValues = useWatch({ control });
@@ -72,7 +60,6 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
     }));
 
     useInjectUser(setValue, ["createdBy"]);
-    useAutoSaveDraft(watchedValues, "materialDraft");
     const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
 
     const onSubmit = async (data: CreateMaterialFormInputs) => {
@@ -86,24 +73,18 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
         formData.append("imageFile", data.imageFile);
       }
 
-      // Kalau mau lihat isi FormData:
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
       const result = await materialProvider.createMaterial(formData);
 
       const { isSuccess, message } = result;
 
       if (isSuccess) {
         toast.success(message ?? "Materi pelajaran berhasil dibuat!");
-        // Hapus draft sebelum onFinish
-        removeItem("subjectDraft");
         onFinish(data);
-        setFileList([]); // reset file list
+        setFileList([]);
       } else {
         toast.error(message ?? "Pembuatan materi pelajaran gagal.");
       }
+
       setIsLoading(false);
     };
 
@@ -117,6 +98,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
         {isLoading && <Loading />}
 
         <Form
+          id="create-material-form"
           name="create-material"
           onFinish={handleSubmit(onSubmit)}
           layout="vertical"

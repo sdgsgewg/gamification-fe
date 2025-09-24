@@ -8,6 +8,6 @@ export interface TaskTypeDetailResponse {
   isCompetitive: boolean;
   isRepeatable: boolean;
   pointMultiplier: number;
-  createdBy?: string;
+  createdBy: string;
   updatedBy?: string;
 }

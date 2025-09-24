@@ -54,7 +54,7 @@ const EditSubjectPage = () => {
     const isDirty = formRef.current?.isDirty;
 
     if (!isDirty) {
-      router.push("/dashboard/subject");
+      router.back();
       return;
     }
 
@@ -65,7 +65,7 @@ const EditSubjectPage = () => {
     removeItem("subjectDraft");
 
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/subject");
+    router.back();
   };
 
   const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {

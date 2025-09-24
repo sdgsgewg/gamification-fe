@@ -3,11 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { message } from "antd";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import { gradeProvider } from "@/app/functions/GradeProvider";
@@ -15,7 +13,6 @@ import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
 import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { removeItem } from "@/app/utils/storage";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const EditMaterialPage = () => {
@@ -54,6 +51,7 @@ const EditMaterialPage = () => {
       console.error(message ?? "Gagal memuat detail materi pelajaran");
       router.push("/dashboard/material");
     }
+
     setIsLoading(false);
   };
 
@@ -79,7 +77,7 @@ const EditMaterialPage = () => {
     const isDirty = formRef.current?.isDirty;
 
     if (!isDirty) {
-      router.push("/dashboard/material");
+      router.back();
       return;
     }
 
@@ -87,10 +85,8 @@ const EditMaterialPage = () => {
   };
 
   const handleBackConfirmation = () => {
-    removeItem("materialDraft");
-
     setIsBackConfirmationModalVisible(false);
-    router.push("/dashboard/material");
+    router.back();
   };
 
   const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
@@ -114,7 +110,7 @@ const EditMaterialPage = () => {
       {isLoading && <Loading />}
 
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Materi Pelajaran" showBackButton={true} />
+      <DashboardTitle title="Edit Materi Pelajaran" onBack={handleBack} />
       {materialData && (
         <EditMaterialForm
           ref={formRef}

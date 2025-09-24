@@ -20,7 +20,6 @@ import {
 } from "@/app/schemas/subjects/editSubject";
 import { getItem, removeItem } from "@/app/utils/storage";
 import {
-  useAutoSaveDraft,
   useDirtyCheckWithDefaults,
   useInitializeFileList,
   useInitializeForm,
@@ -64,7 +63,6 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
     useInitializeFileList(subjectData, setFileList);
-    useAutoSaveDraft(watchedValues, "subjectDraft");
     const isDirty = useDirtyCheckWithDefaults(
       watchedValues,
       subjectData || editSubjectDefaultValues,

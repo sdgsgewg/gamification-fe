@@ -7,6 +7,6 @@ export interface MaterialDetailResponse {
   subject: { subjectId: string; name: string };
   materialGradeIds: string[];
   materialGrade: string;
-  createdBy?: string;
+  createdBy: string;
   updatedBy?: string;
 }

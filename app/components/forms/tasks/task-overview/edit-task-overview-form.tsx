@@ -33,16 +33,20 @@ import DateField from "../../../fields/DateField";
 import TimeField from "../../../fields/TimeField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { getItem, removeItem, setItem } from "@/app/utils/storage";
+import { getItem, removeItem } from "@/app/utils/storage";
 import { combineDateTime } from "@/app/utils/date";
 import { fileToRcFile } from "@/app/utils/file";
-
-export interface EditTaskOverviewFormRef {
-  isDirty: boolean;
-}
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import {
+  useAutoSaveDraft,
+  useDirtyCheckWithDefaults,
+  useInitializeFileList,
+  useInitializeForm,
+  useRevokeBlobUrls,
+} from "@/app/utils/form";
 
 interface EditTaskOverviewFormProps {
-  taskOverview: EditTaskOverviewFormInputs | null;
+  taskOverview?: EditTaskOverviewFormInputs;
   subjectData: SubjectOverviewResponse[];
   materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
@@ -50,10 +54,7 @@ interface EditTaskOverviewFormProps {
   onNext: (values: EditTaskOverviewFormInputs) => void;
 }
 
-const EditTaskOverviewForm = forwardRef<
-  EditTaskOverviewFormRef,
-  EditTaskOverviewFormProps
->(
+const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
   (
     {
       taskOverview,
@@ -87,9 +88,13 @@ const EditTaskOverviewForm = forwardRef<
     });
 
     const watchedValues = useWatch({ control });
-    const [isDirty, setIsDirty] = useState(false);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const selectedSubjectId = useWatch({ control, name: "subjectId" });
+    const [filtertedMaterials, setFiltertedMaterials] = useState<
+      MaterialOverviewResponse[]
+    >([]);
     const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
 
     // Gunakan useMemo untuk nilai turunan
@@ -108,13 +113,6 @@ const EditTaskOverviewForm = forwardRef<
 
       return taskType?.hasDeadline;
     }, [selectedTaskTypeId, taskTypeData]);
-
-    const [filtertedMaterials, setFiltertedMaterials] = useState<
-      MaterialOverviewResponse[]
-    >([]);
-    const [oldImageUrl, setOldImageUrl] = useState<string | undefined>();
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
 
     // Prepare options for select fields
     const subjectOptions = useMemo(
@@ -153,6 +151,19 @@ const EditTaskOverviewForm = forwardRef<
       [gradeData]
     );
 
+    useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
+      ...d,
+      updatedBy: auth.getCachedUserProfile()?.name,
+    }));
+    // useInitializeFileList(taskOverview, setFileList);
+    useAutoSaveDraft(watchedValues, "taskOverviewDraft");
+    const isDirty = useDirtyCheckWithDefaults(
+      watchedValues,
+      taskOverview || editTaskOverviewDefaultValues,
+      ["updatedBy"]
+    );
+    useRevokeBlobUrls(fileList);
+
     // Handler untuk perubahan upload
     const handleImageChange = (info: any) => {
       let fileList = [...info.fileList];
@@ -172,20 +183,6 @@ const EditTaskOverviewForm = forwardRef<
         // Jika tidak ada file, set ke null
         setValue("imageFile", null, { shouldDirty: true });
       }
-    };
-
-    // Handler sebelum upload (opsional untuk validasi)
-    const beforeUpload = (file: File) => {
-      const isJpgOrPng =
-        file.type === "image/jpeg" || file.type === "image/png";
-      if (!isJpgOrPng) {
-        toast.error("Hanya file JPG/PNG yang diizinkan!");
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        toast.error("Ukuran gambar harus kurang dari 2MB!");
-      }
-      return isJpgOrPng && isLt2M;
     };
 
     const onSubmit = async (data: EditTaskOverviewFormInputs) => {
@@ -221,46 +218,6 @@ const EditTaskOverviewForm = forwardRef<
       }
     };
 
-    useEffect(() => {
-      if (taskOverview) {
-        reset({
-          ...taskOverview,
-          imageFile: taskOverview.imageFile ?? undefined,
-        });
-      }
-    }, [taskOverview, reset]);
-
-    useEffect(() => {
-      const user = auth.getCachedUserProfile();
-      if (user) {
-        setValue("updatedBy", user.name);
-      }
-    }, [setValue]);
-
-    // Simpan draft otomatis ke localStorage setiap ada perubahan
-    useEffect(() => {
-      if (!watchedValues) return;
-
-      try {
-        setItem("taskOverviewDraft", JSON.stringify(watchedValues));
-      } catch (error) {
-        console.error("Gagal menyimpan draft ke localStorage:", error);
-      }
-    }, [watchedValues]);
-
-    useEffect(() => {
-      // Simpan blob URLs saat komponen unmount
-      return () => {
-        if (fileList && fileList.length > 0) {
-          fileList.forEach((file) => {
-            if (file.url && file.url.startsWith("blob:")) {
-              URL.revokeObjectURL(file.url);
-            }
-          });
-        }
-      };
-    }, [fileList]);
-
     // Effect untuk mengisi fileList dengan gambar yang sudah ada
     useEffect(() => {
       if (taskOverview) {
@@ -268,8 +225,6 @@ const EditTaskOverviewForm = forwardRef<
           "Task Overview Data (in form): ",
           JSON.stringify(taskOverview, null, 2)
         );
-
-        setOldImageUrl(taskOverview.image || "");
 
         // Jika ada image URL dari server, tampilkan preview
         if (taskOverview.image) {
@@ -316,190 +271,176 @@ const EditTaskOverviewForm = forwardRef<
       }
     }, [selectedSubjectId, subjectData, materialData, resetField]);
 
-    useEffect(() => {
-      const hasData = Object.entries(watchedValues).some(([key, value]) => {
-        // Abaikan field updatedBy
-        if (key === "updatedBy") return false;
-
-        if (Array.isArray(value)) return value.length > 0; // cek array
-        if (typeof value === "string") return value.trim() !== ""; // cek string
-        if (value instanceof Date) return true; // kalau ada tanggal
-        return value !== null && value !== undefined; // cek lainnya
-      });
-
-      setIsDirty(hasData);
-    }, [watchedValues]);
-
     // Expose ke parent
     useImperativeHandle(ref, () => ({
       isDirty,
     }));
 
-    if (isLoading) {
-      return <Loading />;
-    }
-
     return (
-      <Form
-        id="edit-task-overview-form"
-        name="edit-task-overview"
-        onFinish={handleSubmit(onSubmit)}
-        layout="vertical"
-        requiredMark={false}
-      >
-        <FormLayout
-          left={
-            <>
-              <TextField
-                control={control}
-                name="title"
-                label="Judul"
-                placeholder="Masukkan judul tugas"
-                errors={errors}
-                required
-              />
+      <>
+        {isLoading && <Loading />}
 
-              <TextAreaField
-                control={control}
-                name="description"
-                label="Deskripsi"
-                placeholder="Masukkan deskripsi tugas"
-                errors={errors}
-              />
+        <Form
+          id="edit-task-overview-form"
+          name="edit-task-overview"
+          onFinish={handleSubmit(onSubmit)}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <FormLayout
+            left={
+              <>
+                <TextField
+                  control={control}
+                  name="title"
+                  label="Judul"
+                  placeholder="Masukkan judul tugas"
+                  errors={errors}
+                  required
+                />
 
-              <SelectField
-                control={control}
-                name="subjectId"
-                label="Mata Pelajaran"
-                placeholder="Pilih mata pelajaran"
-                options={subjectOptions}
-                errors={errors}
-                loading={subjectOptions.length === 0}
-                disabled={subjectOptions.length === 0}
-                required
-              />
+                <TextAreaField
+                  control={control}
+                  name="description"
+                  label="Deskripsi"
+                  placeholder="Masukkan deskripsi tugas"
+                  errors={errors}
+                />
 
-              <SelectField
-                control={control}
-                name="materialId"
-                label="Materi Pelajaran"
-                placeholder="Pilih materi pelajaran"
-                options={materialOptions}
-                errors={errors}
-                disabled={materialOptions.length === 0}
-              />
+                <SelectField
+                  control={control}
+                  name="subjectId"
+                  label="Mata Pelajaran"
+                  placeholder="Pilih mata pelajaran"
+                  options={subjectOptions}
+                  errors={errors}
+                  loading={subjectOptions.length === 0}
+                  disabled={subjectOptions.length === 0}
+                  required
+                />
 
-              <SelectField
-                control={control}
-                name="taskTypeId"
-                label="Tipe Tugas"
-                placeholder="Pilih tipe tugas"
-                options={taskTypeOptions}
-                errors={errors}
-                loading={taskTypeOptions.length === 0}
-                disabled={taskTypeOptions.length === 0}
-                required
-              />
+                <SelectField
+                  control={control}
+                  name="materialId"
+                  label="Materi Pelajaran"
+                  placeholder="Pilih materi pelajaran"
+                  options={materialOptions}
+                  errors={errors}
+                  disabled={materialOptions.length === 0}
+                />
 
-              <SelectField
-                control={control}
-                name="gradeIds"
-                label="Tingkat Kelas"
-                placeholder="Pilih tingkat kelas"
-                options={gradeOptions}
-                errors={errors}
-                loading={gradeOptions.length === 0}
-                disabled={gradeOptions.length === 0}
-                mode="multiple"
-              />
+                <SelectField
+                  control={control}
+                  name="taskTypeId"
+                  label="Tipe Tugas"
+                  placeholder="Pilih tipe tugas"
+                  options={taskTypeOptions}
+                  errors={errors}
+                  loading={taskTypeOptions.length === 0}
+                  disabled={taskTypeOptions.length === 0}
+                  required
+                />
 
-              {selectedTaskTypeHasDeadline && (
-                <>
-                  <div className="w-full flex flex-col gap-2 mb-0">
-                    <p className="text-base font-medium">Waktu Mulai</p>
-                    <div className="w-full flex flex-row items-center gap-8">
-                      <div className="flex-1">
-                        <DateField
-                          control={control}
-                          name="startDate"
-                          label="Tanggal"
-                          placeholder="Masukkan tanggal"
-                          errors={errors}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <TimeField
-                          control={control}
-                          name="startTime"
-                          label="Jam"
-                          placeholder="Masukkan jam"
-                          errors={errors}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <SelectField
+                  control={control}
+                  name="gradeIds"
+                  label="Tingkat Kelas"
+                  placeholder="Pilih tingkat kelas"
+                  options={gradeOptions}
+                  errors={errors}
+                  loading={gradeOptions.length === 0}
+                  disabled={gradeOptions.length === 0}
+                  mode="multiple"
+                />
 
-                  <div className="w-full flex flex-col gap-2 mb-0">
-                    <p className="text-base font-medium">Waktu Selesai</p>
-                    <div className="w-full flex flex-row items-center gap-8">
-                      <div className="flex-1">
-                        <DateField
-                          control={control}
-                          name="endDate"
-                          label="Tanggal"
-                          placeholder="Masukkan tanggal"
-                          errors={errors}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <TimeField
-                          control={control}
-                          name="endTime"
-                          label="Jam"
-                          placeholder="Masukkan jam"
-                          errors={errors}
-                        />
+                {selectedTaskTypeHasDeadline && (
+                  <>
+                    <div className="w-full flex flex-col gap-2 mb-0">
+                      <p className="text-base font-medium">Waktu Mulai</p>
+                      <div className="w-full flex flex-row items-center gap-8">
+                        <div className="flex-1">
+                          <DateField
+                            control={control}
+                            name="startDate"
+                            label="Tanggal"
+                            placeholder="Masukkan tanggal"
+                            errors={errors}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <TimeField
+                            control={control}
+                            name="startTime"
+                            label="Jam"
+                            placeholder="Masukkan jam"
+                            errors={errors}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              )}
-            </>
-          }
-          right={
-            <ImageField
-              control={control}
-              name="imageFile"
-              label="Upload Gambar"
-              fileList={fileList}
-              setFileList={setFileList}
-              onChange={handleImageChange} // Tambahkan onChange handler
-              errors={errors}
-              setOldImageUrl={setOldImageUrl}
-              mode="file"
-            />
-          }
-          bottom={
-            <>
-              <p className="text-sm mb-4">
-                Jika semua data sudah sesuai, yuk lanjut buat pertanyaannya!
-              </p>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                variant="primary"
-                className="!px-4"
-              >
-                <span className="text-base font-semibold">
-                  Lanjut Buat Soal
-                </span>
-                <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
-              </Button>
-            </>
-          }
-        />
-      </Form>
+
+                    <div className="w-full flex flex-col gap-2 mb-0">
+                      <p className="text-base font-medium">Waktu Selesai</p>
+                      <div className="w-full flex flex-row items-center gap-8">
+                        <div className="flex-1">
+                          <DateField
+                            control={control}
+                            name="endDate"
+                            label="Tanggal"
+                            placeholder="Masukkan tanggal"
+                            errors={errors}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <TimeField
+                            control={control}
+                            name="endTime"
+                            label="Jam"
+                            placeholder="Masukkan jam"
+                            errors={errors}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            }
+            right={
+              <ImageField
+                control={control}
+                name="imageFile"
+                label="Upload Gambar"
+                fileList={fileList}
+                setFileList={setFileList}
+                onChange={handleImageChange}
+                errors={errors}
+                // setOldImageUrl={setOldImageUrl}
+                mode="file"
+              />
+            }
+            bottom={
+              <>
+                <p className="text-sm mb-4">
+                  Jika semua data sudah sesuai, yuk lanjut buat pertanyaannya!
+                </p>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  variant="primary"
+                  className="!px-4"
+                >
+                  <span className="text-base font-semibold">
+                    Lanjut Buat Soal
+                  </span>
+                  <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
+                </Button>
+              </>
+            }
+          />
+        </Form>
+      </>
     );
   }
 );

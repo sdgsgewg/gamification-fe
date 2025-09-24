@@ -1,4 +1,5 @@
 import { DetailPageTableContent } from "./DetailPageTable";
+import { IMAGES } from "@/app/constants/images";
 
 interface SubjectRowProps {
   value: string;
@@ -7,7 +8,7 @@ interface SubjectRowProps {
 export const SubjectRow = ({ value }: SubjectRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/subject.png"
+      imageSrc={IMAGES.SUBJECT}
       imageAlt="Mata Pelajaran"
       label="Mata Pelajaran"
       value={value}
@@ -22,7 +23,7 @@ interface MaterialRowProps {
 export const MaterialRow = ({ value }: MaterialRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/material.png"
+      imageSrc={IMAGES.MATERIAL}
       imageAlt="Materi Pelajaran"
       label="Materi Pelajaran"
       value={value}
@@ -37,7 +38,7 @@ interface GradeRowProps {
 export const GradeRow = ({ value }: GradeRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/grade.png"
+      imageSrc={IMAGES.GRADE}
       imageAlt="Tingkatan Kelas"
       label="Ditujukan Untuk Kelas"
       value={value}
@@ -52,7 +53,7 @@ interface TaskTypeRowProps {
 export const TaskTypeRow = ({ value }: TaskTypeRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/task.png"
+      imageSrc={IMAGES.TASK}
       imageAlt="Tipe Tugas"
       label="Tipe Tugas"
       value={value}
@@ -60,30 +61,31 @@ export const TaskTypeRow = ({ value }: TaskTypeRowProps) => {
   );
 };
 
-interface QuestionCountRowProps {
-  value: string;
+interface NumberRowProps {
+  label: string;
+  value?: number;
 }
 
-export const QuestionCountRow = ({ value }: QuestionCountRowProps) => {
+export const NumberRow = ({ label, value }: NumberRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/question-count.png"
-      imageAlt="Jumlah Soal"
-      label="Jumlah Soal"
-      value={value}
+      imageSrc={IMAGES.NUMBER}
+      imageAlt={label}
+      label={label}
+      value={value?.toString()}
     />
   );
 };
 
-interface TimeRowProps {
+interface DateRowProps {
   label: string;
   value?: string;
 }
 
-export const TimeRow = ({ label, value }: TimeRowProps) => {
+export const DateRow = ({ label, value }: DateRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/date.png"
+      imageSrc={IMAGES.DATE}
       imageAlt={label}
       label={label}
       value={value}
@@ -91,16 +93,64 @@ export const TimeRow = ({ label, value }: TimeRowProps) => {
   );
 };
 
-interface DurationRowProps {
+interface TimeRowProps {
+  label: string;
+  value?: string | boolean;
+}
+
+export const TimeRow = ({ label, value }: TimeRowProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.DURATION}
+      imageAlt={label}
+      label={label}
+      value={value}
+    />
+  );
+};
+
+// TASK TYPE DATA ROWS
+
+interface ScopeRowProps {
   value?: string;
 }
 
-export const DurationRow = ({ value }: DurationRowProps) => {
+export const ScopeRow = ({ value }: ScopeRowProps) => {
   return (
     <DetailPageTableContent
-      imageSrc="/img/duration.png"
-      imageAlt="Durasi"
-      label="Durasi"
+      imageSrc={IMAGES.SCOPE}
+      imageAlt="Scope"
+      label="Scope"
+      value={value}
+    />
+  );
+};
+
+interface IsCompetitiveProps {
+  value?: boolean;
+}
+
+export const IsCompetitiveRow = ({ value }: IsCompetitiveProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.COMPETITIVE}
+      imageAlt="Is Competitive"
+      label="Is Competitive"
+      value={value}
+    />
+  );
+};
+
+interface IsRepeatableRowProps {
+  value?: boolean;
+}
+
+export const IsRepeatableRow = ({ value }: IsRepeatableRowProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.REPEATBALE}
+      imageAlt="Is Repeatable"
+      label="Is Repeatable"
       value={value}
     />
   );

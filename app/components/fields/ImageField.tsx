@@ -6,6 +6,7 @@ import { RcFile, UploadFile } from "antd/es/upload/interface";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useState } from "react";
+import { getImageSrc } from "@/app/utils/image";
 
 interface ImageFieldProps {
   control: any;
@@ -18,6 +19,7 @@ interface ImageFieldProps {
   readonly?: boolean;
   setOldImageUrl?: (url?: string | undefined) => void;
   mode?: "file" | "url";
+  beforeUpload?: (file: File) => boolean | Promise<boolean>;
   onChange?: (value: File | string | null) => void;
 }
 
@@ -32,9 +34,55 @@ const ImageField = ({
   readonly,
   setOldImageUrl,
   mode = "file",
+  beforeUpload,
   onChange,
 }: ImageFieldProps) => {
   const [hovered, setHovered] = useState(false);
+
+  // semua logika beforeUpload ditaruh di sini
+  const handleBeforeUpload = async (
+    file: RcFile,
+    fieldOnChange: (value: any) => void
+  ) => {
+    if (readonly) return false;
+
+    if (beforeUpload) {
+      // Jalankan handler parent dulu
+      const shouldUpload = await beforeUpload(file);
+
+      // Kalau parent return false (prevent auto upload) tetap update preview
+      setFileList([
+        {
+          uid: file.uid,
+          name: file.name,
+          status: "done",
+          url: URL.createObjectURL(file),
+          originFileObj: file,
+        },
+      ]);
+      fieldOnChange(file);
+      onChange?.(file);
+
+      return shouldUpload;
+    }
+
+    // Default behaviour kalau tidak ada custom handler
+    if (mode === "file") {
+      setFileList([
+        {
+          uid: file.uid,
+          name: file.name,
+          status: "done",
+          url: URL.createObjectURL(file),
+          originFileObj: file,
+        },
+      ]);
+      fieldOnChange(file);
+      onChange?.(file);
+    }
+
+    return false; // prevent auto upload ke server
+  };
 
   const handleChange = (info: any) => {
     if (onChange) {
@@ -70,32 +118,9 @@ const ImageField = ({
             showUploadList={false}
             fileList={fileList}
             disabled={readonly}
-            beforeUpload={(file: RcFile) => {
-              if (readonly) return false;
-
-              if (mode === "file") {
-                setFileList([
-                  {
-                    uid: file.uid,
-                    name: file.name,
-                    status: "done",
-                    url: URL.createObjectURL(file),
-                    originFileObj: file, // langsung pakai RcFile / File
-                  },
-                ]);
-                field.onChange(file);
-                onChange?.(file); // trigger hook
-              }
-
-              return false; // prevent auto upload
-            }}
-            // onChange={({ fileList }) => {
-            //   if (mode === "url" && fileList[0]?.url) {
-            //     field.onChange(fileList[0].url);
-            //     onChange?.(file);
-            //   }
-            //   setFileList(fileList);
-            // }}
+            beforeUpload={(file: RcFile) =>
+              handleBeforeUpload(file, field.onChange)
+            }
             onChange={handleChange}
           >
             {fileList.length > 0 ? (
@@ -105,12 +130,7 @@ const ImageField = ({
                 onMouseLeave={() => setHovered(false)}
               >
                 <Image
-                  src={
-                    fileList[0].url ||
-                    (fileList[0].originFileObj
-                      ? URL.createObjectURL(fileList[0].originFileObj)
-                      : "")
-                  }
+                  src={getImageSrc(fileList[0]) ?? ""}
                   alt={fileList[0].name}
                   width={200}
                   height={200}

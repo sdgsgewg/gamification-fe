@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { message } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
@@ -13,26 +12,32 @@ import { taskProvider } from "@/app/functions/TaskProvider";
 import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
 import FilterTaskForm, {
   FilterTaskFormRef,
-  FilterTaskInputs,
 } from "@/app/components/forms/tasks/filter-task-form";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
-import { Grade } from "@/app/interface/grades/IGrade";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
+import { materialProvider } from "@/app/functions/MaterialProvider";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { FilterTaskInputs } from "@/app/schemas/tasks/filterTask";
+import { removeItem } from "@/app/utils/storage";
 
 const TaskPage = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [tasks, setTasks] = useState<TaskOverviewResponse[]>([]);
   const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [materialData, setMaterialData] = useState<MaterialOverviewResponse[]>(
+    []
+  );
   const [taskTypeData, setTaskTypeData] = useState<TaskTypeOverviewResponse[]>(
     []
   );
-  const [gradeData, setGradeData] = useState<Grade[]>([]);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
@@ -51,45 +56,38 @@ const TaskPage = () => {
   const fetchTasks = async (values?: FilterTaskInputs) => {
     setIsLoading(true);
     const res = await taskProvider.getTasks(values);
-
-    if (res.isSuccess && res.data) {
+    const { isSuccess, data, message } = res;
+    if (isSuccess && data) {
       setTasks(
-        res.data.map((t: TaskOverviewResponse, idx: number) => ({
+        data.map((t: TaskOverviewResponse, idx: number) => ({
           key: t.taskId ?? idx,
           ...t,
         }))
       );
     } else {
-      message.error("Gagal memuat tugas");
+      console.error(message ?? "Gagal memuat tugas");
     }
     setIsLoading(false);
   };
 
   const fetchSubjects = async () => {
-    try {
-      const res = await subjectProvider.getSubjects();
-      if (res.isSuccess && res.data) setSubjectData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch subjects: ", error);
-    }
+    const res = await subjectProvider.getSubjects();
+    if (res.isSuccess && res.data) setSubjectData(res.data);
+  };
+
+  const fetchMaterials = async () => {
+    const res = await materialProvider.getMaterials();
+    if (res.isSuccess && res.data) setMaterialData(res.data);
   };
 
   const fetchTaskTypes = async () => {
-    try {
-      const res = await taskTypeProvider.getTaskTypes();
-      if (res.isSuccess && res.data) setTaskTypeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch task types: ", error);
-    }
+    const res = await taskTypeProvider.getTaskTypes();
+    if (res.isSuccess && res.data) setTaskTypeData(res.data);
   };
 
   const fetchGrades = async () => {
-    try {
-      const res = await gradeProvider.getGrades();
-      if (res.isSuccess && res.data) setGradeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch grades: ", error);
-    }
+    const res = await gradeProvider.getGrades();
+    if (res.isSuccess && res.data) setGradeData(res.data);
   };
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
@@ -151,8 +149,13 @@ const TaskPage = () => {
   };
 
   useEffect(() => {
+    removeItem("taskOverviewDraft");
+  }, []);
+
+  useEffect(() => {
     fetchTasks();
     fetchSubjects();
+    fetchMaterials();
     fetchTaskTypes();
     fetchGrades();
   }, []);
@@ -273,6 +276,7 @@ const TaskPage = () => {
         <FilterTaskForm
           ref={formRef}
           subjectData={subjectData}
+          materialData={materialData}
           taskTypeData={taskTypeData}
           gradeData={gradeData}
           onFinish={handleApplyFilter}

@@ -10,9 +10,7 @@ import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
-import FilterTaskForm, {
-  FilterTaskFormRef,
-} from "@/app/components/forms/tasks/filter-task-form";
+import FilterTaskForm from "@/app/components/forms/tasks/filter-task-form";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import { FilterModal } from "@/app/components/modals/FilterModal";
@@ -23,8 +21,8 @@ import { materialProvider } from "@/app/functions/MaterialProvider";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
-import { FilterTaskInputs } from "@/app/schemas/tasks/filterTask";
-import { removeItem } from "@/app/utils/storage";
+import { FilterTaskFormInputs } from "@/app/schemas/tasks/filterTask";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 const TaskPage = () => {
   const router = useRouter();
@@ -42,18 +40,18 @@ const TaskPage = () => {
     current: 1,
     pageSize: 5,
   });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
   const [deleteTaskTitle, setDeleteTaskTitle] = useState<string | null>(null);
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const formRef = useRef<FilterTaskFormRef>(null);
+  const formRef = useRef<FormRef>(null);
 
-  const fetchTasks = async (values?: FilterTaskInputs) => {
+  const fetchTasks = async (values?: FilterTaskFormInputs) => {
     setIsLoading(true);
     const res = await taskProvider.getTasks(values);
     const { isSuccess, data, message } = res;
@@ -93,7 +91,7 @@ const TaskPage = () => {
   const handleOpenFilter = () => setIsFilterModalVisible(true);
   const handleCloseFilter = () => setIsFilterModalVisible(false);
 
-  const handleApplyFilter = (values: FilterTaskInputs) => {
+  const handleApplyFilter = (values: FilterTaskFormInputs) => {
     fetchTasks(values);
     setIsFilterModalVisible(false);
   };
@@ -147,10 +145,6 @@ const TaskPage = () => {
       }
     }
   };
-
-  useEffect(() => {
-    removeItem("taskOverviewDraft");
-  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -270,7 +264,7 @@ const TaskPage = () => {
         formId="filter-task-form"
         onCancel={handleCloseFilter}
         onResetFilters={() => {
-          formRef.current?.resetForm(); // reset form pakai ref
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
         }}
       >
         <FilterTaskForm

@@ -50,7 +50,7 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 lg:ml-64 min-h-screen">
+      <div className="flex-1 lg:ml-64 min-h-screen w-[75dvw]">
         <Header onToggle={handleToggleSidebar} />
         <main className="flex-1 overflow-auto pt-6 pb-12 px-8 space-y-6">
           {children}

@@ -10,15 +10,15 @@ import {
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
+import { FilterTaskFormInputs } from "../schemas/tasks/filterTask";
 import { TaskOverviewResponse } from "../interface/tasks/responses/ITaskOverviewResponse";
 import { TaskDetailResponse } from "../interface/tasks/responses/ITaskDetailResponse";
-import { FilterTaskRequest } from "../interface/tasks/requests/IFilterTaskRequest";
 
 const API_URL = "/tasks";
 
 export const taskProvider = {
   async getTasks(
-    params?: FilterTaskRequest
+    params?: FilterTaskFormInputs
   ): Promise<ApiResponse<TaskOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -28,9 +28,12 @@ export const taskProvider = {
       if (params?.materialId) query.append("materialId", params.materialId);
       if (params?.taskTypeId) query.append("taskTypeId", params.taskTypeId);
 
-      if (params?.gradeIds) {
+      if (params?.gradeIds && params.gradeIds.length > 0) {
         params.gradeIds.forEach((id) => query.append("gradeIds", id));
       }
+
+      if (params?.orderBy) query.append("orderBy", params.orderBy);
+      if (params?.orderState) query.append("orderState", params.orderState);
 
       const url = query.toString() ? `${API_URL}?${query}` : API_URL;
       const data = await getAxios(url);

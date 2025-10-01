@@ -1,8 +1,6 @@
 import Button from "@/app/components/shared/Button";
 import { CreateTaskRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
-import { ModifyTaskNavigationBar } from "./ModifyTaskNavigationBar";
 import Image from "next/image";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { UpdateTaskRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
 import DetailPageWrapper from "../DetailPageWrapper";
 import {
@@ -24,6 +22,7 @@ import { useEffect, useState } from "react";
 import { getDateTime, getDuration } from "@/app/utils/date";
 import QuestionCard from "./QuestionCard";
 import { getImageSrc } from "@/app/utils/image";
+import ModifyTaskNavigationBarWrapper from "./ModifyTaskNavigationBarWrapper";
 
 interface ModifyTaskSummaryContentProps {
   payload: CreateTaskRequest | UpdateTaskRequest;
@@ -161,15 +160,7 @@ const ModifyTaskSummaryContent = ({
 
   return (
     <>
-      <div className="w-full flex flex-row justify-between mb-8">
-        <ModifyTaskNavigationBar
-          label="Masih Ingin merubah data mengenai tugas anda?"
-          navigationType="back"
-          buttonIcon={faArrowLeft}
-          buttonText="Kembali"
-          onBack={onBack}
-        />
-      </div>
+      <ModifyTaskNavigationBarWrapper fromView="task-summary" onBack={onBack} />
 
       {payload && (
         <DetailPageWrapper

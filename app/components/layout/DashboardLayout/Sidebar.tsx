@@ -51,17 +51,10 @@ const MainMenuItem = ({
 
   return (
     <li>
-      {onClick ? (
-        <button onClick={handleClick} className={classes}>
-          <FontAwesomeIcon icon={icon} className="text-base" />
-          <span className="text-sm">{menu}</span>
-        </button>
-      ) : (
-        <Link href={url} onClick={handleClick} className={classes}>
-          <FontAwesomeIcon icon={icon} className="text-base" />
-          <span className="text-sm">{menu}</span>
-        </Link>
-      )}
+      <Link href={url} onClick={handleClick} className={classes}>
+        <FontAwesomeIcon icon={icon} className="text-base" />
+        <span className="text-sm">{menu}</span>
+      </Link>
     </li>
   );
 };

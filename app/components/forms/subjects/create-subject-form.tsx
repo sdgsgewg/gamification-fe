@@ -3,7 +3,7 @@
 import { Form } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   createSubjectDefaultValues,
   CreateSubjectFormInputs,
@@ -17,14 +17,10 @@ import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
-import { getItem, removeItem } from "@/app/utils/storage";
 import Loading from "../../shared/Loading";
-import {
-  useInjectUser,
-  useAutoSaveDraft,
-  useDirtyCheck,
-} from "@/app/utils/form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { useInjectUser } from "@/app/hooks/form/useInjectUser";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface CreateSubjectFormProps {
   onFinish: (values: CreateSubjectFormInputs) => void;
@@ -33,30 +29,24 @@ interface CreateSubjectFormProps {
 const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
   ({ onFinish }, ref) => {
     const { toast } = useToast();
-
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("subjectDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : createSubjectDefaultValues;
-
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       setValue,
     } = useForm<CreateSubjectFormInputs>({
       resolver: zodResolver(createSubjectSchema),
-      defaultValues,
+      defaultValues: createSubjectDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useInjectUser(setValue, ["createdBy"]);
-    const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "createdBy"
+    );
+    useNavigationGuard(isDirty);
 
     const onSubmit = async (data: CreateSubjectFormInputs) => {
       setIsLoading(true);
@@ -75,7 +65,6 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
 
       if (isSuccess) {
         toast.success(message ?? "Mata pelajaran berhasil dibuat!");
-        removeItem("subjectDraft");
         onFinish(data);
         setFileList([]);
       } else {

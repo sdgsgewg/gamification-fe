@@ -61,7 +61,7 @@ export const DetailPageTableContent = ({
   };
 
   return (
-    <div className="grid grid-cols-[3rem_1fr] items-center text-black px-4 py-2">
+    <div className="grid grid-cols-[3rem_1fr] text-black px-4 py-2">
       {/* Icon */}
       <Image
         src={imageSrc}

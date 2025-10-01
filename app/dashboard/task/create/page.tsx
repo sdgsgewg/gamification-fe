@@ -11,9 +11,7 @@ import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOv
 import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
-import CreateTaskOverviewForm, {
-  CreateTaskOverviewFormRef,
-} from "@/app/components/forms/tasks/task-overview/create-task-overview-form";
+import CreateTaskOverviewForm from "@/app/components/forms/tasks/task-overview/create-task-overview-form";
 import CreateTaskQuestionForm from "@/app/components/forms/tasks/task-question/create-task-question-form";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { CreateTaskRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
@@ -21,11 +19,13 @@ import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { CreateTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/createTaskOverview";
+import {
+  createTaskOverviewDefaultValues,
+  CreateTaskOverviewFormInputs,
+} from "@/app/schemas/tasks/task-overview/createTaskOverview";
 import { CreateTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/createTaskQuestion";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-
-type ViewState = "task-overview" | "task-question" | "task-summary";
+import { ViewState } from "@/app/types/task";
 
 const CreateTaskPage = () => {
   const router = useRouter();
@@ -42,11 +42,11 @@ const CreateTaskPage = () => {
     useState(false);
 
   const [taskOverview, setTaskOverview] =
-    useState<CreateTaskOverviewFormInputs | null>(null);
+    useState<CreateTaskOverviewFormInputs>(createTaskOverviewDefaultValues);
   const [taskQuestions, setTaskQuestions] =
     useState<CreateTaskQuestionFormInputs | null>(null);
 
-  const formRef = useRef<FormRef>(null);
+  const formRef = useRef<FormRef<CreateTaskOverviewFormInputs>>(null);
 
   const fetchSubjects = async () => {
     const res = await subjectProvider.getSubjects();
@@ -69,10 +69,17 @@ const CreateTaskPage = () => {
   };
 
   const handleBack = () => {
+    const values = formRef.current?.values;
     const isDirty = formRef.current?.isDirty;
-    const hasData = Boolean(taskOverview) || isDirty;
 
-    if (!hasData) {
+    if (values) {
+      setTaskOverview({
+        ...createTaskOverviewDefaultValues,
+        ...values,
+      });
+    }
+
+    if (!isDirty) {
       router.back();
       return;
     }
@@ -92,9 +99,12 @@ const CreateTaskPage = () => {
   };
 
   // STEP 2: Questions
-  const handleTaskQuestionsSubmit = (qs: CreateTaskQuestionFormInputs) => {
-    console.log("Task question submit data: ", JSON.stringify(qs, null, 2));
+  const handleTaskQuestionsBack = (qs: CreateTaskQuestionFormInputs) => {
+    setTaskQuestions(qs);
+    setView("task-overview");
+  };
 
+  const handleTaskQuestionsSubmit = (qs: CreateTaskQuestionFormInputs) => {
     setTaskQuestions(qs);
     setView("task-summary");
   };
@@ -193,7 +203,7 @@ const CreateTaskPage = () => {
         <DashboardTitle title="Buat Soal" showBackButton={false} />
         <CreateTaskQuestionForm
           taskQuestions={taskQuestions}
-          onBack={() => setView("task-overview")}
+          onBack={handleTaskQuestionsBack}
           onNext={handleTaskQuestionsSubmit}
         />
       </>

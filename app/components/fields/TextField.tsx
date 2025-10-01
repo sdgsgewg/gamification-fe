@@ -33,12 +33,7 @@ const TextField = ({
         label && (
           <span className="text-base font-medium">
             {label}{" "}
-            {!readonly &&
-              (required ? (
-                <span className="text-red-500">*</span>
-              ) : (
-                <span className="text-gray-500">(opsional)</span>
-              ))}
+            {!readonly && required && <span className="text-red-500">*</span>}
           </span>
         )
       }

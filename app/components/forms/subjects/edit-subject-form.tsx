@@ -3,7 +3,7 @@
 import { Form } from "antd";
 import { UploadFile } from "antd/es/upload";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
@@ -18,14 +18,11 @@ import {
   EditSubjectFormInputs,
   editSubjectSchema,
 } from "@/app/schemas/subjects/editSubject";
-import { getItem, removeItem } from "@/app/utils/storage";
-import {
-  useDirtyCheckWithDefaults,
-  useInitializeFileList,
-  useInitializeForm,
-} from "@/app/utils/form";
 import Loading from "../../shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
+import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface EditSubjectFormProps {
   subjectData?: EditSubjectFormInputs;
@@ -36,25 +33,17 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
   ({ subjectData, onFinish }, ref) => {
     const { toast } = useToast();
 
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("subjectDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : subjectData || editSubjectDefaultValues;
-
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       setValue,
       reset,
     } = useForm<EditSubjectFormInputs>({
       resolver: zodResolver(editSubjectSchema),
-      defaultValues,
+      defaultValues: subjectData || editSubjectDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -63,11 +52,10 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
     useInitializeFileList(subjectData, setFileList);
-    const isDirty = useDirtyCheckWithDefaults(
-      watchedValues,
-      subjectData || editSubjectDefaultValues,
-      ["updatedBy"]
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "updatedBy"
     );
+    useNavigationGuard(isDirty);
 
     // Handler untuk perubahan upload
     const handleImageChange = (info: any) => {
@@ -111,7 +99,6 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
 
       if (isSuccess) {
         toast.success(message ?? "Mata pelajaran berhasil diperbarui!");
-        removeItem("subjectDraft");
         onFinish(data);
         setFileList([]);
       } else {

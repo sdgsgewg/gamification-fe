@@ -4,7 +4,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { Form } from "antd";
 import { UploadFile } from "antd/es/upload";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   editMaterialDefaultValues,
   EditMaterialFormInputs,
@@ -23,11 +23,9 @@ import FormLayout from "@/app/dashboard/form-layout";
 import SelectField from "../../fields/SelectField";
 import Loading from "../../shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import {
-  useDirtyCheckWithDefaults,
-  useInitializeFileList,
-  useInitializeForm,
-} from "@/app/utils/form";
+import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
+import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface EditMaterialFormProps {
   materialData?: EditMaterialFormInputs;
@@ -43,7 +41,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       setValue,
       reset,
     } = useForm<EditMaterialFormInputs>({
@@ -51,7 +49,6 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       defaultValues: materialData || editMaterialDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -71,11 +68,10 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
     useInitializeFileList(materialData, setFileList);
-    const isDirty = useDirtyCheckWithDefaults(
-      watchedValues,
-      materialData || editMaterialDefaultValues,
-      ["updatedBy"]
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "updatedBy"
     );
+    useNavigationGuard(isDirty);
 
     // Handler untuk perubahan upload
     const handleImageChange = (info: any) => {

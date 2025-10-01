@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import { useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import { Form } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useForm, useWatch } from "react-hook-form";
@@ -31,18 +25,15 @@ import DateField from "../../../fields/DateField";
 import TimeField from "../../../fields/TimeField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { getItem, removeItem } from "@/app/utils/storage";
 import { combineDateTime } from "@/app/utils/date";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import {
-  useAutoSaveDraft,
-  useDirtyCheck,
-  useInjectUser,
-  useRevokeBlobUrls,
-} from "@/app/utils/form";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { useInjectUser } from "@/app/hooks/form/useInjectUser";
+import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
+import { useInitializeFileListBetweenView } from "@/app/hooks/file/useInitializeFileList";
 
 interface CreateTaskOverviewFormProps {
-  taskOverview: CreateTaskOverviewFormInputs | null;
+  taskOverview: CreateTaskOverviewFormInputs;
   subjectData: SubjectOverviewResponse[];
   materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
@@ -50,7 +41,10 @@ interface CreateTaskOverviewFormProps {
   onNext: (values: CreateTaskOverviewFormInputs) => void;
 }
 
-const CreateTaskOverviewForm = forwardRef<FormRef, CreateTaskOverviewFormProps>(
+const CreateTaskOverviewForm = forwardRef<
+  FormRef<CreateTaskOverviewFormInputs>,
+  CreateTaskOverviewFormProps
+>(
   (
     {
       taskOverview,
@@ -62,22 +56,15 @@ const CreateTaskOverviewForm = forwardRef<FormRef, CreateTaskOverviewFormProps>(
     },
     ref
   ) => {
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("taskOverviewDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : taskOverview || createTaskOverviewDefaultValues;
-
     const {
       control,
       handleSubmit,
       setValue,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       resetField,
     } = useForm<CreateTaskOverviewFormInputs>({
       resolver: zodResolver(createTaskOverviewSchema),
-      defaultValues,
+      defaultValues: taskOverview || createTaskOverviewDefaultValues,
     });
 
     const watchedValues = useWatch({ control });
@@ -105,7 +92,7 @@ const CreateTaskOverviewForm = forwardRef<FormRef, CreateTaskOverviewFormProps>(
       }
 
       return taskType?.hasDeadline;
-    }, [selectedTaskTypeId, taskTypeData]);
+    }, [selectedTaskTypeId, taskTypeData, resetField]);
 
     // Prepare options for select fields
     const subjectOptions = useMemo(
@@ -145,9 +132,20 @@ const CreateTaskOverviewForm = forwardRef<FormRef, CreateTaskOverviewFormProps>(
     );
 
     useInjectUser(setValue, ["creatorId", "createdBy"]);
-    useAutoSaveDraft(watchedValues, "taskOverviewDraft");
-    const isDirty = useDirtyCheck(watchedValues, ["creatorId", "createdBy"]);
-    useRevokeBlobUrls(fileList);
+    const excludedFields = ["creatorId", "createdBy"];
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => !excludedFields.includes(field)
+    );
+    useNavigationGuard(isDirty);
+    useInitializeMaterialBasedOnSelectedSubject(
+      selectedSubjectId,
+      subjectData,
+      materialData,
+      resetField,
+      setFiltertedMaterials
+    );
+    useInitializeFileListBetweenView(taskOverview, fileList, setFileList);
+    // useRevokeBlobUrls(fileList);
 
     const onSubmit = async (data: CreateTaskOverviewFormInputs) => {
       setIsLoading(true);
@@ -166,49 +164,14 @@ const CreateTaskOverviewForm = forwardRef<FormRef, CreateTaskOverviewFormProps>(
         endTime,
       };
 
-      // Hapus draft sebelum onNext
-      removeItem("taskOverviewDraft");
-
       onNext(payload);
 
       setIsLoading(false);
     };
 
-    // Saat memuat data dari parent, recreate blob URLs
-    useEffect(() => {
-      if (taskOverview?.imageFile && fileList.length === 0) {
-        const url = URL.createObjectURL(taskOverview.imageFile);
-        setFileList([
-          {
-            uid: "-1",
-            name: "preview.jpg",
-            status: "done",
-            url: url,
-            originFileObj: taskOverview.imageFile,
-          },
-        ]);
-      }
-    }, [taskOverview, fileList.length]);
-
-    // Reset opsi material field berdasarkan subject yang dipilih
-    useEffect(() => {
-      if (selectedSubjectId) {
-        const subject = subjectData.find(
-          (s) => s.subjectId === selectedSubjectId
-        );
-        if (subject) {
-          resetField("materialId");
-
-          const filteredMaterials = materialData.filter(
-            (m) => m.subject === subject.name
-          );
-          setFiltertedMaterials(filteredMaterials);
-        }
-      }
-    }, [selectedSubjectId, subjectData, materialData, resetField]);
-
     // Expose ke parent
     useImperativeHandle(ref, () => ({
+      values: watchedValues,
       isDirty,
     }));
 

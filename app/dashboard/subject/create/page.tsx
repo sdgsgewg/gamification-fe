@@ -6,7 +6,6 @@ import { CreateSubjectFormInputs } from "@/app/schemas/subjects/createSubject";
 import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateSubjectForm from "@/app/components/forms/subjects/create-subject-form";
-import { removeItem } from "@/app/utils/storage";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 
@@ -29,8 +28,6 @@ const CreateSubjectPage = () => {
   };
 
   const handleBackConfirmation = () => {
-    removeItem("subjectDraft");
-
     setIsBackConfirmationModalVisible(false);
     router.back();
   };

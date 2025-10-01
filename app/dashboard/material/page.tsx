@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { message } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
@@ -12,14 +12,26 @@ import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { FilterModal } from "@/app/components/modals/FilterModal";
+import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import { subjectProvider } from "@/app/functions/SubjectProvider";
+import { gradeProvider } from "@/app/functions/GradeProvider";
+import { FilterMaterialFormInputs } from "@/app/schemas/materials/filterMaterial";
+import FilterMaterialForm from "@/app/components/forms/materials/filter-material-form";
 
 const MaterialPage = () => {
+  const router = useRouter();
   const { toast } = useToast();
   const [materials, setMaterials] = useState<MaterialOverviewResponse[]>([]);
+  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
   const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
     null
@@ -30,12 +42,12 @@ const MaterialPage = () => {
   ] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const router = useRouter();
+  const formRef = useRef<FormRef>(null);
 
-  const fetchMaterials = async (searchText?: string) => {
+  const fetchMaterials = async (values?: FilterMaterialFormInputs) => {
     setIsLoading(true);
-    const res = await materialProvider.getMaterials({ searchText });
- 
+    const res = await materialProvider.getMaterials(values);
+
     if (res.isSuccess && res.data) {
       setMaterials(
         res.data.map((m: MaterialOverviewResponse, idx: number) => ({
@@ -49,9 +61,23 @@ const MaterialPage = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    fetchMaterials();
-  }, []);
+  const fetchSubjects = async () => {
+    const res = await subjectProvider.getSubjects();
+    if (res.isSuccess && res.data) setSubjectData(res.data);
+  };
+
+  const fetchGrades = async () => {
+    const res = await gradeProvider.getGrades();
+    if (res.isSuccess && res.data) setGradeData(res.data);
+  };
+
+  const handleOpenFilter = () => setIsFilterModalVisible(true);
+  const handleCloseFilter = () => setIsFilterModalVisible(false);
+
+  const handleApplyFilter = (values: FilterMaterialFormInputs) => {
+    fetchMaterials(values);
+    setIsFilterModalVisible(false);
+  };
 
   const handleNavigateToCreateMaterialPage = () => {
     router.push("/dashboard/material/create");
@@ -103,6 +129,12 @@ const MaterialPage = () => {
       }
     }
   };
+
+  useEffect(() => {
+    fetchMaterials();
+    fetchSubjects();
+    fetchGrades();
+  }, []);
 
   // Kolom tabel
   const columns: ColumnType<MaterialOverviewResponse>[] = [
@@ -176,9 +208,27 @@ const MaterialPage = () => {
         onAddButtonClick={handleNavigateToCreateMaterialPage}
         searchable
         searchPlaceholder="Cari materi pelajaran…"
-        onSearch={(value) => fetchMaterials(value)}
+        onSearch={(value) => fetchMaterials({ searchText: value })}
+        onOpenFilter={handleOpenFilter}
         onRefresh={() => fetchMaterials()}
       />
+
+      <FilterModal
+        visible={isFilterModalVisible}
+        title="Filter Materi Pelajaran"
+        formId="filter-material-form"
+        onCancel={handleCloseFilter}
+        onResetFilters={() => {
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
+        }}
+      >
+        <FilterMaterialForm
+          ref={formRef}
+          subjectData={subjectData}
+          gradeData={gradeData}
+          onFinish={handleApplyFilter}
+        />
+      </FilterModal>
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}

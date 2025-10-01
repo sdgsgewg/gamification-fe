@@ -4,7 +4,7 @@ import {
   DetailResponseDto,
   handleAxiosError,
 } from "../utils/axiosHelper";
-import { FilterMaterialRequest } from "../interface/materials/requests/IFilterMaterialRequest";
+import { FilterMaterialFormInputs } from "../schemas/materials/filterMaterial";
 import { MaterialOverviewResponse } from "../interface/materials/responses/IMaterialOverviewResponse";
 import { MaterialDetailResponse } from "../interface/materials/responses/IMaterialDetailResponse";
 import {
@@ -18,12 +18,18 @@ const API_URL = "/materials";
 
 export const materialProvider = {
   async getMaterials(
-    params?: FilterMaterialRequest
+    params?: FilterMaterialFormInputs
   ): Promise<ApiResponse<MaterialOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
 
       if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.subjectId) query.append("subjectId", params.subjectId);
+
+      if (params?.gradeIds && params.gradeIds.length > 0) {
+        params.gradeIds.forEach((id) => query.append("gradeIds", id));
+      }
+
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 

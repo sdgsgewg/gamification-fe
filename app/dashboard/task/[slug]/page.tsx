@@ -9,7 +9,6 @@ import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailR
 import { taskProvider } from "@/app/functions/TaskProvider";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
-import Image from "next/image";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   GradeRow,
@@ -44,50 +43,18 @@ const TaskDetailPage = () => {
   const fetchTaskDetail = async () => {
     setIsLoading(true);
 
-    try {
-      const res = await taskProvider.getTask(params.slug);
-      if (res.isSuccess && res.data) {
-        const t = res.data;
-        setTaskData({
-          taskId: t.taskId,
-          title: t.title,
-          slug: t.slug,
-          description: t.description ?? "",
-          image: t.image ?? "",
-          subject: t.subject ?? { subjectId: "", name: "" },
-          material: t.material ?? { materialId: "", name: "" },
-          taskType: t.taskType ?? { taskTypeId: "", name: "" },
-          taskGradeIds: t.taskGradeIds,
-          taskGrade: t.taskGrade,
-          questionCount: t.questionCount,
-          startTime: t.startTime,
-          endTime: t.endTime,
-          duration: t.duration ?? "-",
-          createdBy: t.createdBy,
-          updatedBy: t.updatedBy ?? "-",
-          questions: t.questions.map((q) => ({
-            questionId: q.questionId,
-            text: q.text,
-            point: q.point,
-            type: q.type,
-            timeLimit: q.timeLimit,
-            image: q.image ?? "",
-            options: q.options?.map((o) => ({
-              optionId: o.optionId,
-              text: o.text,
-              isCorrect: o.isCorrect,
-            })),
-          })),
-        });
-      } else {
-        message.error("Gagal memuat detail tugas");
-        router.push("/dashboard/task");
-      }
-    } catch (error) {
-      console.error("Failed to fetch task details: ", error);
-    } finally {
-      setIsLoading(false);
+    const res = await taskProvider.getTask(params.slug);
+
+    const { isSuccess, data } = res;
+
+    if (isSuccess && data) {
+      setTaskData(data);
+    } else {
+      message.error("Gagal memuat detail tugas");
+      router.push("/dashboard/task");
     }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {

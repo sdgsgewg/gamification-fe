@@ -11,21 +11,30 @@ import {
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
+import { FilterTaskTypeFormInputs } from "../schemas/task-types/filterTaskType";
 import { CreateTaskTypeFormInputs } from "../schemas/task-types/createTaskType";
 import { EditTaskTypeFormInputs } from "../schemas/task-types/editTaskType";
-import { FilterTaskTypeRequest } from "../interface/task-types/requests/IFilterTaskTypeRequest";
 import { TaskTypeDetailResponse } from "../interface/task-types/responses/ITaskTypeDetailResponse";
 
 const API_URL = "/task-types";
 
 export const taskTypeProvider = {
   async getTaskTypes(
-    params?: FilterTaskTypeRequest
+    params?: FilterTaskTypeFormInputs
   ): Promise<ApiResponse<TaskTypeOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
 
       if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.scope) query.append("scope", params.scope);
+      if (params?.hasDeadline) query.append("hasDeadline", params.hasDeadline);
+      if (params?.isCompetitive)
+        query.append("isCompetitive", params.isCompetitive);
+      if (params?.isRepeatable)
+        query.append("isRepeatable", params.isRepeatable);
+      if (params?.pointMultiplier)
+        query.append("pointMultiplier", params.pointMultiplier.toString());
+
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 

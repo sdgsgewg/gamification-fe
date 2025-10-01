@@ -2,7 +2,7 @@
 
 import { Form } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   createTaskTypeDefaultValues,
   CreateTaskTypeFormInputs,
@@ -19,9 +19,10 @@ import SelectField from "../../fields/SelectField";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import NumberField from "../../fields/NumberField";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { useDirtyCheck, useInjectUser } from "@/app/utils/form";
 import { TaskTypeScope, TaskTypeScopeLabels } from "@/app/enums/TaskTypeScope";
 import { BooleanField, BooleanFieldLabels } from "@/app/enums/BooleanField";
+import { useInjectUser } from "@/app/hooks/form/useInjectUser";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface CreateTaskTypeFormProps {
   onFinish: (values: CreateTaskTypeFormInputs) => void;
@@ -34,14 +35,13 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       setValue,
     } = useForm<CreateTaskTypeFormInputs>({
       resolver: zodResolver(createTaskTypeSchema),
       defaultValues: createTaskTypeDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [isLoading, setIsLoading] = useState(false);
 
     // Prepare options for select fields
@@ -56,7 +56,10 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
     }));
 
     useInjectUser(setValue, ["createdBy"]);
-    const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "createdBy"
+    );
+    useNavigationGuard(isDirty);
 
     const onSubmit = async (data: CreateTaskTypeFormInputs) => {
       setIsLoading(true);

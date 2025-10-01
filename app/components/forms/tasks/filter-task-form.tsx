@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import { useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import { Form } from "antd";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,23 +12,21 @@ import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOv
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import {
   filterTaskDefaultValues,
-  FilterTaskInputs,
+  FilterTaskFormInputs,
   filterTaskSchema,
 } from "@/app/schemas/tasks/filterTask";
-
-export interface FilterTaskFormRef {
-  resetForm: () => void;
-}
+import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 interface FilterTaskFormProps {
   subjectData: SubjectOverviewResponse[];
   materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
   gradeData: GradeOverviewResponse[];
-  onFinish: (values: FilterTaskInputs) => void;
+  onFinish: (values: FilterTaskFormInputs) => void;
 }
 
-const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
+const FilterTaskForm = forwardRef<FormRef, FilterTaskFormProps>(
   ({ subjectData, materialData, taskTypeData, gradeData, onFinish }, ref) => {
     const {
       control,
@@ -42,7 +34,7 @@ const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
       formState: { errors },
       resetField,
       reset,
-    } = useForm<FilterTaskInputs>({
+    } = useForm<FilterTaskFormInputs>({
       resolver: zodResolver(filterTaskSchema),
       defaultValues: filterTaskDefaultValues,
     });
@@ -89,23 +81,14 @@ const FilterTaskForm = forwardRef<FilterTaskFormRef, FilterTaskFormProps>(
     );
 
     // Reset opsi material field berdasarkan subject yang dipilih
-    useEffect(() => {
-      if (selectedSubjectId) {
-        const subject = subjectData.find(
-          (s) => s.subjectId === selectedSubjectId
-        );
-        if (subject) {
-          resetField("materialId");
+    useInitializeMaterialBasedOnSelectedSubject(
+      selectedSubjectId,
+      subjectData,
+      materialData,
+      resetField,
+      setFiltertedMaterials
+    );
 
-          const filteredMaterials = materialData.filter(
-            (m) => m.subject === subject.name
-          );
-          setFiltertedMaterials(filteredMaterials);
-        }
-      }
-    }, [selectedSubjectId, subjectData, materialData, resetField]);
-
-    // Expose resetForm ke parent via ref
     useImperativeHandle(ref, () => ({
       resetForm: () => reset(),
     }));

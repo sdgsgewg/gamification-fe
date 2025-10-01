@@ -11,7 +11,8 @@ const config = {
         primary: "#556FD7", // contoh warna custom
         secondary: "#9333EA",
         background: "#F5F4FF", // warna untuk background website
-        view: "#74C1FF", // untuk ocon view data
+        border: "#BCB4FF", // warna untuk border
+        view: "#74C1FF", // untuk icon view data
         warning: "#FFC107", // untuk icon edit data dll
         danger: "#DC3545", // untuk icon hapus data dll
       },

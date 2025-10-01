@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { message, Tag } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Tag } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import Table from "@/app/components/shared/table/Table";
@@ -13,14 +13,20 @@ import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { FilterModal } from "@/app/components/modals/FilterModal";
+import FilterTaskTypeForm from "@/app/components/forms/task-types/filter-task-type-form";
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import { FilterTaskTypeFormInputs } from "@/app/schemas/task-types/filterTaskType";
 
 const TaskTypePage = () => {
+  const router = useRouter();
   const { toast } = useToast();
   const [taskTypes, setTaskTypes] = useState<TaskTypeOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [deleteTaskTypeId, setDeleteTaskTypeId] = useState<string | null>(null);
   const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
     null
@@ -31,28 +37,32 @@ const TaskTypePage = () => {
   ] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const router = useRouter();
+  const formRef = useRef<FormRef>(null);
 
-  const fetchTaskTypes = async (searchText?: string) => {
+  const fetchTaskTypes = async (values?: FilterTaskTypeFormInputs) => {
     setIsLoading(true);
-    const res = await taskTypeProvider.getTaskTypes({ searchText });
-
-    if (res.isSuccess && res.data) {
+    const res = await taskTypeProvider.getTaskTypes(values);
+    const { isSuccess, data, message } = res;
+    if (isSuccess && data) {
       setTaskTypes(
-        res.data.map((tt: TaskTypeOverviewResponse, idx: number) => ({
+        data.map((tt: TaskTypeOverviewResponse, idx: number) => ({
           key: tt.taskTypeId ?? idx,
           ...tt,
         }))
       );
     } else {
-      message.error("Gagal memuat tipe tugas");
+      console.error(message ?? "Gagal memuat tipe tugas");
     }
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    fetchTaskTypes();
-  }, []);
+  const handleOpenFilter = () => setIsFilterModalVisible(true);
+  const handleCloseFilter = () => setIsFilterModalVisible(false);
+
+  const handleApplyFilter = (values: FilterTaskTypeFormInputs) => {
+    fetchTaskTypes(values);
+    setIsFilterModalVisible(false);
+  };
 
   const handleNavigateToCreateTaskTypePage = () => {
     router.push("/dashboard/task-type/create");
@@ -104,6 +114,10 @@ const TaskTypePage = () => {
       }
     }
   };
+
+  useEffect(() => {
+    fetchTaskTypes();
+  }, []);
 
   // Kolom tabel
   const columns: ColumnType<TaskTypeOverviewResponse>[] = [
@@ -231,9 +245,22 @@ const TaskTypePage = () => {
         onAddButtonClick={handleNavigateToCreateTaskTypePage}
         searchable
         searchPlaceholder="Cari tipe tugas…"
-        onSearch={(value) => fetchTaskTypes(value)}
+        onSearch={(value) => fetchTaskTypes({ searchText: value })}
+        onOpenFilter={handleOpenFilter}
         onRefresh={() => fetchTaskTypes()}
       />
+
+      <FilterModal
+        visible={isFilterModalVisible}
+        title="Filter Tipe Tugas"
+        formId="filter-task-type-form"
+        onCancel={handleCloseFilter}
+        onResetFilters={() => {
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
+        }}
+      >
+        <FilterTaskTypeForm ref={formRef} onFinish={handleApplyFilter} />
+      </FilterModal>
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}

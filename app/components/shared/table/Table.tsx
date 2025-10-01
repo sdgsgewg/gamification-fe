@@ -72,7 +72,7 @@ function DataTable<T extends object>({
   }, [debouncedQuery]);
 
   return (
-    <div className="w-full max-w-[85dvw] xs:max-w-[90dvw] sm:max-w-[90dvw] md:max-w-[92dvw] lg:max-w-[70dvw] xl:max-w-[76dvw] rounded-xl border border-gray-200 bg-white p-4 shadow-sm mx-auto">
+    <div className="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm mx-auto">
       {title && (
         <h2 className="text-lg font-semibold text-black mb-2">{title}</h2>
       )}

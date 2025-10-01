@@ -115,7 +115,7 @@ export const FillInTheBlankField = ({
 
 export const EssayField = () => {
   return (
-    <div className="mt-4 p-4 border rounded-md bg-gray-50">
+    <div className="p-4 border rounded-md bg-gray-50">
       <p className="text-sm text-gray-600">
         Untuk soal esai, jawaban akan dinilai secara manual oleh pengajar.
       </p>

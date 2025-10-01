@@ -9,7 +9,6 @@ import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import { EditSubjectFormInputs } from "@/app/schemas/subjects/editSubject";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
-import { removeItem } from "@/app/utils/storage";
 import { getImageSrc } from "@/app/utils/image";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 
@@ -62,8 +61,6 @@ const EditSubjectPage = () => {
   };
 
   const handleBackConfirmation = () => {
-    removeItem("subjectDraft");
-
     setIsBackConfirmationModalVisible(false);
     router.back();
   };

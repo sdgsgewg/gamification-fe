@@ -235,9 +235,6 @@ export default class AuthProvider {
   async getLoggedInUser(): Promise<ApiResponse<UserDetailResponse>> {
     try {
       const data = await getAxios("/users/me");
-
-      console.log("Data logged in user: ", JSON.stringify(data, null, 2));
-
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserDetailResponse>(error);

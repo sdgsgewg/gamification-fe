@@ -17,7 +17,6 @@ import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
 import { materialProvider } from "@/app/functions/MaterialProvider";
 import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
-import { message } from "antd";
 import {
   editTaskOverviewDefaultValues,
   EditTaskOverviewFormInputs,
@@ -30,8 +29,7 @@ import { QuestionType } from "@/app/enums/QuestionType";
 import { parseDate } from "@/app/utils/date";
 import Loading from "@/app/components/shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-
-type ViewState = "task-overview" | "task-question" | "task-summary";
+import { ViewState } from "@/app/types/task";
 
 const EditTaskPage = () => {
   const router = useRouter();
@@ -50,98 +48,76 @@ const EditTaskPage = () => {
     useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [taskOverviewDefaultValue, setTaskOverviewDefaultValue] =
+    useState<EditTaskOverviewFormInputs>(editTaskOverviewDefaultValues);
   const [taskOverview, setTaskOverview] = useState<EditTaskOverviewFormInputs>(
     editTaskOverviewDefaultValues
   );
+  const [taskQuestionsDefaultValue, setTaskQuestionsDefaultValue] =
+    useState<EditTaskQuestionFormInputs | null>(null);
   const [taskQuestions, setTaskQuestions] =
     useState<EditTaskQuestionFormInputs | null>(null);
 
-  const formRef = useRef<FormRef>(null);
+  const formRef = useRef<FormRef<EditTaskOverviewFormInputs>>(null);
 
   const fetchTaskDetail = async () => {
     setIsLoading(true);
 
-    try {
-      const res = await taskProvider.getTask(params.slug);
-      if (res.isSuccess && res.data) {
-        const t = res.data;
-        setTaskData({
-          taskId: t.taskId,
-          title: t.title,
-          slug: t.slug,
-          description: t.description,
-          image: t.image,
-          subject: t.subject ?? { subjectId: "", name: "" },
-          material: t.material ?? { materialId: "", name: "" },
-          taskType: t.taskType ?? { taskTypeId: "", name: "" },
-          taskGradeIds: t.taskGradeIds,
-          taskGrade: t.taskGrade,
-          questionCount: t.questionCount,
-          startTime: t.startTime,
-          endTime: t.endTime,
-          duration: t.duration,
-          createdBy: t.createdBy,
-          updatedBy: t.updatedBy,
-          questions:
-            t.questions?.map((q) => ({
-              questionId: q.questionId,
-              text: q.text,
-              point: q.point,
-              type: q.type,
-              timeLimit: q.timeLimit,
-              image: q.image,
-              options: q.options?.map((o) => ({
-                optionId: o.optionId,
-                text: o.text,
-                isCorrect: o.isCorrect,
-              })),
-            })) || [],
-        });
-      } else {
-        message.error("Gagal memuat detail tugas");
-        router.push("/dashboard/task");
-      }
-    } catch (error) {
-      console.error("Failed to fetch task details: ", error);
-    } finally {
-      setIsLoading(false);
+    const res = await taskProvider.getTask(params.slug);
+    const { isSuccess, message, data } = res;
+    if (isSuccess && data) {
+      setTaskData({ ...data, updatedBy: "" });
+    } else {
+      console.error(message ?? "Gagal memuat detail tugas");
+      router.push("/dashboard/task");
     }
+    setIsLoading(false);
   };
 
   const fetchSubjects = async () => {
-    try {
-      const res = await subjectProvider.getSubjects();
-      if (res.isSuccess && res.data) setSubjectData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch subjects: ", error);
-    }
+    const res = await subjectProvider.getSubjects();
+    if (res.isSuccess && res.data) setSubjectData(res.data);
   };
 
   const fetchMaterials = async () => {
-    try {
-      const res = await materialProvider.getMaterials();
-      if (res.isSuccess && res.data) setMaterialData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch materials: ", error);
-    }
+    const res = await materialProvider.getMaterials();
+    if (res.isSuccess && res.data) setMaterialData(res.data);
   };
 
   const fetchTaskTypes = async () => {
-    try {
-      const res = await taskTypeProvider.getTaskTypes();
-      if (res.isSuccess && res.data) setTaskTypeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch task types: ", error);
-    }
+    const res = await taskTypeProvider.getTaskTypes();
+    if (res.isSuccess && res.data) setTaskTypeData(res.data);
   };
 
   const fetchGrades = async () => {
-    try {
-      const res = await gradeProvider.getGrades();
-      if (res.isSuccess && res.data) setGradeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch grades: ", error);
+    const res = await gradeProvider.getGrades();
+    if (res.isSuccess && res.data) setGradeData(res.data);
+  };
+
+  const handleBack = () => {
+    const values = formRef.current?.values;
+    const isDirty = formRef.current?.isDirty;
+
+    console.log("Is Dirty (index page): ", isDirty);
+
+    if (values) {
+      setTaskOverview({
+        ...editTaskOverviewDefaultValues,
+        ...values,
+      });
     }
+
+    if (!isDirty) {
+      router.back();
+      return;
+    }
+
+    setIsBackConfirmationModalVisible(true);
+  };
+
+  const handleBackConfirmation = () => {
+    setIsBackConfirmationModalVisible(false);
+    router.back();
   };
 
   // STEP 1: Overview
@@ -151,9 +127,12 @@ const EditTaskPage = () => {
   };
 
   // STEP 2: Questions
-  const handleTaskQuestionsSubmit = (qs: EditTaskQuestionFormInputs) => {
-    console.log("Task question submit data: ", JSON.stringify(qs, null, 2));
+  const handleTaskQuestionsBack = (qs: EditTaskQuestionFormInputs) => {
+    setTaskQuestions(qs);
+    setView("task-overview");
+  };
 
+  const handleTaskQuestionsSubmit = (qs: EditTaskQuestionFormInputs) => {
     setTaskQuestions(qs);
     setView("task-summary");
   };
@@ -190,12 +169,6 @@ const EditTaskPage = () => {
         })),
       };
 
-      // ✅ Debug log payload object
-      console.log(
-        "Payload Final Submit JSON:",
-        JSON.stringify(payload, null, 2)
-      );
-
       const formData = new FormData();
       formData.append("data", JSON.stringify(payload));
 
@@ -211,12 +184,6 @@ const EditTaskPage = () => {
         }
       });
 
-      // Kalau mau lihat isi FormData:
-      console.log("Isi FormData:");
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
       const result = await taskProvider.updateTask(taskData.taskId, formData);
 
       if (result.isSuccess) {
@@ -231,22 +198,6 @@ const EditTaskPage = () => {
     }
   };
 
-  const handleBack = () => {
-    const isDirty = formRef.current?.isDirty;
-
-    if (!isDirty) {
-      router.back();
-      return;
-    }
-
-    setIsBackConfirmationModalVisible(true);
-  };
-
-  const handleBackConfirmation = () => {
-    setIsBackConfirmationModalVisible(false);
-    router.back();
-  };
-
   const TaskOverviewView = () => {
     return (
       <>
@@ -257,7 +208,10 @@ const EditTaskPage = () => {
         />
         <EditTaskOverviewForm
           ref={formRef}
+          taskOverviewDefaultValue={taskOverviewDefaultValue}
           taskOverview={taskOverview}
+          taskQuestionsDefaultValue={taskQuestionsDefaultValue}
+          taskQuestions={taskQuestions}
           subjectData={subjectData}
           materialData={materialData}
           taskTypeData={taskTypeData}
@@ -274,7 +228,7 @@ const EditTaskPage = () => {
         <DashboardTitle title="Edit Soal" showBackButton={false} />
         <EditTaskQuestionForm
           taskQuestions={taskQuestions}
-          onBack={() => setView("task-overview")}
+          onBack={handleTaskQuestionsBack}
           onNext={handleTaskQuestionsSubmit}
         />
       </>
@@ -313,11 +267,6 @@ const EditTaskPage = () => {
       })),
     };
 
-    console.log(
-      "Hasil payload view task summary: ",
-      JSON.stringify(payload, null, 2)
-    );
-
     const handleBack = () => {
       setView("task-question");
     };
@@ -347,11 +296,9 @@ const EditTaskPage = () => {
   useEffect(() => {
     if (!taskData) return;
 
-    console.log("Task data (index page): ", JSON.stringify(taskData, null, 2));
-
-    setTaskOverview({
+    const defaultTaskOverview = {
       title: taskData.title,
-      description: taskData.description,
+      description: taskData.description ?? "",
       subjectId: taskData.subject.subjectId,
       materialId: taskData.material?.materialId,
       taskTypeId: taskData.taskType.taskTypeId,
@@ -363,10 +310,14 @@ const EditTaskPage = () => {
       endTime: parseDate(taskData.endTime),
       image: taskData.image,
       imageFile: undefined,
-    });
+    };
 
-    setTaskQuestions({
+    setTaskOverviewDefaultValue(defaultTaskOverview);
+    setTaskOverview(defaultTaskOverview);
+
+    const defaultTaskQuestions = {
       questions: taskData.questions.map((q) => {
+        // multiple choice
         if (q.type === QuestionType.MULTIPLE_CHOICE) {
           const correctIndex = q.options?.findIndex((o) => o.isCorrect) ?? -1;
           return {
@@ -377,6 +328,7 @@ const EditTaskPage = () => {
           };
         }
 
+        // true or false
         if (q.type === QuestionType.TRUE_FALSE) {
           const correctOpt = q.options?.find((o) => o.isCorrect);
           return {
@@ -387,6 +339,7 @@ const EditTaskPage = () => {
           };
         }
 
+        // fill in the blanks
         if (q.type === QuestionType.FILL_BLANK) {
           const correctOpt = q.options?.find((o) => o.isCorrect);
           return {
@@ -405,7 +358,12 @@ const EditTaskPage = () => {
           correctAnswer: "",
         };
       }),
-    });
+    };
+
+    console.log("Default task questions: ", defaultTaskQuestions);
+
+    setTaskQuestionsDefaultValue(defaultTaskQuestions);
+    setTaskQuestions(defaultTaskQuestions);
   }, [taskData]);
 
   useEffect(() => {

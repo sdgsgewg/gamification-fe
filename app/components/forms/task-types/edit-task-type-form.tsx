@@ -2,7 +2,7 @@
 
 import { Form } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   editTaskTypeDefaultValues,
   EditTaskTypeFormInputs,
@@ -22,10 +22,8 @@ import NumberField from "../../fields/NumberField";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { TaskTypeScope, TaskTypeScopeLabels } from "@/app/enums/TaskTypeScope";
 import { BooleanField, BooleanFieldLabels } from "@/app/enums/BooleanField";
-import {
-  useDirtyCheckWithDefaults,
-  useInitializeForm,
-} from "@/app/utils/form";
+import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface EditTaskTypeFormProps {
   taskTypeData?: EditTaskTypeFormInputs;
@@ -39,14 +37,13 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       reset,
     } = useForm<EditTaskTypeFormInputs>({
       resolver: zodResolver(editTaskTypeSchema),
       defaultValues: taskTypeData || editTaskTypeDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [isLoading, setIsLoading] = useState(false);
 
     // Prepare options for select fields
@@ -64,11 +61,10 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
       ...d,
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
-    const isDirty = useDirtyCheckWithDefaults(
-      watchedValues,
-      taskTypeData || editTaskTypeDefaultValues,
-      ["updatedBy"]
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "updatedBy"
     );
+    useNavigationGuard(isDirty);
 
     const onSubmit = async (data: EditTaskTypeFormInputs) => {
       if (!taskTypeData || !taskTypeData.taskTypeId) return;

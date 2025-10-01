@@ -42,3 +42,17 @@ export const editTaskQuestionSchema = z.object({
 });
 
 export type EditTaskQuestionFormInputs = z.infer<typeof editTaskQuestionSchema>;
+
+export const editTaskQuestionDefaultValues: EditTaskQuestionFormInputs = {
+  questions: [
+    {
+      text: "",
+      point: 0,
+      timeLimit: undefined,
+      type: QuestionType.MULTIPLE_CHOICE,
+      image: "",
+      imageFile: null,
+      options: [],
+    },
+  ],
+};

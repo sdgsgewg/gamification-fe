@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import { useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import { Form } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
-import { useToast } from "@/app/hooks/use-toast";
 import { useForm, useWatch } from "react-hook-form";
 import {
   editTaskOverviewDefaultValues,
@@ -33,20 +26,23 @@ import DateField from "../../../fields/DateField";
 import TimeField from "../../../fields/TimeField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { getItem, removeItem } from "@/app/utils/storage";
 import { combineDateTime } from "@/app/utils/date";
-import { fileToRcFile } from "@/app/utils/file";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
 import {
-  useAutoSaveDraft,
-  useDirtyCheckWithDefaults,
   useInitializeFileList,
-  useInitializeForm,
-  useRevokeBlobUrls,
-} from "@/app/utils/form";
+  useInitializeFileListBetweenView,
+} from "@/app/hooks/file/useInitializeFileList";
+import { EditTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/editTaskQuestion";
+import { isEqual } from "lodash";
 
 interface EditTaskOverviewFormProps {
-  taskOverview?: EditTaskOverviewFormInputs;
+  taskOverviewDefaultValue: EditTaskOverviewFormInputs;
+  taskOverview: EditTaskOverviewFormInputs;
+  taskQuestionsDefaultValue: EditTaskQuestionFormInputs | null;
+  taskQuestions: EditTaskQuestionFormInputs | null;
   subjectData: SubjectOverviewResponse[];
   materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
@@ -54,10 +50,16 @@ interface EditTaskOverviewFormProps {
   onNext: (values: EditTaskOverviewFormInputs) => void;
 }
 
-const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
+const EditTaskOverviewForm = forwardRef<
+  FormRef<EditTaskOverviewFormInputs>,
+  EditTaskOverviewFormProps
+>(
   (
     {
+      taskOverviewDefaultValue,
       taskOverview,
+      taskQuestionsDefaultValue,
+      taskQuestions,
       subjectData,
       materialData,
       taskTypeData,
@@ -66,15 +68,6 @@ const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
     },
     ref
   ) => {
-    const { toast } = useToast();
-
-    const savedDraft =
-      typeof window !== "undefined" ? getItem("taskOverviewDraft") : null;
-
-    const defaultValues = savedDraft
-      ? JSON.parse(savedDraft)
-      : taskOverview || editTaskOverviewDefaultValues;
-
     const {
       control,
       handleSubmit,
@@ -84,7 +77,7 @@ const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
       reset,
     } = useForm<EditTaskOverviewFormInputs>({
       resolver: zodResolver(editTaskOverviewSchema),
-      defaultValues,
+      defaultValues: taskOverviewDefaultValue || editTaskOverviewDefaultValues,
     });
 
     const watchedValues = useWatch({ control });
@@ -155,14 +148,39 @@ const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
       ...d,
       updatedBy: auth.getCachedUserProfile()?.name,
     }));
-    // useInitializeFileList(taskOverview, setFileList);
-    useAutoSaveDraft(watchedValues, "taskOverviewDraft");
-    const isDirty = useDirtyCheckWithDefaults(
+    useInitializeFileList(taskOverview, setFileList);
+
+    const isDirty = useMemo(() => {
+      const wv = JSON.stringify(watchedValues);
+      const todv = JSON.stringify({
+        ...taskOverviewDefaultValue,
+        updatedBy: auth.getCachedUserProfile()?.name,
+      });
+
+      const isTaskOverviewFormDirty = wv !== todv;
+
+      const isTaskQuestionsFormDirty = !isEqual(
+        taskQuestions,
+        taskQuestionsDefaultValue
+      );
+
+      return isTaskOverviewFormDirty || isTaskQuestionsFormDirty;
+    }, [
       watchedValues,
-      taskOverview || editTaskOverviewDefaultValues,
-      ["updatedBy"]
+      taskOverviewDefaultValue,
+      taskQuestionsDefaultValue,
+      taskQuestions,
+    ]);
+
+    useNavigationGuard(isDirty);
+    useInitializeMaterialBasedOnSelectedSubject(
+      selectedSubjectId,
+      subjectData,
+      materialData,
+      resetField,
+      setFiltertedMaterials
     );
-    useRevokeBlobUrls(fileList);
+    useInitializeFileListBetweenView(taskOverview, fileList, setFileList);
 
     // Handler untuk perubahan upload
     const handleImageChange = (info: any) => {
@@ -188,91 +206,28 @@ const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
     const onSubmit = async (data: EditTaskOverviewFormInputs) => {
       setIsLoading(true);
 
-      try {
-        let startTime = undefined;
-        let endTime = undefined;
+      let startTime = undefined;
+      let endTime = undefined;
 
-        if (data.startDate && data.startTime && data.endDate && data.endTime) {
-          startTime = combineDateTime(data.startDate, data.startTime);
-          endTime = combineDateTime(data.endDate, data.endTime);
-        }
-
-        const payload = {
-          ...data,
-          startTime,
-          endTime,
-        };
-
-        // Hapus draft sebelum onNext
-        removeItem("taskOverviewDraft");
-
-        onNext(payload);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          toast.error(err.message);
-        } else {
-          toast.error("Gagal upload gambar");
-        }
-      } finally {
-        setIsLoading(false);
+      if (data.startDate && data.startTime && data.endDate && data.endTime) {
+        startTime = combineDateTime(data.startDate, data.startTime);
+        endTime = combineDateTime(data.endDate, data.endTime);
       }
+
+      const payload = {
+        ...data,
+        startTime,
+        endTime,
+      };
+
+      onNext(payload);
+
+      setIsLoading(false);
     };
-
-    // Effect untuk mengisi fileList dengan gambar yang sudah ada
-    useEffect(() => {
-      if (taskOverview) {
-        console.log(
-          "Task Overview Data (in form): ",
-          JSON.stringify(taskOverview, null, 2)
-        );
-
-        // Jika ada image URL dari server, tampilkan preview
-        if (taskOverview.image) {
-          setFileList([
-            {
-              uid: "-1",
-              name: "old-image.png",
-              status: "done",
-              url: taskOverview.image,
-            } as UploadFile,
-          ]);
-        }
-
-        // Jika ada imageFile baru dari upload
-        if (taskOverview.imageFile instanceof File) {
-          const url = URL.createObjectURL(taskOverview.imageFile);
-          setFileList([
-            {
-              uid: "-2",
-              name: taskOverview.imageFile.name,
-              status: "done",
-              url,
-              originFileObj: fileToRcFile(taskOverview.imageFile),
-            },
-          ]);
-        }
-      }
-    }, [taskOverview]);
-
-    // Reset opsi material field berdasarkan subject yang dipilih
-    useEffect(() => {
-      if (selectedSubjectId) {
-        const subject = subjectData.find(
-          (s) => s.subjectId === selectedSubjectId
-        );
-        if (subject) {
-          resetField("materialId");
-
-          const filteredMaterials = materialData.filter(
-            (m) => m.subject === subject.name
-          );
-          setFiltertedMaterials(filteredMaterials);
-        }
-      }
-    }, [selectedSubjectId, subjectData, materialData, resetField]);
 
     // Expose ke parent
     useImperativeHandle(ref, () => ({
+      values: watchedValues,
       isDirty,
     }));
 
@@ -415,7 +370,6 @@ const EditTaskOverviewForm = forwardRef<FormRef, EditTaskOverviewFormProps>(
                 setFileList={setFileList}
                 onChange={handleImageChange}
                 errors={errors}
-                // setOldImageUrl={setOldImageUrl}
                 mode="file"
               />
             }

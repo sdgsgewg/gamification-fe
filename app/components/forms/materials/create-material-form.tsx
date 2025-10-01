@@ -3,7 +3,7 @@
 import { Form } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   createMaterialDefaultValues,
   CreateMaterialFormInputs,
@@ -22,7 +22,8 @@ import SelectField from "../../fields/SelectField";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { useDirtyCheck, useInjectUser } from "@/app/utils/form";
+import { useInjectUser } from "@/app/hooks/form/useInjectUser";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface CreateMaterialFormProps {
   subjectData: SubjectOverviewResponse[];
@@ -37,14 +38,13 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
     const {
       control,
       handleSubmit,
-      formState: { errors },
+      formState: { errors, dirtyFields },
       setValue,
     } = useForm<CreateMaterialFormInputs>({
       resolver: zodResolver(createMaterialSchema),
       defaultValues: createMaterialDefaultValues,
     });
 
-    const watchedValues = useWatch({ control });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -60,7 +60,10 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
     }));
 
     useInjectUser(setValue, ["createdBy"]);
-    const isDirty = useDirtyCheck(watchedValues, ["createdBy"]);
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "createdBy"
+    );
+    useNavigationGuard(isDirty);
 
     const onSubmit = async (data: CreateMaterialFormInputs) => {
       setIsLoading(true);

@@ -3,40 +3,26 @@
 import { Form } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useToast } from "@/app/hooks/use-toast";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import {
+  createTaskQuestionDefaultValues,
   CreateTaskQuestionFormInputs,
   createTaskQuestionSchema,
 } from "@/app/schemas/tasks/task-questions/createTaskQuestion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
-import TextAreaField from "../../../fields/TextAreaField";
-import ImageField from "../../../fields/ImageField";
-import FormLayout from "@/app/dashboard/form-layout";
+import { useRef, useState } from "react";
 import Loading from "../../../shared/Loading";
-import SelectField from "../../../fields/SelectField";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faPlus,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
-import { ModifyTaskNavigationBar } from "@/app/components/pages/Dashboard/Task/ModifyTaskNavigationBar";
-import NumberField from "@/app/components/fields/NumberField";
-import Button from "../../../shared/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  EssayField,
-  FillInTheBlankField,
-  MultipleChoiceField,
-  TrueOrFalseField,
-} from "@/app/components/fields/QuestionTypeField";
-import { QuestionType, QuestionTypeLabels } from "@/app/enums/QuestionType";
-import { fileToRcFile } from "@/app/utils/file";
+import { QuestionType } from "@/app/enums/QuestionType";
+import ModifyTaskNavigationBarWrapper from "@/app/components/pages/Dashboard/Task/ModifyTaskNavigationBarWrapper";
+import ModifyTaskQuestionNavigationBar from "@/app/components/pages/Dashboard/Task/ModifyTaskQuestionNavigationBar";
+import ModifyTaskQuestionCard from "@/app/components/pages/Dashboard/Task/ModifyTaskQuestionCard";
+import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { useScrollToEnd } from "@/app/hooks/form/useScrollToEnd";
+import { useInitTaskQuestionsForm } from "@/app/hooks/form/useInitTaskQuestionsForm";
 
 interface CreateTaskQuestionFormProps {
   taskQuestions: CreateTaskQuestionFormInputs | null;
-  onBack: () => void;
+  onBack: (values: CreateTaskQuestionFormInputs) => void;
   onNext: (values: CreateTaskQuestionFormInputs) => void;
 }
 
@@ -47,151 +33,35 @@ export default function CreateTaskQuestionForm({
 }: CreateTaskQuestionFormProps) {
   const { toast } = useToast();
 
-  const defaultValues: CreateTaskQuestionFormInputs = {
-    questions: [
-      {
-        text: "",
-        point: 0,
-        timeLimit: undefined,
-        type: "",
-        imageFile: null,
-        options: [],
-      },
-    ],
-  };
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateTaskQuestionFormInputs>({
+  const methods = useForm<CreateTaskQuestionFormInputs>({
     resolver: zodResolver(createTaskQuestionSchema),
-    defaultValues,
+    defaultValues: createTaskQuestionDefaultValues,
   });
 
-  const hasReset = useRef(false);
+  const { control, handleSubmit, reset } = methods;
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "questions",
   });
 
-  const [fileList, setFileList] = useState<Record<string, UploadFile[]>>({});
+  const { fileList, setFileList } =
+    useInitTaskQuestionsForm<CreateTaskQuestionFormInputs>({
+      taskQuestions,
+      reset,
+      mode: "create",
+    });
+
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
+  const [deleteQuestionIndex, setDeleteQuestionIndex] = useState<number>(0);
+  const [
+    isDeleteConfirmationModalVisible,
+    setIsDeleteConfirmationModalVisible,
+  ] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Prepare options for select fields
-  const questionTypeOptions = Object.values(QuestionType).map((value) => ({
-    value,
-    label: QuestionTypeLabels[value],
-  }));
-
-  const renderQuestionTypeFields = (
-    questionIndex: number,
-    questionType: QuestionType
-  ) => {
-    switch (questionType) {
-      case QuestionType.MULTIPLE_CHOICE:
-        return (
-          <MultipleChoiceField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      case QuestionType.TRUE_FALSE:
-        return (
-          <TrueOrFalseField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      case QuestionType.FILL_BLANK:
-        return (
-          <FillInTheBlankField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      case QuestionType.ESSAY:
-        return <EssayField />;
-      default:
-        return null;
-    }
-  };
-
-  const handleBackWithSubmit = handleSubmit((data) => {
-    onSubmit(data);
-    onBack();
-  });
-
-  const onSubmit = async (data: CreateTaskQuestionFormInputs) => {
-    setIsLoading(true);
-
-    try {
-      const transformed = {
-        ...data,
-        questions: data.questions.map((q) => {
-          // multiple choice
-          if (
-            q.type === QuestionType.MULTIPLE_CHOICE &&
-            q.correctAnswer !== undefined
-          ) {
-            const correctIndex = parseInt(q.correctAnswer as string, 10);
-
-            return {
-              ...q,
-              options: q.options
-                ? q.options.map((opt, i) => ({
-                    ...opt,
-                    isCorrect: i === correctIndex,
-                  }))
-                : [],
-            };
-          }
-
-          // true/false
-          if (q.type === QuestionType.TRUE_FALSE) {
-            return {
-              ...q,
-              options: [
-                { text: "Benar", isCorrect: q.correctAnswer === "true" },
-                { text: "Salah", isCorrect: q.correctAnswer === "false" },
-              ],
-            };
-          }
-
-          // fill in the blank
-          if (q.type === QuestionType.FILL_BLANK) {
-            return {
-              ...q,
-              options: [
-                {
-                  text: String(q.correctAnswer),
-                  isCorrect: true,
-                },
-              ],
-            };
-          }
-
-          // essay biarkan default
-          return q;
-        }),
-      };
-
-      onNext(transformed);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Gagal menambahkan pertanyaan");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  useScrollToEnd(scrollContainerRef, [selectedQuestionIndex, fields.length]);
 
   const addNewQuestion = () => {
     append({
@@ -201,14 +71,28 @@ export default function CreateTaskQuestionForm({
       type: "",
       imageFile: null,
       options: [],
+      correctAnswer: "", // default kosong
     });
+
+    setSelectedQuestionIndex(fields.length); // langsung pindah ke soal baru
   };
 
-  // letakkan di atas return
-  const watchedQuestionTypes = useWatch({
-    control,
-    name: "questions",
-  });
+  const showDeleteModal = (questionIdx: number) => {
+    setDeleteQuestionIndex(questionIdx);
+    setIsDeleteConfirmationModalVisible(true);
+  };
+
+  const confirmDeleteQuestion = () => {
+    if (!deleteQuestionIndex) return;
+    remove(deleteQuestionIndex);
+    setSelectedQuestionIndex(deleteQuestionIndex - 1);
+    setIsDeleteConfirmationModalVisible(false);
+    toast.success("Soal berhasil dihapus!");
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteConfirmationModalVisible(false);
+  };
 
   const handleFileListChange = (questionId: string, fileList: UploadFile[]) => {
     setFileList((prev) => ({
@@ -217,170 +101,136 @@ export default function CreateTaskQuestionForm({
     }));
   };
 
-  useEffect(() => {
-    if (taskQuestions) {
-      // console.log("Task questions: ", JSON.stringify(taskQuestions, null, 2));
+  const getTransformedData = (data: CreateTaskQuestionFormInputs) => {
+    const transformed = {
+      ...data,
+      questions: data.questions.map((q) => {
+        // multiple choice
+        if (
+          q.type === QuestionType.MULTIPLE_CHOICE &&
+          q.correctAnswer !== undefined
+        ) {
+          const correctIndex = parseInt(q.correctAnswer as string, 10);
 
-      reset(taskQuestions);
-      hasReset.current = true;
-
-      // Recreate blob URLs for each question's image
-      const newFileList: Record<string, UploadFile[]> = {};
-
-      taskQuestions.questions.forEach((question, index) => {
-        if (question.imageFile instanceof File) {
-          const url = URL.createObjectURL(question.imageFile);
-          const rcFile = fileToRcFile(question.imageFile);
-
-          newFileList[`question-${index}`] = [
-            {
-              uid: "-1",
-              name: rcFile.name || "preview.jpg",
-              status: "done",
-              url: url,
-              originFileObj: rcFile,
-            },
-          ];
+          return {
+            ...q,
+            options: q.options
+              ? q.options.map((opt, i) => ({
+                  ...opt,
+                  isCorrect: i === correctIndex,
+                }))
+              : [],
+          };
         }
-      });
 
-      setFileList(newFileList);
-    }
-  }, [taskQuestions, reset]);
+        // true/false
+        if (q.type === QuestionType.TRUE_FALSE) {
+          return {
+            ...q,
+            options: q.options
+              ? q.options.map((opt) => ({
+                  ...opt,
+                  isCorrect:
+                    opt.text === "Benar"
+                      ? q.correctAnswer === "true"
+                      : q.correctAnswer === "false",
+                }))
+              : [],
+          };
+        }
 
-  useEffect(() => {
-    // Simpan blob URLs saat komponen unmount
-    return () => {
-      Object.values(fileList).forEach((files) => {
-        files.forEach((file) => {
-          if (file.url && file.url.startsWith("blob:")) {
-            URL.revokeObjectURL(file.url);
-          }
-        });
-      });
+        // fill in the blank
+        if (q.type === QuestionType.FILL_BLANK) {
+          return {
+            ...q,
+            options: q.options
+              ? q.options.map(() => ({
+                  text: String(q.correctAnswer),
+                  isCorrect: true,
+                }))
+              : [],
+          };
+        }
+
+        // essay biarkan default
+        return q;
+      }),
     };
-  }, [fileList]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
+    return transformed;
+  };
+
+  const handleBackWithSubmit = handleSubmit((data) => {
+    setIsLoading(true);
+    const transformed = getTransformedData(data);
+    onBack(transformed);
+    setIsLoading(false);
+  });
+
+  const onSubmit = async (data: CreateTaskQuestionFormInputs) => {
+    setIsLoading(true);
+    const transformed = getTransformedData(data);
+    onNext(transformed);
+    setIsLoading(false);
+  };
 
   return (
-    <Form
-      name="create-task-question"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <div className="w-full flex flex-row justify-between mb-8">
-        <ModifyTaskNavigationBar
-          label="Masih Ingin merubah data mengenai tugas anda?"
-          navigationType="back"
-          buttonIcon={faArrowLeft}
-          buttonText="Kembali"
-          onBack={handleBackWithSubmit}
-        />
-        <ModifyTaskNavigationBar
-          label="Lanjut Review?"
-          navigationType="next"
-          buttonIcon={faArrowRight}
-          buttonText="Lanjut"
-          onNext={handleSubmit(onSubmit)}
-        />
-      </div>
+    <>
+      {isLoading && <Loading />}
 
-      <div className="mb-6">
-        <Button variant="primary" onClick={addNewQuestion} className="mb-4">
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Tambah Pertanyaan
-        </Button>
-      </div>
+      <FormProvider {...methods}>
+        <Form
+          name="create-task-question"
+          onFinish={handleSubmit(onSubmit)}
+          layout="vertical"
+          requiredMark={false}
+        >
+          {/* Navigation atas */}
+          <ModifyTaskNavigationBarWrapper
+            fromView="task-question"
+            onBack={handleBackWithSubmit}
+            onNext={handleSubmit(onSubmit)}
+          />
 
-      {fields.map((field, index) => {
-        const questionType = watchedQuestionTypes?.[index]?.type;
+          {/* Bar soal */}
+          <ModifyTaskQuestionNavigationBar
+            fields={fields}
+            selectedQuestionIndex={selectedQuestionIndex}
+            setSelectedQuestionIndex={setSelectedQuestionIndex}
+            setDeleteQuestionIndex={setDeleteQuestionIndex}
+            showDeleteModal={showDeleteModal}
+            addNewQuestion={addNewQuestion}
+            scrollContainerRef={scrollContainerRef}
+          />
 
-        return (
-          <div
-            key={field.id}
-            className="mb-8 p-6 border rounded-lg bg-white relative"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Pertanyaan #{index + 1}</h3>
-              <Button
-                variant="danger"
-                size="small"
-                onClick={() => remove(index)}
-                disabled={fields.length <= 1}
-              >
-                <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                Hapus
-              </Button>
+          {/* Question Card */}
+          {fields.map((field, idx) => (
+            <div
+              key={field.id}
+              style={{
+                display: idx === selectedQuestionIndex ? "block" : "none",
+              }}
+            >
+              <ModifyTaskQuestionCard
+                index={idx}
+                fieldsLength={fields.length}
+                fileList={fileList}
+                onFileListChange={handleFileListChange}
+                showDeleteModal={showDeleteModal}
+              />
             </div>
+          ))}
+        </Form>
+      </FormProvider>
 
-            <FormLayout
-              left={
-                <>
-                  <TextAreaField
-                    control={control}
-                    name={`questions.${index}.text`}
-                    label="Pertanyaan"
-                    placeholder="Masukkan pertanyaan"
-                    errors={errors}
-                    required
-                  />
-
-                  <NumberField
-                    control={control}
-                    name={`questions.${index}.point`}
-                    label="Jumlah poin"
-                    placeholder="Masukkan jumlah poin untuk pertanyaan"
-                    errors={errors}
-                    required
-                    min={0}
-                    step={1}
-                  />
-
-                  <NumberField
-                    control={control}
-                    name={`questions.${index}.timeLimit`}
-                    label="Batas Waktu (detik)"
-                    placeholder="Masukkan batas waktu untuk pertanyaan"
-                    errors={errors}
-                    min={0}
-                    step={1}
-                  />
-
-                  <SelectField
-                    control={control}
-                    name={`questions.${index}.type`}
-                    label="Tipe Pertanyaan"
-                    placeholder="Pilih tipe pertanyaan"
-                    options={questionTypeOptions}
-                    errors={errors}
-                    required
-                  />
-
-                  {questionType &&
-                    renderQuestionTypeFields(index, questionType)}
-                </>
-              }
-              right={
-                <ImageField
-                  control={control}
-                  name={`questions.${index}.imageFile`}
-                  label="Upload Gambar"
-                  fileList={fileList[`question-${index}`] || []}
-                  setFileList={(fileList) =>
-                    handleFileListChange(`question-${index}`, fileList)
-                  }
-                  errors={errors}
-                  mode="file"
-                />
-              }
-            />
-          </div>
-        );
-      })}
-    </Form>
+      <DeleteConfirmationModal
+        visible={isDeleteConfirmationModalVisible}
+        modalText={`Apakah kamu yakin ingin menghapus 'Soal #${
+          deleteQuestionIndex + 1
+        }'?`}
+        onConfirm={confirmDeleteQuestion}
+        onCancel={cancelDelete}
+      />
+    </>
   );
 }

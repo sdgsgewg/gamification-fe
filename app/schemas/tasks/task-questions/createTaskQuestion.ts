@@ -41,3 +41,16 @@ export const createTaskQuestionSchema = z.object({
 export type CreateTaskQuestionFormInputs = z.infer<
   typeof createTaskQuestionSchema
 >;
+
+export const createTaskQuestionDefaultValues: CreateTaskQuestionFormInputs = {
+  questions: [
+    {
+      text: "",
+      point: 0,
+      timeLimit: undefined,
+      type: "",
+      imageFile: null,
+      options: [],
+    },
+  ],
+};

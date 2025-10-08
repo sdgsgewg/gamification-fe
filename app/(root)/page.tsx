@@ -3,19 +3,6 @@ import React from "react";
 const HomePage: React.FC = () => {
   return (
     <div className="font-sans text-gray-800">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-8 py-4 bg-white shadow">
-        <h1 className="text-xl font-bold text-indigo-600">GAMIFICATION</h1>
-        <div className="flex gap-6">
-          <a href="#" className="hover:text-indigo-600">Aktivitas</a>
-          <a href="#" className="hover:text-indigo-600">Leaderboard</a>
-        </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-lg">Masuk</button>
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg">Daftar</button>
-        </div>
-      </nav>
-
       {/* Hero */}
       <section className="flex flex-col md:flex-row items-center justify-between bg-indigo-50 px-8 py-16">
         <div className="max-w-lg">

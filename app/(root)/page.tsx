@@ -7,7 +7,7 @@ const HomePage: React.FC = () => {
       <section className="flex flex-col md:flex-row items-center justify-between bg-indigo-50 px-8 py-16">
         <div className="max-w-lg">
           <h2 className="text-3xl font-bold mb-4">
-            Buat Belajar Lebih Seru. <br /> Raih Nilai Lebih Tinggi.
+            Buat Belajar Lebih Mantap. <br /> Raih Nilai Lebih Tinggi.
           </h2>
           <p className="mb-6 text-gray-600">
             Sistem belajar berbasis game untuk kamu yang suka tantangan. 

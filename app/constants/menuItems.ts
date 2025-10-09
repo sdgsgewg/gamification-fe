@@ -12,6 +12,13 @@ import {
   faListCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { Role } from "../enums/Role";
+import { ROUTES } from "./routes";
+import { IMAGES } from "./images";
+import { resolveDashboardRoute } from "./resolveRoute";
+import { auth } from "@/app/functions/AuthProvider";
+
+const user = auth.getCachedUserProfile();
+const role = user?.role.name ?? Role.GUEST;
 
 export interface MenuItem {
   menu: string;
@@ -29,24 +36,28 @@ export interface MenuItem {
 
 // HEADER (Main Layout)
 export const mainMenuItems: MenuItem[] = [
-  { menu: "Aktivitas", url: "/activity", roles: [Role.GUEST, Role.STUDENT] },
+  {
+    menu: "Aktivitas",
+    url: ROUTES.ROOT.ACTIVITY,
+    roles: [Role.GUEST, Role.STUDENT],
+  },
   {
     menu: "Leaderboard",
-    url: "/leaderboard",
+    url: ROUTES.ROOT.LEADERBOARD,
     roles: [Role.GUEST, Role.STUDENT],
   },
   {
     menu: "Kelas Saya",
-    url: "/dashboard/class",
+    url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  { menu: "Tugas", url: "/dashboard/task", roles: [Role.TEACHER] },
+  { menu: "Tugas", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
   {
     menu: "Leaderboard Kelas",
-    url: "/dashboard/leaderboard",
+    url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
     roles: [Role.TEACHER],
   },
-  { menu: "Dashboard", url: "/dashboard", roles: [Role.ADMIN] },
+  { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
   {
     menu: "Manajemen Konten",
     url: "#",
@@ -54,26 +65,26 @@ export const mainMenuItems: MenuItem[] = [
     dropdownMenuItems: [
       {
         menu: "Mata Pelajaran",
-        url: "/dashboard/subject",
-        icon: "/img/subject.png",
+        url: ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS,
+        icon: IMAGES.SUBJECT,
         roles: [Role.ADMIN],
       },
       {
         menu: "Materi Pelajaran",
-        url: "/dashboard/material",
-        icon: "/img/material.png",
+        url: ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS,
+        icon: IMAGES.MATERIAL,
         roles: [Role.ADMIN],
       },
       {
         menu: "Tugas",
-        url: "/dashboard/task",
-        icon: "/img/task.png",
+        url: ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS,
+        icon: IMAGES.TASK,
         roles: [Role.ADMIN],
       },
       {
         menu: "Mini Game",
-        url: "/dashboard/mini-game",
-        icon: "/img/mini-game.png",
+        url: ROUTES.DASHBOARD.ADMIN.MANAGE_MINI_GAMES,
+        icon: IMAGES.MINI_GAME,
         roles: [Role.ADMIN],
       },
     ],
@@ -128,16 +139,20 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
 
 // FOOTER (Main Layout)
 export const footerMainMenuItems: MenuItem[] = [
-  { menu: "Aktivitas", url: "/activity", roles: [Role.GUEST, Role.STUDENT] },
   {
-    menu: "Leaderboard",
-    url: "/leaderboard",
+    menu: "Aktivitas",
+    url: ROUTES.ROOT.ACTIVITY,
     roles: [Role.GUEST, Role.STUDENT],
   },
-  { menu: "Masuk/Daftar", url: "/login", roles: [Role.GUEST] },
+  {
+    menu: "Leaderboard",
+    url: ROUTES.ROOT.LEADERBOARD,
+    roles: [Role.GUEST, Role.STUDENT],
+  },
+  { menu: "Masuk/Daftar", url: ROUTES.AUTH.LOGIN, roles: [Role.GUEST] },
   {
     menu: "Kelas Saya",
-    url: "/dashboard/class",
+    url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
   {
@@ -145,13 +160,13 @@ export const footerMainMenuItems: MenuItem[] = [
     url: "/profile",
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  { menu: "Tugas", url: "/dashboard/task", roles: [Role.TEACHER] },
+  { menu: "Tugas", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
   {
     menu: "Leaderboard Kelas",
-    url: "/dashboard/leaderboard",
+    url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
     roles: [Role.TEACHER],
   },
-  { menu: "Dashboard", url: "/dashboard", roles: [Role.ADMIN] },
+  { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
   { menu: "Pengaturan Akun", url: "/account-settings", roles: [Role.ADMIN] },
   {
     menu: "Keluar",
@@ -188,19 +203,19 @@ export const sidebarMainMenuItems: MenuItem[] = [
   { menu: "Dashboard", url: "/dashboard", icon: faHome, roles: [Role.ADMIN] },
   {
     menu: "Kelas Saya",
-    url: "/dashboard/class",
+    url: resolveDashboardRoute(role, "/class"),
     icon: faChalkboard,
     roles: [Role.STUDENT, Role.TEACHER],
   },
   {
     menu: "Tugas",
-    url: "/dashboard/task",
+    url: resolveDashboardRoute(role, "/task"),
     icon: faClipboardList,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
     menu: "Leaderboard",
-    url: "/dashboard/leaderboard",
+    url: resolveDashboardRoute(role, "/leaderboard"),
     icon: faRankingStar,
     roles: [Role.STUDENT, Role.TEACHER],
   },
@@ -209,19 +224,19 @@ export const sidebarMainMenuItems: MenuItem[] = [
 export const sidebarAdminMenuItems: MenuItem[] = [
   {
     menu: "Mata Pelajaran",
-    url: "/dashboard/subject",
+    url: ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS,
     icon: faBook,
     roles: [Role.ADMIN],
   },
   {
     menu: "Materi",
-    url: "/dashboard/material",
+    url: ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS,
     icon: faBookOpen,
     roles: [Role.ADMIN],
   },
   {
     menu: "Tipe Tugas",
-    url: "/dashboard/task-type",
+    url: ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES,
     icon: faListCheck,
     roles: [Role.ADMIN],
   },

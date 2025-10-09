@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
 import { auth } from "@/app/functions/AuthProvider";
 import { IMAGES } from "@/app/constants/images";
+import { ROUTES } from "@/app/constants/routes";
 
 type ViewState = "prompt" | "verifying" | "success" | "error";
 
@@ -29,7 +30,7 @@ const EmailVerificationPage = () => {
       setView("verifying");
       auth.verifyEmail(token).then((res) => {
         if (res.isSuccess && res.data) {
-          router.replace(`/email-verification?uid=${res.data}`); // clean URL
+          router.replace(`${ROUTES.AUTH.EMAIL_VERIFICATION}?uid=${res.data}`); // clean URL
           setView("success");
         } else {
           setView("error");
@@ -43,7 +44,7 @@ const EmailVerificationPage = () => {
   };
 
   const handleContinue = () => {
-    router.push(`/complete-profile?uid=${uid}`);
+    router.push(`${ROUTES.AUTH.COMPLETE_PROFILE}?uid=${uid}`);
   };
 
   const handleBack = () => {

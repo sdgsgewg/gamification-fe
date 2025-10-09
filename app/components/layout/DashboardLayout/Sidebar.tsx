@@ -141,7 +141,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   }, []);
 
   return (
-    <aside className="bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
+    <aside className="bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black z-50">
       <div className="h-16 flex items-center justify-between ps-4 pe-2">
         <h1
           className="text-2xl font-bold uppercase cursor-pointer"

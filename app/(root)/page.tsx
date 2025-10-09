@@ -1,22 +1,14 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { Suspense } from "react";
 import { auth } from "../functions/AuthProvider";
 import { Section } from "../components/pages/Home/Section";
 import { Role } from "../enums/Role";
 import { roleSectionsMap } from "../constants/roleSectionsMap";
 
 const HomePage: React.FC = () => {
-  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
-
-  useEffect(() => {
-    const user = auth.getCachedUserProfile();
-    if (user) {
-      setUserRole(user.role.name);
-    } else {
-      setUserRole(Role.GUEST);
-    }
-  }, []);
+  const user = auth.getCachedUserProfile();
+  const userRole = user?.role.name ?? Role.GUEST;
 
   return (
     <div className="font-sans text-gray-800">

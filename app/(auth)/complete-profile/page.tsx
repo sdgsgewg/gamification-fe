@@ -10,6 +10,7 @@ import { gradeProvider } from "@/app/functions/GradeProvider";
 import { userProvider } from "@/app/functions/UserProvider";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 import { IMAGES } from "@/app/constants/images";
+import { ROUTES } from "@/app/constants/routes";
 
 type ViewState = "form" | "success" | "error";
 
@@ -64,7 +65,7 @@ const CompleteProfilePage = () => {
   };
 
   const handleNavigateToLogin = () => {
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   const handleGoToGmail = () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,9 +14,8 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { auth, authEventTarget } from "@/app/functions/AuthProvider";
+import { auth } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
-import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 
 interface MainMenuItemProps {
   url: string;
@@ -163,15 +162,15 @@ const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
             height={32}
           />
           <div className="flex flex-col gap-1">
-            <p className="text-base font-medium">
-              Halo, {name}
-            </p>
+            <p className="text-base font-medium">Halo, {name}</p>
             {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-[#EAE9FF] text-[0.625rem] rounded-lg px-3">
                   {level}
                 </span>
-                <p className="text-[0.625rem]">{xp}/{nextLevelXp}</p>
+                <p className="text-[0.625rem]">
+                  {xp}/{nextLevelXp}
+                </p>
               </div>
             )}
           </div>
@@ -183,38 +182,15 @@ const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
 };
 
 const Header = () => {
-  const [user, setUser] = useState<UserDetailResponse | null>(null);
-  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const router = useRouter();
+  const user = auth.getCachedUserProfile();
+  const userRole = user?.role.name ?? Role.GUEST;
 
   const handleNavigateToHomePage = () => {
     router.push("/");
   };
-
-  useEffect(() => {
-    const updateUser = () => {
-      const user = auth.getCachedUserProfile();
-      if (user) {
-        setUser(user);
-        setUserRole(user.role.name);
-      } else {
-        setUserRole(Role.GUEST);
-      }
-    };
-
-    updateUser(); // Initial
-
-    const handleAuthChange = () => {
-      updateUser(); // Re-fetch profile on logout/login
-    };
-
-    authEventTarget.addEventListener("authChanged", handleAuthChange);
-    return () => {
-      authEventTarget.removeEventListener("authChanged", handleAuthChange);
-    };
-  }, []);
 
   return (
     <header className="bg-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
@@ -232,7 +208,12 @@ const Header = () => {
           {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
+            <UserDropdownMenu
+              name={user.name}
+              role={userRole}
+              level={user.level}
+              xp={user.xp}
+            />
           )}
         </div>
 
@@ -255,7 +236,12 @@ const Header = () => {
           {!user || userRole === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
-            <UserDropdownMenu name={user.name} role={userRole} level={user.level} xp={user.xp} />
+            <UserDropdownMenu
+              name={user.name}
+              role={userRole}
+              level={user.level}
+              xp={user.xp}
+            />
           )}
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResetPasswordFormInputs } from "@/app/schemas/auth/resetPassword";
 import ResetPasswordForm from "@/app/components/forms/auth/reset-password-form";
+import { ROUTES } from "@/app/constants/routes";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function ResetPasswordPage() {
 
   const handleResetPasswordRequest = (values: ResetPasswordFormInputs) => {
     console.log("Reset password request for:", values);
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   return (

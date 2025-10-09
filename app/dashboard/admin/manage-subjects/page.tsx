@@ -12,8 +12,9 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ROUTES } from "@/app/constants/routes";
 
-const SubjectPage = () => {
+const ManageSubjectPage = () => {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<SubjectOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
@@ -31,6 +32,7 @@ const SubjectPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
 
   const fetchSubjects = async (searchText?: string) => {
     setIsLoading(true);
@@ -52,16 +54,16 @@ const SubjectPage = () => {
     fetchSubjects();
   }, []);
 
-  const handleNavigateToCreateSubjectPage = () => {
-    router.push("/dashboard/subject/create");
+  const handleNavigateToCreateManageSubjectPage = () => {
+    router.push(`${baseRoute}/create`);
   };
 
   const handleView = (slug: string) => {
-    router.push(`/dashboard/subject/${slug}`);
+    router.push(`${baseRoute}/${slug}`);
   };
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/subject/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (subjectId: string, name: string) => {
@@ -154,7 +156,7 @@ const SubjectPage = () => {
             setPagination({ current: page, pageSize });
           },
         }}
-        onAddButtonClick={handleNavigateToCreateSubjectPage}
+        onAddButtonClick={handleNavigateToCreateManageSubjectPage}
         searchable
         searchPlaceholder="Cari mata pelajaran…"
         onSearch={(value) => fetchSubjects(value)}
@@ -171,4 +173,4 @@ const SubjectPage = () => {
   );
 };
 
-export default SubjectPage;
+export default ManageSubjectPage;

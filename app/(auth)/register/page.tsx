@@ -6,6 +6,7 @@ import { RegisterFormInputs } from "@/app/schemas/auth/register";
 import RegisterForm from "@/app/components/forms/auth/register-form";
 import { RoleOverviewResponse } from "@/app/interface/roles/responses/IRoleOverviewResponse";
 import { roleProvider } from "@/app/functions/RoleProvider";
+import { ROUTES } from "@/app/constants/routes";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const RegisterPage = () => {
 
   const handleRegisterSuccess = (values: RegisterFormInputs) => {
     sessionStorage.setItem("userEmail", values.email);
-    router.push("/email-verification");
+    router.push(ROUTES.AUTH.EMAIL_VERIFICATION);
   };
 
   return <RegisterForm roleData={roleData} onFinish={handleRegisterSuccess} />;

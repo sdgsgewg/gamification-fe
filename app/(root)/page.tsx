@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   const userRole = user?.role.name ?? Role.GUEST;
 
   return (
-    <div className="font-sans text-gray-800">
+    <div className="font-sans text-black">
       <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
         {roleSectionsMap[userRole].map(({ name, element }, index) => (
           <Section key={name} sectionName={name} isOdd={index % 2 === 0}>

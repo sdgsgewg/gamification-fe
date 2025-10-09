@@ -19,6 +19,7 @@ interface MainMenuItemProps {
   menu: string;
   icon: IconDefinition;
   url: string;
+  role: string;
   onClick?: () => void;
   onCloseSidebar?: () => void;
 }
@@ -27,15 +28,19 @@ const MainMenuItem = ({
   menu,
   icon,
   url,
+  role,
   onClick,
   onCloseSidebar,
 }: MainMenuItemProps) => {
+  const modifiedRole = role.toLowerCase();
   const pathname = usePathname();
 
   const isActive =
-    url === "/dashboard"
+    url == `/dashboard/${modifiedRole}`
       ? pathname === url
       : pathname === url || pathname.startsWith(url + "/");
+
+  // const isActive = true;
 
   const handleClick = () => {
     if (onClick) onClick();
@@ -48,6 +53,8 @@ const MainMenuItem = ({
   const hoverClasses = "hover:bg-[#DCD9FF] hover:font-medium";
 
   const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
+
+  // const classes = `${baseClasses} ${activeClasses}`;
 
   return (
     <li>
@@ -75,9 +82,10 @@ const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
         <MainMenuItem
           key={item.url}
           menu={item.menu}
-          url={item.url}
           icon={item.icon ?? faQuestionCircle}
-          onCloseSidebar={onClose} // ✅ Tutup sidebar setelah klik menu
+          url={item.url}
+          role={role}
+          onCloseSidebar={onClose}
         />
       ))}
     </ul>
@@ -102,9 +110,10 @@ const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
           <MainMenuItem
             key={item.url}
             menu={item.menu}
-            url={item.url}
             icon={item.icon ?? faQuestionCircle}
-            onCloseSidebar={onClose} // ✅ Tutup sidebar juga
+            url={item.url}
+            role={role}
+            onCloseSidebar={onClose}
           />
         ))}
       </ul>
@@ -165,7 +174,8 @@ const Sidebar = ({ onClose }: SidebarProps) => {
           <MainMenuItem
             menu="Keluar"
             icon={faRightFromBracket}
-            url="#"
+            url="/"
+            role={userRole}
             onClick={handleLogout}
             onCloseSidebar={onClose}
           />

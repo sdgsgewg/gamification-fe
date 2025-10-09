@@ -17,6 +17,7 @@ export const ROUTES = {
     BADGES: "/badges",
     ACTIVITY: "/activity",
     LEADERBOARD: "/leaderboard",
+    PROFILE: "/users",
   },
 
   // 🎓 Dashboard
@@ -27,8 +28,8 @@ export const ROUTES = {
     STUDENT: {
       BASE: "/dashboard/student",
       HOME: "/dashboard/student",
-      CLASS: "/dashboard/teacher/class",
-      TASKS: "/dashboard/teacher/tasks",
+      CLASS: "/dashboard/student/class",
+      TASKS: "/dashboard/student/tasks",
       LEADERBOARD: "/dashboard/student/leaderboard",
     },
 

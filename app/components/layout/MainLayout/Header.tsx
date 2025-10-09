@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,13 +10,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   mainMenuItems,
+  MenuItem,
   userDropdownMenuItems,
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { auth, authEventTarget } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 
 interface MainMenuItemProps {
   url: string;
@@ -107,16 +109,22 @@ const AuthActionButtons = () => {
 
 interface UserDropdownMenuProps {
   name: string;
+  username: string;
   role: Role;
   level?: number;
   xp?: number;
 }
 
-const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
+const UserDropdownMenu = ({
+  name,
+  username,
+  role,
+  level,
+  xp,
+}: UserDropdownMenuProps) => {
   const router = useRouter();
-
   const userMenus = userDropdownMenuItems[role] || [];
-  const [nextLevelXp, setNextLevelXp] = useState<number>(100); // default next level: 2
+  const [nextLevelXp] = useState<number>(100);
 
   const handleLogout = () => {
     const logout = async () => {
@@ -128,18 +136,36 @@ const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
     router.push("/");
   };
 
+  const handleMenuClick = async (e: React.MouseEvent, item: MenuItem) => {
+    e.preventDefault();
+
+    if (item.menu.toLowerCase() === "keluar") {
+      return handleLogout();
+    }
+
+    // Handle dynamic path
+    if (item.dynamicPath && username) {
+      const path = item.dynamicPath(username);
+      router.push(path);
+      return;
+    }
+
+    // Default navigation
+    if (item.url) router.push(item.url);
+  };
+
   return (
     <div className="ms-0 lg:ms-auto flex items-center gap-4">
       <Dropdown
         trigger={["click"]}
         menu={{
           items: userMenus.map((item) => ({
-            key: item.url,
+            key: item.menu,
             label: (
               <a
-                href={item.url}
+                href={item.url || "#"}
+                onClick={(e) => handleMenuClick(e, item)}
                 className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={handleLogout}
               >
                 {item.icon && (
                   <FontAwesomeIcon
@@ -155,13 +181,9 @@ const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
         placement="bottomRight"
         className="cursor-pointer"
       >
-        <div className="flex items-center gap-3 text-black">
-          <Image
-            src={"/img/profile.png"}
-            alt={"Profile"}
-            width={32}
-            height={32}
-          />
+        {/* Header user info */}
+        <div className="flex items-center gap-3 text-black cursor-pointer">
+          <Image src="/img/profile.png" alt="Profile" width={32} height={32} />
           <div className="flex flex-col gap-1">
             <p className="text-base font-medium">Halo, {name}</p>
             {role === Role.STUDENT && (
@@ -183,15 +205,39 @@ const UserDropdownMenu = ({ name, role, level, xp }: UserDropdownMenuProps) => {
 };
 
 const Header = () => {
-  const router = useRouter();
+  const [user, setUser] = useState<UserDetailResponse>();
+  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const user = auth.getCachedUserProfile();
-  const userRole = user?.role.name ?? Role.GUEST;
+  const router = useRouter();
 
   const handleNavigateToHomePage = () => {
     router.push("/");
   };
+
+  useEffect(() => {
+    const updateUser = async () => {
+      const user = await auth.getCachedUserProfile();
+      if (user) {
+        setUser(user);
+        setUserRole(user.role.name);
+      } else {
+        setUser(undefined);
+        setUserRole(Role.GUEST);
+      }
+    };
+
+    updateUser(); // Initial
+
+    const handleAuthChange = () => {
+      updateUser(); // Re-fetch profile on logout/login
+    };
+
+    authEventTarget.addEventListener("authChanged", handleAuthChange);
+    return () => {
+      authEventTarget.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, []);
 
   return (
     <header className="bg-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
@@ -211,6 +257,7 @@ const Header = () => {
           ) : (
             <UserDropdownMenu
               name={user.name}
+              username={user.username}
               role={userRole}
               level={user.level}
               xp={user.xp}
@@ -239,6 +286,7 @@ const Header = () => {
           ) : (
             <UserDropdownMenu
               name={user.name}
+              username={user.username}
               role={userRole}
               level={user.level}
               xp={user.xp}

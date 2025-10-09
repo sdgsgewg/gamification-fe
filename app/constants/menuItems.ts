@@ -23,6 +23,7 @@ const role = user?.role.name ?? Role.GUEST;
 export interface MenuItem {
   menu: string;
   url: string;
+  dynamicPath?: (text: string) => string;
   icon?: IconDefinition;
   roles: Role[];
   isShownOnFooter?: boolean;
@@ -96,7 +97,8 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   Student: [
     {
       menu: "Profil",
-      url: "/profile",
+      url: "",
+      dynamicPath: (username: string) => `/users/${username}`,
       icon: faUser,
       roles: [Role.STUDENT],
     },
@@ -110,7 +112,8 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   Teacher: [
     {
       menu: "Profil",
-      url: "/profile",
+      url: "",
+      dynamicPath: (username: string) => `/users/${username}`,
       icon: faUser,
       roles: [Role.TEACHER],
     },
@@ -157,7 +160,8 @@ export const footerMainMenuItems: MenuItem[] = [
   },
   {
     menu: "Profil",
-    url: "/profile",
+    url: "",
+    dynamicPath: (username: string) => `/users/${username}`,
     roles: [Role.STUDENT, Role.TEACHER],
   },
   { menu: "Tugas", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
@@ -200,7 +204,12 @@ export const footerHelpMenuItems: MenuItem[] = [
 
 // SIDEBAR (Dashboard Layout)
 export const sidebarMainMenuItems: MenuItem[] = [
-  { menu: "Dashboard", url: "/dashboard", icon: faHome, roles: [Role.ADMIN] },
+  {
+    menu: "Dashboard",
+    url: resolveDashboardRoute(role),
+    icon: faHome,
+    roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
+  },
   {
     menu: "Kelas Saya",
     url: resolveDashboardRoute(role, "/class"),
@@ -209,7 +218,7 @@ export const sidebarMainMenuItems: MenuItem[] = [
   },
   {
     menu: "Tugas",
-    url: resolveDashboardRoute(role, "/task"),
+    url: resolveDashboardRoute(role, "/tasks"),
     icon: faClipboardList,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },

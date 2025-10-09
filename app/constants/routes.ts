@@ -13,6 +13,8 @@ export const ROUTES = {
   ROOT: {
     HOME: "/",
     ABOUT: "/about",
+    SUBJECTS: "/subjects",
+    BADGES: "/badges",
     ACTIVITY: "/activity",
     LEADERBOARD: "/leaderboard",
   },

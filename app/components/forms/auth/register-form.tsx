@@ -24,6 +24,7 @@ import PasswordField from "../../fields/PasswordField";
 import FormLayout from "@/app/(auth)/form-layout";
 import Loading from "../../shared/Loading";
 import FormTitle from "../../pages/Auth/FormTitle";
+import { ROUTES } from "@/app/constants/routes";
 
 interface RegisterFormProps {
   roleData: RoleOverviewResponse[];
@@ -76,7 +77,7 @@ export default function RegisterForm({
   };
 
   const handleNavigateToLogin = () => {
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   return (

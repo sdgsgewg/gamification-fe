@@ -30,9 +30,11 @@ import { parseDate } from "@/app/utils/date";
 import Loading from "@/app/components/shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ViewState } from "@/app/types/task";
+import { ROUTES } from "@/app/constants/routes";
 
 const EditTaskPage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
   const params = useParams<{ slug: string }>();
   const [taskData, setTaskData] = useState<TaskDetailResponse | null>(null);
   const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
@@ -69,7 +71,7 @@ const EditTaskPage = () => {
       setTaskData({ ...data, updatedBy: "" });
     } else {
       console.error(message ?? "Gagal memuat detail tugas");
-      router.push("/dashboard/task");
+      router.push(`${baseRoute}`);
     }
     setIsLoading(false);
   };
@@ -188,7 +190,7 @@ const EditTaskPage = () => {
 
       if (result.isSuccess) {
         toast.success("Tugas berhasil diperbarui!");
-        router.push("/dashboard/task");
+        router.push(`${baseRoute}`);
       } else {
         toast.error(result.message || "Gagal memperbarui tugas");
       }

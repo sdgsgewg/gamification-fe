@@ -18,6 +18,7 @@ import {
 } from "../Section";
 import { TextVariant } from "@/app/types/ui/TextVariant";
 import { getTextClassName } from "@/app/utils/ui/getTextClassName";
+import { ROUTES } from "@/app/constants/routes";
 
 const StatsSection = () => {
   const router = useRouter();
@@ -165,9 +166,9 @@ const StatsSection = () => {
       if (userRole === Role.STUDENT) {
         router.push("/profile");
       } else if (userRole === Role.TEACHER) {
-        router.push("/dashboard/class");
+        router.push(ROUTES.DASHBOARD.TEACHER.CLASS);
       } else {
-        router.push("/dashboard");
+        router.push(ROUTES.DASHBOARD.ADMIN.HOME);
       }
     };
 

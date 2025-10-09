@@ -12,6 +12,7 @@ import CreateMaterialForm from "@/app/components/forms/materials/create-material
 import { CreateMaterialFormInputs } from "@/app/schemas/materials/createMaterial";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ROUTES } from "@/app/constants/routes";
 
 const CreateMaterialPage = () => {
   const router = useRouter();
@@ -58,7 +59,7 @@ const CreateMaterialPage = () => {
 
   const handleCreateMaterialSuccess = (values: CreateMaterialFormInputs) => {
     console.log("Create material successful with:", values);
-    router.push("/dashboard/material");
+    router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
   };
 
   useEffect(() => {

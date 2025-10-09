@@ -20,10 +20,12 @@ import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { gradeProvider } from "@/app/functions/GradeProvider";
 import { FilterMaterialFormInputs } from "@/app/schemas/materials/filterMaterial";
 import FilterMaterialForm from "@/app/components/forms/materials/filter-material-form";
+import { ROUTES } from "@/app/constants/routes";
 
 const MaterialPage = () => {
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS;
   const [materials, setMaterials] = useState<MaterialOverviewResponse[]>([]);
   const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
   const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
@@ -80,15 +82,15 @@ const MaterialPage = () => {
   };
 
   const handleNavigateToCreateMaterialPage = () => {
-    router.push("/dashboard/material/create");
+    router.push(`${baseRoute}/create`);
   };
 
   const handleView = (slug: string) => {
-    router.push(`/dashboard/material/${slug}`);
+    router.push(`${baseRoute}/${slug}`);
   };
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/material/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (materialId: string, name: string) => {

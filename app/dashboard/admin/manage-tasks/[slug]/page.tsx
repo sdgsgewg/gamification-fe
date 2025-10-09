@@ -25,6 +25,7 @@ import {
 import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import { ROUTES } from "@/app/constants/routes";
 
 const TaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -39,6 +40,7 @@ const TaskDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
 
   const fetchTaskDetail = async () => {
     setIsLoading(true);
@@ -51,7 +53,7 @@ const TaskDetailPage = () => {
       setTaskData(data);
     } else {
       message.error("Gagal memuat detail tugas");
-      router.push("/dashboard/task");
+      router.push(`${baseRoute}`);
     }
 
     setIsLoading(false);
@@ -97,7 +99,7 @@ const TaskDetailPage = () => {
       const res = await taskProvider.deleteTask(id);
       if (res.isSuccess) {
         toast.success("Tugas berhasil dihapus");
-        router.push("/dashboard/task");
+        router.push(`${baseRoute}`);
       } else {
         toast.error(res.message ?? "Gagal menghapus tugas");
       }

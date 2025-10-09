@@ -11,6 +11,7 @@ import {
 import { Role } from "@/app/enums/Role";
 import { auth } from "@/app/functions/AuthProvider";
 import Button from "@/app/components/shared/Button";
+import { ROUTES } from "@/app/constants/routes";
 
 const HeroSection = () => {
   const router = useRouter();
@@ -27,9 +28,9 @@ const HeroSection = () => {
 
   const handleClickStartNow = () => {
     if (userRole === Role.GUEST) {
-      router.push("/login");
+      router.push(ROUTES.AUTH.LOGIN);
     } else {
-      router.push("/activity");
+      router.push(ROUTES.ROOT.ACTIVITY);
     }
   };
 

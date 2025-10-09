@@ -23,9 +23,11 @@ import { gradeProvider } from "@/app/functions/GradeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterTaskFormInputs } from "@/app/schemas/tasks/filterTask";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { ROUTES } from "@/app/constants/routes";
 
 const TaskPage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
   const { toast } = useToast();
   const [tasks, setTasks] = useState<TaskOverviewResponse[]>([]);
   const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
@@ -97,15 +99,15 @@ const TaskPage = () => {
   };
 
   const handleNavigateToCreateTaskPage = () => {
-    router.push("/dashboard/task/create");
+    router.push(`${baseRoute}/create`);
   };
 
   const handleView = (slug: string) => {
-    router.push(`/dashboard/task/${slug}`);
+    router.push(`${baseRoute}/${slug}`);
   };
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/task/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (taskId: string, title: string) => {

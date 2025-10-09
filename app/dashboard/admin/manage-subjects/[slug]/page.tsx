@@ -21,6 +21,7 @@ import {
 import { SubjectRow } from "@/app/components/shared/table/detail-page/TableRowData";
 import { getImageSrc } from "@/app/utils/image";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import { ROUTES } from "@/app/constants/routes";
 
 const SubjectDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -40,6 +41,7 @@ const SubjectDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
 
   const fetchSubjectDetail = async () => {
     setIsLoading(true);
@@ -57,7 +59,7 @@ const SubjectDetailPage = () => {
       });
     } else {
       message.error("Gagal memuat detail mata pelajaran");
-      router.push("/dashboard/subject");
+      router.push(`${baseRoute}`);
     }
     setIsLoading(false);
   };
@@ -92,7 +94,7 @@ const SubjectDetailPage = () => {
   }, [subjectData]);
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/subject/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (subjectId: string, name: string) => {
@@ -121,7 +123,7 @@ const SubjectDetailPage = () => {
       const res = await subjectProvider.deleteSubject(id);
       if (res.isSuccess) {
         toast.success("Mata pelajaran berhasil dihapus");
-        router.push("/dashboard/subject");
+        router.push(`${baseRoute}`);
       } else {
         toast.error(res.message || "Gagal menghapus mata pelajaran");
       }

@@ -8,9 +8,11 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateSubjectForm from "@/app/components/forms/subjects/create-subject-form";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { ROUTES } from "@/app/constants/routes";
 
 const CreateSubjectPage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
 
@@ -34,7 +36,7 @@ const CreateSubjectPage = () => {
 
   const handleCreateSubjectSuccess = (values: CreateSubjectFormInputs) => {
     console.log("Create subject successful with:", values);
-    router.push("/dashboard/subject");
+    router.push(`${baseRoute}`);
   };
 
   return (

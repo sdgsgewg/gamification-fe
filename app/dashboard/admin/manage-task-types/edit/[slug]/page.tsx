@@ -10,9 +10,11 @@ import EditTaskTypeForm from "@/app/components/forms/task-types/edit-task-type-f
 import { EditTaskTypeFormInputs } from "@/app/schemas/task-types/editTaskType";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ROUTES } from "@/app/constants/routes";
 
 const EditTaskTypePage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
   const params = useParams<{ slug: string }>();
   const [taskTypeData, setTaskTypeData] =
     useState<EditTaskTypeFormInputs | null>(null);
@@ -44,7 +46,7 @@ const EditTaskTypePage = () => {
       });
     } else {
       console.error(message ?? "Gagal memuat detail tipe tugas");
-      router.push("/dashboard/task-type");
+      router.push(`${baseRoute}`);
     }
 
     setIsLoading(false);
@@ -68,7 +70,7 @@ const EditTaskTypePage = () => {
 
   const handleEdittaskTypeSuccess = (values: EditTaskTypeFormInputs) => {
     console.log("Edit task type successful with:", values);
-    router.push("/dashboard/task-type");
+    router.push(`${baseRoute}`);
   };
 
   useEffect(() => {

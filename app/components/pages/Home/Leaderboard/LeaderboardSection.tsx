@@ -8,6 +8,7 @@ import {
   SideBySideContentSection,
   SideBySideContentSectionProps,
 } from "../Section";
+import { ROUTES } from "@/app/constants/routes";
 
 const leaderboardData: LeaderboardData[] = [
   { rank: 1, name: "Dinda P.", points: 36700 },
@@ -21,13 +22,15 @@ const LeaderboardSection = () => {
   const router = useRouter();
 
   const navigateToLeaderboardPage = () => {
-    router.push("/leaderboard");
+    router.push(ROUTES.ROOT.LEADERBOARD);
   };
 
   const LeaderboardTextContent = () => {
     return (
       <div className="w-full lg:w-1/2">
-        <h3 className="text-3xl sm:text-4xl font-bold mb-4">Leaderboard Terkini</h3>
+        <h3 className="text-3xl sm:text-4xl font-bold mb-4">
+          Leaderboard Terkini
+        </h3>
         <p className="text-black text-base font-medium mb-6 sm:mb-8">
           Jadikan proses belajar lebih seru dengan sistem leaderboard! Raih
           peringkat teratas dengan mengerjakan berbagai tugas dan tantangan, dan

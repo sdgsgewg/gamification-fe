@@ -21,6 +21,7 @@ import {
 import { TaskTypeDetailResponse } from "@/app/interface/task-types/responses/ITaskTypeDetailResponse";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import { ROUTES } from "@/app/constants/routes";
 
 const TaskTypeDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -38,6 +39,7 @@ const TaskTypeDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
 
   useEffect(() => {
     if (!params.slug) return;
@@ -66,7 +68,7 @@ const TaskTypeDetailPage = () => {
         });
       } else {
         console.error(message ?? "Gagal memuat detail tipe tugas");
-        router.push("/dashboard/task-type");
+        router.push(`${baseRoute}`);
       }
 
       setIsLoading(false);
@@ -109,7 +111,7 @@ const TaskTypeDetailPage = () => {
 
     if (isSuccess) {
       toast.success(message ?? "Tipe tugas berhasil dihapus");
-      router.push("/dashboard/task-type");
+      router.push(`${baseRoute}`);
     } else {
       toast.error(message ?? "Gagal menghapus tipe tugas");
     }

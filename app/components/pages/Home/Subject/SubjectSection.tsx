@@ -4,12 +4,13 @@ import {
   CenteredContentSectionProps,
 } from "../Section";
 import SubjectCardWrapper from "./SubjectCardWrapper";
+import { ROUTES } from "@/app/constants/routes";
 
 export const SubjectSection: React.FC = () => {
   const router = useRouter();
 
   const handleClickCTA = () => {
-    router.push("/subjects");
+    router.push(ROUTES.ROOT.SUBJECTS);
   };
 
   const subjectSectionHeader: CenteredContentSectionProps = {

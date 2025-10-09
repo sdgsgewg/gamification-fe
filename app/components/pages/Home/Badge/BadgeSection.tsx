@@ -4,12 +4,13 @@ import {
   CenteredContentSectionProps,
 } from "../Section";
 import BadgeCardWrapper from "./BadgeCardWrapper";
+import { ROUTES } from "@/app/constants/routes";
 
 export const BadgeSection: React.FC = () => {
   const router = useRouter();
 
   const handleClickCTA = () => {
-    router.push("/badges");
+    router.push(ROUTES.ROOT.BADGES);
   };
 
   const badgeSectionHeader: CenteredContentSectionProps = {

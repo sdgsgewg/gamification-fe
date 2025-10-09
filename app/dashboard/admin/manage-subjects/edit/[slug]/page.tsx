@@ -11,9 +11,11 @@ import { EditSubjectFormInputs } from "@/app/schemas/subjects/editSubject";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { getImageSrc } from "@/app/utils/image";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { ROUTES } from "@/app/constants/routes";
 
 const EditSubjectPage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
   const params = useParams<{ slug: string }>();
   const [subjectData, setSubjectData] = useState<EditSubjectFormInputs | null>(
     null
@@ -43,7 +45,7 @@ const EditSubjectPage = () => {
       });
     } else {
       console.error(message ?? "Gagal memuat detail mata pelajaran");
-      router.push("/dashboard/subject");
+      router.push(`${baseRoute}`);
     }
 
     setIsLoading(false);
@@ -67,7 +69,7 @@ const EditSubjectPage = () => {
 
   const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {
     console.log("Edit subject successful with:", values);
-    router.push("/dashboard/subject");
+    router.push(`${baseRoute}`);
   };
 
   useEffect(() => {

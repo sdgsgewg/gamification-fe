@@ -14,6 +14,7 @@ import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
 import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ROUTES } from "@/app/constants/routes";
 
 const EditMaterialPage = () => {
   const router = useRouter();
@@ -49,7 +50,7 @@ const EditMaterialPage = () => {
       });
     } else {
       console.error(message ?? "Gagal memuat detail materi pelajaran");
-      router.push("/dashboard/material");
+      router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
     }
 
     setIsLoading(false);
@@ -91,7 +92,7 @@ const EditMaterialPage = () => {
 
   const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
     console.log("Edit material successful with:", values);
-    router.push("/dashboard/material");
+    router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
   };
 
   useEffect(() => {

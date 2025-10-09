@@ -26,9 +26,11 @@ import {
 import { CreateTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/createTaskQuestion";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ViewState } from "@/app/types/task";
+import { ROUTES } from "@/app/constants/routes";
 
 const CreateTaskPage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
   const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
   const [materialData, setMaterialData] = useState<MaterialOverviewResponse[]>(
     []
@@ -170,7 +172,7 @@ const CreateTaskPage = () => {
 
       if (result.isSuccess) {
         toast.success("Tugas berhasil dibuat!");
-        router.push("/dashboard/task");
+        router.push(`${baseRoute}`);
       } else {
         toast.error(result.message || "Gagal membuat tugas");
       }

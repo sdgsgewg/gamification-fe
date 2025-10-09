@@ -18,6 +18,7 @@ import {
   HistoryTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import { ROUTES } from "@/app/constants/routes";
 
 const MaterialDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -101,7 +102,7 @@ const MaterialDetailPage = () => {
       const res = await materialProvider.deleteMaterial(id);
       if (res.isSuccess) {
         toast.success("Materi pelajaran berhasil dihapus");
-        router.push("/dashboard/material");
+        router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
       } else {
         toast.error(res.message ?? "Gagal menghapus materi pelajaran");
       }

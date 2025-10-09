@@ -17,10 +17,12 @@ import { FilterModal } from "@/app/components/modals/FilterModal";
 import FilterTaskTypeForm from "@/app/components/forms/task-types/filter-task-type-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { FilterTaskTypeFormInputs } from "@/app/schemas/task-types/filterTaskType";
+import { ROUTES } from "@/app/constants/routes";
 
 const TaskTypePage = () => {
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
   const [taskTypes, setTaskTypes] = useState<TaskTypeOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -65,15 +67,15 @@ const TaskTypePage = () => {
   };
 
   const handleNavigateToCreateTaskTypePage = () => {
-    router.push("/dashboard/task-type/create");
+    router.push(`${baseRoute}/create`);
   };
 
   const handleView = (slug: string) => {
-    router.push(`/dashboard/task-type/${slug}`);
+    router.push(`${baseRoute}/${slug}`);
   };
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/task-type/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (materialId: string, name: string) => {

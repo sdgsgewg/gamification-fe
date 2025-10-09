@@ -21,6 +21,7 @@ import {
 import { useState } from "react";
 import Loading from "../../shared/Loading";
 import FormTitle from "../../pages/Auth/FormTitle";
+import { ROUTES } from "@/app/constants/routes";
 
 interface LoginFormProps {
   onFinish: (values: LoginFormInputs) => void;
@@ -65,7 +66,7 @@ export default function LoginForm({
   };
 
   const handleNavigateToRegister = () => {
-    router.push("/register");
+    router.push(ROUTES.AUTH.REGISTER);
   };
 
   return (

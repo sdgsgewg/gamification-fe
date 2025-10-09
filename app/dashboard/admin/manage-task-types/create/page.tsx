@@ -8,9 +8,11 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateTaskTypeForm from "@/app/components/forms/task-types/create-task-type-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ROUTES } from "@/app/constants/routes";
 
 const CreateTaskTypePage = () => {
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
 
@@ -34,7 +36,7 @@ const CreateTaskTypePage = () => {
 
   const handleCreateTaskTypeSuccess = (values: CreateTaskTypeFormInputs) => {
     console.log("Create task type successful with:", values);
-    router.push("/dashboard/task-type");
+    router.push(`${baseRoute}`);
   };
 
   return (

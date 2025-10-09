@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useSectionContext } from "../../pages/Home/Section";
+import { ROUTES } from "@/app/constants/routes";
 
 type FromPage = "home" | "subjects";
 
@@ -25,7 +26,7 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
   const bgColor = fromPage === "home" ? homePageBgColor : subjectPageBgColor;
 
   const navigateToActivityPage = () => {
-    router.push("/activity");
+    router.push(ROUTES.ROOT.SUBJECTS);
   };
 
   return (

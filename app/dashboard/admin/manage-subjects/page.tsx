@@ -16,6 +16,8 @@ import { ROUTES } from "@/app/constants/routes";
 
 const ManageSubjectPage = () => {
   const { toast } = useToast();
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
   const [subjects, setSubjects] = useState<SubjectOverviewResponse[]>([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -30,9 +32,6 @@ const ManageSubjectPage = () => {
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
 
   const fetchSubjects = async (searchText?: string) => {
     setIsLoading(true);

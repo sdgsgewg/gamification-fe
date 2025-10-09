@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
+import { ROUTES } from "@/app/constants/routes";
 
 interface MainMenuItemProps {
   url: string;
@@ -89,13 +90,13 @@ const AuthActionButtons = () => {
   return (
     <div className="flex flex-row gap-4">
       <button
-        onClick={() => router.push("/login")}
+        onClick={() => router.push(ROUTES.AUTH.LOGIN)}
         className="bg-[#EAE9FF] text-[#556FD7] font-bold rounded-2xl px-6 py-2 hover:bg-[#d9d8f2] transition cursor-pointer"
       >
         Masuk
       </button>
       <button
-        onClick={() => router.push("/register")}
+        onClick={() => router.push(ROUTES.AUTH.REGISTER)}
         className="bg-[#556FD7] text-white font-bold rounded-2xl px-6 py-2 hover:bg-[#445cc0] transition cursor-pointer"
       >
         Daftar

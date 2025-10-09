@@ -11,21 +11,14 @@ import {
 import { Role } from "@/app/enums/Role";
 import { auth } from "@/app/functions/AuthProvider";
 import Button from "@/app/components/shared/Button";
+import { ROUTES } from "@/app/constants/routes";
 
 const CTASection = () => {
   const router = useRouter();
-  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
+  const user = auth.getCachedUserProfile();
+  const userRole = user?.role.name ?? Role.GUEST;
   const [title, setTitle] = useState<string>("");
   const [subtitle, setSubtitle] = useState<string>("");
-
-  useEffect(() => {
-    const user = auth.getCachedUserProfile();
-    if (user) {
-      setUserRole(user.role.name);
-    } else {
-      setUserRole(Role.GUEST);
-    }
-  }, []);
 
   useEffect(() => {
     if (userRole === Role.GUEST) {
@@ -43,9 +36,9 @@ const CTASection = () => {
 
   const handleClickStartNow = () => {
     if (userRole === Role.GUEST) {
-      router.push("/login");
+      router.push(ROUTES.AUTH.LOGIN);
     } else {
-      router.push("/activity");
+      router.push(ROUTES.ROOT.ACTIVITY);
     }
   };
 

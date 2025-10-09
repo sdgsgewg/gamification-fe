@@ -17,6 +17,7 @@ import Loading from "../../shared/Loading";
 import FormLayout from "@/app/(auth)/form-layout";
 import TextField from "../../fields/TextField";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
+import { ROUTES } from "@/app/constants/routes";
 
 interface ForgotPasswordFormProps {
   onFinish: (values: ForgotPasswordInputs) => void;
@@ -58,7 +59,7 @@ export default function ForgotPasswordForm({
   };
 
   const handleNavigateToLogin = () => {
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   return (

@@ -14,6 +14,9 @@ export const IMAGES = {
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/auth/google.png",
 
   // General
+  HERO: "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/hero.png",
+  ACTIVITY:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/activity.jpg",
   DEFAULT_IMAGE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/default-image.jpg",
   DESCRIPTION:
@@ -35,6 +38,19 @@ export const IMAGES = {
   TIME: "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/time.png",
   MINI_GAME:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/mini-game.png",
+  RELEVANT_QUESTIONS:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/relevant-questions.png",
+  LEADERBOARD:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/leaderboard.png",
+  BADGE:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/badge.png",
+  CLASS:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/class.png",
+  CTA: "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/cta.png",
+  DEFAULT_PROFILE:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/default-profile.png",
+  PEOPLE:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/people.png",
 
   // Task Type
   SCOPE:
@@ -43,4 +59,18 @@ export const IMAGES = {
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/competitive.png",
   REPEATBALE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/repeatable.png",
+
+  // Leaderboard
+  GOLD_MEDAL:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/gold-medal.png",
+  SILVER_MEDAL:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/silver-medal.png",
+  BRONZE_MEDAL:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/bronze-medal.png",
+  GOLD_MEDAL_CROP:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/gold-medal-crop.png",
+  SILVER_MEDAL_CROP:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/silver-medal-crop.png",
+  BRONZE_MEDAL_CROP:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/bronze-medal-crop.png",
 };

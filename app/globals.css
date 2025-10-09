@@ -73,3 +73,42 @@ body {
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
+
+/* ===== Leaderboard table style ===== */
+
+/* Hilangkan rounded bawaan Ant Design */
+.leaderboard-table .ant-table,
+.leaderboard-table .ant-table-container,
+.leaderboard-table .ant-table-thead > tr:first-child > *:first-child,
+.leaderboard-table .ant-table-thead > tr:first-child > *:last-child {
+  border-radius: 0 !important;
+}
+
+.leaderboard-table .ant-table-thead > tr > th {
+  background-color: #556fd7 !important;
+  color: white !important;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 16px;
+  border: none !important;
+  border-right: none !important;
+}
+
+.leaderboard-table .ant-table-tbody > tr > td {
+  font-size: 0.875rem;
+  padding: 4px 16px;
+  border-top: 1px solid #aca8ff;
+  border-bottom: none !important;
+}
+
+.leaderboard-table .ant-table-tbody > tr:nth-child(odd) {
+  background-color: #eae9ff;
+}
+
+.leaderboard-table .ant-table-tbody > tr:nth-child(even) {
+  background-color: #f5f4ff;
+}
+
+.leaderboard-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: 1px solid #aca8ff !important;
+}

@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { message } from "antd";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
-import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
-import { taskProvider } from "@/app/functions/TaskProvider";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
@@ -26,51 +23,27 @@ import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
+import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
+import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
 
 const TaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [taskData, setTaskData] = useState<TaskDetailResponse | null>(null);
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
+
+  const { data: taskData, isLoading } = useTaskDetail(params.slug, "detail");
+  const { mutateAsync: deleteTask } = useDeleteTask();
+
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
   const [deleteTaskName, setDeleteTaskName] = useState<string | null>(null);
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
-
-  const fetchTaskDetail = async () => {
-    setIsLoading(true);
-
-    const res = await taskProvider.getTask(params.slug);
-
-    const { isSuccess, data } = res;
-
-    if (isSuccess && data) {
-      setTaskData(data);
-    } else {
-      message.error("Gagal memuat detail tugas");
-      router.push(`${baseRoute}`);
-    }
-
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (params.slug) {
-      fetchTaskDetail();
-    }
-  }, [params.slug]);
-
-  useEffect(() => {
-    console.log("Task detail data: ", JSON.stringify(taskData, null, 2));
-  }, [taskData]);
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/task/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (materialId: string, name: string) => {
@@ -79,7 +52,7 @@ const TaskDetailPage = () => {
     setIsDeleteConfirmationModalVisible(true);
   };
 
-  const confirmDeleteMaterial = () => {
+  const confirmDelete = () => {
     if (deleteTaskId !== null) {
       handleDelete(deleteTaskId);
       setDeleteTaskId(null);
@@ -95,20 +68,13 @@ const TaskDetailPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await taskProvider.deleteTask(id);
-      if (res.isSuccess) {
-        toast.success("Tugas berhasil dihapus");
-        router.push(`${baseRoute}`);
-      } else {
-        toast.error(res.message ?? "Gagal menghapus tugas");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus tugas");
-      }
+    const res = await deleteTask(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Tugas berhasil dihapus");
+      router.push(`${baseRoute}`);
+    } else {
+      toast.error(message ?? "Gagal menghapus tugas");
     }
   };
 
@@ -116,7 +82,7 @@ const TaskDetailPage = () => {
     console.log("Share task with id: ", id);
   };
 
-  if (isLoading || !taskData) {
+  if (!taskData) {
     return <Loading />;
   }
 
@@ -181,6 +147,8 @@ const TaskDetailPage = () => {
 
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}
@@ -205,7 +173,7 @@ const TaskDetailPage = () => {
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
         modalText={`Apakah kamu yakin ingin menghapus tugas dengan nama '${deleteTaskName}'?`}
-        onConfirm={confirmDeleteMaterial}
+        onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
     </>

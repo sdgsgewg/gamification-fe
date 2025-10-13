@@ -47,7 +47,7 @@ export const taskTypeProvider = {
     }
   },
 
-  async getTaskType(
+  async getTaskTypeDetail(
     slug: string
   ): Promise<ApiResponse<TaskTypeDetailResponse>> {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
@@ -8,93 +8,58 @@ import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { taskProvider } from "@/app/functions/TaskProvider";
 import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
 import FilterTaskForm from "@/app/components/forms/tasks/filter-task-form";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
-import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import { FilterModal } from "@/app/components/modals/FilterModal";
-import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
-import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { materialProvider } from "@/app/functions/MaterialProvider";
-import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
-import { gradeProvider } from "@/app/functions/GradeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterTaskFormInputs } from "@/app/schemas/tasks/filterTask";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ROUTES } from "@/app/constants/routes";
+import { useTasks } from "@/app/hooks/tasks/useTasks";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useGrades } from "@/app/hooks/grades/useGrades";
+import { useMaterials } from "@/app/hooks/materials/useMaterials";
+import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
+import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 
 const TaskPage = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
-  const { toast } = useToast();
-  const [tasks, setTasks] = useState<TaskOverviewResponse[]>([]);
-  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
-  const [materialData, setMaterialData] = useState<MaterialOverviewResponse[]>(
-    []
-  );
-  const [taskTypeData, setTaskTypeData] = useState<TaskTypeOverviewResponse[]>(
-    []
-  );
-  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
+
+  const [filters, setFilters] = useState<FilterTaskFormInputs>({
+    searchText: "",
+  });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
+  const { data: tasks = [], isLoading, refetch } = useTasks(filters);
+  const { mutateAsync: deleteTask } = useDeleteTask();
+  const { data: subjectData = [] } = useSubjects();
+  const { data: materialData = [] } = useMaterials();
+  const { data: taskTypeData = [] } = useTaskTypes();
+  const { data: gradeData = [] } = useGrades();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
   const [deleteTaskTitle, setDeleteTaskTitle] = useState<string | null>(null);
   const [
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const formRef = useRef<FormRef>(null);
-
-  const fetchTasks = async (values?: FilterTaskFormInputs) => {
-    setIsLoading(true);
-    const res = await taskProvider.getTasks(values);
-    const { isSuccess, data, message } = res;
-    if (isSuccess && data) {
-      setTasks(
-        data.map((t: TaskOverviewResponse, idx: number) => ({
-          key: t.taskId ?? idx,
-          ...t,
-        }))
-      );
-    } else {
-      console.error(message ?? "Gagal memuat tugas");
-    }
-    setIsLoading(false);
-  };
-
-  const fetchSubjects = async () => {
-    const res = await subjectProvider.getSubjects();
-    if (res.isSuccess && res.data) setSubjectData(res.data);
-  };
-
-  const fetchMaterials = async () => {
-    const res = await materialProvider.getMaterials();
-    if (res.isSuccess && res.data) setMaterialData(res.data);
-  };
-
-  const fetchTaskTypes = async () => {
-    const res = await taskTypeProvider.getTaskTypes();
-    if (res.isSuccess && res.data) setTaskTypeData(res.data);
-  };
-
-  const fetchGrades = async () => {
-    const res = await gradeProvider.getGrades();
-    if (res.isSuccess && res.data) setGradeData(res.data);
-  };
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
   const handleCloseFilter = () => setIsFilterModalVisible(false);
 
   const handleApplyFilter = (values: FilterTaskFormInputs) => {
-    fetchTasks(values);
+    setFilters((prev) => ({
+      ...prev,
+      ...values, // gabungkan filter baru dengan search text
+    }));
     setIsFilterModalVisible(false);
   };
 
@@ -131,30 +96,15 @@ const TaskPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await taskProvider.deleteTask(id);
-      if (res.isSuccess) {
-        toast.success("Tugas berhasil dihapus");
-        fetchTasks();
-      } else {
-        toast.error(res.message || "Gagal menghapus tugas");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus tugas");
-      }
+    const res = await deleteTask(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Tugas berhasil dihapus");
+      refetch();
+    } else {
+      toast.error(message || "Gagal menghapus tugas");
     }
   };
-
-  useEffect(() => {
-    fetchTasks();
-    fetchSubjects();
-    fetchMaterials();
-    fetchTaskTypes();
-    fetchGrades();
-  }, []);
 
   // Kolom tabel
   const columns: ColumnType<TaskOverviewResponse>[] = [
@@ -255,9 +205,11 @@ const TaskPage = () => {
         onAddButtonClick={handleNavigateToCreateTaskPage}
         searchable
         searchPlaceholder="Cari tugas…"
-        onSearch={(value) => fetchTasks({ searchText: value })}
+        onSearch={(value) =>
+          setFilters((prev) => ({ ...prev, searchText: value }))
+        }
         onOpenFilter={handleOpenFilter}
-        onRefresh={() => fetchTasks()}
+        onRefresh={() => refetch()}
       />
 
       <FilterModal

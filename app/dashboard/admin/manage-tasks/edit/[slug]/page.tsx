@@ -4,19 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
-import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
-import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
-import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
-import { gradeProvider } from "@/app/functions/GradeProvider";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
-import { materialProvider } from "@/app/functions/MaterialProvider";
-import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
 import {
   editTaskOverviewDefaultValues,
   EditTaskOverviewFormInputs,
@@ -31,24 +22,26 @@ import Loading from "@/app/components/shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ViewState } from "@/app/types/task";
 import { ROUTES } from "@/app/constants/routes";
+import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useMaterials } from "@/app/hooks/materials/useMaterials";
+import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
+import { useGrades } from "@/app/hooks/grades/useGrades";
 
 const EditTaskPage = () => {
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
-  const params = useParams<{ slug: string }>();
-  const [taskData, setTaskData] = useState<TaskDetailResponse | null>(null);
-  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
-  const [materialData, setMaterialData] = useState<MaterialOverviewResponse[]>(
-    []
-  );
-  const [taskTypeData, setTaskTypeData] = useState<TaskTypeOverviewResponse[]>(
-    []
-  );
-  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
+
+  const { data: taskData, isLoading } = useTaskDetail(params.slug, "edit");
+  const { data: subjectData = [] } = useSubjects();
+  const { data: materialData = [] } = useMaterials();
+  const { data: taskTypeData = [] } = useTaskTypes();
+  const { data: gradeData = [] } = useGrades();
+
   const [view, setView] = useState<ViewState>("task-overview");
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const [taskOverviewDefaultValue, setTaskOverviewDefaultValue] =
     useState<EditTaskOverviewFormInputs>(editTaskOverviewDefaultValues);
@@ -62,45 +55,9 @@ const EditTaskPage = () => {
 
   const formRef = useRef<FormRef<EditTaskOverviewFormInputs>>(null);
 
-  const fetchTaskDetail = async () => {
-    setIsLoading(true);
-
-    const res = await taskProvider.getTask(params.slug);
-    const { isSuccess, message, data } = res;
-    if (isSuccess && data) {
-      setTaskData({ ...data, updatedBy: "" });
-    } else {
-      console.error(message ?? "Gagal memuat detail tugas");
-      router.push(`${baseRoute}`);
-    }
-    setIsLoading(false);
-  };
-
-  const fetchSubjects = async () => {
-    const res = await subjectProvider.getSubjects();
-    if (res.isSuccess && res.data) setSubjectData(res.data);
-  };
-
-  const fetchMaterials = async () => {
-    const res = await materialProvider.getMaterials();
-    if (res.isSuccess && res.data) setMaterialData(res.data);
-  };
-
-  const fetchTaskTypes = async () => {
-    const res = await taskTypeProvider.getTaskTypes();
-    if (res.isSuccess && res.data) setTaskTypeData(res.data);
-  };
-
-  const fetchGrades = async () => {
-    const res = await gradeProvider.getGrades();
-    if (res.isSuccess && res.data) setGradeData(res.data);
-  };
-
   const handleBack = () => {
     const values = formRef.current?.values;
     const isDirty = formRef.current?.isDirty;
-
-    console.log("Is Dirty (index page): ", isDirty);
 
     if (values) {
       setTaskOverview({
@@ -290,12 +247,6 @@ const EditTaskPage = () => {
   };
 
   useEffect(() => {
-    if (params.slug) {
-      fetchTaskDetail();
-    }
-  }, [params.slug]);
-
-  useEffect(() => {
     if (!taskData) return;
 
     const defaultTaskOverview = {
@@ -362,25 +313,14 @@ const EditTaskPage = () => {
       }),
     };
 
-    console.log("Default task questions: ", defaultTaskQuestions);
-
     setTaskQuestionsDefaultValue(defaultTaskQuestions);
     setTaskQuestions(defaultTaskQuestions);
   }, [taskData]);
 
-  useEffect(() => {
-    fetchSubjects();
-    fetchMaterials();
-    fetchTaskTypes();
-    fetchGrades();
-  }, []);
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
       {view === "task-overview" ? (
         <TaskOverviewView />

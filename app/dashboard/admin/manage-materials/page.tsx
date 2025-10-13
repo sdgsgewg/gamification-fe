@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { message } from "antd";
+import React, { useRef, useState } from "react";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
@@ -10,30 +9,36 @@ import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IM
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { materialProvider } from "@/app/functions/MaterialProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterModal } from "@/app/components/modals/FilterModal";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
-import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { gradeProvider } from "@/app/functions/GradeProvider";
 import { FilterMaterialFormInputs } from "@/app/schemas/materials/filterMaterial";
 import FilterMaterialForm from "@/app/components/forms/materials/filter-material-form";
 import { ROUTES } from "@/app/constants/routes";
+import { useMaterials } from "@/app/hooks/materials/useMaterials";
+import { useDeleteMaterial } from "@/app/hooks/materials/useDeleteMaterial";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useGrades } from "@/app/hooks/grades/useGrades";
 
 const MaterialPage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS;
-  const [materials, setMaterials] = useState<MaterialOverviewResponse[]>([]);
-  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
-  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
+
+  const [filters, setFilters] = useState<FilterMaterialFormInputs>({
+    searchText: "",
+  });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
+  const { data: materials = [], isLoading, refetch } = useMaterials(filters);
+  const { mutateAsync: deleteMaterial } = useDeleteMaterial();
+  const { data: subjectData = [] } = useSubjects();
+  const { data: gradeData = [] } = useGrades();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
   const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
     null
@@ -42,42 +47,17 @@ const MaterialPage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const formRef = useRef<FormRef>(null);
-
-  const fetchMaterials = async (values?: FilterMaterialFormInputs) => {
-    setIsLoading(true);
-    const res = await materialProvider.getMaterials(values);
-
-    if (res.isSuccess && res.data) {
-      setMaterials(
-        res.data.map((m: MaterialOverviewResponse, idx: number) => ({
-          key: m.materialId ?? idx,
-          ...m,
-        }))
-      );
-    } else {
-      message.error("Gagal memuat materi");
-    }
-    setIsLoading(false);
-  };
-
-  const fetchSubjects = async () => {
-    const res = await subjectProvider.getSubjects();
-    if (res.isSuccess && res.data) setSubjectData(res.data);
-  };
-
-  const fetchGrades = async () => {
-    const res = await gradeProvider.getGrades();
-    if (res.isSuccess && res.data) setGradeData(res.data);
-  };
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
   const handleCloseFilter = () => setIsFilterModalVisible(false);
 
   const handleApplyFilter = (values: FilterMaterialFormInputs) => {
-    fetchMaterials(values);
+    setFilters((prev) => ({
+      ...prev,
+      ...values, // gabungkan filter baru dengan search text
+    }));
     setIsFilterModalVisible(false);
   };
 
@@ -115,28 +95,15 @@ const MaterialPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await materialProvider.deleteMaterial(id);
-      if (res.isSuccess) {
-        toast.success("Materi berhasil dihapus");
-        fetchMaterials();
-      } else {
-        toast.error(res.message || "Gagal menghapus materi");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus materi");
-      }
+    const res = await deleteMaterial(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Materi berhasil dihapus");
+      refetch();
+    } else {
+      toast.error(message ?? "Gagal menghapus materi pelajaran");
     }
   };
-
-  useEffect(() => {
-    fetchMaterials();
-    fetchSubjects();
-    fetchGrades();
-  }, []);
 
   // Kolom tabel
   const columns: ColumnType<MaterialOverviewResponse>[] = [
@@ -210,9 +177,11 @@ const MaterialPage = () => {
         onAddButtonClick={handleNavigateToCreateMaterialPage}
         searchable
         searchPlaceholder="Cari materi pelajaran…"
-        onSearch={(value) => fetchMaterials({ searchText: value })}
+        onSearch={(value) =>
+          setFilters((prev) => ({ ...prev, searchText: value }))
+        }
         onOpenFilter={handleOpenFilter}
-        onRefresh={() => fetchMaterials()}
+        onRefresh={() => refetch()}
       />
 
       <FilterModal

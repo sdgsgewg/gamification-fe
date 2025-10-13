@@ -36,7 +36,7 @@ export const subjectProvider = {
     }
   },
 
-  async getSubject(id: string): Promise<ApiResponse<SubjectDetailResponse>> {
+  async getSubjectDetail(id: string): Promise<ApiResponse<SubjectDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
       return { isSuccess: true, data };

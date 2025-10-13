@@ -44,7 +44,7 @@ export const taskProvider = {
     }
   },
 
-  async getTask(slug: string): Promise<ApiResponse<TaskDetailResponse>> {
+  async getTaskDetail(slug: string): Promise<ApiResponse<TaskDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${slug}`);
       return { isSuccess: true, data };

@@ -3,13 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
-type User = {
-  id: string;
-  name: string;
-};
+const TeacherDashboardPage = () => {
+  const { user } = useGetCachedUser();
 
-const TeacherDashboardPage: React.FC<{ user?: User }> = ({ user }) => {
   const classes = [
     { name: "XII IPA 1", slug: "xii-ipa-1" },
     { name: "XII IPA 2", slug: "xii-ipa-2" },

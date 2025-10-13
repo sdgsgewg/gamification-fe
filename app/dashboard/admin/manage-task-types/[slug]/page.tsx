@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
@@ -18,16 +18,23 @@ import {
   DetailInformationTable,
   HistoryTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
-import { TaskTypeDetailResponse } from "@/app/interface/task-types/responses/ITaskTypeDetailResponse";
-import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
+import { useTaskTypeDetail } from "@/app/hooks/task-types/useTaskTypeDetail";
+import { useDeleteTaskType } from "@/app/hooks/task-types/useDeleteTaskType";
 
 const TaskTypeDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [taskTypeData, setTaskTypeData] =
-    useState<TaskTypeDetailResponse | null>(null);
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
+
+  const { data: taskTypeData, isLoading } = useTaskTypeDetail(
+    params.slug,
+    "detail"
+  );
+  const { mutateAsync: deleteTaskType } = useDeleteTaskType();
+
   const [deleteTaskTypeId, setDeleteTaskTypeId] = useState<string | null>(null);
   const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
     null
@@ -36,49 +43,9 @@ const TaskTypeDetailPage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
-
-  useEffect(() => {
-    if (!params.slug) return;
-
-    const fetchTaskTypeDetail = async () => {
-      setIsLoading(true);
-
-      const res = await taskTypeProvider.getTaskType(params.slug);
-
-      const { isSuccess, message, data } = res;
-
-      if (isSuccess && data) {
-        const tt = data;
-        setTaskTypeData({
-          taskTypeId: tt.taskTypeId,
-          name: tt.name,
-          slug: tt.slug,
-          description: tt.description ?? "",
-          scope: tt.scope,
-          hasDeadline: tt.hasDeadline,
-          isCompetitive: tt.isCompetitive,
-          isRepeatable: tt.isRepeatable,
-          pointMultiplier: tt.pointMultiplier,
-          createdBy: tt.createdBy,
-          updatedBy: tt.updatedBy ?? "-",
-        });
-      } else {
-        console.error(message ?? "Gagal memuat detail tipe tugas");
-        router.push(`${baseRoute}`);
-      }
-
-      setIsLoading(false);
-    };
-
-    fetchTaskTypeDetail();
-  }, [params.slug]);
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/task-type/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (taskTypeId: string, name: string) => {
@@ -103,20 +70,14 @@ const TaskTypeDetailPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    setIsLoading(true);
-
-    const res = await taskTypeProvider.deleteTaskType(id);
-
+    const res = await deleteTaskType(id);
     const { isSuccess, message } = res;
-
     if (isSuccess) {
       toast.success(message ?? "Tipe tugas berhasil dihapus");
       router.push(`${baseRoute}`);
     } else {
       toast.error(message ?? "Gagal menghapus tipe tugas");
     }
-
-    setIsLoading(false);
   };
 
   if (!taskTypeData) {

@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { message } from "antd";
+import React, { useState } from "react";
 import { useToast } from "@/app/hooks/use-toast";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
@@ -13,12 +11,16 @@ import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useDeleteSubject } from "@/app/hooks/subjects/useDeleteSubject";
 
 const ManageSubjectPage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
-  const [subjects, setSubjects] = useState<SubjectOverviewResponse[]>([]);
+  const [searchText, setSearchText] = useState<string>("");
+  const { data: subjects = [], isLoading, refetch } = useSubjects(searchText);
+  const { mutateAsync: deleteSubject } = useDeleteSubject();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
@@ -31,27 +33,6 @@ const ManageSubjectPage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchSubjects = async (searchText?: string) => {
-    setIsLoading(true);
-    const res = await subjectProvider.getSubjects({ searchText });
-    if (res.isSuccess && res.data) {
-      setSubjects(
-        res.data.map((s: SubjectOverviewResponse, idx: number) => ({
-          key: s.subjectId ?? idx,
-          ...s,
-        }))
-      );
-    } else {
-      message.error("Gagal memuat mata pelajaran");
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
 
   const handleNavigateToCreateManageSubjectPage = () => {
     router.push(`${baseRoute}/create`);
@@ -87,20 +68,13 @@ const ManageSubjectPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await subjectProvider.deleteSubject(id);
-      if (res.isSuccess) {
-        toast.success("Mata pelajaran berhasil dihapus");
-        fetchSubjects();
-      } else {
-        toast.error(res.message || "Gagal menghapus mata pelajaran");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus mata pelajaran");
-      }
+    const res = await deleteSubject(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Mata pelajaran berhasil dihapus");
+      refetch();
+    } else {
+      toast.error(message ?? "Gagal menghapus mata pelajaran");
     }
   };
 
@@ -158,8 +132,8 @@ const ManageSubjectPage = () => {
         onAddButtonClick={handleNavigateToCreateManageSubjectPage}
         searchable
         searchPlaceholder="Cari mata pelajaran…"
-        onSearch={(value) => fetchSubjects(value)}
-        onRefresh={() => fetchSubjects()}
+        onSearch={(value) => setSearchText(value)}
+        onRefresh={() => refetch()}
       />
 
       <DeleteConfirmationModal

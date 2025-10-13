@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { message } from "antd";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
-import { SubjectDetailResponse } from "@/app/interface/subjects/responses/ISubjectDetailResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
-import { materialProvider } from "@/app/functions/MaterialProvider";
 import { ColumnType } from "antd/es/table";
 import DataTable from "@/app/components/shared/table/Table";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
@@ -19,17 +15,27 @@ import {
   HistoryTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { SubjectRow } from "@/app/components/shared/table/detail-page/TableRowData";
-import { getImageSrc } from "@/app/utils/image";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
+import { useMaterials } from "@/app/hooks/materials/useMaterials";
+import { useSubjectDetail } from "@/app/hooks/subjects/useSubjectDetail";
+import { useDeleteSubject } from "@/app/hooks/subjects/useDeleteSubject";
 
 const SubjectDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [subjectData, setSubjectData] = useState<SubjectDetailResponse | null>(
-    null
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
+
+  const { data: subjectData, isLoading } = useSubjectDetail(
+    params.slug,
+    "detail"
   );
-  const [materials, setMaterials] = useState<MaterialOverviewResponse[]>([]);
+  const { mutateAsync: deleteSubject } = useDeleteSubject();
+  const { data: materials = [] } = useMaterials({
+    subjectId: subjectData?.subjectId,
+  });
+
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
   const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(
     null
@@ -38,60 +44,6 @@ const SubjectDetailPage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
-
-  const fetchSubjectDetail = async () => {
-    setIsLoading(true);
-    const res = await subjectProvider.getSubject(params.slug);
-    if (res.isSuccess && res.data) {
-      const s = res.data;
-      setSubjectData({
-        subjectId: s.subjectId,
-        name: s.name,
-        slug: s.slug,
-        description: s.description ?? "",
-        image: s.image ? getImageSrc(s.image) : "",
-        createdBy: s.createdBy,
-        updatedBy: s.updatedBy ?? "-",
-      });
-    } else {
-      message.error("Gagal memuat detail mata pelajaran");
-      router.push(`${baseRoute}`);
-    }
-    setIsLoading(false);
-  };
-
-  const fetchMaterials = async (searchText?: string) => {
-    setIsLoading(true);
-    const res = await materialProvider.getMaterials({ searchText });
-
-    if (res.isSuccess && res.data) {
-      setMaterials(
-        res.data.map((m: MaterialOverviewResponse, idx: number) => ({
-          key: m.materialId ?? idx,
-          ...m,
-        }))
-      );
-    } else {
-      message.error("Gagal memuat materi");
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (params.slug) {
-      fetchSubjectDetail();
-    }
-  }, [params.slug]);
-
-  useEffect(() => {
-    if (subjectData) {
-      fetchMaterials(subjectData.name);
-    }
-  }, [subjectData]);
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
@@ -119,30 +71,22 @@ const SubjectDetailPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await subjectProvider.deleteSubject(id);
-      if (res.isSuccess) {
-        toast.success("Mata pelajaran berhasil dihapus");
-        router.push(`${baseRoute}`);
-      } else {
-        toast.error(res.message || "Gagal menghapus mata pelajaran");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus mata pelajaran");
-      }
+    const res = await deleteSubject(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Mata pelajaran berhasil dihapus");
+      router.push(`${baseRoute}`);
+    } else {
+      toast.error(message ?? "Gagal menghapus mata pelajaran");
     }
   };
 
-  if (isLoading || !subjectData) {
+  if (!subjectData) {
     return <Loading />;
   }
 
   const LeftSideContent = () => {
     const { name, image, description } = subjectData;
-
     return (
       <DetailPageLeftSideContent
         name={name}
@@ -225,6 +169,8 @@ const SubjectDetailPage = () => {
 
   return (
     <>
+      {isLoading && <Loading />}
+
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}

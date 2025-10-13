@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import EditTaskTypeForm from "@/app/components/forms/task-types/edit-task-type-form";
@@ -11,46 +10,22 @@ import { EditTaskTypeFormInputs } from "@/app/schemas/task-types/editTaskType";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
+import { useTaskTypeDetail } from "@/app/hooks/task-types/useTaskTypeDetail";
 
 const EditTaskTypePage = () => {
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
-  const params = useParams<{ slug: string }>();
-  const [taskTypeData, setTaskTypeData] =
-    useState<EditTaskTypeFormInputs | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const { data: taskTypeData, isLoading } = useTaskTypeDetail(
+    params.slug,
+    "edit"
+  );
+
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
 
   const formRef = useRef<FormRef>(null);
-
-  const fetchTaskTypeDetail = async () => {
-    setIsLoading(true);
-
-    const res = await taskTypeProvider.getTaskType(params.slug);
-
-    const { isSuccess, message, data } = res;
-
-    if (isSuccess && data) {
-      const tt = data;
-      setTaskTypeData({
-        taskTypeId: tt.taskTypeId,
-        name: tt.name,
-        description: tt.description || "",
-        scope: tt.scope || "",
-        hasDeadline: tt.hasDeadline.toString(),
-        isCompetitive: tt.isCompetitive.toString(),
-        isRepeatable: tt.isRepeatable.toString(),
-        pointMultiplier: tt.pointMultiplier,
-        updatedBy: "",
-      });
-    } else {
-      console.error(message ?? "Gagal memuat detail tipe tugas");
-      router.push(`${baseRoute}`);
-    }
-
-    setIsLoading(false);
-  };
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
@@ -72,12 +47,6 @@ const EditTaskTypePage = () => {
     console.log("Edit task type successful with:", values);
     router.push(`${baseRoute}`);
   };
-
-  useEffect(() => {
-    if (params.slug) {
-      fetchTaskTypeDetail();
-    }
-  }, [params.slug]);
 
   return (
     <>

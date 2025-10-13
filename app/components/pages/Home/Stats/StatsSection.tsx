@@ -4,11 +4,8 @@ import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { Role } from "@/app/enums/Role";
 import { auth } from "@/app/functions/AuthProvider";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { message } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,6 +16,7 @@ import {
 import { TextVariant } from "@/app/types/ui/TextVariant";
 import { getTextClassName } from "@/app/utils/ui/getTextClassName";
 import { ROUTES } from "@/app/constants/routes";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 
 const StatsSection = () => {
   const router = useRouter();
@@ -52,28 +50,7 @@ const StatsSection = () => {
   };
 
   const LeftSideContent = () => {
-    const [subjects, setSubjects] = useState<SubjectOverviewResponse[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const fetchSubjects = async () => {
-      setIsLoading(true);
-      const res = await subjectProvider.getSubjects();
-      if (res.isSuccess && res.data) {
-        setSubjects(
-          res.data.map((s: SubjectOverviewResponse, idx: number) => ({
-            key: s.subjectId ?? idx,
-            ...s,
-          }))
-        );
-      } else {
-        message.error("Gagal memuat mata pelajaran");
-      }
-      setIsLoading(false);
-    };
-
-    useEffect(() => {
-      if (userRole === Role.ADMIN) fetchSubjects();
-    }, []);
+    const { data: subjects = [] } = useSubjects();
 
     const xpCurrent = 30000;
     const xpTotal = 33800;

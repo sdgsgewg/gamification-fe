@@ -1,78 +1,35 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
-import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
-import { materialProvider } from "@/app/functions/MaterialProvider";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
-import { gradeProvider } from "@/app/functions/GradeProvider";
-import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
 import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
+import { useMaterialDetail } from "@/app/hooks/materials/useMaterialDetail";
+import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useGrades } from "@/app/hooks/grades/useGrades";
 
 const EditMaterialPage = () => {
-  const router = useRouter();
   const params = useParams<{ slug: string }>();
-  const [materialData, setMaterialData] =
-    useState<EditMaterialFormInputs | null>(null);
-  const [subjectData, setSubjectData] = useState<SubjectOverviewResponse[]>([]);
-  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS;
+
+  const { data: materialData, isLoading } = useMaterialDetail(
+    params.slug,
+    "edit"
+  );
+  const { data: subjectData = [] } = useSubjects();
+  const { data: gradeData = [] } = useGrades();
+
   const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
     useState(false);
 
   const formRef = useRef<FormRef>(null);
-
-  const fetchMaterialDetail = async () => {
-    setIsLoading(true);
-
-    const res = await materialProvider.getMaterial(params.slug);
-
-    const { isSuccess, message, data } = res;
-
-    if (isSuccess && data) {
-      const m = data;
-      setMaterialData({
-        materialId: m.materialId,
-        name: m.name,
-        description: m.description ?? "",
-        subjectId: m.subject.subjectId,
-        gradeIds: m.materialGradeIds,
-        updatedBy: "",
-        image: m.image,
-        imageFile: null,
-      });
-    } else {
-      console.error(message ?? "Gagal memuat detail materi pelajaran");
-      router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
-    }
-
-    setIsLoading(false);
-  };
-
-  const fetchSubjects = async () => {
-    try {
-      const res = await subjectProvider.getSubjects();
-      if (res.isSuccess && res.data) setSubjectData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch subjects: ", error);
-    }
-  };
-
-  const fetchGrades = async () => {
-    try {
-      const res = await gradeProvider.getGrades();
-      if (res.isSuccess && res.data) setGradeData(res.data);
-    } catch (error) {
-      console.error("Failed to fetch grades: ", error);
-    }
-  };
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
@@ -92,19 +49,8 @@ const EditMaterialPage = () => {
 
   const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
     console.log("Edit material successful with:", values);
-    router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
+    router.push(`${baseRoute}`);
   };
-
-  useEffect(() => {
-    if (params.slug) {
-      fetchMaterialDetail();
-    }
-  }, [params.slug]);
-
-  useEffect(() => {
-    fetchSubjects();
-    fetchGrades();
-  }, []);
 
   return (
     <>

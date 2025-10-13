@@ -5,7 +5,7 @@ export function resolveDashboardRoute(role: Role, subPath = ""): string {
   switch (role) {
     case Role.ADMIN:
       return `${ROUTES.DASHBOARD.ADMIN.BASE}${
-        subPath === "/task" ? "/manage-tasks" : subPath
+        subPath === "/tasks" ? "/manage-tasks" : subPath
       }`;
     case Role.TEACHER:
       return `${ROUTES.DASHBOARD.TEACHER.BASE}${subPath}`;

@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
-import { MaterialDetailResponse } from "@/app/interface/materials/responses/IMaterialDetailResponse";
 import Loading from "@/app/components/shared/Loading";
-import { materialProvider } from "@/app/functions/MaterialProvider";
 import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
@@ -19,12 +17,21 @@ import {
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
+import { useDeleteMaterial } from "@/app/hooks/materials/useDeleteMaterial";
+import { useMaterialDetail } from "@/app/hooks/materials/useMaterialDetail";
 
 const MaterialDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [materialData, setMaterialData] =
-    useState<MaterialDetailResponse | null>(null);
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS;
+
+  const { data: materialData, isLoading } = useMaterialDetail(
+    params.slug,
+    "detail"
+  );
+  const { mutateAsync: deleteMaterial } = useDeleteMaterial();
+
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
   const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
     null
@@ -33,47 +40,9 @@ const MaterialDetailPage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!params.slug) return;
-
-    const fetchMaterialDetail = async () => {
-      setIsLoading(true);
-
-      const res = await materialProvider.getMaterial(params.slug);
-
-      const { isSuccess, message, data } = res;
-
-      if (isSuccess && data) {
-        const m = data;
-        setMaterialData({
-          materialId: m.materialId,
-          name: m.name,
-          slug: m.slug,
-          description: m.description ?? "",
-          image: m.image ?? "",
-          subject: m.subject ?? { subjectId: "", name: "" },
-          materialGradeIds: m.materialGradeIds ?? [],
-          materialGrade: m.materialGrade ?? "-",
-          createdBy: m.createdBy,
-          updatedBy: m.updatedBy ?? "-",
-        });
-      } else {
-        console.error(message ?? "Gagal memuat detail materi");
-        router.push("/dashboard/material");
-      }
-
-      setIsLoading(false);
-    };
-
-    fetchMaterialDetail();
-  }, [params.slug]);
 
   const handleEdit = (slug: string) => {
-    router.push(`/dashboard/material/edit/${slug}`);
+    router.push(`${baseRoute}/edit/${slug}`);
   };
 
   const showDeleteModal = (materialId: string, name: string) => {
@@ -82,7 +51,7 @@ const MaterialDetailPage = () => {
     setIsDeleteConfirmationModalVisible(true);
   };
 
-  const confirmDeleteMaterial = () => {
+  const confirmDelete = () => {
     if (deleteMaterialId !== null) {
       handleDelete(deleteMaterialId);
       setDeleteMaterialId(null);
@@ -98,20 +67,13 @@ const MaterialDetailPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await materialProvider.deleteMaterial(id);
-      if (res.isSuccess) {
-        toast.success("Materi pelajaran berhasil dihapus");
-        router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
-      } else {
-        toast.error(res.message ?? "Gagal menghapus materi pelajaran");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus materi pelajaran");
-      }
+    const res = await deleteMaterial(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Materi berhasil dihapus");
+      router.push(`${baseRoute}`);
+    } else {
+      toast.error(message ?? "Gagal menghapus materi pelajaran");
     }
   };
 
@@ -174,7 +136,7 @@ const MaterialDetailPage = () => {
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
         modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
-        onConfirm={confirmDeleteMaterial}
+        onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
     </>

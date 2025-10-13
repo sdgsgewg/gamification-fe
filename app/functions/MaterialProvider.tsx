@@ -42,7 +42,7 @@ export const materialProvider = {
     }
   },
 
-  async getMaterial(
+  async getMaterialDetail(
     slug: string
   ): Promise<ApiResponse<MaterialDetailResponse>> {
     try {

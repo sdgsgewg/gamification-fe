@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Tag } from "antd";
 import { useToast } from "@/app/hooks/use-toast";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
@@ -11,24 +11,32 @@ import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/I
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import FilterTaskTypeForm from "@/app/components/forms/task-types/filter-task-type-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { FilterTaskTypeFormInputs } from "@/app/schemas/task-types/filterTaskType";
 import { ROUTES } from "@/app/constants/routes";
+import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
+import { useDeleteTaskType } from "@/app/hooks/task-types/useDeleteTaskType";
 
 const TaskTypePage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
-  const [taskTypes, setTaskTypes] = useState<TaskTypeOverviewResponse[]>([]);
+
+  const [filters, setFilters] = useState<FilterTaskTypeFormInputs>({
+    searchText: "",
+  });
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
+  const { data: taskTypes = [], isLoading, refetch } = useTaskTypes(filters);
+  const { mutateAsync: deleteTaskType } = useDeleteTaskType();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
   const [deleteTaskTypeId, setDeleteTaskTypeId] = useState<string | null>(null);
   const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
     null
@@ -37,32 +45,17 @@ const TaskTypePage = () => {
     isDeleteConfirmationModalVisible,
     setIsDeleteConfirmationModalVisible,
   ] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const formRef = useRef<FormRef>(null);
-
-  const fetchTaskTypes = async (values?: FilterTaskTypeFormInputs) => {
-    setIsLoading(true);
-    const res = await taskTypeProvider.getTaskTypes(values);
-    const { isSuccess, data, message } = res;
-    if (isSuccess && data) {
-      setTaskTypes(
-        data.map((tt: TaskTypeOverviewResponse, idx: number) => ({
-          key: tt.taskTypeId ?? idx,
-          ...tt,
-        }))
-      );
-    } else {
-      console.error(message ?? "Gagal memuat tipe tugas");
-    }
-    setIsLoading(false);
-  };
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
   const handleCloseFilter = () => setIsFilterModalVisible(false);
 
   const handleApplyFilter = (values: FilterTaskTypeFormInputs) => {
-    fetchTaskTypes(values);
+    setFilters((prev) => ({
+      ...prev,
+      ...values, // gabungkan filter baru dengan search text
+    }));
     setIsFilterModalVisible(false);
   };
 
@@ -100,26 +93,15 @@ const TaskTypePage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await taskTypeProvider.deleteTaskType(id);
-      if (res.isSuccess) {
-        toast.success("Tipe Tugas berhasil dihapus");
-        fetchTaskTypes();
-      } else {
-        toast.error(res.message ?? "Gagal menghapus tipe tugas");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Terjadi kesalahan saat menghapus");
-      }
+    const res = await deleteTaskType(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      toast.success(message ?? "Tipe Tugas berhasil dihapus");
+      refetch();
+    } else {
+      toast.error(message ?? "Gagal menghapus tipe tugas");
     }
   };
-
-  useEffect(() => {
-    fetchTaskTypes();
-  }, []);
 
   // Kolom tabel
   const columns: ColumnType<TaskTypeOverviewResponse>[] = [
@@ -247,9 +229,11 @@ const TaskTypePage = () => {
         onAddButtonClick={handleNavigateToCreateTaskTypePage}
         searchable
         searchPlaceholder="Cari tipe tugas…"
-        onSearch={(value) => fetchTaskTypes({ searchText: value })}
+        onSearch={(value) =>
+          setFilters((prev) => ({ ...prev, searchText: value }))
+        }
         onOpenFilter={handleOpenFilter}
-        onRefresh={() => fetchTaskTypes()}
+        onRefresh={() => refetch()}
       />
 
       <FilterModal

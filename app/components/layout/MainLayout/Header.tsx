@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,10 +15,10 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { auth, authEventTarget } from "@/app/functions/AuthProvider";
+import { auth } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
-import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
 interface MainMenuItemProps {
   url: string;
@@ -205,39 +205,13 @@ const UserDropdownMenu = ({
 };
 
 const Header = () => {
-  const [user, setUser] = useState<UserDetailResponse>();
-  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
+  const { user, role } = useGetCachedUser();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const router = useRouter();
 
   const handleNavigateToHomePage = () => {
     router.push("/");
   };
-
-  useEffect(() => {
-    const updateUser = async () => {
-      const user = await auth.getCachedUserProfile();
-      if (user) {
-        setUser(user);
-        setUserRole(user.role.name);
-      } else {
-        setUser(undefined);
-        setUserRole(Role.GUEST);
-      }
-    };
-
-    updateUser(); // Initial
-
-    const handleAuthChange = () => {
-      updateUser(); // Re-fetch profile on logout/login
-    };
-
-    authEventTarget.addEventListener("authChanged", handleAuthChange);
-    return () => {
-      authEventTarget.removeEventListener("authChanged", handleAuthChange);
-    };
-  }, []);
 
   return (
     <header className="bg-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
@@ -251,14 +225,14 @@ const Header = () => {
 
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
-          <MainMenuItemWrapper role={userRole} />
-          {!user || userRole === Role.GUEST ? (
+          <MainMenuItemWrapper role={role} />
+          {!user || role === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
-              role={userRole}
+              role={role}
               level={user.level}
               xp={user.xp}
             />
@@ -280,14 +254,14 @@ const Header = () => {
       {/* Mobile menu dropdown */}
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
-          <MainMenuItemWrapper role={userRole} isMobile />
-          {!user || userRole === Role.GUEST ? (
+          <MainMenuItemWrapper role={role} isMobile />
+          {!user || role === Role.GUEST ? (
             <AuthActionButtons />
           ) : (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
-              role={userRole}
+              role={role}
               level={user.level}
               xp={user.xp}
             />

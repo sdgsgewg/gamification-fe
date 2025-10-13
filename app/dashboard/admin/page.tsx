@@ -1,14 +1,9 @@
 "use client";
 
+import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import React from "react";
 
-type User = {
-  id: string;
-  name: string;
-  role: { name: string };
-};
-
-const AdminDashboardPage: React.FC<{ user?: User }> = ({ user }) => {
+const AdminDashboardPage = () => {
   const stats = [
     { label: "Guru", value: 200 },
     { label: "Siswa", value: 300 },
@@ -26,8 +21,8 @@ const AdminDashboardPage: React.FC<{ user?: User }> = ({ user }) => {
   ];
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-black mb-6">Dashboard Admin</h1>
+    <>
+      <DashboardTitle title="Dashboard" showBackButton={false} />
 
       {/* Statistik */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -51,7 +46,7 @@ const AdminDashboardPage: React.FC<{ user?: User }> = ({ user }) => {
         </h2>
         <BarChart data={kelasData} />
       </div>
-    </div>
+    </>
   );
 };
 

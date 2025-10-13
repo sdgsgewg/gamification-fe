@@ -54,8 +54,6 @@ const MainMenuItem = ({
 
   const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
 
-  // const classes = `${baseClasses} ${activeClasses}`;
-
   return (
     <li>
       <Link href={url} onClick={handleClick} className={classes}>

@@ -24,23 +24,6 @@ const ActivityPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="bg-white shadow px-8 py-4 flex justify-between items-center">
-        <nav className="flex space-x-8">
-          <a href="#" className="font-bold text-blue-600">GAMIFICATION</a>
-          <a href="#">Aktivitas</a>
-          <a href="#">Leaderboard</a>
-        </nav>
-        <div className="flex space-x-3">
-          <button className="px-4 py-1 text-sm rounded text-blue-600 border border-blue-600">
-            Masuk
-          </button>
-          <button className="px-4 py-1 text-sm rounded bg-blue-600 text-white">
-            Daftar
-          </button>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section
         className="relative bg-cover bg-center h-64 flex items-center justify-center text-white"

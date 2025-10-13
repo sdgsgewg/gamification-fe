@@ -34,6 +34,7 @@ export const roleSectionsMap = {
   ],
   [Role.TEACHER]: [
     { name: "hero", element: <HeroSection /> },
+    { name: "howItWorks", element: <HowItWorksSection /> },
     { name: "features", element: <FeatureSection /> },
     { name: "stats", element: <StatsSection /> },
   ],

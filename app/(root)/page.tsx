@@ -1,19 +1,17 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { auth } from "../functions/AuthProvider";
 import { Section } from "../components/pages/Home/Section";
-import { Role } from "../enums/Role";
 import { roleSectionsMap } from "../constants/roleSectionsMap";
+import { useGetCachedUser } from "../hooks/useGetCachedUser";
 
 const HomePage: React.FC = () => {
-  const user = auth.getCachedUserProfile();
-  const userRole = user?.role.name ?? Role.GUEST;
+  const { role } = useGetCachedUser();
 
   return (
     <div className="font-sans text-black">
       <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
-        {roleSectionsMap[userRole].map(({ name, element }, index) => (
+        {roleSectionsMap[role].map(({ name, element }, index) => (
           <Section key={name} sectionName={name} isOdd={index % 2 === 0}>
             {element}
           </Section>

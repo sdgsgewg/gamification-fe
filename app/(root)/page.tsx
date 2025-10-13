@@ -9,15 +9,13 @@ const HomePage: React.FC = () => {
   const { role } = useGetCachedUser();
 
   return (
-    <div className="font-sans text-black">
-      <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
-        {roleSectionsMap[role].map(({ name, element }, index) => (
-          <Section key={name} sectionName={name} isOdd={index % 2 === 0}>
-            {element}
-          </Section>
-        ))}
-      </Suspense>
-    </div>
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      {roleSectionsMap[role].map(({ name, element }, index) => (
+        <Section key={name} sectionName={name} isOdd={index % 2 === 0}>
+          {element}
+        </Section>
+      ))}
+    </Suspense>
   );
 };
 

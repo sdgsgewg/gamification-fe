@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext } from "react";
 import { LinkOutlined } from "@ant-design/icons";
 

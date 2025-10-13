@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
@@ -5,8 +7,8 @@ import Button from "@/app/components/shared/Button";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useSectionContext } from "../../pages/Home/Section";
 import { ROUTES } from "@/app/constants/routes";
+import { useSafeSectionContext } from "@/app/hooks/useSafeSectionContext";
 
 type FromPage = "home" | "subjects";
 
@@ -19,7 +21,7 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
   const { image, name, activityCount } = subject;
   const router = useRouter();
 
-  const { isOdd } = useSectionContext();
+  const { isOdd } = useSafeSectionContext();
 
   const homePageBgColor = isOdd ? "bg-white" : "bg-[#F5F4FF]";
   const subjectPageBgColor = "bg-white";
@@ -31,7 +33,9 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
 
   return (
     <div
-      className={`${bgColor} max-w-[16rem] flex flex-col items-start justify-start rounded-xl shadow-sm p-6`}
+      className={`${bgColor} ${
+        fromPage === "home" ? "max-w-[16rem]" : "max-w-[13rem]"
+      } flex flex-col items-start justify-start rounded-xl shadow-sm p-6`}
     >
       <div className="w-full mb-2">
         <Image src={image ?? ""} alt={name} width={64} height={64} />

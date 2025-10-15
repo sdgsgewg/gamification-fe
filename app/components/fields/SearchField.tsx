@@ -10,6 +10,7 @@ interface SearchFieldProps {
   name: string;
   placeholder?: string;
   formId: string;
+  className?: string;
 }
 
 const SearchField = ({
@@ -17,6 +18,7 @@ const SearchField = ({
   name,
   placeholder,
   formId,
+  className,
 }: SearchFieldProps) => {
   return (
     <Form.Item name={name} style={{ marginBottom: "0rem" }}>
@@ -24,7 +26,7 @@ const SearchField = ({
         name={name}
         control={control}
         render={({ field }) => (
-          <div className="flex">
+          <div className={`flex ${className}`}>
             <Input
               {...field}
               placeholder={placeholder}

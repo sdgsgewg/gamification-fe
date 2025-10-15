@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
+import { useIsTablet } from "@/app/hooks/useIsTablet";
 import { useIsDesktop } from "@/app/hooks/useIsDesktop";
 
 interface ActivityHeaderProps {
@@ -17,10 +18,11 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
   children,
   onResetFilters,
 }) => {
+  const { isMediumTablet } = useIsTablet();
   const isDesktop = useIsDesktop();
 
   return (
-    <div className="relative h-96 flex items-center px-8 md:px-12 xl:px-20 text-white overflow-hidden">
+    <div className="relative h-72 xs:h-76 md:h-96 flex items-center px-8 md:px-12 xl:px-20 text-white overflow-hidden">
       <Image
         src={IMAGES.ACTIVITY}
         alt="Activity Background"
@@ -30,8 +32,8 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
       />
       <div className="absolute inset-0 bg-black/60"></div>
       <div className="relative z-10 w-full flex flex-col items-start gap-8">
-        <div className="w-full flex flex-col gap-4 text-white">
-          <h1 className="text-4xl font-bold">Aktivitas Belajar</h1>
+        <div className="w-full flex flex-col gap-2 sm:gap-4 text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold">Aktivitas Belajar</h1>
           <p className="text-base font-medium">
             Temukan berbagai tugas, quiz, dan game seru!
           </p>
@@ -41,7 +43,7 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
         <div className="w-full">{children}</div>
 
         {/* Apply or reset filters */}
-        {isDesktop && (
+        {(isMediumTablet || isDesktop) && (
           <div className="w-full max-w-sm flex items-end justify-end gap-4 ms-auto">
             <Button
               key="reset"

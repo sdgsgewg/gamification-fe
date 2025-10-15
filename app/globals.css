@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f5f4ff;
   --foreground: #171717;
+}
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-xxs: 360px;
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  --color-primary: #556fd7;
+  --color-primary-hover: #4559b5;
+  --color-secondary: #9333ea;
+  --color-outline: #9333ea;
+  --color-outline-hover: #e1e0fa;
+  --color-border: #bcb4ff;
+  --color-view: #74c1ff;
+  --color-view-hover: #4fa8f8;
+  --color-warning: #ffc107;
+  --color-warning-hover: #e0a800;
+  --color-danger: #dc3545;
+  --color-danger-hover: #b02a37;
 }
 
 @theme inline {
@@ -74,7 +98,14 @@ body {
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-/* ===== Leaderboard table style ===== */
+/* ===== Ant Design Input Style ===== */
+/* ubah warna placeholder Select Ant Design */
+.ant-select-selection-placeholder {
+  color: #000000 !important;
+  opacity: 1;
+}
+
+/* ===== Leaderboard Table Style ===== */
 
 /* Hilangkan rounded bawaan Ant Design */
 .leaderboard-table .ant-table,

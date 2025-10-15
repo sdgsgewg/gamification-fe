@@ -21,7 +21,7 @@ export default function CardWrapper({
         sectionName === "howItWorks"
           ? "lg:gap-y-0 lg:gap-x-8 xl:gap-x-12"
           : "lg:gap-y-12 lg:gap-x-16 xl:gap-x-20"
-      }  gap-x-0 sm:gap-x-8 md:gap-x-12`}
+      } gap-x-0 sm:gap-x-8 md:gap-x-12`}
     >
       {children}
     </div>

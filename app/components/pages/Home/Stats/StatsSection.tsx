@@ -61,9 +61,9 @@ const StatsSection = () => {
         <>
           <DataRow text={`Level 25`} textVariant="text-4xl-bold" />
           <DataRow text={`XP:30.000 / 33.800`} textVariant="text-xl-semibold" />
-          <div className="w-full bg-[#F5F4FF] rounded-2xl h-8 overflow-hidden mt-2">
+          <div className="w-full bg-background rounded-2xl h-8 overflow-hidden mt-2">
             <div
-              className="bg-[#556FD7] h-8 rounded-2xl transition-all duration-500"
+              className="bg-primary h-8 rounded-2xl transition-all duration-500"
               style={{ width: `${xpProgress}%` }}
             ></div>
           </div>

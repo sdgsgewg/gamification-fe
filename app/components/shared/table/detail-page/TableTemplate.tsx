@@ -1,6 +1,6 @@
 import TableWrapper from "./TableWrapper";
 import { DetailPageTableHeader } from "./DetailPageTable";
-import { DateRow, TimeRow } from "./TableRowData";
+import { DateRow, StatusRow, TimeRow } from "./TableRowData";
 import { IMAGES } from "@/app/constants/images";
 
 interface DetailInformationTableProps {
@@ -71,6 +71,34 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
       {/* Isi */}
       <DateRow label="Dibuat Oleh" value={createdBy} />
       <DateRow label="Terkahir Diperbarui" value={updatedBy ?? ""} />
+    </TableWrapper>
+  );
+};
+
+interface ProgressTableProps {
+  lastAccessedTime: string;
+  completedTime?: string;
+  status?: string;
+}
+
+export const ProgressTable = ({
+  lastAccessedTime,
+  completedTime,
+  status,
+}: ProgressTableProps) => {
+  return (
+    <TableWrapper>
+      {/* Header */}
+      <DetailPageTableHeader
+        imageSrc={IMAGES.WORK_PROGRESS}
+        imageAlt="Progres Pengerjaan"
+        label="Progres Pengerjaan"
+      />
+
+      {/* Isi */}
+      <DateRow label="Terakhir Diakses" value={lastAccessedTime} />
+      <DateRow label="Selesai Kerja" value={completedTime ?? ""} />
+      <StatusRow value={status ?? "Sedang Dikerjakan"} />
     </TableWrapper>
   );
 };

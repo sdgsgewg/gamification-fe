@@ -13,7 +13,7 @@ interface Option {
 interface SelectFieldProps {
   control: any;
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   size?: "small" | "middle" | "large";
   options: Option[];
@@ -22,6 +22,7 @@ interface SelectFieldProps {
   disabled?: boolean;
   mode?: "multiple" | "tags";
   required?: boolean;
+  className?: string;
   onChange?: (value: string | number | boolean) => void;
 }
 
@@ -37,6 +38,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   disabled = false,
   mode = undefined, // Default to single select
   required = false,
+  className,
   onChange,
 }) => {
   const error = get(errors, name);
@@ -44,9 +46,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label} {required && <span className="text-red-500">*</span>}
-        </span>
+        label && (
+          <span className="text-base font-medium">
+            {label} {required && <span className="text-red-500">*</span>}
+          </span>
+        )
       }
       validateStatus={error ? "error" : ""}
       help={error?.message}
@@ -69,6 +73,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
             allowClear={mode === "multiple"}
             showSearch
             optionFilterProp="label"
+            className={className}
             filterOption={(input, option) =>
               (option?.label as string)
                 .toLowerCase()

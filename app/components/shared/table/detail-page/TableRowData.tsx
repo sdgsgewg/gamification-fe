@@ -155,3 +155,20 @@ export const IsRepeatableRow = ({ value }: IsRepeatableRowProps) => {
     />
   );
 };
+
+// ACTIVITY DATA ROWS
+
+interface StatusRowProps {
+  value: string;
+}
+
+export const StatusRow = ({ value }: StatusRowProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.ACTIVITY_STATUS}
+      imageAlt="Status Aktivitas"
+      label="Status"
+      value={value}
+    />
+  );
+};

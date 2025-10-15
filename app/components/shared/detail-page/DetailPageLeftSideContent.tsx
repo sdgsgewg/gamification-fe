@@ -18,12 +18,13 @@ const DetailPageLeftSideContent = ({
   return (
     <div className="flex flex-col gap-4 text-black">
       <h2 className="text-2xl font-semibold">{name}</h2>
-      {hasImage && (
+      {hasImage && image && (
         <Image
-          src={image ?? IMAGES.DEFAULT_IMAGE}
+          src={image || IMAGES.DEFAULT_IMAGE}
           alt={name}
           width={200}
           height={200}
+          className="rounded-xl object-cover"
         />
       )}
       <div className="flex flex-col gap-4 mt-4">

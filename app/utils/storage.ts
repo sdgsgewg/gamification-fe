@@ -17,7 +17,6 @@ export function removeItem(key: string): void {
 
 export function clearStorage(): void {
   if (!isBrowser) return;
-  console.log("Cleararrara");
   window.localStorage.clear();
 }
 

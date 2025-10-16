@@ -7,12 +7,14 @@ interface DetailPageWrapperProps {
   left: React.ReactNode;
   right: React.ReactNode;
   bottom?: React.ReactNode;
+  hasBottomDivider?: boolean;
 }
 
 export default function DetailPageWrapper({
   left,
   right,
   bottom,
+  hasBottomDivider = false,
 }: DetailPageWrapperProps) {
   return (
     <div className="w-full space-y-0 md:space-y-8">
@@ -21,8 +23,8 @@ export default function DetailPageWrapper({
         <div className="md:w-3/5 space-y-8">{right}</div>
       </div>
       {bottom && (
-        <div>
-          <Divider className="!border-black !my-12" />
+        <div className={`${!hasBottomDivider ? "mt-12" : ""}`}>
+          {hasBottomDivider && <Divider className="!border-black !my-12" />}
           {bottom}
         </div>
       )}

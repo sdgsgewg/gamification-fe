@@ -2,7 +2,7 @@ import Button from "@/app/components/shared/Button";
 import { CreateTaskRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
 import Image from "next/image";
 import { UpdateTaskRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
-import DetailPageWrapper from "../DetailPageWrapper";
+import DetailPageWrapper from "../../../shared/detail-page/DetailPageWrapper";
 import {
   DetailInformationTable,
   DurationTable,

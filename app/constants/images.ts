@@ -60,6 +60,12 @@ export const IMAGES = {
   REPEATBALE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/repeatable.png",
 
+  // Activity
+  WORK_PROGRESS:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/activity/work_progress.png",
+  ACTIVITY_STATUS:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/activity/status.png",
+
   // Leaderboard
   GOLD_MEDAL:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/gold-medal.png",

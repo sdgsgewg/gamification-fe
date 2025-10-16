@@ -5,7 +5,7 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
-import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
+import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   GradeRow,
@@ -21,7 +21,7 @@ import {
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
-import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
 import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
@@ -167,6 +167,7 @@ const TaskDetailPage = () => {
           left={<LeftSideContent />}
           right={<RightSideContent />}
           bottom={<BottomContent />}
+          hasBottomDivider
         />
       )}
 

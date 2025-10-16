@@ -13,6 +13,7 @@ interface TextFieldProps {
   required?: boolean;
   readonly?: boolean;
   prefixIcon?: React.ReactNode;
+  className?: string;
 }
 
 const TextField = ({
@@ -24,6 +25,7 @@ const TextField = ({
   required,
   readonly,
   prefixIcon,
+  className,
 }: TextFieldProps) => {
   const error = get(errors, name);
 
@@ -41,6 +43,7 @@ const TextField = ({
       validateStatus={error ? "error" : ""}
       help={error?.message}
       style={{ marginBottom: error ? "1rem" : "0rem" }}
+      className={className}
     >
       <Controller
         name={name}
@@ -52,6 +55,7 @@ const TextField = ({
             placeholder={placeholder}
             size="large"
             readOnly={readonly}
+            className={className}
           />
         )}
       />

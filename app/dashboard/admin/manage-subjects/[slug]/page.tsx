@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import Loading from "@/app/components/shared/Loading";
-import DetailPageWrapper from "@/app/components/pages/Dashboard/DetailPageWrapper";
+import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import { ColumnType } from "antd/es/table";
 import DataTable from "@/app/components/shared/table/Table";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
@@ -15,7 +15,7 @@ import {
   HistoryTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { SubjectRow } from "@/app/components/shared/table/detail-page/TableRowData";
-import DetailPageLeftSideContent from "@/app/components/pages/Dashboard/DetailPageLeftSideContent";
+import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
 import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useSubjectDetail } from "@/app/hooks/subjects/useSubjectDetail";

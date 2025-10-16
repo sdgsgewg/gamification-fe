@@ -11,7 +11,7 @@ export const useTaskDetail = <M extends ManageItemMode>(
   mode: M
 ) => {
   return useQuery({
-    queryKey: ["materialDetail", slug],
+    queryKey: ["taskDetail", slug],
     enabled: !!slug,
     queryFn: async () => {
       const res = await taskProvider.getTaskDetail(slug);

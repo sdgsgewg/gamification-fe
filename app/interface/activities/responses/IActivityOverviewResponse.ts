@@ -5,7 +5,7 @@ export interface ActivityOverviewResponse {
   image?: string;
   type: string;
   subject: string;
-  taskGrade: string;
+  grade: string;
   questionCount: number;
   answeredCount?: number;
 }

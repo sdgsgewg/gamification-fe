@@ -18,7 +18,7 @@ const StatusBar = ({
   height,
 }: StatusBarProps) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col">
       {/* Status Text */}
       <p className={`${labelClassName}`}>{`${current} dari ${total} Soal`}</p>
       {/* Status Bar */}

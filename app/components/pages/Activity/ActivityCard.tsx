@@ -15,6 +15,7 @@ interface ActivityCardProps {
   title: string;
   slug: string;
   subject: string;
+  grade: string;
   questionCount: number;
   answeredCount?: number;
 }
@@ -26,6 +27,7 @@ const ActivityCard = ({
   title,
   slug,
   subject,
+  grade,
   questionCount,
   answeredCount,
 }: ActivityCardProps) => {
@@ -37,7 +39,8 @@ const ActivityCard = ({
 
   return (
     <div
-      className={`relative bg-white w-full h-full flex flex-col gap-2 rounded-lg shadow-md p-3`}
+      className={`relative bg-white w-full h-full flex flex-col gap-2 rounded-lg shadow-md p-3 cursor-pointer`}
+      onClick={() => navigateToActivityDetailPage(slug)}
     >
       <div className="flex items-center justify-between text-white font-semibold">
         {/* Type */}
@@ -54,7 +57,7 @@ const ActivityCard = ({
       </div>
 
       {/* Gambar Aktivitas */}
-      <div className="w-2/3 my-2">
+      <div className="w-2/3">
         <Image
           src={image !== "" ? image : IMAGES.CTA}
           alt={title}
@@ -70,7 +73,7 @@ const ActivityCard = ({
           current={answeredCount}
           total={questionCount}
           labelClassName="text-[0.625rem] font-medium"
-          height={"h-3"}
+          height={"h-2"}
         />
       )}
 
@@ -84,29 +87,16 @@ const ActivityCard = ({
           <p className="text-xs font-medium">{subject}</p>
         </span>
 
-        <div className="flex items-center justify-between">
-          {/* Jumlah Soal */}
-          <span className="flex items-center gap-2">
-            <Image
-              src={IMAGES.TASK}
-              alt={questionCount.toString()}
-              width={20}
-              height={20}
-            />
-            <p className="text-xs font-medium">{`${questionCount} Soal`}</p>
-          </span>
-
-          {/* CTA Button */}
-          <Button
-            type="primary"
-            size="small"
-            variant="primary"
-            className="!flex !items-center !justify-center !px-3 !rounded-2xl"
-            onClick={() => navigateToActivityDetailPage(slug)}
-          >
-            <span className="text-xs font-semibold">Lihat</span>
-          </Button>
-        </div>
+        {/* Jumlah Soal */}
+        <span className="flex items-center gap-2">
+          <Image
+            src={IMAGES.GRADE}
+            alt={`Kelas ${grade}`}
+            width={20}
+            height={20}
+          />
+          <p className="text-xs font-medium">{`Kelas ${grade}`}</p>
+        </span>
       </div>
     </div>
   );

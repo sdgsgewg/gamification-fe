@@ -115,41 +115,40 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
     const ActivityHeaderView = () => {
       return (
         <div className="w-full grid grid-cols-1 xxs:flex xxs:items-center md:grid md:grid-cols-4 gap-y-2 xxs:gap-y-0 gap-x-4 sm:gap-x-8 md:gap-x-4 lg:gap-x-8">
-          {isMediumTablet ||
-            (isDesktop && (
-              <>
-                {/* Filter Mata Pelajaran */}
-                <SelectField
-                  control={control}
-                  name="subjectId"
-                  placeholder="Mata pelajaran"
-                  options={subjectOptions}
-                  loading={subjectOptions.length === 0}
-                  disabled={subjectOptions.length === 0}
-                />
+          {(isMediumTablet || isDesktop) && (
+            <>
+              {/* Filter Mata Pelajaran */}
+              <SelectField
+                control={control}
+                name="subjectId"
+                placeholder="Mata pelajaran"
+                options={subjectOptions}
+                loading={subjectOptions.length === 0}
+                disabled={subjectOptions.length === 0}
+              />
 
-                {/* Filter Tipe Aktivitas */}
-                <SelectField
-                  control={control}
-                  name="taskTypeId"
-                  placeholder="Tipe Aktivitas"
-                  options={taskTypeOptions}
-                  loading={taskTypeOptions.length === 0}
-                  disabled={taskTypeOptions.length === 0}
-                />
+              {/* Filter Tipe Aktivitas */}
+              <SelectField
+                control={control}
+                name="taskTypeId"
+                placeholder="Tipe Aktivitas"
+                options={taskTypeOptions}
+                loading={taskTypeOptions.length === 0}
+                disabled={taskTypeOptions.length === 0}
+              />
 
-                {/* Filter Kelas */}
-                <SelectField
-                  control={control}
-                  name="gradeIds"
-                  placeholder="Kelas"
-                  options={gradeOptions}
-                  loading={gradeOptions.length === 0}
-                  disabled={gradeOptions.length === 0}
-                  mode="multiple"
-                />
-              </>
-            ))}
+              {/* Filter Kelas */}
+              <SelectField
+                control={control}
+                name="gradeIds"
+                placeholder="Kelas"
+                options={gradeOptions}
+                loading={gradeOptions.length === 0}
+                disabled={gradeOptions.length === 0}
+                mode="multiple"
+              />
+            </>
+          )}
 
           <div className="xxs:flex-1 ">
             <SearchField
@@ -160,17 +159,16 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
             />
           </div>
 
-          {!isMediumTablet ||
-            (!isDesktop && (
-              <Button
-                icon={<FilterOutlined />}
-                size="large"
-                className="border"
-                onClick={onOpenFilter}
-              >
-                {""}
-              </Button>
-            ))}
+          {(!isMediumTablet && !isDesktop) && (
+            <Button
+              icon={<FilterOutlined />}
+              size="large"
+              className="border"
+              onClick={onOpenFilter}
+            >
+              {""}
+            </Button>
+          )}
         </div>
       );
     };

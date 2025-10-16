@@ -48,7 +48,6 @@ export default class AuthProvider {
 
           await this.fetchUserProfile();
           this.isLoggedIn = true;
-          return;
         }
       } catch (err: unknown) {
         const axiosErr = err as AxiosError;
@@ -79,9 +78,7 @@ export default class AuthProvider {
   getUserProfile() {
     const user = getItem(this.userProfileKey);
     if (user) {
-      const parsed = JSON.parse(user);
-      const { user_id, ...rest } = parsed;
-      this.userProfile = { userId: user_id, ...rest };
+      this.userProfile = JSON.parse(user);
     }
   }
 

@@ -15,7 +15,6 @@ export const useActivityDetail = (slug: string) => {
         throw new Error("Gagal memuat detail aktivitas");
 
       const act = res.data;
-      console.log("Activity detail data: ", JSON.stringify(act , null, 2));
 
       const mapped: ActivityDetailResponse = {
         ...act,

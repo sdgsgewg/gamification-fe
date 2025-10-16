@@ -45,6 +45,7 @@ const ActivitySectionPage = () => {
               title={activity.title}
               slug={activity.slug}
               subject={activity.subject}
+              grade={activity.grade}
               questionCount={activity.questionCount}
               answeredCount={
                 showAnsweredCount ? activity.answeredCount : undefined

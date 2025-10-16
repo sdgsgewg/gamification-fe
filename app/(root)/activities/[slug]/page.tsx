@@ -42,8 +42,10 @@ const ActivityDetailPage = () => {
   } = useActivities({
     subjectId: activityData?.subject.subjectId,
     materialId: activityData?.material?.materialId,
-    taskTypeId: activityData?.type.taskTypeId,
   });
+  const filteredSimilarActivities = similarActivities.filter(
+    (activity) => activity.slug !== params.slug
+  );
 
   if (!activityData) {
     return <Loading />;
@@ -141,6 +143,8 @@ const ActivityDetailPage = () => {
   };
 
   const BottomContent = () => {
+    if (filteredSimilarActivities.length === 0) return null;
+
     return (
       <div className="flex flex-col gap-6">
         <div className="pb-2 border-b-1 border-b-black">
@@ -158,6 +162,7 @@ const ActivityDetailPage = () => {
                 title={sa.title}
                 slug={sa.slug}
                 subject={sa.subject}
+                grade={sa.grade}
                 questionCount={sa.questionCount}
               />
             ))}

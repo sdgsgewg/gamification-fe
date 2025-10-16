@@ -10,7 +10,9 @@ export default function RootLayout({
   return (
     <>
       <Header />
-      <main className="bg-[#F5F4FF] min-h-screen pt-16 lg:pt-19 text-black">{children}</main>
+      <main className="bg-[#F5F4FF] min-h-screen pt-16 lg:pt-19 text-black">
+        {children}
+      </main>
       <Footer />
     </>
   );

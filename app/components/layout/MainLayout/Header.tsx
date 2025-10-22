@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faChevronUp,
   faChevronDown,
   faBars,
   faXmark,
@@ -19,6 +20,7 @@ import { auth } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import ThemeSwitcher from "../../shared/ThemeSwitcher";
 
 interface MainMenuItemProps {
   url: string;
@@ -26,7 +28,7 @@ interface MainMenuItemProps {
 }
 
 const MainMenuItem = ({ url, menu }: MainMenuItemProps) => (
-  <li className="text-black">
+  <li className="text-dark">
     <a href={url}>{menu}</a>
   </li>
 );
@@ -40,6 +42,8 @@ const MainMenuItemWrapper = ({
   role,
   isMobile = false,
 }: MainMenuItemWrapperProps) => {
+  const [open, setOpen] = useState(false); // <-- state untuk buka/tutup dropdown
+
   const filteredItems = mainMenuItems.filter((item) =>
     item.roles.includes(role)
   );
@@ -50,15 +54,16 @@ const MainMenuItemWrapper = ({
     >
       {filteredItems.map((item) =>
         item.dropdownMenuItems ? (
-          <li key={item.menu} className="text-black">
+          <li key={item.menu} className="text-dark">
             <Dropdown
+              onOpenChange={(flag) => setOpen(flag)} // <-- handle buka/tutup
               menu={{
                 items: item.dropdownMenuItems.map((sub) => ({
                   key: sub.url,
                   label: (
                     <a
                       href={sub.url}
-                      className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center gap-2 px-1 py-2 text-sm hover:bg-light-emphasis"
                     >
                       <Image
                         src={sub.icon ?? "/img/default.png"}
@@ -66,7 +71,7 @@ const MainMenuItemWrapper = ({
                         width={16}
                         height={16}
                       />
-                      <span>{sub.menu}</span>
+                      <span className="text-dark">{sub.menu}</span>
                     </a>
                   ),
                 })),
@@ -74,7 +79,10 @@ const MainMenuItemWrapper = ({
             >
               <a href={item.url} className="flex items-center gap-2">
                 {item.menu}
-                <FontAwesomeIcon icon={faChevronDown} className="text-xs" />
+                <FontAwesomeIcon
+                  icon={open ? faChevronUp : faChevronDown}
+                  className="text-xs transition-transform duration-200"
+                />
               </a>
             </Dropdown>
           </li>
@@ -90,19 +98,20 @@ const AuthActionButtons = () => {
   const router = useRouter();
 
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row items-center gap-4">
       <button
         onClick={() => router.push(ROUTES.AUTH.LOGIN)}
-        className="bg-[#EAE9FF] text-[#556FD7] font-bold rounded-2xl px-6 py-2 hover:bg-[#d9d8f2] transition cursor-pointer"
+        className="bg-tertiary text-tx-primary-accent font-bold rounded-2xl px-6 py-2 hover:bg-tertiary-hover transition cursor-pointer"
       >
         Masuk
       </button>
       <button
         onClick={() => router.push(ROUTES.AUTH.REGISTER)}
-        className="bg-[#556FD7] text-white font-bold rounded-2xl px-6 py-2 hover:bg-[#445cc0] transition cursor-pointer"
+        className="bg-primary text-white font-bold rounded-2xl px-6 py-2 hover:bg-primary-hover transition cursor-pointer"
       >
         Daftar
       </button>
+      <ThemeSwitcher />
     </div>
   );
 };
@@ -125,6 +134,7 @@ const UserDropdownMenu = ({
   const router = useRouter();
   const userMenus = userDropdownMenuItems[role] || [];
   const [nextLevelXp] = useState<number>(100);
+  const [open, setOpen] = useState(false); // <-- state untuk buka/tutup dropdown
 
   const handleLogout = () => {
     const logout = async () => {
@@ -132,7 +142,6 @@ const UserDropdownMenu = ({
     };
 
     logout();
-
     router.push("/");
   };
 
@@ -143,52 +152,68 @@ const UserDropdownMenu = ({
       return handleLogout();
     }
 
-    // Handle dynamic path
     if (item.dynamicPath && username) {
       const path = item.dynamicPath(username);
       router.push(path);
       return;
     }
 
-    // Default navigation
     if (item.url) router.push(item.url);
   };
 
   return (
-    <div className="ms-0 lg:ms-auto flex items-center gap-4">
+    <div className="bg-surface flex items-center gap-4 ms-0 lg:ms-auto">
       <Dropdown
         trigger={["click"]}
+        open={open}
+        onOpenChange={(flag) => setOpen(flag)} // <-- handle buka/tutup
+        getPopupContainer={(trigger) => trigger.parentElement!}
         menu={{
-          items: userMenus.map((item) => ({
-            key: item.menu,
-            label: (
-              <a
-                href={item.url || "#"}
-                onClick={(e) => handleMenuClick(e, item)}
-                className="flex items-center gap-2 px-1 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                {item.icon && (
-                  <FontAwesomeIcon
-                    icon={item.icon}
-                    className="w-4 h-4 text-gray-600"
-                  />
-                )}
-                <span>{item.menu}</span>
-              </a>
-            ),
-          })),
+          items: [
+            ...userMenus.map((item) => ({
+              key: item.menu,
+              label: (
+                <a
+                  href={item.url || "#"}
+                  onClick={(e) => handleMenuClick(e, item)}
+                  className="flex items-center gap-2 px-1 py-2 hover:bg-light-emphasis"
+                >
+                  {item.icon && (
+                    <FontAwesomeIcon
+                      icon={item.icon}
+                      className="w-4 h-4 text-tx-tertiary"
+                    />
+                  )}
+                  <span className="text-sm text-tx-secondary">{item.menu}</span>
+                </a>
+              ),
+            })),
+            {
+              key: "custom-divider",
+              label: <div className="h-[1px] bg-light-emphasis my-1" />,
+            },
+            {
+              key: "theme-switcher",
+              label: (
+                <div className="flex items-center justify-between px-1 py-1">
+                  <span className="text-sm text-tx-secondary">Tema</span>
+                  <ThemeSwitcher />
+                </div>
+              ),
+            },
+          ],
         }}
         placement="bottomRight"
         className="cursor-pointer"
       >
         {/* Header user info */}
-        <div className="flex items-center gap-3 text-black cursor-pointer">
+        <div className="flex items-center gap-3 text-dark cursor-pointer select-none">
           <Image src="/img/profile.png" alt="Profile" width={32} height={32} />
           <div className="flex flex-col gap-1">
             <p className="text-base font-medium">Halo, {name}</p>
             {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
-                <span className="bg-[#EAE9FF] text-[0.625rem] rounded-lg px-3">
+                <span className="bg-tertiary text-[0.625rem] rounded-lg px-3">
                   {level}
                 </span>
                 <p className="text-[0.625rem]">
@@ -197,7 +222,12 @@ const UserDropdownMenu = ({
               </div>
             )}
           </div>
-          <FontAwesomeIcon icon={faChevronDown} className="text-xs" />
+
+          {/* Ganti ikon tergantung state open */}
+          <FontAwesomeIcon
+            icon={open ? faChevronUp : faChevronDown}
+            className="text-xs transition-transform duration-200"
+          />
         </div>
       </Dropdown>
     </div>
@@ -214,10 +244,10 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
+    <header className="bg-surface px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
       <div className="flex items-center justify-between">
         <h1
-          className="text-[#556FD7] text-2xl font-bold uppercase cursor-pointer"
+          className="text-tx-primary-accent text-2xl font-bold uppercase cursor-pointer"
           onClick={handleNavigateToHomePage}
         >
           Gamification
@@ -241,7 +271,7 @@ const Header = () => {
 
         {/* Hamburger Icon (Mobile only) */}
         <button
-          className="lg:hidden text-[#556FD7] cursor-pointer"
+          className="lg:hidden text-tx-primary-accent cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <FontAwesomeIcon

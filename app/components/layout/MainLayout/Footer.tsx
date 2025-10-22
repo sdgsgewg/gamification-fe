@@ -103,7 +103,7 @@ const FollowUsSection = () => {
 
 const CopyrightSection = () => {
   return (
-    <div className="flex items-center justify-center pt-8 border-t-2 border-[#95A3DA] mt-6">
+    <div className="flex items-center justify-center pt-8 border-t-2 border-br-tertiary mt-6">
       <p className="text-white text-sm font-normal text-center">
         &copy; Copyright {new Date().getFullYear()}. All rights reserved.
       </p>
@@ -116,7 +116,7 @@ const Footer = () => {
   const userRole = user?.role.name ?? Role.GUEST;
 
   return (
-    <footer className="bg-[#556FD7] px-6 py-8 mt-auto">
+    <footer className="bg-primary px-6 py-8 mt-auto">
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-24 xl:gap-32 mb-8">
         <AboutSection />
         <MainMenuItemWrapper role={userRole} />

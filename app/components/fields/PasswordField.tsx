@@ -4,6 +4,7 @@ import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
 import { LockOutlined } from "@ant-design/icons";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface PasswordFieldProps {
   control: any;
@@ -31,17 +32,7 @@ const PasswordField = ({
   return (
     <Form.Item
       label={
-        label ? (
-          <span className="text-base font-medium">
-            {label}{" "}
-            {!readonly &&
-              (required ? (
-                <span className="text-red-500">*</span>
-              ) : (
-                <span className="text-gray-500">(opsional)</span>
-              ))}
-          </span>
-        ) : null
+        label && <Label label={label} required={required} readonly={readonly} />
       }
       name={name}
       validateStatus={error ? "error" : ""}

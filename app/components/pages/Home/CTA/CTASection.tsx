@@ -46,7 +46,7 @@ const CTASection = () => {
     return (
       <div className="w-full lg:w-[55%] flex flex-col">
         <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4">{title}</h2>
-        <p className="text-gray-600 text-base font-medium">{subtitle}</p>
+        <p className="text-tx-secondary text-base font-medium">{subtitle}</p>
         <div className="flex [@media(max-width:380px)]:flex-col flex-row sm:flex-row gap-4 mt-8">
           <Button
             type="primary"
@@ -55,7 +55,7 @@ const CTASection = () => {
             className="!p-6 !rounded-[1.25rem]"
             onClick={handleClickStartNow}
           >
-            <span className="text-white font-bold">Mulai Sekarang</span>
+            <span className="font-bold">Mulai Sekarang</span>
           </Button>
         </div>
       </div>

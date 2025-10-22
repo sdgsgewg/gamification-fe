@@ -3,6 +3,7 @@
 import { Form, InputNumber } from "antd";
 import { Controller } from "react-hook-form";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface NumberFieldProps {
   control: any;
@@ -36,10 +37,7 @@ const NumberField = ({
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label}{" "}
-          {!readonly && required && <span className="text-red-500">*</span>}
-        </span>
+        label && <Label label={label} required={required} readonly={readonly} />
       }
       validateStatus={error ? "error" : ""}
       help={error?.message}

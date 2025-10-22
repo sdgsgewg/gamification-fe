@@ -3,6 +3,7 @@
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface TextFieldProps {
   control: any;
@@ -33,10 +34,11 @@ const TextField = ({
     <Form.Item
       label={
         label && (
-          <span className="text-base font-medium">
-            {label}{" "}
-            {!readonly && required && <span className="text-red-500">*</span>}
-          </span>
+          <Label
+            label={label}
+            required={required}
+            readonly={readonly}
+          />
         )
       }
       name={name}

@@ -4,6 +4,7 @@ import { Form, DatePicker } from "antd";
 import { Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface DateFieldProps {
   control: any;
@@ -33,15 +34,7 @@ const DateField = ({
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label}{" "}
-          {!readonly &&
-            (required ? (
-              <span className="text-red-500">*</span>
-            ) : (
-              <span className="text-gray-500">(opsional)</span>
-            ))}
-        </span>
+        label && <Label label={label} required={required} readonly={readonly} />
       }
       validateStatus={error ? "error" : ""}
       help={error?.message}

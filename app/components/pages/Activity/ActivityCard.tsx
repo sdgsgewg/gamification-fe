@@ -2,7 +2,6 @@
 
 import React from "react";
 import Image from "next/image";
-import Button from "@/app/components/shared/Button";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
 import { IMAGES } from "@/app/constants/images";
@@ -39,18 +38,18 @@ const ActivityCard = ({
 
   return (
     <div
-      className={`relative bg-white w-full h-full flex flex-col gap-2 rounded-lg shadow-md p-3 cursor-pointer`}
+      className={`relative bg-card w-full h-full flex flex-col gap-2 rounded-lg shadow-md p-3 cursor-pointer`}
       onClick={() => navigateToActivityDetailPage(slug)}
     >
       <div className="flex items-center justify-between text-white font-semibold">
         {/* Type */}
-        <span className="bg-[#8A8AE1] py-[0.15rem] px-2 rounded-4xl text-[0.5rem] uppercase">
+        <span className="bg-activity-type py-[0.15rem] px-2 rounded-4xl text-[0.5rem] uppercase">
           {type}
         </span>
 
         {/* Tag New Activity */}
         {isNewActivity && (
-          <span className="bg-[#64A4F6] py-[0.15rem] px-2 rounded-sm text-[0.5rem] uppercase">
+          <span className="bg-activity-new py-[0.15rem] px-2 rounded-sm text-[0.5rem] uppercase">
             Baru
           </span>
         )}

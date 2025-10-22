@@ -4,6 +4,7 @@ import React from "react";
 import { Controller } from "react-hook-form";
 import { Form, Radio, RadioChangeEvent, Space } from "antd";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface Option {
   value: string | number | boolean;
@@ -44,14 +45,7 @@ const RadioField: React.FC<RadioFieldProps> = ({
 
   return (
     <Form.Item
-      label={
-        label && (
-          <span className="text-base font-medium">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </span>
-        )
-      }
+      label={label && <Label label={label} required={required} />}
       validateStatus={error ? "error" : ""}
       help={error?.message}
       style={{ marginBottom: error ? "1rem" : "0rem" }}

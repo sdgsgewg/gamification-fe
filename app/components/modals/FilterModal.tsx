@@ -50,11 +50,17 @@ export const FilterModal = ({
         </div>,
       ]}
     >
-      <Divider style={{ margin: "0.8rem 0 1rem 0" }} />
+      <Divider
+        style={{ margin: "0.8rem 0 1rem 0" }}
+        className="!border-light-muted"
+      />
       <div className="min-h-[22rem] max-h-[25rem] overflow-y-auto custom-thin-scrollbar">
-        {children} 
+        {children}
       </div>
-      <Divider style={{ margin: "1.2rem 0 1.2rem 0" }} />
+      <Divider
+        style={{ margin: "1.2rem 0 1.2rem 0" }}
+        className="!border-light-muted"
+      />
     </Modal>
   );
 };

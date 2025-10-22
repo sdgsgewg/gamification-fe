@@ -16,7 +16,7 @@ const DetailPageLeftSideContent = ({
   description,
 }: DetailPageLeftSideContentProps) => {
   return (
-    <div className="flex flex-col gap-4 text-black">
+    <div className="flex flex-col gap-4 text-dark">
       <h2 className="text-2xl font-semibold">{name}</h2>
       {hasImage && image && (
         <Image

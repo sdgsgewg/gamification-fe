@@ -79,4 +79,6 @@ export const IMAGES = {
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/silver-medal-crop.png",
   BRONZE_MEDAL_CROP:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/bronze-medal-crop.png",
+
+    //Profile
 };

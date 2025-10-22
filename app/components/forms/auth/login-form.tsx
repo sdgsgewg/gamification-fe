@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Checkbox, Divider } from "antd";
+import { Form, Checkbox } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm, Controller } from "react-hook-form";
@@ -22,6 +22,7 @@ import { useState } from "react";
 import Loading from "../../shared/Loading";
 import FormTitle from "../../pages/Auth/FormTitle";
 import { ROUTES } from "@/app/constants/routes";
+import AuthDivider from "../../pages/Auth/AuthDivider";
 
 interface LoginFormProps {
   onFinish: (values: LoginFormInputs) => void;
@@ -107,7 +108,11 @@ export default function LoginForm({
                   name="remember"
                   control={control}
                   render={({ field }) => (
-                    <Checkbox checked={field.value} onChange={field.onChange}>
+                    <Checkbox
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="!text-dark"
+                    >
                       Ingat Saya?
                     </Checkbox>
                   )}
@@ -115,7 +120,7 @@ export default function LoginForm({
                 <Button
                   type="link"
                   onClick={onForgotPasswordClick}
-                  className="!text-[#4F68F8]"
+                  className="!text-tx-primary-accent"
                 >
                   Lupa Password?
                 </Button>
@@ -133,14 +138,7 @@ export default function LoginForm({
                 </Button>
               </Form.Item>
 
-              <Divider
-                style={{
-                  color: "#000000",
-                }}
-                className="!m-0"
-              >
-                OR
-              </Divider>
+              <AuthDivider />
 
               <OAuthButton
                 message="Continue with Google"

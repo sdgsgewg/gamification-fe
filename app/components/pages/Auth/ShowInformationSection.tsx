@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import Button from "../../shared/Button";
 
 interface ShowInformationSectionProps {
   imageUrl: string;
@@ -20,7 +21,7 @@ const ShowInformationSection = ({
   buttonText,
 }: ShowInformationSectionProps) => {
   return (
-    <div className="bg-white w-[32rem] lg:w-[52rem] max-w-full flex flex-col items-center justify-center rounded-2xl shadow-2xl text-black text-center px-20 py-16">
+    <div className="bg-background w-[32rem] lg:w-[52rem] max-w-full flex flex-col items-center justify-center rounded-2xl shadow-2xl text-dark text-center px-20 py-16">
       <Image
         src={imageUrl}
         alt={imageAlt}
@@ -33,12 +34,15 @@ const ShowInformationSection = ({
         <div className="text-lg font-medium">{subtitle1}</div>
         {subtitle2 && <div className="text-lg font-medium">{subtitle2}</div>}
       </div>
-      <button
+      <Button
+        type="primary"
+        size="large"
+        variant="primary"
+        className="!text-xl !py-6 !px-13 !rounded-lg !mt-12"
         onClick={onButtonClick}
-        className="bg-[#556FD7] text-white text-lg font-semibold px-12 py-3 rounded-lg hover:bg-[#3A53C1] mt-12 cursor-pointer transition duration-300 ease-in-out"
       >
-        {buttonText}
-      </button>
+        <span>{buttonText}</span>
+      </Button>
     </div>
   );
 };

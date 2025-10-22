@@ -14,7 +14,7 @@ export const DetailPageTableHeader = ({
   label,
 }: DetailPageTableHeaderProps) => {
   return (
-    <div className="bg-[#556FD7] grid grid-cols-[3rem_1fr] items-center text-white px-4 py-2">
+    <div className="bg-primary grid grid-cols-[3rem_1fr] items-center text-white px-4 py-2">
       <Image
         src={imageSrc}
         alt={imageAlt}
@@ -61,7 +61,7 @@ export const DetailPageTableContent = ({
   };
 
   return (
-    <div className="grid grid-cols-[3rem_1fr] text-black px-4 py-2">
+    <div className="grid grid-cols-[3rem_1fr] text-dark px-4 py-2">
       {/* Icon */}
       <Image
         src={imageSrc}
@@ -72,7 +72,7 @@ export const DetailPageTableContent = ({
       />
 
       {/* Label & Value */}
-      <div className="grid grid-cols-2 w-full">
+      <div className="grid grid-cols-2 w-full text-dark">
         <p className="text-base font-medium">{label}</p>
         <div className="text-base font-normal">{renderValue()}</div>
       </div>

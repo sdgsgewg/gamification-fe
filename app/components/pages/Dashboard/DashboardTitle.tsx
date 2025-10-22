@@ -36,7 +36,7 @@ const DashboardTitle = ({
   };
 
   return (
-    <div className="flex items-center justify-between pb-2 border-b-1 border-b-black">
+    <div className="flex items-center justify-between pb-2 border-b-1 border-b-dark">
       <div className="flex items-center gap-4">
         {(showBackButton || onBack) && (
           <Button
@@ -50,7 +50,12 @@ const DashboardTitle = ({
           </Button>
         )}
         {onEdit && (
-          <Button type="primary" size="middle" variant="warning" onClick={onEdit}>
+          <Button
+            type="primary"
+            size="middle"
+            variant="warning"
+            onClick={onEdit}
+          >
             <FontAwesomeIcon icon={faPenToSquare} className="mr-1" />
             <span className="text-base font-semibold">Edit</span>
           </Button>
@@ -66,7 +71,7 @@ const DashboardTitle = ({
             <span className="text-base font-semibold">Hapus</span>
           </Button>
         )}
-        {title && <h1 className="text-3xl text-black font-bold">{title}</h1>}
+        {title && <h1 className="text-3xl text-dark font-bold">{title}</h1>}
       </div>
       {onShare && (
         <div>

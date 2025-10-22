@@ -7,6 +7,7 @@ import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useState } from "react";
 import { getImageSrc } from "@/app/utils/image";
+import Label from "./Label";
 
 interface ImageFieldProps {
   control: any;
@@ -93,15 +94,14 @@ const ImageField = ({
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label}{" "}
-          {!readonly &&
-            (required ? (
-              <span className="text-red-500">*</span>
-            ) : (
-              <span className="text-gray-500">{"(opsional)"}</span>
-            ))}
-        </span>
+        label && (
+          <Label
+            label={label}
+            required={required}
+            optional={true}
+            readonly={readonly}
+          />
+        )
       }
       name={name}
       validateStatus={errors?.[name] ? "error" : ""}
@@ -154,7 +154,7 @@ const ImageField = ({
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center w-60 aspect-square border-2 border-dashed rounded-lg hover:border-blue-500 hover:text-blue-500 transition cursor-pointer">
+              <div className="flex flex-col items-center justify-center w-60 aspect-square border-2 border-dashed rounded-lg text-dark hover:border-blue-500 hover:text-blue-500 transition cursor-pointer">
                 <PlusOutlined className="text-2xl mb-2" />
                 <span className="text-sm">
                   {readonly ? "Tidak ada gambar" : "Upload"}

@@ -72,9 +72,9 @@ function DataTable<T extends object>({
   }, [debouncedQuery]);
 
   return (
-    <div className="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm mx-auto">
+    <div className="w-full rounded-xl border border-light-muted bg-surface p-4 shadow-sm mx-auto">
       {title && (
-        <h2 className="text-lg font-semibold text-black mb-2">{title}</h2>
+        <h2 className="text-lg font-semibold text-dark mb-2">{title}</h2>
       )}
 
       {(searchable || extra || onRefresh) && (
@@ -92,7 +92,7 @@ function DataTable<T extends object>({
               <Button
                 icon={<ReloadOutlined />}
                 onClick={onRefresh}
-                className="border"
+                className="!bg-surface !text-dark border"
               >
                 Refresh
               </Button>
@@ -107,14 +107,14 @@ function DataTable<T extends object>({
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
                 prefix={<SearchOutlined />}
-                className="sm:w-64"
+                className="sm:w-64 !bg-surface !text-dark"
               />
             )}
             {onOpenFilter && (
               <Button
                 icon={<FilterOutlined />}
                 onClick={onOpenFilter} // <- callback ke parent
-                className="border"
+                className="!bg-surface !text-dark border"
               >
                 {""}
               </Button>
@@ -124,8 +124,8 @@ function DataTable<T extends object>({
       )}
 
       <div className="relative">
-        <div className="pointer-events-none absolute top-0 left-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10" />
-        <div className="pointer-events-none absolute top-0 right-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10" />
+        {/* <div className="pointer-events-none absolute top-0 left-0 h-full w-6 bg-gradient-to-r from-surface to-transparent z-10" />
+        <div className="pointer-events-none absolute top-0 right-0 h-full w-6 bg-gradient-to-l from-surface to-transparent z-10" /> */}
 
         <AntdTable<T>
           columns={columns}
@@ -145,6 +145,7 @@ function DataTable<T extends object>({
             ...scroll,
           }}
           size={size}
+          className="dashboard-table custom-thin-scrollbar"
         />
       </div>
     </div>

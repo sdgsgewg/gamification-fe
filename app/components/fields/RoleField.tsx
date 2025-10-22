@@ -5,6 +5,7 @@ import { Controller } from "react-hook-form";
 import { Control, FieldErrors } from "react-hook-form";
 import { RoleOverviewResponse } from "@/app/interface/roles/responses/IRoleOverviewResponse";
 import { Role, RoleLabels } from "@/app/enums/Role";
+import Label from "./Label";
 
 interface RoleFieldProps {
   control: Control<any>;
@@ -19,7 +20,7 @@ export default function RoleField({
 }: RoleFieldProps) {
   return (
     <Form.Item
-      label={<span className="font-medium">Anda membuat akun sebagai?</span>}
+      label={<Label label={`Anda membuat akun sebagai?`} />}
       validateStatus={errors.roleId ? "error" : ""}
       help={errors.roleId?.message}
       style={{ marginBottom: errors.roleId ? "1rem" : "0rem" }}
@@ -49,13 +50,16 @@ export default function RoleField({
                   value={role.roleId}
                   style={{
                     padding: "0.7rem 1rem",
-                    color: field.value === role.roleId ? "#2563EB" : "#374151",
+                    color:
+                      field.value === role.roleId
+                        ? "var(--text-primary-accent)"
+                        : "var(--text-secondary)",
                     fontWeight: field.value === role.roleId ? "600" : "400",
                   }}
                   className={`w-1/2 border rounded-md ${
                     field.value === role.roleId
-                      ? "border-blue-600"
-                      : "border-gray-300"
+                      ? "border-[var(--color-primary)]"
+                      : "border-[var(--color-light-accent)]"
                   }`}
                 >
                   {label}

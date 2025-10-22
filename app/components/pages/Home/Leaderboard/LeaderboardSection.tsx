@@ -31,7 +31,7 @@ const LeaderboardSection = () => {
         <h3 className="text-3xl sm:text-4xl font-bold mb-4">
           Leaderboard Terkini
         </h3>
-        <p className="text-black text-base font-medium mb-6 sm:mb-8">
+        <p className="text-tx-secondary text-base font-medium mb-6 sm:mb-8">
           Jadikan proses belajar lebih seru dengan sistem leaderboard! Raih
           peringkat teratas dengan mengerjakan berbagai tugas dan tantangan, dan
           buktikan bahwa kamu bisa jadi yang terbaik.

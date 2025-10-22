@@ -25,7 +25,7 @@ export const LeaderboardPreviewTable = ({
         return (
           <>
             {text > 3 ? (
-              <span className="text-black text-base font-medium">{text}</span>
+              <span className="text-dark text-base font-medium">{text}</span>
             ) : (
               <div className="flex items-center justify-center">
                 <Image
@@ -80,31 +80,31 @@ export const LeaderboardPreviewTable = ({
   );
 };
 
-export const LeaderboardTable = () => {
-  return (
-    <table className="w-full border-collapse bg-white rounded-xl shadow">
-      <thead className="bg-indigo-600 text-white">
-        <tr>
-          <th className="px-4 py-2">Rank</th>
-          <th className="px-4 py-2">Nama</th>
-          <th className="px-4 py-2">Poin</th>
-        </tr>
-      </thead>
-      <tbody>
-        {[
-          { rank: 1, name: "Dinda P.", points: 36700 },
-          { rank: 2, name: "Arif W.", points: 34200 },
-          { rank: 3, name: "Zahra I.", points: 33150 },
-          { rank: 4, name: "Rafi A.", points: 32700 },
-          { rank: 5, name: "Chika M.", points: 31800 },
-        ].map((row) => (
-          <tr key={row.rank} className="border-t">
-            <td className="px-4 py-2">{row.rank}</td>
-            <td className="px-4 py-2">{row.name}</td>
-            <td className="px-4 py-2">{row.points}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
+// export const LeaderboardTable = () => {
+//   return (
+//     <table className="w-full border-collapse bg-white rounded-xl shadow">
+//       <thead className="bg-indigo-600 text-white">
+//         <tr>
+//           <th className="px-4 py-2">Rank</th>
+//           <th className="px-4 py-2">Nama</th>
+//           <th className="px-4 py-2">Poin</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         {[
+//           { rank: 1, name: "Dinda P.", points: 36700 },
+//           { rank: 2, name: "Arif W.", points: 34200 },
+//           { rank: 3, name: "Zahra I.", points: 33150 },
+//           { rank: 4, name: "Rafi A.", points: 32700 },
+//           { rank: 5, name: "Chika M.", points: 31800 },
+//         ].map((row) => (
+//           <tr key={row.rank} className="border-t">
+//             <td className="px-4 py-2">{row.rank}</td>
+//             <td className="px-4 py-2">{row.name}</td>
+//             <td className="px-4 py-2">{row.points}</td>
+//           </tr>
+//         ))}
+//       </tbody>
+//     </table>
+//   );
+// };

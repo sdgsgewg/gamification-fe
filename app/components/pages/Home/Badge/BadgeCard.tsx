@@ -16,7 +16,7 @@ const BadgeCard = ({ badge }: BadgeCardProps) => {
   const { icon, name, description, progressPercentage, progressText, notes } =
     badge;
   const { isOdd } = useSectionContext();
-  const bgColor = isOdd ? "bg-white" : "bg-[#F5F4FF]";
+  const bgColor = isOdd ? "bg-card" : "bg-background";
 
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -35,7 +35,7 @@ const BadgeCard = ({ badge }: BadgeCardProps) => {
     return (
       <span
         className={`flex gap-2 ${
-          progressPercentage === 100 ? "text-[#34C759]" : "text-[#556FD7]"
+          progressPercentage === 100 ? "text-success" : "text-primary"
         } ${isFlipped ? "text-sm" : "text-base"} font-semibold`}
       >
         {progressPercentage === 100 ? <CheckSquareOutlined /> : ""}
@@ -72,12 +72,12 @@ const BadgeCard = ({ badge }: BadgeCardProps) => {
         >
           <div className="flex flex-col">
             <h4 className="text-xl font-bold">{name}</h4>
-            <p className="text-sm text-gray-700">{description}</p>
+            <p className="text-sm text-tx-secondary">{description}</p>
           </div>
           {userRole === Role.STUDENT && (
             <div className="flex flex-col items-center justify-center gap-1 mt-auto">
               <ProgressText />
-              <p className="text-xs font-normal">{notes}</p>
+              <p className="text-xs text-tx-tertiary font-normal">{notes}</p>
             </div>
           )}
         </div>

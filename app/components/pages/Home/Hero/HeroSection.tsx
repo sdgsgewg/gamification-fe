@@ -53,11 +53,11 @@ const HeroSection = () => {
         <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4">
           Buat Belajar Lebih Seru. <br /> Raih Nilai Lebih Tinggi.
         </h2>
-        <p className="text-gray-600 text-base font-medium">
+        <p className="text-tx-secondary text-base font-medium">
           Sistem belajar berbasis game untuk kamu yang suka tantangan. Kerjakan
           tugas, kumpulkan badge, dan dominasi leaderboard.
         </p>
-        <div className="flex [@media(max-width:380px)]:flex-col flex-row sm:flex-row gap-4 mt-8">
+        <div className="flex xxs:flex-col flex-row sm:flex-row gap-4 mt-8">
           <Button
             type="primary"
             size="large"

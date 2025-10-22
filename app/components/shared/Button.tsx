@@ -35,7 +35,7 @@ const Button: React.FC<CustomButtonProps> = ({
       break;
     case "outline":
       variantClassName =
-        "!bg-outline hover:!bg-outline-hover !text-primary !border !border-primary";
+        "!bg-outline hover:!bg-outline-hover !text-tx-primary-accent !border !border-br-primary";
       break;
     case "view":
       variantClassName = `!bg-view hover:!bg-view-hover !text-black ${

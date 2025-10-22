@@ -27,8 +27,7 @@ const StatsSection = () => {
     const user = auth.getCachedUserProfile();
     if (user) {
       setUserName(user.name);
-      // setUserRole(user.role.name);
-      setUserRole(Role.ADMIN);
+      setUserRole(user.role.name);
     }
   }, []);
 
@@ -165,7 +164,7 @@ const StatsSection = () => {
           <div className="flex flex-col gap-4">
             <DataRow
               icon={{ src: IMAGES.LEADERBOARD, alt: "top student" }}
-              text={`Siswa Terbaik Minngu Ini`}
+              text={`Siswa Terbaik Minggu Ini`}
               textVariant="text-[1.8rem]-semibold"
             />
             <DataRow
@@ -191,7 +190,7 @@ const StatsSection = () => {
         </div>
 
         {/* BOTTOM SECTION */}
-        <div className="mt-auto">
+        <div className="mt-4 lg:mt-auto">
           <Button
             type="primary"
             size="large"

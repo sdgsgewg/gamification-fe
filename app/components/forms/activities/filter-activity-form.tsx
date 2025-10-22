@@ -11,7 +11,6 @@ import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/I
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import { FilterOutlined } from "@ant-design/icons";
-
 import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import {
@@ -159,11 +158,11 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
             />
           </div>
 
-          {(!isMediumTablet && !isDesktop) && (
+          {!isMediumTablet && !isDesktop && (
             <Button
-              icon={<FilterOutlined />}
+              icon={<FilterOutlined className="!text-dark" />}
               size="large"
-              className="border"
+              className="!bg-surface border !border-light-muted"
               onClick={onOpenFilter}
             >
               {""}

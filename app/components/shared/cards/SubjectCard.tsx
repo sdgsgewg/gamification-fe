@@ -23,8 +23,8 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
 
   const { isOdd } = useSafeSectionContext();
 
-  const homePageBgColor = isOdd ? "bg-white" : "bg-[#F5F4FF]";
-  const subjectPageBgColor = "bg-white";
+  const homePageBgColor = isOdd ? "bg-card" : "bg-background";
+  const subjectPageBgColor = "bg-card";
   const bgColor = fromPage === "home" ? homePageBgColor : subjectPageBgColor;
 
   const navigateToActivityPage = () => {
@@ -41,7 +41,7 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
         <Image src={image ?? ""} alt={name} width={64} height={64} />
       </div>
       <h4 className="text-xl font-bold text-start mb-1">{name}</h4>
-      <p className="text-black text-sm font-medium mb-6">{`${activityCount} Aktivitas Tersedia`}</p>
+      <p className="text-dark text-sm font-medium mb-6">{`${activityCount} Aktivitas Tersedia`}</p>
       <Button
         type="primary"
         size="middle"

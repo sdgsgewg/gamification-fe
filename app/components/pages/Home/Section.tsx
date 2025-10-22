@@ -50,16 +50,16 @@ export const CenteredContentSection: React.FC<CenteredContentSectionProps> = ({
 }) => {
   return (
     <section className="container flex flex-col items-center justify-center text-center mx-auto">
-      <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4 max-w-xl">
+      <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 max-w-xl">
         {title}
       </h2>
-      <span className="text-base text-black mb-8 sm:mb-16 max-w-xl">
+      <span className="text-base text-foreground mb-8 sm:mb-16 max-w-xl">
         {subtitle}
       </span>
       {children}
       {cta && (
         <div
-          className="flex flex-row gap-1 text-[#556FD7] text-base font-semibold mt-8 sm:mt-16 cursor-pointer hover:underline"
+          className="flex flex-row gap-1 text-tx-primary-accent text-base font-semibold mt-8 sm:mt-16 cursor-pointer hover:underline"
           onClick={onClickCTA}
         >
           <LinkOutlined />
@@ -106,7 +106,7 @@ export const Section: React.FC<SectionProps> = ({
           sectionName === "hero"
             ? "md:px-16 lg:px-24 xl:px-28"
             : "md:px-12 xl:px-16"
-        } ${isOdd ? "bg-[#F5F4FF]" : "bg-white"}`}
+        } ${isOdd ? "bg-background" : "bg-surface"}`}
       >
         {children}
       </section>

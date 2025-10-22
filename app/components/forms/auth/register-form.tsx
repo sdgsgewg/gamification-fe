@@ -1,6 +1,6 @@
 "use cliet";
 
-import { Form, Divider } from "antd";
+import { Form } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -25,6 +25,7 @@ import FormLayout from "@/app/(auth)/form-layout";
 import Loading from "../../shared/Loading";
 import FormTitle from "../../pages/Auth/FormTitle";
 import { ROUTES } from "@/app/constants/routes";
+import AuthDivider from "../../pages/Auth/AuthDivider";
 
 interface RegisterFormProps {
   roleData: RoleOverviewResponse[];
@@ -144,14 +145,7 @@ export default function RegisterForm({
                 </Button>
               </Form.Item>
 
-              <Divider
-                style={{
-                  color: "#000000",
-                }}
-                className="!m-0"
-              >
-                OR
-              </Divider>
+              <AuthDivider />
 
               <OAuthButton
                 message="Continue with Google"

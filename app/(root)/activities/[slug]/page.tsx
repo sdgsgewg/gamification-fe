@@ -124,11 +124,13 @@ const ActivityDetailPage = () => {
         </DetailInformationTable>
 
         {/* Waktu Pengerjaan */}
-        <DurationTable
-          startTime={getDateTime(startTime ?? null)}
-          endTime={getDateTime(endTime ?? null)}
-          duration={duration}
-        />
+        {(startTime || endTime || duration) && (
+          <DurationTable
+            startTime={getDateTime(startTime ?? null)}
+            endTime={getDateTime(endTime ?? null)}
+            duration={duration}
+          />
+        )}
 
         {/* Progres Pengerjaan */}
         {lastAccessedTime && (
@@ -147,8 +149,8 @@ const ActivityDetailPage = () => {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="pb-2 border-b-1 border-b-black">
-          <h2 className="text-xl text-black font-bold">Similar</h2>
+        <div className="pb-2 border-b-1 border-b-dark">
+          <h2 className="text-xl text-dark font-bold">Similar</h2>
         </div>
 
         <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-8 md:gap-x-12">

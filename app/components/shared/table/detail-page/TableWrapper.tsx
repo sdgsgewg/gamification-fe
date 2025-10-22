@@ -1,5 +1,4 @@
 import React from "react";
-import { Form } from "antd";
 
 interface TableWrapperProps {
   children: React.ReactNode;
@@ -7,7 +6,7 @@ interface TableWrapperProps {
 
 export default function TableWrapper({ children }: TableWrapperProps) {
   return (
-    <div className="rounded-md border border-[#BCB4FF] overflow-hidden">
+    <div className="rounded-md border border-br-primary overflow-hidden">
       {children}
     </div>
   );

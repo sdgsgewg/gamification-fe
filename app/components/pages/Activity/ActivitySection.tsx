@@ -134,7 +134,7 @@ const ActivitySection: React.FC<ActivitySectionProps> = ({
             >
               {showIndex && (
                 <span
-                  className="absolute -left-2 xxs:left-4 sm:left-1 md:-left-1 bottom-0 text-6xl xxs:text-7xl xs:text-6xl xl:text-8xl font-black text-blue-950 drop-shadow-sm pointer-events-none select-none"
+                  className="absolute -left-2 xxs:left-4 sm:left-1 md:-left-1 bottom-0 text-6xl xxs:text-7xl xs:text-6xl xl:text-8xl font-black text-activity-rank drop-shadow-sm pointer-events-none select-none"
                   style={{ zIndex: 5 }}
                 >
                   {index + 1}
@@ -172,6 +172,7 @@ const ActivitySection: React.FC<ActivitySectionProps> = ({
             title={activity.title}
             slug={activity.slug}
             subject={activity.subject}
+            grade={activity.grade}
             questionCount={activity.questionCount}
             answeredCount={
               showAnsweredCount ? activity.answeredCount : undefined
@@ -191,7 +192,7 @@ const ActivitySection: React.FC<ActivitySectionProps> = ({
         <h2 className="text-2xl font-bold">{title}</h2>
         {type && (
           <RightOutlined
-            className="!text-black cursor-pointer hover:scale-110 transition"
+            className="!text-dark cursor-pointer hover:scale-110 transition"
             onClick={() => navigateToSectionPage(type)}
           />
         )}

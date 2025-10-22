@@ -16,7 +16,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="relative w-full max-w-full bg-[#F5F4FF] flex min-h-screen overflow-hidden">
+    <div className="relative w-full max-w-full bg-background flex min-h-screen overflow-hidden">
       {/* SIDEBAR */}
       {/* Mobile Overlay */}
       <div
@@ -34,7 +34,7 @@ export default function DashboardLayout({
 
         {/* Sidebar Panel */}
         <div
-          className={`absolute top-0 left-0 h-full w-64 bg-[#EAE9FF] border-r-2 border-[#BCB4FF] shadow-lg transform transition-transform duration-300 ease-in-out ${
+          className={`absolute top-0 left-0 h-full w-64 bg-tertiary border-r-2 border-br-primary shadow-lg transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >

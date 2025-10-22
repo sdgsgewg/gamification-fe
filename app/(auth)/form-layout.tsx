@@ -9,7 +9,7 @@ interface FormLayoutProps {
 
 export default function FormLayout({ top, bottom }: FormLayoutProps) {
   return (
-    <div className="bg-white w-[32rem] lg:w-[52rem] xl:w-[60rem] max-w-full flex rounded-2xl overflow-hidden">
+    <div className="bg-background w-[32rem] lg:w-[52rem] xl:w-[60rem] max-w-full flex rounded-2xl overflow-hidden">
       <div className="w-full lg:w-1/2">
         <div className="flex flex-col gap-8 p-8">{top}</div>
         {bottom && <div>{bottom}</div>}

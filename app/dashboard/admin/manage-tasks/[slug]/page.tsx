@@ -129,7 +129,7 @@ const TaskDetailPage = () => {
   const BottomContent = () => {
     return (
       <>
-        <h2 className="text-black font-semibold text-2xl mb-4">Daftar Soal</h2>
+        <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
 
         <div className="flex flex-col gap-8">
           {taskData.questions.map((q, idx) => (

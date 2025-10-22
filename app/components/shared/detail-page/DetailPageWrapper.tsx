@@ -24,7 +24,7 @@ export default function DetailPageWrapper({
       </div>
       {bottom && (
         <div className={`${!hasBottomDivider ? "mt-12" : ""}`}>
-          {hasBottomDivider && <Divider className="!border-black !my-12" />}
+          {hasBottomDivider && <Divider className="!text-dark !border-light-muted !my-12" />}
           {bottom}
         </div>
       )}

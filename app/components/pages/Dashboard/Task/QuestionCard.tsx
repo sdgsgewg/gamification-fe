@@ -60,7 +60,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       title={
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span>{`Soal ${index + 1}`}</span>
+            <span className="text-dark">{`Soal ${index + 1}`}</span>
             <Tag color="blue">
               {`Tipe: ${
                 QuestionTypeLabels[question.type as QuestionType] ||
@@ -78,12 +78,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         </div>
       }
-      className="!bg-[#F5F4FF] !border !border-[#BCB4FF] shadow-sm rounded-lg"
+      className="!bg-background !border !border-br-primary shadow-sm rounded-lg"
       headStyle={{
-        backgroundColor: "#EAE9FF",
+        // backgroundColor: "#EAE9FF",
+        backgroundColor: "var(--color-tertiary)",
         fontWeight: "bold",
-        borderBottom: "1px solid #BCB4FF",
-        borderColor: "#BCB4FF",
+        borderBottom: "1px solid var(--border-primary)",
+        borderColor: "var(--border-primary)",
       }}
     >
       {/* Gambar soal */}
@@ -94,7 +95,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       )}
 
       {/* Teks soal */}
-      <p className="mb-2 text-base">{question.text}</p>
+      <p className="text-dark text-base mb-2">{question.text}</p>
 
       {/* Opsi jawaban */}
       {question.options && question.options.length > 0 && (
@@ -102,7 +103,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           {question.options.map((opt, i) => (
             <div
               key={i}
-              className="min-w-[10rem] bg-[#EAE9FF] flex items-center justify-start rounded-lg px-4 py-2 text-sm font-semibold"
+              className="min-w-[10rem] bg-tertiary flex items-center justify-start rounded-lg px-4 py-2 text-sm font-semibold"
             >
               <span className="me-1">{String.fromCharCode(65 + i)}.</span>
               <span className="me-3">{opt.text}</span>

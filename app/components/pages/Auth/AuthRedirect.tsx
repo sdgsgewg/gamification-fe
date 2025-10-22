@@ -14,11 +14,11 @@ const AuthRedirect: React.FC<AuthRedirectProps> = ({
   onClick,
 }) => {
   return (
-    <div className="bg-[#F0F0F0] text-center flex items-center gap-1 px-8 py-5 rounded-b-lg">
-      <span className="text-sm font-medium">{message}</span>
+    <div className="bg-auth-redirect text-center flex items-center gap-1 px-8 py-5 rounded-b-lg">
+      <span className="text-dark text-sm font-medium">{message}</span>
       <span
         onClick={onClick}
-        className="text-[#4F68F8] text-sm font-medium cursor-pointer hover:underline"
+        className="text-tx-primary-accent text-sm font-medium cursor-pointer hover:underline"
       >
         {linkText}
       </span>

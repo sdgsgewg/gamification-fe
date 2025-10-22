@@ -14,6 +14,7 @@ import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { auth } from "@/app/functions/AuthProvider";
 import { Role } from "@/app/enums/Role";
+import ThemeSwitcher from "../../shared/ThemeSwitcher";
 
 interface MainMenuItemProps {
   menu: string;
@@ -40,17 +41,15 @@ const MainMenuItem = ({
       ? pathname === url
       : pathname === url || pathname.startsWith(url + "/");
 
-  // const isActive = true;
-
   const handleClick = () => {
     if (onClick) onClick();
     if (onCloseSidebar) onCloseSidebar();
   };
 
   const baseClasses =
-    "bg-[#E9E8FF] flex items-center gap-2 px-4 py-3 w-full text-left text-black cursor-pointer transition duration-300 ease-in-out";
-  const activeClasses = "!bg-[#D3D0FF] font-semibold";
-  const hoverClasses = "hover:bg-[#DCD9FF] hover:font-medium";
+    "flex items-center gap-2 px-4 py-3 w-full text-left text-dark cursor-pointer transition duration-300 ease-in-out";
+  const activeClasses = "!bg-secondary font-semibold";
+  const hoverClasses = "hover:bg-tertiary-hover hover:font-medium";
 
   const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
 
@@ -119,6 +118,18 @@ const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
   );
 };
 
+const PersonalizationMenuItemWrapper = () => {
+  return (
+    <ul className="pt-4 border-t-2 border-br-primary">
+      <p className="text-xs font-semibold px-4 mb-1">Personalisasi</p>
+      <div className="flex items-center justify-between gap-2 px-4 py-3 w-full text-left text-dark">
+        <span className="text-sm text-tx-secondary">Tema</span>
+        <ThemeSwitcher />
+      </div>
+    </ul>
+  );
+};
+
 interface SidebarProps {
   onClose: () => void;
 }
@@ -148,7 +159,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   }, []);
 
   return (
-    <aside className="bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black z-50">
+    <aside className="bg-tertiary min-h-screen border-r-2 border-br-primary text-dark z-50">
       <div className="h-16 flex items-center justify-between ps-4 pe-2">
         <h1
           className="text-2xl font-bold uppercase cursor-pointer"
@@ -158,7 +169,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         </h1>
         <button
           onClick={onClose}
-          className="block lg:hidden text-gray-700 hover:text-gray-900 cursor-pointer"
+          className="block lg:hidden text-tx-primary  cursor-pointer"
         >
           <FontAwesomeIcon icon={faXmark} className="text-xl" />
         </button>
@@ -168,7 +179,8 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         {userRole === Role.ADMIN && (
           <AdminMenuItemWrapper role={userRole} onClose={onClose} />
         )}
-        <ul className="pt-4 border-t-2 border-[#BCB4FF]">
+        <PersonalizationMenuItemWrapper />
+        <ul className="pt-4 border-t-2 border-br-primary">
           <MainMenuItem
             menu="Keluar"
             icon={faRightFromBracket}

@@ -3,11 +3,12 @@
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
 import get from "lodash.get";
+import Label from "./Label";
 
 interface TextAreaFieldProps {
   control: any;
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   errors?: Record<string, any>;
   required?: boolean;
@@ -34,10 +35,7 @@ const TextAreaField = ({
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label}{" "}
-          {!readonly && required && <span className="text-red-500">*</span>}
-        </span>
+        label && <Label label={label} required={required} readonly={readonly} />
       }
       name={name}
       validateStatus={error ? "error" : ""}

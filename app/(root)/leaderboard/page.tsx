@@ -1,9 +1,9 @@
-import { withMetadata } from "@/app/utils/withMetadata";
 import React from "react";
+import { withMetadata } from "@/app/utils/withMetadata";
 
 export const metadata = withMetadata(
   "Leaderboard",
-  "Halaman tentang leaderboard pegguna"
+  "Halaman tentang leaderboard pengguna"
 );
 
 const LeaderboardPage = () => {
@@ -16,103 +16,88 @@ const LeaderboardPage = () => {
   const leaderboard = [
     { rank: 4, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
     { rank: 5, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 6, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 7, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 8, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 9, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 10, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 11, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 12, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 13, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 14, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 15, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 16, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
-    { rank: 17, name: "Kevin Wijaya", points: 10500, image: "/avatar5.png" },
-    { rank: 18, name: "Caca Permata Sari", points: 11000, image: "/avatar4.png" },
+    { rank: 6, name: "Rizky Maulana", points: 10200, image: "/avatar6.png" },
+    { rank: 7, name: "Lia Rahmawati", points: 9800, image: "/avatar7.png" },
+    { rank: 8, name: "Hendra Gunawan", points: 9500, image: "/avatar8.png" },
+    { rank: 9, name: "Putri Anjani", points: 9300, image: "/avatar9.png" },
+    { rank: 10, name: "Fajar Setiawan", points: 9000, image: "/avatar10.png" },
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="bg-white shadow px-8 py-4 flex justify-between items-center">
-        <nav className="flex space-x-8">
-          <a href="#" className="font-bold text-blue-600">GAMIFICATION</a>
-          <a href="#">Aktivitas</a>
-          <a href="#">Leaderboard</a>
-          <a href="#">Kelas Saya</a>
-        </nav>
-        <div className="flex items-center space-x-3">
-          <img
-            src="/avatar-user.png"
-            alt="User"
-            className="w-10 h-10 rounded-full border"
-          />
-          <div>
-            <p className="text-sm font-semibold">Halo, Jessen</p>
-            <p className="text-xs text-gray-500">20000 / 38000 XP</p>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-300 flex flex-col">
+      <main className="container mx-auto flex-1 py-12 px-6">
+        <h1 className="text-4xl font-extrabold text-center text-blue-800 mb-10">
+          🌟 Leaderboard Pengguna
+        </h1>
 
-      {/* Content */}
-      <main className="container mx-auto flex-1 py-10 px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Top 3 */}
-          <div className="flex justify-center items-end space-x-6">
-            {topThree.map((person, index) => (
+        {/* Top 3 Section */}
+        <div className="flex justify-center items-end space-x-6 mb-16">
+          {topThree.map((person, index) => (
+            <div
+              key={index}
+              className={`relative flex flex-col items-center transition-transform hover:scale-105 ${
+                index === 0 ? "order-2" : index === 1 ? "order-1" : "order-3"
+              }`}
+            >
+              {/* Podium */}
               <div
-                key={index}
-                className={`flex flex-col items-center justify-end ${
-                  index === 0 ? "order-2" : index === 1 ? "order-1" : "order-3"
+                className={`flex flex-col items-center justify-end rounded-2xl shadow-xl backdrop-blur-md bg-white/40 p-5 ${
+                  index === 0
+                    ? "h-64 w-40 border-4 border-yellow-400"
+                    : index === 1
+                    ? "h-56 w-36 border-4 border-gray-300"
+                    : "h-52 w-32 border-4 border-amber-600"
                 }`}
               >
-                <div className="w-32 h-52 bg-gradient-to-t from-yellow-400 to-yellow-100 rounded-lg flex flex-col items-center justify-end p-3 shadow">
-                  <span className="text-3xl">{person.medal}</span>
-                  <img
-                    src={person.image}
-                    alt={person.name}
-                    className="w-16 h-16 rounded-full my-2"
-                  />
-                  <p className="font-bold text-center text-sm text-black">{person.name}</p>
-                  <span className="bg-blue-100 text-blue-700 rounded-full px-3 py-1 mt-2 text-xs font-semibold">
-                    {person.points}
-                  </span>
-                </div>
+                <span className="text-4xl mb-2">{person.medal}</span>
+                <img
+                  src={person.image}
+                  alt={person.name}
+                  className="w-20 h-20 rounded-full border-4 border-white shadow-lg mb-2"
+                />
+                <p className="font-bold text-center text-sm text-gray-800">
+                  {person.name}
+                </p>
+                <span className="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-semibold">
+                  {person.points.toLocaleString()} pts
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Leaderboard Table */}
-          <div>
-            <table className="w-full border-collapse text-black">
-              <thead>
-                <tr className="bg-blue-600 text-white">
-                  <th className="py-2 px-3 text-left">Rank</th>
-                  <th className="py-2 px-3 text-left">Nama</th>
-                  <th className="py-2 px-3 text-left">Poin</th>
+        {/* Leaderboard Table */}
+        <div className="bg-white/70 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden">
+          <table className="w-full border-collapse text-gray-800">
+            <thead>
+              <tr className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+                <th className="py-3 px-4 text-left font-semibold">🏅 Rank</th>
+                <th className="py-3 px-4 text-left font-semibold">👤 Nama</th>
+                <th className="py-3 px-4 text-left font-semibold">🔥 Poin</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboard.map((user, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
+                >
+                  <td className="py-3 px-4 font-semibold text-blue-700">{user.rank}</td>
+                  <td className="py-3 px-4 flex items-center space-x-3">
+                    <img
+                      src={user.image}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full border-2 border-blue-300"
+                    />
+                    <span>{user.name}</span>
+                  </td>
+                  <td className="py-3 px-4 font-semibold text-blue-800">
+                    {user.points.toLocaleString()}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((user, index) => (
-                  <tr
-                    key={index}
-                    className="border-b last:border-0 hover:bg-gray-100"
-                  >
-                    <td className="py-2 px-3">{user.rank}</td>
-                    <td className="py-2 px-3 flex items-center space-x-2">
-                      <img
-                        src={user.image}
-                        alt={user.name}
-                        className="w-6 h-6 rounded-full"
-                      />
-                      <span>{user.name}</span>
-                    </td>
-                    <td className="py-2 px-3">{user.points}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>

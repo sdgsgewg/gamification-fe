@@ -1,255 +1,458 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
-export default function ClassPage() {
-  const joinedClasses = [
-    {
-      slug: "12e-sman-1",
-      name: "Kelas 12E SMAN 1",
-      subjectCount: 6,
-      members: 28,
-      color: "#8aa2ff", // base hue for the card’s gradient
-    },
+/* ----------------------------- Types & mocks ----------------------------- */
+
+type WorkKind = "Tryout" | "Live Quiz" | "Review Quiz" | "Assignment";
+
+type Work = {
+  id: string;
+  title: string;
+  kind: WorkKind;
+  subject: string;
+  questions: number;
+  deadline?: string;
+};
+
+type Person = { id: string; name: string; avatar: string };
+
+const MOCK_ACTIVE: Work[] = [
+  {
+    id: "w1",
+    title: "Prep UTS MTK 2025",
+    kind: "Tryout",
+    subject: "Matematika",
+    questions: 50,
+    deadline: "10 November 2025 (23:59 WIB)",
+  },
+];
+
+const MOCK_FINISHED: Work[] = [
+  { id: "w2", title: "Live Quiz Peluang Bersyarat", kind: "Live Quiz", subject: "Matematika", questions: 20 },
+  { id: "w3", title: "Review Quiz Statistika Inferensial", kind: "Review Quiz", subject: "Matematika", questions: 25 },
+  { id: "w4", title: "Tugas Fungsi dan Grafik", kind: "Assignment", subject: "Matematika", questions: 30 },
+];
+
+const MOCK_STUDENTS: Person[] = [
+  { id: "s1", name: "Susi Pudjianti", avatar: "/avatars/a1.png" },
+  { id: "s2", name: "Angel Wicaksono", avatar: "/avatars/a2.png" },
+  { id: "s3", name: "Siti Nurhalizah", avatar: "/avatars/a3.png" },
+  { id: "s4", name: "Caca Permarta Sari", avatar: "/avatars/a4.png" },
+  { id: "s5", name: "Kevin Wijaya", avatar: "/avatars/a5.png" },
+  { id: "s6", name: "Denis", avatar: "/avatars/a6.png" },
+  { id: "s7", name: "Sarah", avatar: "/avatars/a7.png" },
+  { id: "s8", name: "Adit", avatar: "/avatars/a8.png" },
+];
+
+const MOCK_TEACHERS: Person[] = [
+  { id: "t1", name: "Herman Hidayat", avatar: "/avatars/teacher.png" },
+];
+
+/* --------------------------------- Page --------------------------------- */
+
+export default function StudentClassPage() {
+  const [tab, setTab] = useState<"tasks" | "people" | "leaderboard">("tasks");
+  const [taskState, setTaskState] = useState<"active" | "done">("active");
+  const [who, setWho] = useState<"students" | "teachers">("students");
+  const [page, setPage] = useState(1);
+
+  const className = "Kelas 12E SMAN 1";
+  const classTagline =
+    "Kelas dengan semangat belajar tinggi dan komitmen terhadap keunggulan.";
+
+  const dataWorks = taskState === "active" ? MOCK_ACTIVE : MOCK_FINISHED;
+  const dataPeople = who === "students" ? MOCK_STUDENTS : MOCK_TEACHERS;
+
+  const podiumTop3 = [
+    { name: "Susi Pudjianti", score: 12500, avatar: "/avatars/a1.png" },
+    { name: "Angel Wicaksono", score: 12000, avatar: "/avatars/a2.png" },
+    { name: "Siti Nurhalizah", score: 11500, avatar: "/avatars/a3.png" },
   ];
 
+  const leaderboardRows = useMemo(
+    () =>
+      Array.from({ length: 15 }).map((_, i) => ({
+        rank: i + 4,
+        name: i % 2 ? "Kevin Wijaya" : "Caca Permata Sari",
+        points: i % 2 ? 10500 : 11000,
+        avatar: i % 2 ? "/avatars/a5.png" : "/avatars/a4.png",
+      })),
+    []
+  );
+
   return (
-    <div className="cls-page">
-      <div className="title-row">
-        <h1 className="title">Kelas Saya</h1>
-        <span className="count-chip">{joinedClasses.length} Kelas</span>
+    <div className="px-7 pb-16 pt-6 text-[var(--text-primary)] bg-[var(--background)]">
+      {/* Header row */}
+      <div className="mb-4 grid gap-4">
+
+        <div className="flex items-start justify-between border-b-2 border-[var(--color-outline)] pb-2">
+          <div>
+            <h1 className="text-3xl font-extrabold leading-tight">{className}</h1>
+            <p className="mt-1 max-w-[560px] text-[var(--text-secondary)]">{classTagline}</p>
+          </div>
+          <div
+            className="h-14 w-20 rounded-lg border border-[var(--border-secondary)]"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--color-secondary), var(--color-tertiary))",
+            }}
+            aria-hidden
+          />
+        </div>
       </div>
 
-      <div className="class-grid">
-        {joinedClasses.map((cls) => (
-          <Link
-            href={`/dashboard/student/class/${cls.slug}`}
-            key={cls.slug}
-            className="card"
-            style={
-              {
-                // tailor gradient per class
-                //@ts-ignore
-                "--gradA": cls.color,
-                "--gradB": "rgba(118,129,255,0.85)",
-              } as React.CSSProperties
+      {/* Tabs */}
+      <div className="mb-4 flex gap-8 border-b-2 border-[var(--color-outline)]">
+        <TabButton active={tab === "tasks"} onClick={() => setTab("tasks")}>
+          Tugas
+        </TabButton>
+        <TabButton active={tab === "people"} onClick={() => setTab("people")}>
+          Anggota
+        </TabButton>
+        <TabButton
+          active={tab === "leaderboard"}
+          onClick={() => setTab("leaderboard")}
+        >
+          Leaderboard
+        </TabButton>
+      </div>
+
+      {/* TAB: TUGAS */}
+      {tab === "tasks" && (
+        <>
+          <div className="mb-3 flex gap-3">
+            <Pill active={taskState === "active"} onClick={() => setTaskState("active")}>
+              Aktif
+            </Pill>
+            <Pill active={taskState === "done"} onClick={() => setTaskState("done")}>
+              Selesai
+            </Pill>
+          </div>
+
+          <div
+            className={
+              taskState === "active"
+                ? "grid max-w-[680px] grid-cols-1 gap-6"
+                : "grid grid-cols-1 gap-6 lg:grid-cols-2"
             }
           >
-            {/* gradient banner */}
-            <div className="banner">
-              <div className="avatar">{getInitials(cls.name)}</div>
-              <div className="name">{cls.name}</div>
-            </div>
+            {dataWorks.map((w) => (
+              <TaskCard key={w.id} work={w} showDeadline={taskState === "active"} />
+            ))}
+          </div>
 
-            {/* meta row */}
-            <div className="meta">
-              <span className="chip">{cls.subjectCount} Mata Pelajaran</span>
-              <span className="dot">•</span>
-              <span className="chip">{cls.members} Anggota</span>
-              <span className="spacer" />
-              <span className="cta">
-                Masuk Kelas
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden
+          <Pager page={page} pages={2} onChange={setPage} />
+        </>
+      )}
+
+      {/* TAB: ANGGOTA */}
+      {tab === "people" && (
+        <>
+          <div className="mb-3 flex gap-2">
+            <CountToggle
+              label="Murid"
+              count={MOCK_STUDENTS.length}
+              active={who === "students"}
+              onClick={() => setWho("students")}
+            />
+            <CountToggle
+              label="Guru"
+              count={MOCK_TEACHERS.length}
+              active={who === "teachers"}
+              onClick={() => setWho("teachers")}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+            {dataPeople.map((p) => (
+              <div
+                key={p.id}
+                className="grid place-items-center gap-3 rounded-xl border-2 border-[var(--border-secondary)] bg-[var(--color-card)] p-5"
+              >
+                <div className="h-40 w-40 overflow-hidden rounded-full border border-[var(--border-secondary)] bg-[var(--color-tertiary)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.avatar} alt={p.name} className="h-full w-full object-cover" />
+                </div>
+                <div className="font-extrabold">{p.name}</div>
+              </div>
+            ))}
+          </div>
+
+          <Pager page={page} pages={2} onChange={setPage} />
+        </>
+      )}
+
+      {/* TAB: LEADERBOARD */}
+      {tab === "leaderboard" && (
+        <div className="grid gap-6 pt-4 lg:grid-cols-[360px_1fr]">
+          {/* Podium */}
+          <div className="grid grid-cols-3 gap-6 items-end justify-center">
+            {([1, 2, 3] as const).map((place) => {
+              const user = podiumTop3[place - 1];
+              return (
+                <PodiumPosition
+                  key={user.name}
+                  place={place}
+                  name={user.name}
+                  score={user.score}
+                  avatar={user.avatar}
+                />
+              );
+            })}
+          </div>
+
+          {/* Table */}
+          <div className="overflow-hidden rounded-lg border-2 border-[var(--border-secondary)]">
+            <div className="grid grid-cols-[120px_1fr_140px] bg-[var(--color-primary)] px-3 py-2 font-bold text-white">
+              <div>Rank</div>
+              <div>Nama</div>
+              <div>Poin</div>
+            </div>
+            <div>
+              {leaderboardRows.map((r, i) => (
+                <div
+                  key={r.rank}
+                  className={`grid grid-cols-[120px_1fr_140px] items-center px-3 py-2 ${
+                    i % 2 === 0 ? "bg-[var(--color-tertiary)]" : "bg-[var(--background)]"
+                  } border-b-2 border-[var(--border-secondary)]`}
                 >
-                  <path
-                    d="M8 5l8 7-8 7"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
+                  <div>{r.rank}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 overflow-hidden rounded-full border border-[var(--border-secondary)] bg-[var(--color-card)]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={r.avatar} alt="" className="h-full w-full object-cover" />
+                    </span>
+                    {r.name}
+                  </div>
+                  <div>{r.points}</div>
+                </div>
+              ))}
             </div>
-          </Link>
-        ))}
-      </div>
-
-      <style jsx>{`
-        :root {
-          --ink: #0f172a;
-          --muted: #64748b;
-          --bg: #f3f4fb;
-          --card: #ffffff;
-          --ring: rgba(80, 102, 255, 0.18);
-          --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.08);
-          --shadow-2: 0 18px 40px rgba(98, 106, 255, 0.18);
-        }
-
-        .cls-page {
-          max-width: 1040px;
-          margin: 0 auto;
-          padding: 32px 20px 80px;
-          color: var(--ink);
-          background:
-            radial-gradient(1200px 600px at -10% -10%, #e9eaff 0%, transparent 60%),
-            radial-gradient(1200px 700px at 110% -20%, #f5ecff 0%, transparent 60%);
-          border-radius: 16px;
-        }
-
-        .title-row {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 18px;
-        }
-
-        .title {
-          font-size: 36px;
-          font-weight: 800;
-          margin: 0;
-          letter-spacing: 0.2px;
-        }
-
-        .count-chip {
-          background: #eef2ff;
-          color: #3949ab;
-          border: 1px solid #e0e7ff;
-          font-weight: 700;
-          font-size: 13px;
-          padding: 6px 10px;
-          border-radius: 999px;
-        }
-
-        .class-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 16px;
-        }
-
-        .card {
-          display: block;
-          text-decoration: none;
-          color: inherit;
-          background: rgba(255, 255, 255, 0.9);
-          border: 1px solid rgba(109, 117, 255, 0.12);
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: var(--shadow-1);
-          transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-          position: relative;
-          isolation: isolate;
-        }
-        .card::after {
-          /* subtle shine on hover */
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(
-            600px 200px at -10% 0%,
-            rgba(255, 255, 255, 0.65),
-            transparent 60%
-          );
-          opacity: 0;
-          transition: opacity 200ms ease;
-          pointer-events: none;
-          z-index: 0;
-        }
-        .card:hover {
-          transform: translateY(-3px);
-          box-shadow: var(--shadow-2);
-          border-color: var(--ring);
-        }
-        .card:hover::after {
-          opacity: 1;
-        }
-
-        .banner {
-          position: relative;
-          z-index: 1;
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 22px 24px;
-          color: #fff;
-          background: linear-gradient(135deg, var(--gradA), var(--gradB));
-        }
-
-        .avatar {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(2px);
-          display: grid;
-          place-items: center;
-          font-weight: 800;
-          letter-spacing: 0.5px;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
-            0 2px 10px rgba(0, 0, 0, 0.12);
-        }
-        .name {
-          font-weight: 800;
-          font-size: 20px;
-          line-height: 1.15;
-          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
-        }
-
-        .meta {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 18px 16px;
-          background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
-        }
-        .chip {
-          background: #f1f5ff;
-          color: #3949ab;
-          border: 1px solid #e0e7ff;
-          padding: 6px 10px;
-          border-radius: 999px;
-          font-weight: 600;
-          font-size: 13px;
-        }
-        .dot {
-          color: var(--muted);
-        }
-        .spacer {
-          flex: 1;
-        }
-        .cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-weight: 700;
-          color: #3f51b5;
-          background: #eef2ff;
-          border: 1px solid #e0e7ff;
-          padding: 6px 10px;
-          border-radius: 999px;
-          transition: transform 120ms ease, background 120ms ease;
-        }
-        .card:hover .cta {
-          background: #e6eaff;
-          transform: translateX(2px);
-        }
-
-        @media (max-width: 720px) {
-          .title {
-            font-size: 28px;
-          }
-          .banner {
-            padding: 18px;
-          }
-          .name {
-            font-size: 18px;
-          }
-        }
-      `}</style>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function getInitials(name: string) {
-  const parts = name.split(" ");
-  const first = parts[1]?.replace(/\D/g, "") || parts[0]?.[0] || "C";
-  // For something like "Kelas 12E SMAN 1" we want "12E"
-  const match = name.match(/\b(\d+\w?)\b/);
-  return match ? match[1] : first.toUpperCase();
+/* ------------------------------- Components ------------------------------ */
+
+function TabButton({
+  active,
+  children,
+  onClick,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative -mb-[2px] border-none bg-transparent px-1 py-3 font-bold text-[var(--text-secondary)] transition ${
+        active ? "text-[var(--text-primary)]" : ""
+      }`}
+    >
+      {children}
+      {active && (
+        <span className="absolute inset-x-0 -bottom-[2px] block h-1 rounded-full bg-[var(--color-primary)]" />
+      )}
+    </button>
+  );
+}
+
+function Pill({
+  active,
+  children,
+  onClick,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full border px-5 py-2 font-bold transition ${
+        active
+          ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+          : "border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-primary)] hover:bg-[var(--color-surface)]"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TaskCard({ work, showDeadline }: { work: Work; showDeadline?: boolean }) {
+  return (
+    <div className="flex gap-4 rounded-2xl border-2 border-[var(--border-secondary)] bg-[var(--color-card)] p-5">
+      <div className="h-[116px] w-[140px] rounded-xl border border-[var(--border-secondary)] bg-[var(--color-tertiary)]" />
+      <div className="min-w-0">
+        <h3 className="mb-2 text-lg font-extrabold leading-snug">{work.title}</h3>
+        <span className="inline-block rounded-full bg-[var(--color-secondary)] px-3 py-1 text-[12px] font-bold text-[var(--text-primary)]">
+          {work.kind}
+        </span>
+
+        <div className="mt-3 grid gap-1 text-[var(--text-secondary)]">
+          <div>Mata Pelajaran: {work.subject}</div>
+          <div>Jumlah Soal: {work.questions}</div>
+          {showDeadline && work.deadline && (
+            <div className="mt-1 inline-flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M7 10h5m-5 4h10M7 2v4m10-4v4M3 8h18M5 6h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="whitespace-pre-wrap">Deadline: {work.deadline}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CountToggle({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count: number;
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`grid min-w-[120px] grid-rows-[auto_auto] justify-items-center rounded-t-xl border px-4 py-2 font-bold ${
+        active
+          ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+          : "border-[var(--border-secondary)] bg-[var(--color-tertiary)] text-[var(--text-secondary)]"
+      }`}
+    >
+      <div className="text-sm">{count}</div>
+      <div className="text-xs">{label}</div>
+    </button>
+  );
+}
+
+function PodiumPosition({
+  place,
+  name,
+  score,
+  avatar,
+}: {
+  place: 1 | 2 | 3;
+  name: string;
+  score: number;
+  avatar: string;
+}) {
+  const medalColors: Record<1 | 2 | 3, string> = {
+    1: "#F7E08F", // gold
+    2: "#D9DDE5", // silver
+    3: "#E6C392", // bronze
+  };
+
+  return (
+    <div
+      className="relative flex flex-col items-center justify-end rounded-lg border-2 border-[var(--border-secondary)] pb-6 pt-12"
+      style={{
+        background: `linear-gradient(180deg, #ffffffaa 0%, #ffffff00 60%), ${medalColors[place]}`,
+        height: "400px", // fixed height for nice balance
+      }}
+    >
+      {/* Top Medal */}
+      <div className="absolute -top-5 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--border-secondary)] bg-white/60">
+        <span
+          className="h-6 w-6 rounded-full border border-[var(--border-secondary)]"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 30%, #ffffffaa 0 35%, transparent 36%), #ffd54f",
+          }}
+        />
+      </div>
+
+      {/* Avatar */}
+      <div className="absolute top-1/4 -translate-y-1/2 transform">
+        <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-[var(--border-secondary)] bg-[var(--color-card)] shadow-md">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={avatar}
+            alt={name}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* Name & Score */}
+      <div className="mt-32 text-center">
+        <div className="font-extrabold text-[var(--text-primary)]">{name}</div>
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--border-secondary)] bg-[var(--color-primary)] px-4 py-2 font-extrabold text-white">
+          <span
+            className="inline-block h-4 w-4 rounded-full border border-[var(--border-secondary)]"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 30%, #ffffffaa 0 35%, transparent 36%), #ffd54f",
+            }}
+          />
+          {score}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Pager({
+  page,
+  pages,
+  onChange,
+}: {
+  page: number;
+  pages: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div className="mx-auto mt-6 flex w-fit items-center gap-2">
+      <button
+        onClick={() => onChange(Math.max(1, page - 1))}
+        className="grid h-9 min-w-9 place-items-center rounded-md border border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-secondary)]"
+        aria-label="Sebelumnya"
+      >
+        ‹
+      </button>
+      {Array.from({ length: pages }).map((_, i) => {
+        const n = i + 1;
+        const active = n === page;
+        return (
+          <button
+            key={n}
+            onClick={() => onChange(n)}
+            className={`grid h-9 min-w-9 place-items-center rounded-md border font-bold ${
+              active
+                ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                : "border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-secondary)]"
+            }`}
+          >
+            {n}
+          </button>
+        );
+      })}
+      <button
+        onClick={() => onChange(Math.min(pages, page + 1))}
+        className="grid h-9 min-w-9 place-items-center rounded-md border border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-secondary)]"
+        aria-label="Berikutnya"
+      >
+        ›
+      </button>
+    </div>
+  );
 }

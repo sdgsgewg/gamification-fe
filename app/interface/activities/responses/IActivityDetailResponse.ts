@@ -1,3 +1,12 @@
+import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
+
+export interface ActivityAttempt {
+  answeredCount?: number;
+  startedAt?: string | null;
+  lastAccessedAt?: string | null;
+  status?: ActivityAttemptStatus;
+}
+
 export interface ActivityDetailResponse {
   id: string;
   title: string;
@@ -9,12 +18,9 @@ export interface ActivityDetailResponse {
   type: { taskTypeId: string; name: string };
   grade: string;
   questionCount: number;
-  answeredCount: number;
   startTime?: Date;
   endTime?: Date;
   duration?: string;
   createdBy: string;
-  lastAccessedTime?: string;
-  completedTime?: string;
-  status?: string;
+  attempt?: ActivityAttempt;
 }

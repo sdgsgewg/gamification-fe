@@ -16,7 +16,7 @@ export const useActivityDetail = (slug: string) => {
 
       const act = res.data;
 
-      console.log("Activity Detail: ", JSON.stringify(act, null, 2));
+      console.log("Activity Detail Data: ", JSON.stringify(act, null, 2));
 
       const mapped: ActivityDetailResponse = {
         ...act,

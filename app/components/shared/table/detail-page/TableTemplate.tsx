@@ -2,6 +2,7 @@ import TableWrapper from "./TableWrapper";
 import { DetailPageTableHeader } from "./DetailPageTable";
 import { DateRow, StatusRow, TimeRow } from "./TableRowData";
 import { IMAGES } from "@/app/constants/images";
+import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
 
 interface DetailInformationTableProps {
   children: React.ReactNode;
@@ -76,14 +77,14 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
 };
 
 interface ProgressTableProps {
+  startedTime: string;
   lastAccessedTime: string;
-  completedTime?: string;
   status?: string;
 }
 
 export const ProgressTable = ({
   lastAccessedTime,
-  completedTime,
+  startedTime,
   status,
 }: ProgressTableProps) => {
   return (
@@ -96,9 +97,9 @@ export const ProgressTable = ({
       />
 
       {/* Isi */}
+      <DateRow label="Mulai Kerja" value={startedTime} />
       <DateRow label="Terakhir Diakses" value={lastAccessedTime} />
-      <DateRow label="Selesai Kerja" value={completedTime ?? ""} />
-      <StatusRow value={status ?? "Sedang Dikerjakan"} />
+      <StatusRow value={status ?? ActivityAttemptStatus.ON_PROGRESS} />
     </TableWrapper>
   );
 };

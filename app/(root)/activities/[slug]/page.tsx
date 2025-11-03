@@ -27,12 +27,15 @@ import StatusBar from "@/app/components/shared/StatusBar";
 import Button from "@/app/components/shared/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import { Status, StatusLabels } from "@/app/enums/Status";
+import {
+  ActivityAttemptStatus,
+  ActivityAttemptStatusLabels,
+} from "@/app/enums/ActivityAttemptStatus";
+import PageLayout from "../../page-layout";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const baseRoute = ROUTES.ROOT.ACTIVITY;
 
   const { data: activityData, isLoading: isActivityDataLoading } =
     useActivityDetail(params.slug);
@@ -47,19 +50,20 @@ const ActivityDetailPage = () => {
     (activity) => activity.slug !== params.slug
   );
 
+  const handleNavigateToActivityAttemptPage = () => {
+    router.push(`${ROUTES.ROOT.ACTIVITYATTEMPT}/${params.slug}`);
+  };
+
   if (!activityData) {
     return <Loading />;
   }
 
   const LeftSideContent = () => {
-    const {
-      title,
-      image,
-      description,
-      questionCount,
-      answeredCount,
-      lastAccessedTime,
-    } = activityData;
+    const { title, image, description, questionCount, attempt } = activityData;
+
+    if (!attempt) return;
+
+    const { answeredCount, lastAccessedAt } = attempt;
 
     return (
       <>
@@ -70,7 +74,7 @@ const ActivityDetailPage = () => {
         />
 
         {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
-        {lastAccessedTime && (
+        {lastAccessedAt && answeredCount && answeredCount < questionCount && (
           <StatusBar
             current={answeredCount}
             total={questionCount}
@@ -85,10 +89,13 @@ const ActivityDetailPage = () => {
           size="large"
           variant="primary"
           className="!py-4 !px-6 !rounded-[1.5rem]"
+          onClick={handleNavigateToActivityAttemptPage}
         >
           <FontAwesomeIcon icon={faPlay} />
           <span className="text-base font-semibold ms-3">
-            {lastAccessedTime ? "Lanjutkan" : "Mulai"}
+            {lastAccessedAt && answeredCount && answeredCount < questionCount
+              ? "Lanjutkan"
+              : "Mulai"}
           </span>
         </Button>
       </>
@@ -105,12 +112,15 @@ const ActivityDetailPage = () => {
       startTime,
       endTime,
       duration,
-      lastAccessedTime,
-      completedTime,
-      status,
+      attempt,
     } = activityData;
 
-    const statusLabel = StatusLabels[status as Status] ?? "";
+    if (!attempt) return;
+
+    const { startedAt, lastAccessedAt, status } = attempt;
+
+    const statusLabel =
+      ActivityAttemptStatusLabels[status as ActivityAttemptStatus] ?? "";
 
     return (
       <>
@@ -133,13 +143,15 @@ const ActivityDetailPage = () => {
         )}
 
         {/* Progres Pengerjaan */}
-        {lastAccessedTime && (
-          <ProgressTable
-            lastAccessedTime={lastAccessedTime}
-            completedTime={completedTime}
-            status={statusLabel}
-          />
-        )}
+        {startedAt &&
+          lastAccessedAt &&
+          statusLabel !== ActivityAttemptStatusLabels["completed"] && (
+            <ProgressTable
+              startedTime={startedAt}
+              lastAccessedTime={lastAccessedAt}
+              status={statusLabel}
+            />
+          )}
       </>
     );
   };
@@ -177,13 +189,13 @@ const ActivityDetailPage = () => {
     <>
       {isActivityDataLoading || (isSimilarActivitiesLoading && <Loading />)}
 
-      <div className="w-full pt-12 pb-16 px-4 sm:px-8 md:px-12 lg:px-16">
+      <PageLayout>
         <DetailPageWrapper
           left={<LeftSideContent />}
           right={<RightSideContent />}
           bottom={<BottomContent />}
         />
-      </div>
+      </PageLayout>
     </>
   );
 };

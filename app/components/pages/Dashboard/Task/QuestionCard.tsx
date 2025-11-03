@@ -62,7 +62,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-dark">{`Soal ${index + 1}`}</span>
             <Tag color="blue">
-              {`Tipe: ${
+              {`${
                 QuestionTypeLabels[question.type as QuestionType] ||
                 question.type
               }`}
@@ -80,7 +80,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       }
       className="!bg-background !border !border-br-primary shadow-sm rounded-lg"
       headStyle={{
-        // backgroundColor: "#EAE9FF",
         backgroundColor: "var(--color-tertiary)",
         fontWeight: "bold",
         borderBottom: "1px solid var(--border-primary)",

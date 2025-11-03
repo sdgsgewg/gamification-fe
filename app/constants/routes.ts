@@ -17,6 +17,8 @@ export const ROUTES = {
     BADGES: "/badges",
     ACTIVITY: "/activities",
     ACTIVITYSECTION: "/activities/sections",
+    ACTIVITYATTEMPT: "/activities/attempt",
+    ACTIVITYSUMMARY: "/activities/summary",
     LEADERBOARD: "/leaderboard",
     PROFILE: "/users",
   },

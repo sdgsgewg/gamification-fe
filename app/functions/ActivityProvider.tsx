@@ -3,6 +3,8 @@ import { getAxios } from "../utils/AxiosFunction";
 import { FilterActivityFormInputs } from "../schemas/activities/filterActivity";
 import { ActivityOverviewResponse } from "../interface/activities/responses/IActivityOverviewResponse";
 import { ActivityDetailResponse } from "../interface/activities/responses/IActivityDetailResponse";
+import { ActivityWithQuestionsResponse } from "../interface/activities/responses/IActivityWithQuestionsResponse";
+import { ActivitySummaryResponse } from "../interface/activities/responses/IActivitySummaryResponse";
 
 const API_URL = "/activities";
 
@@ -41,6 +43,31 @@ export const activityProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ActivityDetailResponse>(error);
+    }
+  },
+
+  async getActivityWithQuestions(
+    slug: string
+  ): Promise<ApiResponse<ActivityWithQuestionsResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/attempt/${slug}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ActivityWithQuestionsResponse>(error);
+    }
+  },
+
+  async getActivitySummaryFromAttempt(
+    slug: string
+  ): Promise<ApiResponse<ActivitySummaryResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/summary/${slug}`);
+
+      console.log ("Summary Data: ", JSON.stringify(data, null, 2));
+
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ActivitySummaryResponse>(error);
     }
   },
 };

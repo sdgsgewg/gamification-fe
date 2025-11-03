@@ -3,6 +3,7 @@
 /* ===== Root theme variables ===== */
 :root {
   --background: #f5f4ff;
+  --background-hover: #e4e2fd;
   --foreground: #171717;
 
   --color-surface: #fafaff; /* sedikit lebih terang dari card */
@@ -27,6 +28,9 @@
   --color-scrollbar-track: #edebff;
   --color-scrollbar-thumb: #dddbfc;
   --color-scrollbar-thumb-hover: #ccc8fe;
+  --color-correct-answer: #f0fdf4;
+  --color-incorrect-answer: #fef2f2;
+  --color-correct-option: #dcfce7;
 
   /* Activity Tag Colors */
   --color-activity-type: #8a8ae1;
@@ -63,6 +67,7 @@
 /* ===== Dark theme overrides ===== */
 html.dark {
   --background: #0c0d2b;
+  --background-hover: #17193f;
   --foreground: #ededed;
 
   --color-surface: #1a1b4a; /* di antara background & card */
@@ -87,6 +92,9 @@ html.dark {
   --color-scrollbar-track: #302f6e;
   --color-scrollbar-thumb: #21205b;
   --color-scrollbar-thumb-hover: #0b0d46;
+  --color-correct-answer: #1a3b2c;
+  --color-incorrect-answer: #3b1a1a;
+  --color-correct-option: #14532d;
 
   /* Activity Tag Colors */
   --color-activity-type: #6b6bd4;
@@ -132,6 +140,7 @@ html.dark {
   --breakpoint-2xl: 1536px;
 
   --color-background: var(--background);
+  --color-background-hover: var(--background-hover);
   --color-foreground: var(--foreground);
 
   --color-surface: var(--color-surface);
@@ -154,6 +163,9 @@ html.dark {
   --color-scrollbar-track: var(--color-scrollbar-track);
   --color-scrollbar-thumb: var(--color-scrollbar-thumb);
   --color-scrollbar-thumb-hover: var(--color-scrollbar-thumb-hover);
+  --color-correct-answer: var(--color-correct-answer);
+  --color-incorrect-answer: var(--color-incorrect-answer);
+  --color-correct-option: var(--color-correct-option);
 
   --color-activity-type: var(--color-activity-type);
   --color-activity-new: var(--color-activity-new);
@@ -250,7 +262,7 @@ html.dark .ant-dropdown-menu-item-divider {
 
 /* ===== Ant Design Input adjustments ===== */
 /* Input & Select background styling */
-.ant-input, 
+.ant-input,
 .ant-input-affix-wrapper {
   background-color: var(--color-surface) !important;
   color: var(--text-primary) !important;

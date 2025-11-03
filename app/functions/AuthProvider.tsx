@@ -36,8 +36,12 @@ export default class AuthProvider {
     this.getUserProfile();
     this.getFirstTimeChecked();
 
+    // const sessionToken = getItem(this.sessionTokenKey);
+    // console.log("This sessionToken: ", sessionToken);
+
     // 🔁 Jika tidak ada token atau token tidak valid, coba refresh token
     if (!this.sessionToken || !this.isTokenValid(this.sessionToken)) {
+      // if (!sessionToken || !this.isTokenValid(sessionToken)) {
       try {
         const refresh = await postAxios(`${API_URL}/refresh`);
 
@@ -232,6 +236,9 @@ export default class AuthProvider {
   async getLoggedInUser(): Promise<ApiResponse<UserDetailResponse>> {
     try {
       const data = await getAxios("/users/me");
+
+      console.log("Logged In User: ", JSON.stringify(data, null, 2));
+
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserDetailResponse>(error);

@@ -20,6 +20,7 @@ export const ROUTES = {
     ACTIVITYATTEMPT: "/activities/attempt",
     ACTIVITYSUMMARY: "/activities/summary",
     LEADERBOARD: "/leaderboard",
+    HISTORY: "/history",
     PROFILE: "/users",
   },
 

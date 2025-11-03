@@ -1,0 +1,231 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useTaskAttemptDetail } from "@/app/hooks/task-attempts/useTaskAttemptDetail";
+import Loading from "@/app/components/shared/Loading";
+import PageLayout from "@/app/(root)/page-layout";
+import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
+import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
+import { IMAGES } from "@/app/constants/images";
+import {
+  DetailInformationTable,
+  DurationTable,
+  ProgressTable,
+} from "@/app/components/shared/table/detail-page/TableTemplate";
+import {
+  GradeRow,
+  MaterialRow,
+  NumberRow,
+  SubjectRow,
+  TaskTypeRow,
+} from "@/app/components/shared/table/detail-page/TableRowData";
+import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
+import { getDateTime } from "@/app/utils/date";
+import {
+  ActivityAttemptStatus,
+  ActivityAttemptStatusLabels,
+} from "@/app/enums/ActivityAttemptStatus";
+import Button from "@/app/components/shared/Button";
+
+type BottomContentView = "stats" | "duration" | "progress" | "questions";
+
+const HistoryDetailPage = () => {
+  const params = useParams<{ id: string }>();
+
+  const { data: attemptDetailData, isLoading: isattemptDetailDataLoading } =
+    useTaskAttemptDetail(params.id);
+
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  // Prefill answers ketika attemptDetailData berhasil dimuat
+  useEffect(() => {
+    if (!attemptDetailData) return;
+
+    // Hanya jalankan prefill kalau ada attempt sebelumnya
+
+    const prefilledAnswers: Record<string, any> = {};
+
+    attemptDetailData.questions.forEach((q) => {
+      if (q.userAnswer) {
+        prefilledAnswers[q.questionId] = {
+          optionId: q.userAnswer.optionId,
+          answerText: q.userAnswer.text,
+        };
+      } else if (q.options) {
+        // Backup: cek dari option yang memiliki isSelected = true
+        const selectedOption = q.options.find((opt) => opt.isSelected);
+        if (selectedOption) {
+          prefilledAnswers[q.questionId] = {
+            optionId: selectedOption.optionId,
+            answerText: null,
+          };
+        }
+      }
+    });
+
+    setAnswers(prefilledAnswers);
+  }, [attemptDetailData]);
+
+  if (!attemptDetailData) return <Loading />;
+
+  const LeftSideContent = () => {
+    const { title, image, description } = attemptDetailData;
+
+    return (
+      <>
+        <DetailPageLeftSideContent
+          name={title}
+          image={image !== "" ? image : IMAGES.ACTIVITY}
+          description={description}
+        />
+      </>
+    );
+  };
+
+  const RightSideContent = () => {
+    const { subject, material, type, questionCount, grade } = attemptDetailData;
+
+    return (
+      <DetailInformationTable>
+        <SubjectRow value={subject} />
+        <MaterialRow value={material ?? ""} />
+        <TaskTypeRow value={type} />
+        <NumberRow label="Jumlah Soal" value={questionCount} />
+        <GradeRow value={grade} />
+      </DetailInformationTable>
+    );
+  };
+
+  const BottomContent = () => {
+    const [view, setView] = useState<BottomContentView>("stats");
+
+    const tabs: { key: BottomContentView; label: string }[] = [
+      { key: "stats", label: "Statistik" },
+      { key: "duration", label: "Durasi" },
+      { key: "progress", label: "Progres" },
+      { key: "questions", label: "Daftar Soal" },
+    ];
+
+    const StatsView = () => {
+      const { pointGained, totalPoints, xpGained, score } =
+        attemptDetailData.stats;
+
+      return (
+        <DetailInformationTable>
+          <NumberRow
+            label="Jumlah Poin"
+            value={`${pointGained}/${totalPoints}`}
+          />
+          <NumberRow label="Jumlah XP" value={xpGained} />
+          <NumberRow label="Nilai" value={score} />
+        </DetailInformationTable>
+      );
+    };
+
+    const DurationView = () => {
+      const { startTime, endTime, duration } = attemptDetailData;
+
+      return (
+        <DurationTable
+          startTime={getDateTime(startTime ?? null)}
+          endTime={getDateTime(endTime ?? null)}
+          duration={duration}
+        />
+      );
+    };
+
+    const ProgressView = () => {
+      const { startedAt, lastAccessedAt, completedAt, status } =
+        attemptDetailData.progress;
+
+      const statusLabel =
+        ActivityAttemptStatusLabels[status as ActivityAttemptStatus] ?? "";
+
+      return (
+        <ProgressTable
+          startedAt={startedAt}
+          lastAccessedAt={lastAccessedAt}
+          completedAt={completedAt}
+          status={statusLabel}
+        />
+      );
+    };
+
+    const QuestionView = () => {
+      return (
+        <>
+          <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
+
+          <div className="flex flex-col gap-8">
+            {attemptDetailData.questions.map((q, idx) => (
+              <ActivityQuestionCard
+                key={idx}
+                index={idx}
+                question={q}
+                selectedOptionId={answers[q.questionId]?.optionId}
+                answerText={answers[q.questionId]?.answerText}
+              />
+            ))}
+          </div>
+        </>
+      );
+    };
+
+    return (
+      <>
+        {/* Navigation tab antar view */}
+        <div className="w-full flex items-center mb-6 border-b border-b-primary">
+          <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.key}
+                size="middle"
+                onClick={() => setView(tab.key)}
+                className={`relative flex items-center gap-2 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
+                ${
+                  view === tab.key
+                    ? "!bg-primary !text-white"
+                    : "!bg-background hover:!bg-background-hover !text-dark"
+                }`}
+              >
+                <span>{tab.label}</span>
+                {view === tab.key && (
+                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-br-primary rounded-t-sm" />
+                )}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-full mx-0 md:max-w-[70%] lg:max-w-[60%] md:mx-auto">
+          {view === "stats" ? (
+            <StatsView />
+          ) : view === "duration" ? (
+            <DurationView />
+          ) : view === "progress" ? (
+            <ProgressView />
+          ) : (
+            <QuestionView />
+          )}
+        </div>
+      </>
+    );
+  };
+
+  return (
+    <>
+      {isattemptDetailDataLoading && <Loading />}
+
+      <PageLayout>
+        <DetailPageWrapper
+          left={<LeftSideContent />}
+          right={<RightSideContent />}
+          bottom={<BottomContent />}
+        />
+      </PageLayout>
+    </>
+  );
+};
+
+export default HistoryDetailPage;

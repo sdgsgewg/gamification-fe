@@ -63,7 +63,7 @@ export const TaskTypeRow = ({ value }: TaskTypeRowProps) => {
 
 interface NumberRowProps {
   label: string;
-  value?: number;
+  value?: number | string;
 }
 
 export const NumberRow = ({ label, value }: NumberRowProps) => {

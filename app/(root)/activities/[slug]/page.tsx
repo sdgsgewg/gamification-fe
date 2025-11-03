@@ -61,9 +61,17 @@ const ActivityDetailPage = () => {
   const LeftSideContent = () => {
     const { title, image, description, questionCount, attempt } = activityData;
 
-    if (!attempt) return;
+    if (!attempt) {
+      return (
+        <DetailPageLeftSideContent
+          name={title}
+          image={image !== "" ? image : IMAGES.ACTIVITY}
+          description={description}
+        />
+      );
+    }
 
-    const { answeredCount, lastAccessedAt } = attempt;
+    const { lastAccessedAt, answeredCount } = attempt;
 
     return (
       <>
@@ -147,8 +155,8 @@ const ActivityDetailPage = () => {
           lastAccessedAt &&
           statusLabel !== ActivityAttemptStatusLabels["completed"] && (
             <ProgressTable
-              startedTime={startedAt}
-              lastAccessedTime={lastAccessedAt}
+              startedAt={startedAt}
+              lastAccessedAt={lastAccessedAt}
               status={statusLabel}
             />
           )}
@@ -165,7 +173,7 @@ const ActivityDetailPage = () => {
           <h2 className="text-xl text-dark font-bold">Similar</h2>
         </div>
 
-        <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-8 md:gap-x-12">
+        <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
           {similarActivities
             .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
             .map((sa) => (

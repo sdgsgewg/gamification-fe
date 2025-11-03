@@ -36,9 +36,11 @@ export const subjectProvider = {
     }
   },
 
-  async getSubjectDetail(id: string): Promise<ApiResponse<SubjectDetailResponse>> {
+  async getSubjectDetail(
+    slug: string
+  ): Promise<ApiResponse<SubjectDetailResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/${id}`);
+      const data = await getAxios(`${API_URL}/${slug}`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<SubjectDetailResponse>(error);

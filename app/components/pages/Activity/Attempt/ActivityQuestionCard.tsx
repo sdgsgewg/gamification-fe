@@ -38,9 +38,13 @@ const ActivityQuestionCard = ({
             </Tag>
           </div>
           <div className="flex items-center gap-2">
-            <Tag color="blue">{`Poin: ${question.point}`}</Tag>
+            <Tag color="blue" className="!m-0">{`Poin: ${question.point}`}</Tag>
             {question.timeLimit && (
-              <Tag color="purple" icon={<ClockCircleOutlined />}>
+              <Tag
+                color="purple"
+                icon={<ClockCircleOutlined />}
+                className="!m-0"
+              >
                 {`${question.timeLimit} detik`}
               </Tag>
             )}

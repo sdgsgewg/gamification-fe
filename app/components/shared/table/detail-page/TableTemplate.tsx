@@ -77,14 +77,16 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
 };
 
 interface ProgressTableProps {
-  startedTime: string;
-  lastAccessedTime: string;
+  startedAt: string;
+  lastAccessedAt: string;
+  completedAt?: string;
   status?: string;
 }
 
 export const ProgressTable = ({
-  lastAccessedTime,
-  startedTime,
+  startedAt,
+  lastAccessedAt,
+  completedAt,
   status,
 }: ProgressTableProps) => {
   return (
@@ -97,8 +99,9 @@ export const ProgressTable = ({
       />
 
       {/* Isi */}
-      <DateRow label="Mulai Kerja" value={startedTime} />
-      <DateRow label="Terakhir Diakses" value={lastAccessedTime} />
+      <DateRow label="Mulai Kerja" value={startedAt} />
+      <DateRow label="Terakhir Diakses" value={lastAccessedAt} />
+      {completedAt && <DateRow label="Selesai Kerja" value={completedAt} />}
       <StatusRow value={status ?? ActivityAttemptStatus.ON_PROGRESS} />
     </TableWrapper>
   );

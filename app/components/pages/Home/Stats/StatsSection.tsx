@@ -17,6 +17,7 @@ import { TextVariant } from "@/app/types/ui/TextVariant";
 import { getTextClassName } from "@/app/utils/ui/getTextClassName";
 import { ROUTES } from "@/app/constants/routes";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
+import { useUserStats } from "@/app/hooks/users/useUserStats";
 
 const StatsSection = () => {
   const router = useRouter();
@@ -52,16 +53,20 @@ const StatsSection = () => {
 
   const LeftSideContent = () => {
     const { data: subjects = [] } = useSubjects();
+    const { data: userStats } = useUserStats();
 
-    const xpCurrent = 30000;
-    const xpTotal = 33800;
-    const xpProgress = (xpCurrent / xpTotal) * 100;
+    if (!userStats) return;
+
+    const { level, currXp, nextLvlMinXp, xpProgress } = userStats;
 
     const StudentData = () => {
       return (
         <>
-          <DataRow text={`Level 25`} textVariant="text-4xl-bold" />
-          <DataRow text={`XP:30.000 / 33.800`} textVariant="text-xl-semibold" />
+          <DataRow text={`Level ${level}`} textVariant="text-4xl-bold" />
+          <DataRow
+            text={`XP:${currXp} / ${nextLvlMinXp}`}
+            textVariant="text-xl-semibold"
+          />
           <div className="w-full bg-background rounded-2xl h-8 overflow-hidden mt-2">
             <div
               className="bg-primary h-8 rounded-2xl transition-all duration-500"

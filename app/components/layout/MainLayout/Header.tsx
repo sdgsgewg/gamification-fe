@@ -21,6 +21,7 @@ import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
+import { useUserStats } from "@/app/hooks/users/useUserStats";
 
 interface MainMenuItemProps {
   url: string;
@@ -120,22 +121,20 @@ interface UserDropdownMenuProps {
   name: string;
   username: string;
   role: Role;
-  level?: number;
-  xp?: number;
 }
 
-const UserDropdownMenu = ({
-  name,
-  username,
-  role,
-  level,
-  xp,
-}: UserDropdownMenuProps) => {
+const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
   const { logout } = useAuth();
   const router = useRouter();
+
   const userMenus = userDropdownMenuItems[role] || [];
-  const [nextLevelXp] = useState<number>(100);
   const [open, setOpen] = useState(false); // <-- state untuk buka/tutup dropdown
+
+  const { data: userStats } = useUserStats();
+
+  if (!userStats) return;
+
+  const { level, currXp, nextLvlMinXp } = userStats;
 
   const handleLogout = () => {
     const asyncLogout = async () => {
@@ -219,7 +218,7 @@ const UserDropdownMenu = ({
                   {level}
                 </span>
                 <p className="text-[0.625rem]">
-                  {xp}/{nextLevelXp}
+                  {currXp}/{nextLvlMinXp}
                 </p>
               </div>
             )}
@@ -265,8 +264,6 @@ const Header = () => {
               name={user.name}
               username={user.username}
               role={role}
-              level={user.level}
-              xp={user.xp}
             />
           )}
         </div>
@@ -294,8 +291,6 @@ const Header = () => {
               name={user.name}
               username={user.username}
               role={role}
-              level={user.level}
-              xp={user.xp}
             />
           )}
         </div>

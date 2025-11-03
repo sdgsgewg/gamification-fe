@@ -49,18 +49,18 @@ function buildRoleAccess(): Record<Role, string[]> {
       ...getFooterMainMenuItems(role),
       ...footerHelpMenuItems,
       ...getSidebarMainMenuItems(role),
-      ...sidebarAdminMenuItems,
-      ...Object.values(userDropdownMenuItems).flat(),
+      // Hanya tambahkan sidebarAdminMenuItems kalau role-nya ADMIN
+      ...(role === Role.ADMIN ? sidebarAdminMenuItems : []),
+      // Hanya ambil dropdown sesuai role
+      ...(userDropdownMenuItems[role] || []),
     ];
 
     const collected = collectUrls(allMenus);
 
-    collected.forEach(({ url, roles }) => {
-      roles.forEach((r) => {
-        if (!access[r].includes(url)) {
-          access[r].push(url);
-        }
-      });
+    collected.forEach(({ url, roles: allowedRoles }) => {
+      if (allowedRoles.includes(role) && !access[role].includes(url)) {
+        access[role].push(url);
+      }
     });
   });
 
@@ -70,20 +70,23 @@ function buildRoleAccess(): Record<Role, string[]> {
 const roleAccess = buildRoleAccess();
 
 export function middleware(req: NextRequest) {
-  //   const user = auth.getCachedUserProfile(); // atau ambil dari cookie/session
-  // 🔹 Ambil role dari cookie, bukan dari AuthProvider client
-  //   const role = user?.role?.name ?? Role.GUEST;
-
-  const roleCookie = req.cookies.get("role")?.value as Role | undefined;
-  const role = roleCookie ?? Role.GUEST;
+  const role = (req.cookies.get("role")?.value as Role) ?? Role.GUEST;
+  const url = req.nextUrl.pathname;
 
   console.log("Role middleware: ", role);
+  console.log("Current URL =>", url);
 
-  const url = req.nextUrl.pathname;
+  // Batasi url khusus admin
+  if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   const allowedPaths = roleAccess[role] || [];
+  const isAllowed = allowedPaths.some(
+    (path) => url === path || url.startsWith(`${path}/`)
+  );
 
-  // cek akses
-  if (!allowedPaths.some((path) => url.startsWith(path))) {
+  if (!isAllowed) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
@@ -92,13 +95,16 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // bagian auth masih error
-    "/(auth)/(login|register)", // cocokkan login & register di group (auth)
-    "/(auth)/login",
-    "/(auth)/:path*",
+    // Auth routes
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/email-verification",
+    "/complete-profile",
 
+    "/dashboard/(.*)", // cocokkan semua di bawah /dashboard
     // sisanya aman
-    "/dashboard/:path*",
     "/activity",
     "/leaderboard",
     "/profile",

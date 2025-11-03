@@ -10,6 +10,7 @@ import {
   faBook,
   faBookOpen,
   faListCheck,
+  faClockRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { Role } from "../enums/Role";
 import { ROUTES } from "./routes";
@@ -91,6 +92,12 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
 export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   Guest: [],
   Student: [
+    {
+      menu: "Riwayat",
+      url: ROUTES.ROOT.HISTORY,
+      icon: faClockRotateLeft,
+      roles: [Role.STUDENT],
+    },
     {
       menu: "Profil",
       url: "",

@@ -3,7 +3,7 @@ import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Button from "../../shared/Button";
 import {
   forgotPasswordDefaultValues,
@@ -28,6 +28,8 @@ export default function ForgotPasswordForm({
 }: ForgotPasswordFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { forgotPassword } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -42,7 +44,7 @@ export default function ForgotPasswordForm({
   const onSubmit = async (data: ForgotPasswordInputs) => {
     setIsLoading(true);
 
-    const result = await auth.forgotPassword(data);
+    const result = await forgotPassword(data);
 
     const { isSuccess, message } = result;
 

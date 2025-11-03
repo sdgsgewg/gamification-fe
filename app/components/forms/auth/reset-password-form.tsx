@@ -5,7 +5,7 @@ import { LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Button from "../../shared/Button";
 import {
   resetPasswordDefaultValues,
@@ -28,6 +28,8 @@ export default function ResetPasswordForm({
   onFinish,
 }: ResetPasswordFormProps) {
   const { toast } = useToast();
+  const { resetPassword } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -42,7 +44,7 @@ export default function ResetPasswordForm({
   const onSubmit = async (data: ResetPasswordFormInputs) => {
     setIsLoading(true);
 
-    const result = await auth.resetPassword(token, data.password);
+    const result = await resetPassword(token, data.password);
 
     const { isSuccess, message } = result;
 

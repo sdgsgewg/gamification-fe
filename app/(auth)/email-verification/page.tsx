@@ -3,20 +3,23 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
-import { auth } from "@/app/functions/AuthProvider";
+
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
+import { useAuth } from "@/app/hooks/useAuth";
 
 type ViewState = "prompt" | "verifying" | "success" | "error";
 
 const EmailVerificationPage = () => {
-  const [email, setEmail] = useState<string | null>(null);
-  const [view, setView] = useState<ViewState>("prompt");
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { verifyEmail } = useAuth();
 
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");
+
+  const [email, setEmail] = useState<string | null>(null);
+  const [view, setView] = useState<ViewState>("prompt");
 
   // Load email from sessionStorage
   useEffect(() => {
@@ -28,7 +31,7 @@ const EmailVerificationPage = () => {
   useEffect(() => {
     if (token) {
       setView("verifying");
-      auth.verifyEmail(token).then((res) => {
+      verifyEmail(token).then((res) => {
         if (res.isSuccess && res.data) {
           router.replace(`${ROUTES.AUTH.EMAIL_VERIFICATION}?uid=${res.data}`); // clean URL
           setView("success");

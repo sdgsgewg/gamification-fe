@@ -11,7 +11,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import FormLayout from "@/app/dashboard/form-layout";
@@ -44,6 +44,8 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
       defaultValues: taskTypeData || editTaskTypeDefaultValues,
     });
 
+    const { getCachedUserProfile } = useAuth();
+
     const [isLoading, setIsLoading] = useState(false);
 
     // Prepare options for select fields
@@ -59,7 +61,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
 
     useInitializeForm<EditTaskTypeFormInputs>(reset, taskTypeData, (d) => ({
       ...d,
-      updatedBy: auth.getCachedUserProfile()?.name,
+      updatedBy: getCachedUserProfile()?.name,
     }));
     const isDirty = Object.keys(dirtyFields).some(
       (field) => field !== "updatedBy"

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/shared/Loading";
 
 enum Role {
@@ -17,12 +17,14 @@ export default function DashboardRedirectPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
+  const { getCachedUserProfile } = useAuth();
+
   useEffect(() => {
     if (token) {
       localStorage.setItem("access_token", token);
     }
 
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     const role = (user?.role?.name || "").toUpperCase();
 
     switch (role) {

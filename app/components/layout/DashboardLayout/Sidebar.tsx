@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   sidebarAdminMenuItems,
-  sidebarMainMenuItems,
+  getSidebarMainMenuItems,
 } from "@/app/constants/menuItems";
 import { usePathname, useRouter } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -12,7 +12,7 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import { Role } from "@/app/enums/Role";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
 
@@ -69,7 +69,7 @@ interface MainMenuItemWrapperProps {
 }
 
 const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
-  const filteredItems = sidebarMainMenuItems.filter((item) =>
+  const filteredItems = getSidebarMainMenuItems(role).filter((item) =>
     item.roles.includes(role)
   );
 
@@ -136,6 +136,7 @@ interface SidebarProps {
 
 const Sidebar = ({ onClose }: SidebarProps) => {
   const router = useRouter();
+  const { logout, getCachedUserProfile } = useAuth();
 
   const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
 
@@ -144,19 +145,19 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   };
 
   const handleLogout = () => {
-    const logout = async () => {
-      await auth.logout();
+    const asyncLogout = async () => {
+      await logout();
     };
 
-    logout();
+    asyncLogout();
 
     router.push("/");
   };
 
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user) setUserRole(user.role.name);
-  }, []);
+  }, [getCachedUserProfile]);
 
   return (
     <aside className="bg-tertiary min-h-screen border-r-2 border-br-primary text-dark z-50">

@@ -9,13 +9,15 @@ import {
   SideBySideContentSectionProps,
 } from "../Section";
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Button from "@/app/components/shared/Button";
 import { ROUTES } from "@/app/constants/routes";
 
 const CTASection = () => {
   const router = useRouter();
-  const user = auth.getCachedUserProfile();
+  const { getCachedUserProfile } = useAuth();
+
+  const user = getCachedUserProfile();
   const userRole = user?.role.name ?? Role.GUEST;
   const [title, setTitle] = useState<string>("");
   const [subtitle, setSubtitle] = useState<string>("");

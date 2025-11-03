@@ -11,7 +11,7 @@ import {
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Loading from "../../shared/Loading";
 import { Form } from "antd";
 import FormLayout from "@/app/(auth)/form-layout";
@@ -33,6 +33,7 @@ export default function CompleteProfileForm({
   onFinish,
 }: CompleteProfileFormProps) {
   const { toast } = useToast();
+  const { completeProfile } = useAuth();
 
   const {
     control,
@@ -61,8 +62,6 @@ export default function CompleteProfileForm({
 
     const role = userData.role.name.toLowerCase();
 
-    console.log("Role: ", role);
-
     setUserRole(role);
     setValue("role", role, { shouldValidate: true });
   }, [userData]);
@@ -70,7 +69,7 @@ export default function CompleteProfileForm({
   const onSubmit = async (data: CompleteProfileFormInputs) => {
     setIsLoading(true);
 
-    const result = await auth.completeProfile(userId, data);
+    const result = await completeProfile(userId, data);
 
     const { isSuccess, message } = result;
 

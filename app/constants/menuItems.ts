@@ -15,10 +15,6 @@ import { Role } from "../enums/Role";
 import { ROUTES } from "./routes";
 import { IMAGES } from "./images";
 import { resolveDashboardRoute } from "./resolveRoute";
-import { auth } from "@/app/functions/AuthProvider";
-
-const user = auth.getCachedUserProfile();
-const role = user?.role.name ?? Role.GUEST;
 
 export interface MenuItem {
   menu: string;
@@ -36,7 +32,7 @@ export interface MenuItem {
 }
 
 // HEADER (Main Layout)
-export const mainMenuItems: MenuItem[] = [
+export const getMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Aktivitas",
     url: ROUTES.ROOT.ACTIVITY,
@@ -141,7 +137,7 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
 };
 
 // FOOTER (Main Layout)
-export const footerMainMenuItems: MenuItem[] = [
+export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Aktivitas",
     url: ROUTES.ROOT.ACTIVITY,
@@ -203,7 +199,7 @@ export const footerHelpMenuItems: MenuItem[] = [
 ];
 
 // SIDEBAR (Dashboard Layout)
-export const sidebarMainMenuItems: MenuItem[] = [
+export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Dashboard",
     url: resolveDashboardRoute(role),

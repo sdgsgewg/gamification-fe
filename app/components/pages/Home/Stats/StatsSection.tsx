@@ -3,7 +3,7 @@
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
@@ -20,16 +20,18 @@ import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 
 const StatsSection = () => {
   const router = useRouter();
+  const { getCachedUserProfile } = useAuth();
+
   const [userName, setUserName] = useState<string>("");
   const [userRole, setUserRole] = useState<Role>(Role.STUDENT);
 
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user) {
       setUserName(user.name);
       setUserRole(user.role.name);
     }
-  }, []);
+  }, [getCachedUserProfile]);
 
   const DataRow = ({
     icon,

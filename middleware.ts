@@ -2,12 +2,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Role } from "./app/enums/Role";
-import { auth } from "./app/functions/AuthProvider";
+
 import {
-  mainMenuItems,
-  footerMainMenuItems,
+  getMainMenuItems,
+  getFooterMainMenuItems,
   footerHelpMenuItems,
-  sidebarMainMenuItems,
+  getSidebarMainMenuItems,
   sidebarAdminMenuItems,
   userDropdownMenuItems,
   MenuItem,
@@ -34,16 +34,7 @@ function collectUrls(items: MenuItem[]): { url: string; roles: Role[] }[] {
 
 // 🔹 Generate mapping role → daftar path
 function buildRoleAccess(): Record<Role, string[]> {
-  const allMenus = [
-    ...mainMenuItems,
-    ...footerMainMenuItems,
-    ...footerHelpMenuItems,
-    ...sidebarMainMenuItems,
-    ...sidebarAdminMenuItems,
-    ...Object.values(userDropdownMenuItems).flat(),
-  ];
-
-  const collected = collectUrls(allMenus);
+  const roles = Object.values(Role);
 
   const access: Record<Role, string[]> = {
     [Role.GUEST]: [],
@@ -52,11 +43,24 @@ function buildRoleAccess(): Record<Role, string[]> {
     [Role.ADMIN]: [],
   };
 
-  collected.forEach(({ url, roles }) => {
-    roles.forEach((r) => {
-      if (!access[r].includes(url)) {
-        access[r].push(url);
-      }
+  roles.forEach((role) => {
+    const allMenus = [
+      ...getMainMenuItems(role),
+      ...getFooterMainMenuItems(role),
+      ...footerHelpMenuItems,
+      ...getSidebarMainMenuItems(role),
+      ...sidebarAdminMenuItems,
+      ...Object.values(userDropdownMenuItems).flat(),
+    ];
+
+    const collected = collectUrls(allMenus);
+
+    collected.forEach(({ url, roles }) => {
+      roles.forEach((r) => {
+        if (!access[r].includes(url)) {
+          access[r].push(url);
+        }
+      });
     });
   });
 
@@ -71,7 +75,7 @@ export function middleware(req: NextRequest) {
   //   const role = user?.role?.name ?? Role.GUEST;
 
   const roleCookie = req.cookies.get("role")?.value as Role | undefined;
-  const role = roleCookie ?? Role.ADMIN;
+  const role = roleCookie ?? Role.GUEST;
 
   console.log("Role middleware: ", role);
 

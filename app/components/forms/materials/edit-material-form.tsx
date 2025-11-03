@@ -13,7 +13,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import TextField from "../../fields/TextField";
@@ -49,6 +49,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       defaultValues: materialData || editMaterialDefaultValues,
     });
 
+    const { getCachedUserProfile } = useAuth();
+
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -65,7 +67,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
 
     useInitializeForm<EditMaterialFormInputs>(reset, materialData, (d) => ({
       ...d,
-      updatedBy: auth.getCachedUserProfile()?.name,
+      updatedBy: getCachedUserProfile()?.name,
     }));
     useInitializeFileList(materialData, setFileList);
     const isDirty = Object.keys(dirtyFields).some(

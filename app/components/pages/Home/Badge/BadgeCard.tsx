@@ -6,13 +6,15 @@ import { useSectionContext } from "../Section";
 import { BadgeData } from "./BadgeCardWrapper";
 import { CheckSquareOutlined } from "@ant-design/icons";
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface BadgeCardProps {
   badge: BadgeData;
 }
 
 const BadgeCard = ({ badge }: BadgeCardProps) => {
+  const { getCachedUserProfile } = useAuth();
+
   const { icon, name, description, progressPercentage, progressText, notes } =
     badge;
   const { isOdd } = useSectionContext();
@@ -23,13 +25,13 @@ const BadgeCard = ({ badge }: BadgeCardProps) => {
   const [userRole, setUserRole] = useState<Role>(Role.GUEST);
 
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user) {
       setUserRole(user.role.name);
     } else {
       setUserRole(Role.GUEST);
     }
-  }, []);
+  }, [getCachedUserProfile]);
 
   const ProgressText = () => {
     return (

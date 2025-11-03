@@ -10,18 +10,17 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  mainMenuItems,
+  getMainMenuItems,
   MenuItem,
   userDropdownMenuItems,
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/app/hooks/useAuth";
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
-import { useAuth } from "@/app/hooks/useAuth";
 
 interface MainMenuItemProps {
   url: string;
@@ -45,7 +44,7 @@ const MainMenuItemWrapper = ({
 }: MainMenuItemWrapperProps) => {
   const [open, setOpen] = useState(false); // <-- state untuk buka/tutup dropdown
 
-  const filteredItems = mainMenuItems.filter((item) =>
+  const filteredItems = getMainMenuItems(role).filter((item) =>
     item.roles.includes(role)
   );
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
+
 import React, { useEffect, useMemo, useState } from "react";
 
 /** Normalize any value for safe display */
@@ -24,8 +26,7 @@ const toLabel = (v: any): string => {
 
 const formatDate = (d: any) => {
   if (!d) return "—";
-  const date =
-    typeof d === "string" || typeof d === "number" ? new Date(d) : d;
+  const date = typeof d === "string" || typeof d === "number" ? new Date(d) : d;
   if (isNaN(date?.getTime?.())) return toLabel(d);
   return date.toLocaleDateString("id-ID", {
     day: "2-digit",
@@ -124,14 +125,16 @@ const InfoRow: React.FC<{
 );
 
 const ProfilePage = () => {
-  const cachedUser = auth.getCachedUserProfile();
-  const userId =
-    (cachedUser as any)?.id ?? (cachedUser as any)?.userId ?? "-";
+  const { getCachedUserProfile } = useAuth();
 
   const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
   const [isEditing, setIsEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const cachedUser: UserDetailResponse | null = getCachedUserProfile();
+
+  const userId = cachedUser?.userId ?? "-";
 
   const [profile, setProfile] = useState<EditableProfile>({
     name: cachedUser?.name,
@@ -166,7 +169,7 @@ const ProfilePage = () => {
 
   /** merge local overrides on mount / when user changes */
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user?.role?.name) setUserRole(user.role.name);
     const o = loadOverrides(String(userId));
     if (o && Object.keys(o).length) {
@@ -182,7 +185,11 @@ const ProfilePage = () => {
 
   // Localized display label
   const displayRole =
-    userRole === Role.STUDENT ? "Siswa" : userRole === Role.TEACHER ? "Guru" : "Admin";
+    userRole === Role.STUDENT
+      ? "Siswa"
+      : userRole === Role.TEACHER
+      ? "Guru"
+      : "Admin";
 
   if (!cachedUser) return null;
 
@@ -410,7 +417,9 @@ const ProfilePage = () => {
           {/* RIGHT: Security & Activity */}
           <div className="overflow-hidden rounded-xl border border-[var(--color-br-secondary)] bg-[var(--color-card)] shadow-sm">
             <SectionHeader
-              title={isStudent ? "Aktivitas & Keamanan" : "Keamanan & Aktivitas"}
+              title={
+                isStudent ? "Aktivitas & Keamanan" : "Keamanan & Aktivitas"
+              }
             />
             <div className="px-5 py-4">
               <div className="space-y-3 text-sm">
@@ -485,7 +494,7 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-      </div> 
+      </div>
 
       {/* ===== Edit Modal ===== */}
       {isEditing && (

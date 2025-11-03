@@ -11,7 +11,7 @@ import {
 } from "@/app/schemas/tasks/task-overview/editTaskOverview";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/Button";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import TextField from "../../../fields/TextField";
 import TextAreaField from "../../../fields/TextAreaField";
 import ImageField from "../../../fields/ImageField";
@@ -81,6 +81,8 @@ const EditTaskOverviewForm = forwardRef<
     });
 
     const watchedValues = useWatch({ control });
+
+    const { getCachedUserProfile } = useAuth();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -146,7 +148,7 @@ const EditTaskOverviewForm = forwardRef<
 
     useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
       ...d,
-      updatedBy: auth.getCachedUserProfile()?.name,
+      updatedBy: getCachedUserProfile()?.name,
     }));
     useInitializeFileList(taskOverview, setFileList);
 
@@ -154,7 +156,7 @@ const EditTaskOverviewForm = forwardRef<
       const wv = JSON.stringify(watchedValues);
       const todv = JSON.stringify({
         ...taskOverviewDefaultValue,
-        updatedBy: auth.getCachedUserProfile()?.name,
+        updatedBy: getCachedUserProfile()?.name,
       });
 
       const isTaskOverviewFormDirty = wv !== todv;
@@ -170,6 +172,7 @@ const EditTaskOverviewForm = forwardRef<
       taskOverviewDefaultValue,
       taskQuestionsDefaultValue,
       taskQuestions,
+      getCachedUserProfile,
     ]);
 
     useNavigationGuard(isDirty);

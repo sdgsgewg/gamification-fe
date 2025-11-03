@@ -6,7 +6,7 @@ import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import OAuthButton from "../../pages/Auth/OAuthButton";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
 import Button from "../../shared/Button";
@@ -37,6 +37,8 @@ export default function RegisterForm({
   onFinish,
 }: RegisterFormProps) {
   const router = useRouter();
+  const { register } = useAuth();
+
   const { toast } = useToast();
   const {
     control,
@@ -59,7 +61,7 @@ export default function RegisterForm({
       roleId: data.roleId,
     };
 
-    const result = await auth.register(payload);
+    const result = await register(payload);
 
     const { isSuccess, message } = result;
 

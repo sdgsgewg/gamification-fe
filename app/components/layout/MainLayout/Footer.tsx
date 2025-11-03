@@ -10,10 +10,10 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import {
   footerHelpMenuItems,
-  footerMainMenuItems,
+  getFooterMainMenuItems,
 } from "@/app/constants/menuItems";
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 
 const AboutSection = () => {
   return (
@@ -42,7 +42,7 @@ interface MenuItemWrapperProps {
 }
 
 const MainMenuItemWrapper = ({ role }: MenuItemWrapperProps) => {
-  const filteredItems = footerMainMenuItems.filter((item) =>
+  const filteredItems = getFooterMainMenuItems(role).filter((item) =>
     item.roles.includes(role)
   );
 
@@ -112,7 +112,9 @@ const CopyrightSection = () => {
 };
 
 const Footer = () => {
-  const user = auth.getCachedUserProfile();
+  const { getCachedUserProfile } = useAuth();
+
+  const user = getCachedUserProfile();
   const userRole = user?.role.name ?? Role.GUEST;
 
   return (

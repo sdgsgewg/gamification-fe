@@ -9,22 +9,24 @@ import {
   SideBySideContentSectionProps,
 } from "../Section";
 import { Role } from "@/app/enums/Role";
-import { auth } from "@/app/functions/AuthProvider";
+
 import Button from "@/app/components/shared/Button";
 import { ROUTES } from "@/app/constants/routes";
+import { useAuth } from "@/app/hooks/useAuth";
 
 const HeroSection = () => {
   const router = useRouter();
+  const { getCachedUserProfile } = useAuth();
   const [userRole, setUserRole] = useState<Role>(Role.GUEST);
 
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user) {
       setUserRole(user.role.name);
     } else {
       setUserRole(Role.GUEST);
     }
-  }, []);
+  }, [getCachedUserProfile]);
 
   const handleClickStartNow = () => {
     if (userRole === Role.GUEST) {

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
@@ -44,12 +44,14 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
       defaultValues: subjectData || editSubjectDefaultValues,
     });
 
+    const { getCachedUserProfile } = useAuth();
+
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useInitializeForm<EditSubjectFormInputs>(reset, subjectData, (d) => ({
       ...d,
-      updatedBy: auth.getCachedUserProfile()?.name,
+      updatedBy: getCachedUserProfile()?.name,
     }));
     useInitializeFileList(subjectData, setFileList);
     const isDirty = Object.keys(dirtyFields).some(

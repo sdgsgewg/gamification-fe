@@ -6,7 +6,7 @@ import { useToast } from "@/app/hooks/use-toast";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Button from "../../shared/Button";
 import OAuthButton from "../../pages/Auth/OAuthButton";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
@@ -35,6 +35,8 @@ export default function LoginForm({
 }: LoginFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { login } = useAuth();
+
   const {
     control,
     handleSubmit,
@@ -49,7 +51,7 @@ export default function LoginForm({
   const onSubmit = async (data: LoginFormInputs) => {
     setIsLoading(true);
 
-    const result = await auth.login(data);
+    const result = await login(data);
 
     if (result.isSuccess) {
       toast.success(result.message ?? "Login berhasil!");

@@ -16,11 +16,12 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface MainMenuItemProps {
   url: string;
@@ -131,17 +132,19 @@ const UserDropdownMenu = ({
   level,
   xp,
 }: UserDropdownMenuProps) => {
+  const { logout } = useAuth();
   const router = useRouter();
   const userMenus = userDropdownMenuItems[role] || [];
   const [nextLevelXp] = useState<number>(100);
   const [open, setOpen] = useState(false); // <-- state untuk buka/tutup dropdown
 
   const handleLogout = () => {
-    const logout = async () => {
-      await auth.logout();
+    const asyncLogout = async () => {
+      await logout();
     };
 
-    logout();
+    asyncLogout();
+
     router.push("/");
   };
 

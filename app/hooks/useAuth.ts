@@ -20,6 +20,8 @@ import { UserDetailResponse } from "../interface/users/responses/IUserDetailResp
 
 const API_URL = "/auth";
 
+export const authEventTarget = new EventTarget();
+
 export function useAuth() {
   // State utama
   const [sessionToken, setSessionToken] = useState<string>("");
@@ -233,10 +235,13 @@ export function useAuth() {
       setUserProfile(null);
       setIsGuest(true);
 
+      authEventTarget.dispatchEvent(new Event("authChanged"));
+
       // Hapus cookie role
       document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
       const res: BaseResponseDto = await postAxios(`${API_URL}/logout`);
+
       return res;
     } catch (error) {
       return handleAxiosError<null>(error);

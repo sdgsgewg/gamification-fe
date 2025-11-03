@@ -4,7 +4,7 @@ import { Role } from "@/app/enums/Role";
 import { auth } from "@/app/functions/AuthProvider";
 import React, { useEffect, useMemo, useState } from "react";
 
-/** Ensure nothing object-like is sent straight to JSX text nodes */
+/** Normalize any value for safe display */
 const toLabel = (v: any): string => {
   if (v === undefined || v === null) return "—";
   if (typeof v === "object") {
@@ -22,11 +22,51 @@ const toLabel = (v: any): string => {
   return String(v);
 };
 
+const formatDate = (d: any) => {
+  if (!d) return "—";
+  const date =
+    typeof d === "string" || typeof d === "number" ? new Date(d) : d;
+  if (isNaN(date?.getTime?.())) return toLabel(d);
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
 type EditableProfile = {
   name?: string;
-  kelas?: any; // can be string | number | { gradeId, name } etc.
+  kelas?: any;
   email?: string;
   avatarUrl?: string;
+  institution?: string;
+  password?: string;
+  birthDate?: string;
+  gender?: string;
+};
+
+/** ---- lightweight local persistence (per user) ---- */
+const LS_KEY = "profile_overrides";
+type OverridesMap = Record<string, Partial<EditableProfile>>;
+const loadOverrides = (userId: string): Partial<EditableProfile> => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return {};
+    const map = JSON.parse(raw) as OverridesMap;
+    return map?.[userId] ?? {};
+  } catch {
+    return {};
+  }
+};
+const saveOverrides = (userId: string, data: Partial<EditableProfile>) => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    const map: OverridesMap = raw ? JSON.parse(raw) : {};
+    map[userId] = { ...(map[userId] ?? {}), ...data };
+    localStorage.setItem(LS_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
 };
 
 const HeaderIcon = () => (
@@ -35,12 +75,66 @@ const HeaderIcon = () => (
   </svg>
 );
 
+const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
+  <div className="flex items-center gap-2 bg-[var(--color-primary)] px-4 py-3">
+    <HeaderIcon />
+    <p className="text-sm font-semibold text-white">{title}</p>
+  </div>
+);
+
+const Pill: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className,
+}) => (
+  <span
+    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}
+  >
+    {children}
+  </span>
+);
+
+const StatBox: React.FC<{ value: React.ReactNode; label: string }> = ({
+  value,
+  label,
+}) => (
+  <div className="rounded-lg border border-[var(--color-br-secondary)] bg-[var(--color-card)] px-6 py-4 text-center shadow-sm">
+    <div className="text-2xl font-extrabold text-[var(--text-primary)]">
+      {value}
+    </div>
+    <div className="mt-1 text-xs font-medium tracking-wide text-[var(--text-tertiary)]">
+      {label}
+    </div>
+  </div>
+);
+
+const InfoRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value?: React.ReactNode;
+}> = ({ icon, label, value }) => (
+  <div className="grid grid-cols-[28px_1fr_2fr] items-center gap-2 py-2">
+    <div className="flex items-center justify-center">{icon}</div>
+    <div className="text-sm text-[var(--text-secondary)]">{label}</div>
+    <div className="text-sm font-medium text-[var(--text-primary)]">
+      {typeof value === "object" && !React.isValidElement(value)
+        ? toLabel(value)
+        : value ?? "—"}
+    </div>
+  </div>
+);
+
 const ProfilePage = () => {
   const cachedUser = auth.getCachedUserProfile();
+  const userId =
+    (cachedUser as any)?.id ?? (cachedUser as any)?.userId ?? "-";
+
   const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
+  const [isEditing, setIsEditing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   const [profile, setProfile] = useState<EditableProfile>({
     name: cachedUser?.name,
-    // kelas might be an object like { gradeId, name }, keep raw then format with toLabel()
     kelas:
       (cachedUser as any)?.kelas ??
       (cachedUser as any)?.grade ??
@@ -55,21 +149,40 @@ const ProfilePage = () => {
       (cachedUser as any)?.avatarUrl ??
       (cachedUser as any)?.picture ??
       "/placeholder-avatar.png",
+    institution:
+      (cachedUser as any)?.institution ??
+      (cachedUser as any)?.metadata?.institution ??
+      "SMAN 70 Jakarta",
+    password: "",
+    birthDate:
+      (cachedUser as any)?.birthDate ??
+      (cachedUser as any)?.metadata?.birthDate ??
+      "",
+    gender:
+      (cachedUser as any)?.gender ??
+      (cachedUser as any)?.metadata?.gender ??
+      "",
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [saving, setSaving] = useState(false);
 
+  /** merge local overrides on mount / when user changes */
   useEffect(() => {
     const user = auth.getCachedUserProfile();
     if (user?.role?.name) setUserRole(user.role.name);
-  }, []);
+    const o = loadOverrides(String(userId));
+    if (o && Object.keys(o).length) {
+      setProfile((p) => ({ ...p, ...o }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-  const userId = (cachedUser as any)?.id ?? (cachedUser as any)?.userId ?? "-";
   const roleLabel = useMemo(
     () => (typeof userRole === "string" ? userRole : Role[userRole] ?? "User"),
     [userRole]
   );
+
+  // Localized display label
+  const displayRole =
+    userRole === Role.STUDENT ? "Siswa" : userRole === Role.TEACHER ? "Guru" : "Admin";
 
   if (!cachedUser) return null;
 
@@ -84,46 +197,77 @@ const ProfilePage = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      setIsEditing(false);
-    }, 500);
+
+    const payload = {
+      name: profile.name,
+      email: profile.email,
+      kelas: profile.kelas,
+      avatarUrl: profile.avatarUrl,
+      institution: profile.institution,
+      birthDate: profile.birthDate,
+      gender: profile.gender,
+    };
+
+    // Optional: persist to your NestJS API
+    try {
+      await fetch("/api/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    } catch {}
+
+    // Persist locally so refresh keeps the data
+    saveOverrides(String(userId), payload);
+
+    // Update any in-memory cache if available
+    try {
+      (auth as any)?.setCachedUserProfile?.({
+        ...(cachedUser as any),
+        ...payload,
+      });
+    } catch {}
+
+    setSaving(false);
+    setIsEditing(false);
   };
 
-  const InfoRow: React.FC<{
-    icon: React.ReactNode;
-    label: string;
-    value?: React.ReactNode;
-  }> = ({ icon, label, value }) => (
-    <div className="grid grid-cols-[28px_1fr_2fr] items-center gap-2 py-2">
-      <div className="flex items-center justify-center">{icon}</div>
-      <div className="text-sm text-gray-700">{label}</div>
-      <div className="text-sm font-medium text-gray-900">
-        {/* Ensure only string/number/nodes, never plain object */}
-        {typeof value === "object" && !React.isValidElement(value)
-          ? toLabel(value)
-          : value ?? "—"}
-      </div>
-    </div>
-  );
+  /** ===== Role helpers ===== */
+  const isStudent = userRole === Role.STUDENT;
+  const isTeacher = userRole === Role.TEACHER;
+  const isAdmin = userRole === Role.ADMIN;
 
-  const Pill: React.FC<{ children: React.ReactNode; className?: string }> = ({
-    children,
-    className,
-  }) => (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}
-    >
-      {children}
-    </span>
-  );
+  const recentActivities =
+    (cachedUser as any)?.activities ??
+    (isTeacher
+      ? [
+          "Memberikan Tugas Tata Surya ke Kelas XII A",
+          "Menilai Tugas Aritmatika untuk Kelas XII B",
+          "Berhasil Meraih 20 Pencapaian",
+          "Memberikan Tugas Listrik Statis ke Kelas XII C",
+        ]
+      : isAdmin
+      ? [
+          "Mengupdate Mata Pelajaran IPS",
+          "Menambahkan Materi Bahasa Indonesia",
+          "Membuat Materi Statistika",
+          "Membuat Mata Pelajaran IPS",
+        ]
+      : [
+          "Menyelesaikan Kuis Fisika",
+          "Mengumpulkan Tugas Matematika",
+          "Mendapat Lencana Ketekunan",
+        ]);
 
+  /** ===== UI ===== */
   return (
-    <div className="min-h-[80vh] w-full bg-[#efeff7] p-6 text-black">
+    <div className="min-h-[80vh] w-full bg-[var(--background)] p-6 text-[var(--text-primary)]">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        {/* ===== Header (2-col grid so stats align to right column) ===== */}
+        <div className="grid gap-6 md:grid-cols-2 md:items-end">
+          {/* LEFT: avatar + name */}
           <div className="flex items-center gap-4">
-            <div className="h-40 w-40 overflow-hidden rounded-full bg-[#e8e6ff] ring-8 ring-[#e8e6ff]">
+            <div className="h-40 w-40 overflow-hidden rounded-full bg-[var(--color-tertiary)] ring-8 ring-[var(--color-tertiary)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={
@@ -134,35 +278,37 @@ const ProfilePage = () => {
                 className="h-full w-full object-cover"
               />
             </div>
+
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
                 {toLabel(profile.name || cachedUser.name || "User")}
               </h1>
+
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <Pill className="bg-indigo-100 text-indigo-700">
-                  {toLabel(roleLabel)}
+                {/* role pill (localized) */}
+                <Pill className="bg-[var(--color-secondary)] text-[var(--text-primary)]">
+                  {displayRole}
                 </Pill>
-                {profile.kelas && (
-                  <Pill className="bg-amber-100 text-amber-700">
-                    Kelas {toLabel(profile.kelas)}
-                  </Pill>
-                )}
-                {profile.email && (
-                  <Pill className="bg-emerald-100 text-emerald-700">
+
+                {/* kelas pill intentionally removed */}
+
+                {!!profile.email && (
+                  <Pill className="bg-[var(--color-surface)] text-[var(--text-primary)] ring-1 ring-[var(--color-light-accent)]">
                     {toLabel(profile.email)}
                   </Pill>
                 )}
               </div>
+
               <div className="mt-3 flex items-center gap-3">
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500"
+                  className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
                 >
                   Edit Profil
                 </button>
                 <button
                   onClick={handleCopyId}
-                  className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-300 transition hover:bg-gray-50"
+                  className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] transition hover:bg-[var(--color-light-emphasis)]"
                   title="Copy User ID"
                 >
                   {copied ? "Disalin!" : "Salin ID"}
@@ -170,62 +316,89 @@ const ProfilePage = () => {
               </div>
             </div>
           </div>
+
+          {/* RIGHT: stats (flush right) */}
+          <div className="flex justify-end">
+            <div
+              className={`grid gap-3 ${
+                isTeacher || isAdmin ? "grid-cols-3" : "grid-cols-2"
+              }`}
+            >
+              {isTeacher && (
+                <>
+                  <StatBox value="3" label="Kelas" />
+                  <StatBox value="100" label="Murid" />
+                  <StatBox value="24" label="Pencapaian" />
+                </>
+              )}
+              {isAdmin && (
+                <>
+                  <StatBox value="5" label="Mata Pelajaran" />
+                  <StatBox value="10" label="Materi" />
+                  <StatBox value="—" label=" " />
+                </>
+              )}
+              {isStudent && (
+                <>
+                  <StatBox value="12" label="Kelas" />
+                  <StatBox value="4" label="Badges" />
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Cards */}
+        {/* ===== Content cards ===== */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="overflow-hidden rounded-xl border border-indigo-200 bg-white shadow-sm">
-            <div className="flex items-center gap-2 bg-indigo-600 px-4 py-3">
-              <HeaderIcon />
-              <p className="text-sm font-semibold text-white">
-                Informasi Detail
-              </p>
-            </div>
+          {/* LEFT: Data Profil */}
+          <div className="overflow-hidden rounded-xl border border-[var(--color-br-secondary)] bg-[var(--color-card)] shadow-sm">
+            <SectionHeader title="Informasi Detail" />
             <div className="px-5 py-4">
               <InfoRow
-                icon={<span className="text-lg">🧑‍🎓</span>}
-                label="Nama"
+                icon={<span>🧑‍🎓</span>}
+                label="Nama Lengkap"
                 value={toLabel(profile.name || cachedUser.name)}
               />
               <InfoRow
-                icon={<span className="text-lg">🧭</span>}
-                label="Kelas"
-                value={toLabel(profile.kelas)}
+                icon={<span>✉️</span>}
+                label="Email"
+                value={toLabel(profile.email)}
               />
               <InfoRow
-                icon={<span className="text-lg">📝</span>}
-                label="Tipe Tugas"
-                value={toLabel(
-                  (cachedUser as any)?.metadata?.tipeTugas ?? "Scheduled Quiz"
-                )}
+                icon={<span>🎂</span>}
+                label="Tanggal Lahir"
+                value={formatDate(profile.birthDate)}
               />
               <InfoRow
-                icon={<span className="text-lg">🔢</span>}
-                label="Jumlah Soal"
-                value={toLabel(
-                  (cachedUser as any)?.metadata?.jumlahSoal ?? 20
-                )}
+                icon={<span>⚧️</span>}
+                label="Jenis Kelamin"
+                value={
+                  profile.gender
+                    ? toLabel(profile.gender)
+                    : toLabel((cachedUser as any)?.gender)
+                }
               />
+              {(isStudent || isTeacher) && (
+                <InfoRow
+                  icon={<span>🏷️</span>}
+                  label="Kelas"
+                  value={toLabel(profile.kelas)}
+                />
+              )}
               <InfoRow
-                icon={<span className="text-lg">🏫</span>}
-                label="Ditujukan Untuk Kelas"
-                value={toLabel(
-                  (cachedUser as any)?.metadata?.ditujukanKelas ??
-                    profile.kelas ??
-                    "—"
-                )}
-              />
-              <InfoRow
-                icon={<span className="text-lg">🆔</span>}
+                icon={<span>🆔</span>}
                 label="User ID"
                 value={
                   <button
                     onClick={handleCopyId}
-                    className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50"
-                    title="Copy"
+                    className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-[var(--color-primary)] ring-1 ring-[var(--color-br-secondary)] hover:bg-[var(--color-tertiary)]"
                   >
                     <span className="truncate">{toLabel(userId)}</span>
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4"
+                      fill="currentColor"
+                    >
                       <path d="M9 2a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H9Zm-4 6H4a2 2 0 0 0-2 2v9a3 3 0 0 0 3 3h9a2 2 0 0 0 2-2v-1H8a3 3 0 0 1-3-3V8Z" />
                     </svg>
                   </button>
@@ -234,51 +407,78 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-indigo-200 bg-white shadow-sm">
-            <div className="flex items-center gap-2 bg-indigo-600 px-4 py-3">
-              <HeaderIcon />
-              <p className="text-sm font-semibold text-white">
-                Keamanan & Aktivitas
-              </p>
-            </div>
+          {/* RIGHT: Security & Activity */}
+          <div className="overflow-hidden rounded-xl border border-[var(--color-br-secondary)] bg-[var(--color-card)] shadow-sm">
+            <SectionHeader
+              title={isStudent ? "Aktivitas & Keamanan" : "Keamanan & Aktivitas"}
+            />
             <div className="px-5 py-4">
               <div className="space-y-3 text-sm">
-                <div className="flex items-start justify-between rounded-lg bg-gray-100 p-3">
+                <div className="flex items-start justify-between rounded-lg bg-[var(--color-surface)] p-3">
                   <div>
-                    <p className="font-medium text-gray-900">Peran Saat Ini</p>
-                    <p className="text-gray-600">
+                    <p className="font-medium text-[var(--text-primary)]">
+                      Peran Saat Ini
+                    </p>
+                    <p className="text-[var(--text-tertiary)]">
                       Anda masuk sebagai{" "}
-                      <span className="font-semibold">{toLabel(roleLabel)}</span>.
+                      <span className="font-semibold">{displayRole}</span>.
                     </p>
                   </div>
-                  <Pill className="bg-indigo-100 text-indigo-700">
-                    {toLabel(roleLabel)}
+                  <Pill className="bg-[var(--color-secondary)] text-[var(--text-primary)]">
+                    {displayRole}
                   </Pill>
                 </div>
 
-                <div className="flex items-start justify-between rounded-lg bg-gray-100 p-3">
+                <div className="flex items-start justify-between rounded-lg bg-[var(--color-surface)] p-3">
                   <div>
-                    <p className="font-medium text-gray-900">Sesi</p>
-                    <p className="text-gray-600">
+                    <p className="font-medium text-[var(--text-primary)]">
+                      Sesi
+                    </p>
+                    <p className="text-[var(--text-tertiary)]">
                       Terautentikasi menggunakan cache profil lokal.
                     </p>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-[var(--text-muted)]">
                     {(cachedUser as any)?.lastLoginAt
-                      ? new Date((cachedUser as any).lastLoginAt).toLocaleString()
+                      ? new Date(
+                          (cachedUser as any).lastLoginAt
+                        ).toLocaleString()
                       : "Waktu tidak tersedia"}
                   </span>
+                </div>
+
+                <div className="rounded-lg border border-[var(--color-br-secondary)]">
+                  <div className="border-b border-[var(--color-br-secondary)] bg-[var(--color-tertiary)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)]">
+                    Aktivitas Terbaru
+                  </div>
+                  <ul className="space-y-2 p-3">
+                    {recentActivities.map((a: string, i: number) => (
+                      <li
+                        key={i}
+                        className="list-disc pl-4 text-[var(--text-secondary)]"
+                      >
+                        {a}
+                        <div className="text-[10px] text-[var(--text-muted)]">
+                          {i === 0
+                            ? "2 Hari yang lalu"
+                            : i === 1
+                            ? "4 Hari yang lalu"
+                            : "1 Minggu yang lalu"}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <button
                     onClick={() => window.location.reload()}
-                    className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-300 transition hover:bg-gray-50"
+                    className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] transition hover:bg-[var(--color-light-emphasis)]"
                   >
                     Muat Ulang Profil
                   </button>
-                  <span className="text-xs text-gray-500">
-                    Data diperbarui dari cache auth.
+                  <span className="text-xs text-[var(--text-muted)]">
+                    Data diperbarui dari cache auth / local override.
                   </span>
                 </div>
               </div>
@@ -287,10 +487,11 @@ const ProfilePage = () => {
         </div>
       </div> 
 
+      {/* ===== Edit Modal ===== */}
       {isEditing && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
-            <div className="flex items-center justify-between bg-indigo-600 px-4 py-3">
+          <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-[var(--color-card)] shadow-xl">
+            <div className="flex items-center justify-between bg-[var(--color-primary)] px-4 py-3">
               <div className="flex items-center gap-2">
                 <HeaderIcon />
                 <p className="text-sm font-semibold text-white">Edit Profil</p>
@@ -302,33 +503,126 @@ const ProfilePage = () => {
                 Tutup
               </button>
             </div>
+
             <form onSubmit={handleSave} className="space-y-4 px-5 py-5">
+              {/* Common */}
               <div>
-                <label className="mb-1 block text-sm text-gray-700">Nama</label>
+                <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                  Nama Lengkap
+                </label>
                 <input
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                   value={toLabel(profile.name)}
                   onChange={(e) =>
                     setProfile((p) => ({ ...p, name: e.target.value }))
                   }
                 />
               </div>
-              <div>
-                <label className="mb-1 block text-sm text-gray-700">Kelas</label>
-                <input
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={toLabel(profile.kelas)}
-                  onChange={(e) =>
-                    setProfile((p) => ({ ...p, kelas: e.target.value }))
-                  }
-                />
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                    Email
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    value={toLabel(profile.email)}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, email: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                    Tanggal Lahir
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    value={profile.birthDate ?? ""}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, birthDate: e.target.value }))
+                    }
+                  />
+                </div>
               </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                    Jenis Kelamin
+                  </label>
+                  <select
+                    className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    value={profile.gender ?? ""}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, gender: e.target.value }))
+                    }
+                  >
+                    <option value="">Pilih</option>
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+
+                {/* Siswa only */}
+                {isStudent && (
+                  <div>
+                    <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                      Kelas
+                    </label>
+                    <input
+                      className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      value={toLabel(profile.kelas)}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, kelas: e.target.value }))
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Guru/Admin extras */}
+              {(userRole === Role.TEACHER || userRole === Role.ADMIN) && (
+                <>
+                  <div>
+                    <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                      Institusi
+                    </label>
+                    <input
+                      className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      value={toLabel(profile.institution)}
+                      onChange={(e) =>
+                        setProfile((p) => ({
+                          ...p,
+                          institution: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm text-[var(--text-secondary)]">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      value={profile.password ?? ""}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, password: e.target.value }))
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
               <div>
-                <label className="mb-1 block text-sm text-gray-700">
+                <label className="mb-1 block text-sm text-[var(--text-secondary)]">
                   URL Avatar
                 </label>
                 <input
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                   placeholder="https://…"
                   value={toLabel(profile.avatarUrl)}
                   onChange={(e) =>
@@ -336,18 +630,19 @@ const ProfilePage = () => {
                   }
                 />
               </div>
+
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-300 hover:bg-gray-50"
+                  className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] hover:bg-[var(--color-light-emphasis)]"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+                  className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
                 >
                   {saving ? "Menyimpan…" : "Simpan"}
                 </button>

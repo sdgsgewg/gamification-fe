@@ -12,10 +12,7 @@ import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
 import PageLayout from "@/app/(root)/page-layout";
 import AttemptActivityNavigationBarWrapper from "@/app/components/pages/Activity/Attempt/AttemptActivityNavigationBarWrapper";
-import {
-  BackConfirmationModal,
-  SubmitConfirmationModal,
-} from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { MessageModal } from "@/app/components/modals/MessageModal";
 import { LevelUpModal } from "@/app/components/modals/LevelUpModal";
@@ -40,13 +37,14 @@ const AttemptActivityPage = () => {
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [backModal, setBackModal] = useState({
+  const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
     text: "Apakah anda yakin ingin kembali? Semua progres akan tetap disimpan.",
   });
 
-  const [submitModal, setSubmitModal] = useState({
+  const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
+    text: "Apakah anda yakin ingin mengumpulkan aktivitas ini? Mohon dikoreksi kembali.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -109,13 +107,13 @@ const AttemptActivityPage = () => {
   if (!activityData) return <Loading />;
 
   const handleOpenBackConfirmation = () => {
-    setBackModal((prev) => ({ ...prev, visible: true }));
+    setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = async () => {
     if (!user || !activityData) return;
 
-    setBackModal((prev) => ({ ...prev, visible: false }));
+    setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
 
     // Cek apakah user sudah menjawab minimal 1 soal
     const hasAnswered = Object.values(answers).some(
@@ -203,11 +201,13 @@ const AttemptActivityPage = () => {
   };
 
   const handleOpenSubmitConfirmation = () => {
-    setSubmitModal({ visible: true });
+    setSubmitConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleSubmitConfirmation = async () => {
-    if (!user) return;
+    if (!user || !activityData) return;
+
+    setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }));
 
     const totalQuestions = activityData.questions.length;
     const answeredCount = Object.values(answers).filter(
@@ -309,6 +309,8 @@ const AttemptActivityPage = () => {
   const handleMessageModalConfirmation = () => {
     setMessageModal((prev) => ({ ...prev, visible: false }));
 
+    if (!messageModal.isSuccess) return;
+
     if (messageModal.type === "submit") {
       router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
     } else if (messageModal.type === "back") {
@@ -318,7 +320,7 @@ const AttemptActivityPage = () => {
 
   const handleLevelUpModalConfirmation = () => {
     setLevelUpModal((prev) => ({ ...prev, visible: false }));
-    // router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
+    router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
   };
 
   const currentQuestion = activityData.questions[selectedQuestionIndex];
@@ -357,17 +359,24 @@ const AttemptActivityPage = () => {
           }
         />
 
-        <BackConfirmationModal
-          visible={backModal.visible}
-          text={backModal.text}
+        <ConfirmationModal
+          visible={backConfirmationModal.visible}
+          text={backConfirmationModal.text}
+          type="back"
           onConfirm={handleBackConfirmation}
-          onCancel={() => setBackModal((prev) => ({ ...prev, visible: false }))}
+          onCancel={() =>
+            setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+          }
         />
 
-        <SubmitConfirmationModal
-          visible={submitModal.visible}
+        <ConfirmationModal
+          visible={submitConfirmationModal.visible}
+          text={submitConfirmationModal.text}
+          type="submit"
           onConfirm={handleSubmitConfirmation}
-          onCancel={() => setSubmitModal({ visible: false })}
+          onCancel={() =>
+            setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
+          }
         />
 
         <MessageModal

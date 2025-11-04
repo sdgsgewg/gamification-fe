@@ -49,6 +49,7 @@ export interface TaskAttemptDetailResponse {
   type: string;
   grade: string;
   questionCount: number;
+  answeredCount: number;
   startTime?: Date;
   endTime?: Date;
   duration?: string;

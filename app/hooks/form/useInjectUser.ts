@@ -1,6 +1,6 @@
-import { auth } from "@/app/functions/AuthProvider";
 import { useEffect } from "react";
 import { Path, PathValue, UseFormSetValue } from "react-hook-form";
+import { useAuth } from "../useAuth";
 
 /**
  * Inject default creatorId / createdBy ke form (untuk create)
@@ -11,8 +11,10 @@ export function useInjectUser<
   setValue: UseFormSetValue<T>,
   fields: Array<keyof T> = ["creatorId", "createdBy"]
 ) {
+  const { getCachedUserProfile } = useAuth();
+
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
+    const user = getCachedUserProfile();
     if (user) {
       if (fields.includes("creatorId") && "userId" in user) {
         setValue("creatorId" as Path<T>, user.userId as PathValue<T, Path<T>>);

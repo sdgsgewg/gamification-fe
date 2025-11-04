@@ -100,12 +100,25 @@ const HistoryDetailPage = () => {
   const BottomContent = () => {
     const [view, setView] = useState<BottomContentView>("stats");
 
+    const { progress } = attemptDetailData;
+    const isCompleted = !!progress?.completedAt; // true kalau sudah selesai
+
+    // Buat daftar tab dinamis
     const tabs: { key: BottomContentView; label: string }[] = [
-      { key: "stats", label: "Statistik" },
-      { key: "duration", label: "Durasi" },
-      { key: "progress", label: "Progres" },
-      { key: "questions", label: "Daftar Soal" },
+      ...(isCompleted ? [{ key: "stats" as const, label: "Statistik" }] : []),
+      { key: "duration" as const, label: "Durasi" },
+      { key: "progress" as const, label: "Progres" },
+      ...(isCompleted
+        ? [{ key: "questions" as const, label: "Daftar Soal" }]
+        : []),
     ];
+
+    // Jika view aktif tidak tersedia lagi (misal user di stats tapi belum completed), fallback ke "progress"
+    useEffect(() => {
+      if (!isCompleted && (view === "stats" || view === "questions")) {
+        setView("progress");
+      }
+    }, [isCompleted, view]);
 
     const StatsView = () => {
       const { pointGained, totalPoints, xpGained, score } =
@@ -115,10 +128,10 @@ const HistoryDetailPage = () => {
         <DetailInformationTable>
           <NumberRow
             label="Jumlah Poin"
-            value={`${pointGained}/${totalPoints}`}
+            value={pointGained ? `${pointGained}/${totalPoints}` : "-"}
           />
           <NumberRow label="Jumlah XP" value={xpGained} />
-          <NumberRow label="Nilai" value={score} />
+          <NumberRow label="Nilai" value={pointGained ? score : "-"} />
         </DetailInformationTable>
       );
     };

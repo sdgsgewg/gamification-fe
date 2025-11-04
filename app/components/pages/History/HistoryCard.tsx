@@ -12,6 +12,7 @@ import {
   ActivityAttemptStatus,
   ActivityAttemptStatusLabels,
 } from "@/app/enums/ActivityAttemptStatus";
+import { IMAGES } from "@/app/constants/images";
 
 interface HistoryCardProps {
   attempt: TaskAttemptOverviewResponse;
@@ -27,12 +28,12 @@ const HistoryCard = ({ attempt }: HistoryCardProps) => {
 
   return (
     <div
-      className={`bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
+      className={`h-24 sm:h-28 xl:h-32 bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
       onClick={navigateToHistoryDetailPage}
     >
-      <div className="w-[12%]">
+      <div className="w-[15%] md:w-[12%] xl:w-[8%]">
         <Image
-          src={image ?? ""}
+          src={image ?? IMAGES.ACTIVITY}
           alt={title}
           width={200}
           height={200}
@@ -44,14 +45,14 @@ const HistoryCard = ({ attempt }: HistoryCardProps) => {
           <h4 className="text-lg font-bold text-start">{title}</h4>
           <p className="text-dark text-sm font-medium">
             {completedTime
-              ? `Terakhir diakses: ${lastAccessedTime}`
-              : `Dikumpul pada: ${completedTime}`}
+              ? `Dikumpul pada: ${completedTime}`
+              : `Terakhir diakses: ${lastAccessedTime}`}
           </p>
         </div>
         <div className="flex items-start justify-start">
           <Tag color={completedTime ? "green" : "yellow"} className="!m-0">
             <FontAwesomeIcon icon={completedTime ? faCheck : faClock} />
-            <span>
+            <span className="ms-1">
               {ActivityAttemptStatusLabels[status as ActivityAttemptStatus]}
             </span>
           </Tag>

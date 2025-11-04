@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { FilterActivityFormInputs } from "@/app/schemas/activities/filterActivity";
 import { activityProvider } from "@/app/functions/ActivityProvider";
-import { ActivityOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
+import { ActivityOverviewResponse } from "@/app/interface/activities/responses/IActivityOverviewResponse";
 
 export const useActivities = (values?: FilterActivityFormInputs) => {
   return useQuery({

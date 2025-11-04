@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useState, forwardRef, useImperativeHandle } from "react";
+import {
+  useMemo,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
 import { Form } from "antd";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,11 +32,13 @@ import { useIsDesktop } from "@/app/hooks/useIsDesktop";
 type UIState = "activity-header" | "filter-modal";
 
 interface FilterActivityFormProps {
+  formId: string;
   subjectData: SubjectOverviewResponse[];
   materialData: MaterialOverviewResponse[];
   taskTypeData: TaskTypeOverviewResponse[];
   gradeData: GradeOverviewResponse[];
   fromUI: UIState;
+  filterValue: FilterActivityFormInputs;
   onOpenFilter: () => void;
   onFinish: (values: FilterActivityFormInputs) => void;
 }
@@ -38,11 +46,13 @@ interface FilterActivityFormProps {
 const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
   (
     {
+      formId,
       subjectData,
       materialData,
       taskTypeData,
       gradeData,
       fromUI,
+      filterValue,
       onOpenFilter,
       onFinish,
     },
@@ -51,8 +61,14 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
     const { control, handleSubmit, resetField, reset } =
       useForm<FilterActivityFormInputs>({
         resolver: zodResolver(filterActivitySchema),
-        defaultValues: filterActivityDefaultValues,
+        defaultValues: filterValue ?? filterActivityDefaultValues,
       });
+
+    useEffect(() => {
+      if (filterValue) {
+        reset(filterValue); // sync form values dengan filterValue dari parent
+      }
+    }, [filterValue, reset]);
 
     const selectedSubjectId = useWatch({ control, name: "subjectId" });
     const [filtertedMaterials, setFiltertedMaterials] = useState<
@@ -199,6 +215,11 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
             placeholder="Materi pelajaran"
             options={materialOptions}
             disabled={materialOptions.length === 0}
+            helpText={
+              selectedSubjectId !== "" && materialOptions.length === 0
+                ? "Belum ada materi yang tersedia untuk mata pelajaran ini."
+                : undefined
+            }
           />
 
           <SelectField
@@ -227,8 +248,8 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
 
     return (
       <Form
-        id="filter-activity-form"
-        name="filter-activity"
+        id={formId}
+        name={formId}
         onFinish={handleSubmit(onFinish)}
         layout={`${fromUI === "activity-header" ? "horizontal" : "vertical"}`}
         className={`${

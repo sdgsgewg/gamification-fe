@@ -1,10 +1,25 @@
 import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
 
+interface TaskType {
+  name: string;
+  isRepeatable: boolean;
+}
+
+interface Attempt {
+  answeredCount?: number;
+}
+
 interface TaskAttemptStats {
   pointGained: number;
   totalPoints: number;
   xpGained: number;
   score: number;
+}
+
+interface TaskDuration {
+  startTime?: Date;
+  endTime?: Date;
+  duration?: string;
 }
 
 interface TaskAttemptProgress {
@@ -42,19 +57,18 @@ export interface Question {
 
 export interface TaskAttemptDetailResponse {
   title: string;
+  slug: string;
   image?: string;
   description: string;
   subject: string;
   material: string;
-  type: string;
   grade: string;
   questionCount: number;
-  answeredCount: number;
-  startTime?: Date;
-  endTime?: Date;
-  duration?: string;
   createdBy: string;
+  type: TaskType;
+  attempt?: Attempt;
   stats: TaskAttemptStats;
+  duration?: TaskDuration;
   progress: TaskAttemptProgress;
   questions: Question[];
 }

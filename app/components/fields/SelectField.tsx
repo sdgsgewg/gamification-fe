@@ -19,6 +19,7 @@ interface SelectFieldProps {
   size?: "small" | "middle" | "large";
   options: Option[];
   errors?: Record<string, any>;
+  helpText?: string;
   loading?: boolean;
   disabled?: boolean;
   mode?: "multiple" | "tags";
@@ -35,6 +36,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   size = "large",
   options,
   errors,
+  helpText,
   loading = false,
   disabled = false,
   mode = undefined, // Default to single select
@@ -48,7 +50,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
     <Form.Item
       label={label && <Label label={label} required={required} />}
       validateStatus={error ? "error" : ""}
-      help={error?.message}
+      help={error?.message ?? helpText}
       style={{ marginBottom: error ? "1rem" : "0rem" }}
       required={required}
     >

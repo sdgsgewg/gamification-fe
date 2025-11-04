@@ -114,7 +114,7 @@ const ActivityQuestionCard = ({
 
       <p className="text-dark text-base mb-4">{question.text}</p>
 
-      {/* === PILIHAN GANDA / TRUE-FALSE === */}
+      {/* === PILIHAN GANDA === */}
       {question.type === "multiple_choice" && question.options && (
         <div className="flex flex-col gap-3 mt-3">
           {question.options.map((opt, optIndex) => {
@@ -166,7 +166,7 @@ const ActivityQuestionCard = ({
                 className={`transition-all duration-300 ${bgColor} ${borderColor} border rounded-lg px-4 py-2 flex justify-between items-center shadow-sm`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-dark">
+                  <span className="bg-secondary font-semibold text-dark py-1 px-3 rounded-full">
                     {optionLabel}.
                   </span>
                   <span
@@ -184,6 +184,7 @@ const ActivityQuestionCard = ({
         </div>
       )}
 
+      {/* === TRUE OR FALSE === */}
       {question.type === "true_false" && question.options && (
         <div className="flex flex-col gap-3 mt-3">
           {question.options.map((opt) => {

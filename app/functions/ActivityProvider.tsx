@@ -27,6 +27,7 @@ export const activityProvider = {
       }
 
       const url = query.toString() ? `${API_URL}?${query}` : API_URL;
+
       const data = await getAxios(url);
 
       return { isSuccess: true, data };
@@ -63,7 +64,7 @@ export const activityProvider = {
     try {
       const data = await getAxios(`${API_URL}/summary/${slug}`);
 
-      console.log ("Summary Data: ", JSON.stringify(data, null, 2));
+      console.log("Summary Data: ", JSON.stringify(data, null, 2));
 
       return { isSuccess: true, data };
     } catch (error) {

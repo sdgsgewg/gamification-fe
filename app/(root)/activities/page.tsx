@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import {
   filterActivityDefaultValues,
@@ -23,6 +24,7 @@ import {
 } from "@/app/enums/ActivitySectionType";
 
 const ActivityPage = () => {
+  const searchParams = useSearchParams();
   const { user } = useGetCachedUser();
 
   const [filters, setFilters] = useState<FilterActivityFormInputs>(
@@ -62,8 +64,21 @@ const ActivityPage = () => {
   const { data: taskTypeData = [] } = useTaskTypes();
   const { data: gradeData = [] } = useGrades();
 
-  const formRef = useRef<FormRef>(null);
+  const headerFormRef = useRef<FormRef>(null);
+  const modalFormRef = useRef<FormRef>(null);
 
+  useEffect(() => {
+    const subjectId = searchParams.get("subjectId");
+
+    if (subjectId) {
+      setFilters((prev) => ({
+        ...prev,
+        subjectId: subjectId,
+      }));
+    }
+  }, [searchParams]);
+
+  // Penanda apakah terdapat filter yang berubah atau tidak
   const isDefaultFilter = (filters: FilterActivityFormInputs) => {
     const defaultKeys = Object.keys(filterActivityDefaultValues);
     return defaultKeys.every((key) => {
@@ -78,6 +93,7 @@ const ActivityPage = () => {
     });
   };
 
+  // Penanda page default (tampil beberapa sections)
   const isDefault = isDefaultFilter(filters);
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
@@ -89,6 +105,12 @@ const ActivityPage = () => {
       ...values, // gabungkan filter baru dengan search text
     }));
     setIsFilterModalVisible(false);
+  };
+
+  const handleResetFilters = () => {
+    headerFormRef.current?.resetForm?.();
+    modalFormRef.current?.resetForm?.();
+    setFilters(filterActivityDefaultValues);
   };
 
   const isLoading =
@@ -103,18 +125,18 @@ const ActivityPage = () => {
       {isLoading && <Loading />}
 
       <ActivityHeader
-        formId="filter-activity-form"
-        onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm();
-        }}
+        formId="filter-activity-header-form"
+        onResetFilters={handleResetFilters}
       >
         <FilterActivityForm
-          ref={formRef}
+          formId="filter-activity-header-form"
+          ref={headerFormRef}
           subjectData={subjectData}
           materialData={materialData}
           taskTypeData={taskTypeData}
           gradeData={gradeData}
           fromUI="activity-header"
+          filterValue={filters}
           onOpenFilter={handleOpenFilter}
           onFinish={handleApplyFilter}
         />
@@ -170,19 +192,19 @@ const ActivityPage = () => {
       <FilterModal
         visible={isFilterModalVisible}
         title="Filter Aktivitas"
-        formId="filter-activity-form"
+        formId="filter-activity-modal-form"
         onCancel={handleCloseFilter}
-        onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm();
-        }}
+        onResetFilters={handleResetFilters}
       >
         <FilterActivityForm
-          ref={formRef}
+          formId="filter-activity-modal-form"
+          ref={modalFormRef}
           subjectData={subjectData}
           materialData={materialData}
           taskTypeData={taskTypeData}
           gradeData={gradeData}
           fromUI="filter-modal"
+          filterValue={filters}
           onOpenFilter={handleOpenFilter}
           onFinish={handleApplyFilter}
         />

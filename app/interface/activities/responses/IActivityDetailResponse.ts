@@ -1,10 +1,28 @@
 import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
 
-export interface ActivityAttempt {
-  answeredCount?: number;
-  startedAt?: string | null;
-  lastAccessedAt?: string | null;
-  status?: ActivityAttemptStatus;
+interface ActivityType {
+  name: string;
+  isRepeatable: boolean;
+}
+
+interface CurrentAttempt {
+  answeredCount: number;
+  startedAt: string;
+  lastAccessedAt: string;
+  status: ActivityAttemptStatus;
+}
+
+interface RecentAttempt {
+  startedAt: string;
+  lastAccessedAt: string;
+  completedAt: string;
+  status: ActivityAttemptStatus;
+}
+
+interface ActivityDuration {
+  startTime?: Date;
+  endTime?: Date;
+  duration?: string;
 }
 
 export interface ActivityDetailResponse {
@@ -13,14 +31,13 @@ export interface ActivityDetailResponse {
   slug: string;
   description?: string;
   image?: string;
-  subject: { subjectId: string; name: string };
-  material?: { materialId: string; name: string };
-  type: { taskTypeId: string; name: string };
+  subject: { id: string; name: string };
+  material?: { id: string; name: string };
   grade: string;
   questionCount: number;
-  startTime?: Date;
-  endTime?: Date;
-  duration?: string;
   createdBy: string;
-  attempt?: ActivityAttempt;
+  type: ActivityType;
+  currAttempt?: CurrentAttempt;
+  recentAttempt?: RecentAttempt;
+  duration?: ActivityDuration;
 }

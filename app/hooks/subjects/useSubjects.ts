@@ -8,6 +8,7 @@ export const useSubjects = (searchText?: string) => {
     queryKey: ["subjects", searchText],
     queryFn: async () => {
       const res = await subjectProvider.getSubjects({ searchText });
+
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: SubjectOverviewResponse[]) =>

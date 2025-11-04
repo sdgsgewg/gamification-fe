@@ -163,7 +163,7 @@ const ActivitySection: React.FC<ActivitySectionProps> = ({
 
   const FilterView = () => {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-8 lg:gap-y-12 gap-x-0 sm:gap-x-8 md:gap-x-12">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-8 lg:gap-y-12 gap-x-0 xs:gap-x-4 sm:gap-x-8 md:gap-x-12">
         {activities.map((activity) => (
           <ActivityCard
             key={activity.id}

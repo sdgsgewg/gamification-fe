@@ -67,26 +67,61 @@ const ActivityQuestionCard = ({
 
       <p className="text-dark text-base mb-2">{question.text}</p>
 
-      {(question.type === "multiple_choice" ||
-        question.type === "true_false") &&
-        question.options && (
-          <div className="flex flex-col gap-3 mt-3">
-            {question.options.map((opt) => (
+      {/* === PILIHAN GANDA === */}
+      {question.type === "multiple_choice" && question.options && (
+        <div className="flex flex-col gap-3 mt-3">
+          {question.options.map((opt, optIndex) => {
+            // Label opsi: A, B, C, D, E...
+            const optionLabel = String.fromCharCode(65 + optIndex);
+
+            return (
               <button
                 key={opt.optionId}
                 onClick={() => onOptionSelect?.(opt.optionId)}
-                className={`bg-surface w-full text-left px-4 py-2 rounded-lg border ${
+                className={`bg-surface w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg border ${
                   selectedOptionId === opt.optionId
-                    ? "border-primary bg-blue-50"
+                    ? "border-primary !bg-tertiary"
                     : "border-light-accent hover:bg-light-emphasis"
                 } cursor-pointer`}
               >
-                <span className="text-dark">{opt.text}</span>
+                <span className="bg-secondary font-semibold text-dark py-1 px-3 rounded-full">
+                  {optionLabel}
+                </span>
+                <span
+                  className={`text-dark ${
+                    selectedOptionId === opt.optionId
+                      ? "font-semibold"
+                      : "font-normal"
+                  }`}
+                >
+                  {opt.text}
+                </span>
               </button>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
+      )}
 
+      {/* === TRUE OR FALSE === */}
+      {question.type === "true_false" && question.options && (
+        <div className="flex flex-col gap-3 mt-3">
+          {question.options.map((opt) => (
+            <button
+              key={opt.optionId}
+              onClick={() => onOptionSelect?.(opt.optionId)}
+              className={`bg-surface w-full text-left px-4 py-2 rounded-lg border ${
+                selectedOptionId === opt.optionId
+                  ? "border-primary !bg-blue-100"
+                  : "border-light-accent hover:bg-light-emphasis"
+              } cursor-pointer`}
+            >
+              <span className="text-dark">{opt.text}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* === ISIAN / ESSAY === */}
       {(question.type === "fill_blank" || question.type === "essay") && (
         <Input.TextArea
           rows={4}

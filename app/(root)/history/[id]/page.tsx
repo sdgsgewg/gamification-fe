@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTaskAttemptDetail } from "@/app/hooks/task-attempts/useTaskAttemptDetail";
 import Loading from "@/app/components/shared/Loading";
 import PageLayout from "@/app/(root)/page-layout";
@@ -27,11 +27,16 @@ import {
   ActivityAttemptStatusLabels,
 } from "@/app/enums/ActivityAttemptStatus";
 import Button from "@/app/components/shared/Button";
+import StatusBar from "@/app/components/shared/StatusBar";
+import { ROUTES } from "@/app/constants/routes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 type BottomContentView = "stats" | "duration" | "progress" | "questions";
 
 const HistoryDetailPage = () => {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
 
   const { data: attemptDetailData, isLoading: isattemptDetailDataLoading } =
     useTaskAttemptDetail(params.id);
@@ -67,10 +72,33 @@ const HistoryDetailPage = () => {
     setAnswers(prefilledAnswers);
   }, [attemptDetailData]);
 
+  const handleNavigateToActivityAttemptPage = () => {
+    router.push(`${ROUTES.ROOT.ACTIVITYATTEMPT}/${attemptDetailData?.slug}`);
+  };
+
   if (!attemptDetailData) return <Loading />;
 
   const LeftSideContent = () => {
-    const { title, image, description } = attemptDetailData;
+    const {
+      title,
+      image,
+      description,
+      questionCount,
+      type,
+      attempt,
+      progress,
+    } = attemptDetailData;
+
+    const answeredCount = attempt?.answeredCount ?? 0;
+    const lastAccessedAt = progress?.lastAccessedAt ?? null;
+    const status = progress.status;
+
+    const buttonText =
+      status === ActivityAttemptStatus.ON_PROGRESS
+        ? "Lanjutkan"
+        : type.isRepeatable
+        ? "Kerja Ulang"
+        : "Mulai";
 
     return (
       <>
@@ -79,6 +107,28 @@ const HistoryDetailPage = () => {
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
+
+        {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
+        {lastAccessedAt && answeredCount && answeredCount < questionCount && (
+          <StatusBar
+            current={answeredCount}
+            total={questionCount}
+            labelClassName="text-base font-medium"
+            bgClassName="bg-white"
+            height={"h-6"}
+          />
+        )}
+
+        <Button
+          type="primary"
+          size="large"
+          variant="primary"
+          className="!py-4 !px-6 !rounded-[1.5rem]"
+          onClick={handleNavigateToActivityAttemptPage}
+        >
+          <FontAwesomeIcon icon={faPlay} />
+          <span className="text-base font-semibold ms-3">{buttonText}</span>
+        </Button>
       </>
     );
   };
@@ -90,7 +140,7 @@ const HistoryDetailPage = () => {
       <DetailInformationTable>
         <SubjectRow value={subject} />
         <MaterialRow value={material ?? ""} />
-        <TaskTypeRow value={type} />
+        <TaskTypeRow value={type.name} />
         <NumberRow label="Jumlah Soal" value={questionCount} />
         <GradeRow value={grade} />
       </DetailInformationTable>
@@ -100,7 +150,7 @@ const HistoryDetailPage = () => {
   const BottomContent = () => {
     const [view, setView] = useState<BottomContentView>("stats");
 
-    const { progress } = attemptDetailData;
+    const { duration, progress } = attemptDetailData;
     const isCompleted = !!progress?.completedAt; // true kalau sudah selesai
 
     // Buat daftar tab dinamis
@@ -137,13 +187,15 @@ const HistoryDetailPage = () => {
     };
 
     const DurationView = () => {
-      const { startTime, endTime, duration } = attemptDetailData;
+      if (!duration) return;
+
+      const { startTime, endTime, duration: taskDuration } = duration;
 
       return (
         <DurationTable
           startTime={getDateTime(startTime ?? null)}
           endTime={getDateTime(endTime ?? null)}
-          duration={duration}
+          duration={taskDuration}
         />
       );
     };

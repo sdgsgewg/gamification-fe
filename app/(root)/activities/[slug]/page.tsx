@@ -43,8 +43,8 @@ const ActivityDetailPage = () => {
     data: similarActivities = [],
     isLoading: isSimilarActivitiesLoading,
   } = useActivities({
-    subjectId: activityData?.subject.subjectId,
-    materialId: activityData?.material?.materialId,
+    subjectId: activityData?.subject.id,
+    materialId: activityData?.material?.id,
   });
   const filteredSimilarActivities = similarActivities.filter(
     (activity) => activity.slug !== params.slug
@@ -59,19 +59,32 @@ const ActivityDetailPage = () => {
   }
 
   const LeftSideContent = () => {
-    const { title, image, description, questionCount, attempt } = activityData;
+    const {
+      title,
+      image,
+      description,
+      questionCount,
+      type,
+      currAttempt,
+      recentAttempt,
+    } = activityData;
 
-    if (!attempt) {
-      return (
-        <DetailPageLeftSideContent
-          name={title}
-          image={image !== "" ? image : IMAGES.ACTIVITY}
-          description={description}
-        />
-      );
+    // === Tentukan teks & visibilitas tombol ===
+    let buttonLabel: string | null = null;
+
+    if (currAttempt) {
+      buttonLabel = "Lanjutkan";
+    } else if (recentAttempt) {
+      if (type.isRepeatable) {
+        buttonLabel = "Kerja Ulang";
+      } else {
+        buttonLabel = null; // Tidak render tombol
+      }
+    } else {
+      buttonLabel = "Mulai";
     }
 
-    const { lastAccessedAt, answeredCount } = attempt;
+    const shouldShowButton = buttonLabel !== null;
 
     return (
       <>
@@ -82,9 +95,9 @@ const ActivityDetailPage = () => {
         />
 
         {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
-        {lastAccessedAt && answeredCount && answeredCount < questionCount && (
+        {currAttempt && (
           <StatusBar
-            current={answeredCount}
+            current={currAttempt.answeredCount}
             total={questionCount}
             labelClassName="text-base font-medium"
             bgClassName="bg-white"
@@ -92,20 +105,19 @@ const ActivityDetailPage = () => {
           />
         )}
 
-        <Button
-          type="primary"
-          size="large"
-          variant="primary"
-          className="!py-4 !px-6 !rounded-[1.5rem]"
-          onClick={handleNavigateToActivityAttemptPage}
-        >
-          <FontAwesomeIcon icon={faPlay} />
-          <span className="text-base font-semibold ms-3">
-            {lastAccessedAt && answeredCount && answeredCount < questionCount
-              ? "Lanjutkan"
-              : "Mulai"}
-          </span>
-        </Button>
+        {/* Tombol hanya muncul jika sesuai kondisi */}
+        {shouldShowButton && (
+          <Button
+            type="primary"
+            size="large"
+            variant="primary"
+            className="!py-4 !px-6 !rounded-[1.5rem]"
+            onClick={handleNavigateToActivityAttemptPage}
+          >
+            <FontAwesomeIcon icon={faPlay} />
+            <span className="text-base font-semibold ms-3">{buttonLabel}</span>
+          </Button>
+        )}
       </>
     );
   };
@@ -117,18 +129,35 @@ const ActivityDetailPage = () => {
       type,
       questionCount,
       grade,
-      startTime,
-      endTime,
+      currAttempt,
+      recentAttempt,
       duration,
-      attempt,
     } = activityData;
 
-    if (!attempt) return;
+    // duration
+    const startTime = duration?.startTime ?? null;
+    const endTime = duration?.endTime ?? null;
+    const activityDuration = duration?.duration ?? undefined;
 
-    const { startedAt, lastAccessedAt, status } = attempt;
-
-    const statusLabel =
-      ActivityAttemptStatusLabels[status as ActivityAttemptStatus] ?? "";
+    // progress
+    const startedAt = currAttempt
+      ? currAttempt.startedAt
+      : recentAttempt
+      ? recentAttempt.startedAt
+      : null;
+    const lastAccessedAt = currAttempt
+      ? currAttempt.lastAccessedAt
+      : recentAttempt
+      ? recentAttempt.lastAccessedAt
+      : null;
+    const completedAt = recentAttempt ? recentAttempt.completedAt : null;
+    const statusLabel = currAttempt
+      ? ActivityAttemptStatusLabels[currAttempt.status as ActivityAttemptStatus]
+      : recentAttempt
+      ? ActivityAttemptStatusLabels[
+          recentAttempt.status as ActivityAttemptStatus
+        ]
+      : "";
 
     return (
       <>
@@ -142,24 +171,23 @@ const ActivityDetailPage = () => {
         </DetailInformationTable>
 
         {/* Waktu Pengerjaan */}
-        {(startTime || endTime || duration) && (
+        {(startTime || endTime || activityDuration) && (
           <DurationTable
             startTime={getDateTime(startTime ?? null)}
             endTime={getDateTime(endTime ?? null)}
-            duration={duration}
+            duration={activityDuration}
           />
         )}
 
         {/* Progres Pengerjaan */}
-        {startedAt &&
-          lastAccessedAt &&
-          statusLabel !== ActivityAttemptStatusLabels["completed"] && (
-            <ProgressTable
-              startedAt={startedAt}
-              lastAccessedAt={lastAccessedAt}
-              status={statusLabel}
-            />
-          )}
+        {(currAttempt || recentAttempt) && (
+          <ProgressTable
+            startedAt={startedAt}
+            lastAccessedAt={lastAccessedAt}
+            completedAt={completedAt}
+            status={statusLabel}
+          />
+        )}
       </>
     );
   };

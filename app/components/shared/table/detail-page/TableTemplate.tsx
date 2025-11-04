@@ -77,10 +77,10 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
 };
 
 interface ProgressTableProps {
-  startedAt: string;
-  lastAccessedAt: string;
-  completedAt?: string;
-  status?: string;
+  startedAt: string | null;
+  lastAccessedAt: string | null;
+  completedAt?: string | null;
+  status: string;
 }
 
 export const ProgressTable = ({

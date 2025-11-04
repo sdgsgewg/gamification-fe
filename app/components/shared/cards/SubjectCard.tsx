@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "@/app/constants/routes";
 import { useSafeSectionContext } from "@/app/hooks/useSafeSectionContext";
+import { IMAGES } from "@/app/constants/images";
 
 type FromPage = "home" | "subjects";
 
@@ -18,7 +19,7 @@ interface SubjectCardProps {
 }
 
 const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
-  const { image, name, activityCount } = subject;
+  const { subjectId, image, name, activityCount } = subject;
   const router = useRouter();
 
   const { isOdd } = useSafeSectionContext();
@@ -28,7 +29,9 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
   const bgColor = fromPage === "home" ? homePageBgColor : subjectPageBgColor;
 
   const navigateToActivityPage = () => {
-    router.push(ROUTES.ROOT.SUBJECTS);
+    router.push(
+      `${ROUTES.ROOT.ACTIVITY}?subjectId=${encodeURIComponent(subjectId)}`
+    );
   };
 
   return (
@@ -38,7 +41,12 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
       } flex flex-col items-start justify-start rounded-xl shadow-sm p-6`}
     >
       <div className="w-full mb-2">
-        <Image src={image ?? ""} alt={name} width={64} height={64} />
+        <Image
+          src={image ?? IMAGES.DEFAULT_IMAGE}
+          alt={name}
+          width={64}
+          height={64}
+        />
       </div>
       <h4 className="text-xl font-bold text-start mb-1">{name}</h4>
       <p className="text-dark text-sm font-medium mb-6">{`${activityCount} Aktivitas Tersedia`}</p>

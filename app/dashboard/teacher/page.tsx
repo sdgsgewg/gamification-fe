@@ -1,61 +1,162 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
-import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import {
+  FaBookOpen,
+  FaClipboardList,
+  FaTrophy,
+  FaPlusCircle,
+} from "react-icons/fa";
 
-const TeacherDashboardPage = () => {
-  const { user } = useGetCachedUser();
+interface DashboardCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  buttonLabel: string;
+}
 
-  const classes = [
-    { name: "XII IPA 1", slug: "xii-ipa-1" },
-    { name: "XII IPA 2", slug: "xii-ipa-2" },
-    { name: "XII IPS 1", slug: "xii-ips-1" },
+const Card: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    className="p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200"
+    style={{
+      backgroundColor: "var(--color-card)",
+      borderColor: "var(--border-tertiary)",
+    }}
+  >
+    {children}
+  </div>
+);
+
+const Button: React.FC<{ label: string }> = ({ label }) => (
+  <button
+    className="w-full py-2 px-4 font-medium rounded-xl transition-all duration-200"
+    style={{
+      backgroundColor: "var(--color-primary)",
+      color: "white",
+    }}
+    onMouseEnter={(e) =>
+      ((e.target as HTMLButtonElement).style.backgroundColor =
+        "var(--color-primary-hover)")
+    }
+    onMouseLeave={(e) =>
+      ((e.target as HTMLButtonElement).style.backgroundColor =
+        "var(--color-primary)")
+    }
+  >
+    {label}
+  </button>
+);
+
+const MainDashboardTeacher: React.FC = () => {
+  const dashboardCards: DashboardCardProps[] = [
+    {
+      title: "Manage Classes",
+      description: "View, organize, and edit your teaching classes.",
+      icon: <FaBookOpen className="w-8 h-8" style={{ color: "var(--color-primary)" }} />,
+      buttonLabel: "Go to Classes",
+    },
+    {
+      title: "Review Tasks",
+      description: "Check student submissions and provide feedback.",
+      icon: (
+        <FaClipboardList
+          className="w-8 h-8"
+          style={{ color: "var(--color-warning)" }}
+        />
+      ),
+      buttonLabel: "Review Now",
+    },
+    {
+      title: "Leaderboard",
+      description: "Monitor student performance and rankings.",
+      icon: <FaTrophy className="w-8 h-8" style={{ color: "var(--color-success)" }} />,
+      buttonLabel: "View Leaderboard",
+    },
+    {
+      title: "Create New Task",
+      description: "Add assignments and challenges for your students.",
+      icon: (
+        <FaPlusCircle
+          className="w-8 h-8"
+          style={{ color: "var(--color-activity-type)" }}
+        />
+      ),
+      buttonLabel: "Create Task",
+    },
   ];
 
   return (
-    <div className="p-6">
-      <DashboardTitle title="Kelas Saya (Guru)" showBackButton={false} />
-
-      <div className="mb-6 text-sm text-gray-600">
-        Mengajar sebagai{" "}
-        <span className="font-semibold text-black">{user?.name ?? "Guru"}</span>
-      </div>
-
-      <div className="flex items-center gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Cari kelas atau siswa..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        />
-        <button className="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
-          🔍
-        </button>
-        <Link
-          href="/dashboard/classes/create"
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+    <div
+      className="flex flex-col w-full min-h-screen p-8 transition-colors duration-300"
+      style={{ backgroundColor: "var(--background)", color: "var(--text-primary)" }}
+    >
+      {/* Header */}
+      <div className="mb-8">
+        <h1
+          className="text-3xl font-bold mb-1"
+          style={{ color: "var(--text-primary)" }}
         >
-          + Buat Kelas
-        </Link>
+          Welcome Back, Teacher 👋
+        </h1>
+        <p className="text-base" style={{ color: "var(--text-tertiary)" }}>
+          Manage your classes, track progress, and engage with your students.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {classes.map(({ name, slug }) => (
-          <Link
-            key={slug}
-            href={`/dashboard/class/${slug}`}
-            className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col items-center shadow hover:shadow-md transition"
-          >
-            <div className="w-16 h-16 mb-4 bg-indigo-100 flex items-center justify-center rounded-lg">
-              🧑‍🏫
+      {/* Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {dashboardCards.map((card, index) => (
+          <Card key={index}>
+            <div className="flex flex-col items-center text-center">
+              <div
+                className="flex items-center justify-center w-16 h-16 rounded-full mb-4"
+                style={{
+                  backgroundColor: "var(--color-tertiary)",
+                }}
+              >
+                {card.icon}
+              </div>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {card.title}
+              </h3>
+              <p
+                className="text-sm mt-2 mb-4"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                {card.description}
+              </p>
+              <Button label={card.buttonLabel} />
             </div>
-            <p className="font-semibold text-center text-black">{name}</p>
-          </Link>
+          </Card>
         ))}
+      </div>
+
+      {/* Optional Section — Recent Submissions */}
+      <div className="mt-12">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: "var(--text-primary-accent)" }}
+        >
+          Recent Submissions
+        </h2>
+        <div
+          className="rounded-2xl p-6 border"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            borderColor: "var(--border-secondary)",
+          }}
+        >
+          <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
+            No recent submissions yet. Once students submit their work, they’ll
+            appear here for review.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default TeacherDashboardPage;
+export default MainDashboardTeacher;

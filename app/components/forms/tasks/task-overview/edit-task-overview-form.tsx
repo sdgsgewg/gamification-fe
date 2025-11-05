@@ -81,18 +81,18 @@ const EditTaskOverviewForm = forwardRef<
     });
 
     const watchedValues = useWatch({ control });
-
     const { getCachedUserProfile } = useAuth();
+
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const selectedSubjectId = useWatch({ control, name: "subjectId" });
-    const [filtertedMaterials, setFiltertedMaterials] = useState<
+    const [filteredMaterials, setFilteredMaterials] = useState<
       MaterialOverviewResponse[]
     >([]);
     const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
 
-    // Gunakan useMemo untuk nilai turunan
+    // Use useMemo for derived values
     const selectedTaskTypeHasDeadline = useMemo(() => {
       if (!selectedTaskTypeId) return undefined;
       const taskType = taskTypeData.find(
@@ -121,11 +121,11 @@ const EditTaskOverviewForm = forwardRef<
 
     const materialOptions = useMemo(
       () =>
-        filtertedMaterials.map((material) => ({
+        filteredMaterials.map((material) => ({
           value: material.materialId,
           label: material.name,
         })),
-      [filtertedMaterials]
+      [filteredMaterials]
     );
 
     const taskTypeOptions = useMemo(
@@ -152,21 +152,21 @@ const EditTaskOverviewForm = forwardRef<
     }));
     useInitializeFileList(taskOverview, setFileList);
 
+    // Detect if form data has been modified
     const isDirty = useMemo(() => {
-      const wv = JSON.stringify(watchedValues);
-      const todv = JSON.stringify({
+      const currentValues = JSON.stringify(watchedValues);
+      const originalValues = JSON.stringify({
         ...taskOverviewDefaultValue,
         updatedBy: getCachedUserProfile()?.name,
       });
 
-      const isTaskOverviewFormDirty = wv !== todv;
-
-      const isTaskQuestionsFormDirty = !isEqual(
+      const isTaskOverviewDirty = currentValues !== originalValues;
+      const isTaskQuestionsDirty = !isEqual(
         taskQuestions,
         taskQuestionsDefaultValue
       );
 
-      return isTaskOverviewFormDirty || isTaskQuestionsFormDirty;
+      return isTaskOverviewDirty || isTaskQuestionsDirty;
     }, [
       watchedValues,
       taskOverviewDefaultValue,
@@ -176,32 +176,26 @@ const EditTaskOverviewForm = forwardRef<
     ]);
 
     useNavigationGuard(isDirty);
+
     useInitializeMaterialBasedOnSelectedSubject(
       selectedSubjectId,
       subjectData,
       materialData,
       resetField,
-      setFiltertedMaterials
+      setFilteredMaterials
     );
     useInitializeFileListBetweenView(taskOverview, fileList, setFileList);
 
-    // Handler untuk perubahan upload
+    // Handle file upload changes
     const handleImageChange = (info: any) => {
-      let fileList = [...info.fileList];
+      let newFileList = [...info.fileList].slice(-1); // only one image allowed
+      setFileList(newFileList);
 
-      // Hanya izinkan satu file
-      fileList = fileList.slice(-1);
-
-      // Update fileList state
-      setFileList(fileList);
-
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        // Set nilai imageFile ke form
-        setValue("imageFile", fileList[0].originFileObj as File, {
+      if (newFileList.length > 0 && newFileList[0].originFileObj) {
+        setValue("imageFile", newFileList[0].originFileObj as File, {
           shouldDirty: true,
         });
       } else {
-        // Jika tidak ada file, set ke null
         setValue("imageFile", null, { shouldDirty: true });
       }
     };
@@ -224,11 +218,10 @@ const EditTaskOverviewForm = forwardRef<
       };
 
       onNext(payload);
-
       setIsLoading(false);
     };
 
-    // Expose ke parent
+    // Expose to parent
     useImperativeHandle(ref, () => ({
       values: watchedValues,
       isDirty,
@@ -251,8 +244,8 @@ const EditTaskOverviewForm = forwardRef<
                 <TextField
                   control={control}
                   name="title"
-                  label="Judul"
-                  placeholder="Masukkan judul tugas"
+                  label="Title"
+                  placeholder="Enter task title"
                   errors={errors}
                   required
                 />
@@ -260,16 +253,16 @@ const EditTaskOverviewForm = forwardRef<
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi tugas"
+                  label="Description"
+                  placeholder="Enter task description"
                   errors={errors}
                 />
 
                 <SelectField
                   control={control}
                   name="subjectId"
-                  label="Mata Pelajaran"
-                  placeholder="Pilih mata pelajaran"
+                  label="Subject"
+                  placeholder="Select subject"
                   options={subjectOptions}
                   errors={errors}
                   loading={subjectOptions.length === 0}
@@ -280,8 +273,8 @@ const EditTaskOverviewForm = forwardRef<
                 <SelectField
                   control={control}
                   name="materialId"
-                  label="Materi Pelajaran"
-                  placeholder="Pilih materi pelajaran"
+                  label="Material"
+                  placeholder="Select material"
                   options={materialOptions}
                   errors={errors}
                   disabled={materialOptions.length === 0}
@@ -290,8 +283,8 @@ const EditTaskOverviewForm = forwardRef<
                 <SelectField
                   control={control}
                   name="taskTypeId"
-                  label="Tipe Tugas"
-                  placeholder="Pilih tipe tugas"
+                  label="Task Type"
+                  placeholder="Select task type"
                   options={taskTypeOptions}
                   errors={errors}
                   loading={taskTypeOptions.length === 0}
@@ -302,8 +295,8 @@ const EditTaskOverviewForm = forwardRef<
                 <SelectField
                   control={control}
                   name="gradeIds"
-                  label="Tingkat Kelas"
-                  placeholder="Pilih tingkat kelas"
+                  label="Grade Levels"
+                  placeholder="Select grade levels"
                   options={gradeOptions}
                   errors={errors}
                   loading={gradeOptions.length === 0}
@@ -314,14 +307,14 @@ const EditTaskOverviewForm = forwardRef<
                 {selectedTaskTypeHasDeadline && (
                   <>
                     <div className="w-full flex flex-col gap-2 mb-0">
-                      <p className="text-base font-medium">Waktu Mulai</p>
+                      <p className="text-base font-medium">Start Time</p>
                       <div className="w-full flex flex-row items-center gap-8">
                         <div className="flex-1">
                           <DateField
                             control={control}
                             name="startDate"
-                            label="Tanggal"
-                            placeholder="Masukkan tanggal"
+                            label="Date"
+                            placeholder="Enter date"
                             errors={errors}
                           />
                         </div>
@@ -329,8 +322,8 @@ const EditTaskOverviewForm = forwardRef<
                           <TimeField
                             control={control}
                             name="startTime"
-                            label="Jam"
-                            placeholder="Masukkan jam"
+                            label="Time"
+                            placeholder="Enter time"
                             errors={errors}
                           />
                         </div>
@@ -338,14 +331,14 @@ const EditTaskOverviewForm = forwardRef<
                     </div>
 
                     <div className="w-full flex flex-col gap-2 mb-0">
-                      <p className="text-base font-medium">Waktu Selesai</p>
+                      <p className="text-base font-medium">End Time</p>
                       <div className="w-full flex flex-row items-center gap-8">
                         <div className="flex-1">
                           <DateField
                             control={control}
                             name="endDate"
-                            label="Tanggal"
-                            placeholder="Masukkan tanggal"
+                            label="Date"
+                            placeholder="Enter date"
                             errors={errors}
                           />
                         </div>
@@ -353,8 +346,8 @@ const EditTaskOverviewForm = forwardRef<
                           <TimeField
                             control={control}
                             name="endTime"
-                            label="Jam"
-                            placeholder="Masukkan jam"
+                            label="Time"
+                            placeholder="Enter time"
                             errors={errors}
                           />
                         </div>
@@ -368,7 +361,7 @@ const EditTaskOverviewForm = forwardRef<
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Gambar"
+                label="Upload Image"
                 fileList={fileList}
                 setFileList={setFileList}
                 onChange={handleImageChange}
@@ -379,7 +372,8 @@ const EditTaskOverviewForm = forwardRef<
             bottom={
               <>
                 <p className="text-sm mb-4">
-                  Jika semua data sudah sesuai, yuk lanjut buat pertanyaannya!
+                  If all the data looks correct, let’s continue to update the
+                  questions!
                 </p>
                 <Button
                   type="primary"
@@ -389,7 +383,7 @@ const EditTaskOverviewForm = forwardRef<
                   className="!px-4"
                 >
                   <span className="text-base font-semibold">
-                    Lanjut Buat Soal
+                    Continue to Edit Questions
                   </span>
                   <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
                 </Button>

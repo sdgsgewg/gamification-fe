@@ -75,23 +75,23 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
     );
     useNavigationGuard(isDirty);
 
-    // Handler untuk perubahan upload
+    // Handler for upload changes
     const handleImageChange = (info: any) => {
       let fileList = [...info.fileList];
 
-      // Hanya izinkan satu file
+      // Only allow one file
       fileList = fileList.slice(-1);
 
       // Update fileList state
       setFileList(fileList);
 
       if (fileList.length > 0 && fileList[0].originFileObj) {
-        // Set nilai imageFile ke form
+        // Set imageFile value in the form
         setValue("imageFile", fileList[0].originFileObj as File, {
           shouldDirty: true,
         });
       } else {
-        // Jika tidak ada file, set ke null
+        // If no file, set to null
         setValue("imageFile", null, { shouldDirty: true });
       }
     };
@@ -106,7 +106,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       const formData = new FormData();
       formData.append("data", JSON.stringify(data));
 
-      // Append file images
+      // Append image file
       if (data.imageFile instanceof File) {
         formData.append("imageFile", data.imageFile);
       }
@@ -119,17 +119,17 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Materi pelajaran berhasil diperbarui!");
+        toast.success(message ?? "Study material successfully updated!");
         onFinish(data);
         setFileList([]);
       } else {
-        toast.error(message ?? "Pembaruan materi pelajaran gagal.");
+        toast.error(message ?? "Failed to update study material.");
       }
 
       setIsLoading(false);
     };
 
-    // Expose ke parent
+    // Expose to parent
     useImperativeHandle(ref, () => ({
       isDirty,
     }));
@@ -151,8 +151,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Nama"
-                  placeholder="Masukkan nama materi pelajaran"
+                  label="Name"
+                  placeholder="Enter the name of the study material"
                   errors={errors}
                   required
                 />
@@ -160,8 +160,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <SelectField
                   control={control}
                   name="subjectId"
-                  label="Mata Pelajaran"
-                  placeholder="Pilih mata pelajaran"
+                  label="Subject"
+                  placeholder="Select a subject"
                   options={subjectOptions}
                   errors={errors}
                   loading={subjectOptions.length === 0}
@@ -172,16 +172,16 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi mata pelajaran"
+                  label="Description"
+                  placeholder="Enter the study material description"
                   errors={errors}
                 />
 
                 <SelectField
                   control={control}
                   name="gradeIds"
-                  label="Tingkat Kelas"
-                  placeholder="Pilih tingkat kelas"
+                  label="Grade Levels"
+                  placeholder="Select grade levels"
                   options={gradeOptions}
                   errors={errors}
                   loading={gradeOptions.length === 0}
@@ -194,7 +194,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Gambar"
+                label="Upload Image"
                 fileList={fileList}
                 setFileList={setFileList}
                 onChange={handleImageChange}

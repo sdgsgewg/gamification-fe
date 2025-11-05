@@ -3,11 +3,11 @@
 /**
  * app/page.tsx
  * Single-file Next.js page that contains BOTH:
- * 1) "Daftar Tugas" list view
+ * 1) "Task List" view
  * 2) "Quiz Detail" view
  *
  * Click the first card (“Quiz Prep…”) to open the detail.
- * Use the “Kembali” button to return to the list.
+ * Use the “Back” button to return to the list.
  */
 
 import { useMemo, useState } from "react";
@@ -26,25 +26,25 @@ export default function Page() {
     () => [
       {
         id: "quiz-prep",
-        title: "Quiz Prep Ujian Program Linear Lanjutan",
+        title: "Quiz Prep: Advanced Linear Programming",
         subtitle: "Exam Preparation",
         status: "Turned In",
       },
       {
         id: "review-quiz",
-        title: "Review Quiz Statistika Inferensial",
+        title: "Review Quiz: Inferential Statistics",
         subtitle: "Review Quiz",
         status: "Turned In",
       },
       {
         id: "live-quiz",
-        title: "Live Quiz Peluang Bersyarat",
+        title: "Live Quiz: Conditional Probability",
         subtitle: "Live Quiz",
         status: "Turned In",
       },
       {
         id: "tugas-fungsi",
-        title: "Tugas Fungsi dan Grafik",
+        title: "Assignment: Functions and Graphs",
         subtitle: "Assignment",
         status: "Turned In",
       },
@@ -158,7 +158,7 @@ function TaskList({
 }) {
   return (
     <>
-      <h1>Daftar Tugas</h1>
+      <h1>Task List</h1>
 
       <div className="toolbar">
         <div className="tabs">
@@ -168,11 +168,11 @@ function TaskList({
         </div>
         <div className="search">
           <input
-            placeholder="Cari berdasarkan nama..."
-            aria-label="Cari"
+            placeholder="Search by name..."
+            aria-label="Search"
             className="input"
           />
-          <button className="iconBtn" title="Cari">
+          <button className="iconBtn" title="Search">
             🔎
           </button>
           <button className="iconBtn" title="Filter">
@@ -190,7 +190,7 @@ function TaskList({
             key={t.id}
             role="button"
             onClick={i === 0 ? onOpenDetail : undefined}
-            title={i === 0 ? "Buka detail" : t.title}
+            title={i === 0 ? "Open detail" : t.title}
           >
             <div className="left">
               <div className="title">{t.title}</div>
@@ -348,55 +348,55 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
     <>
       <div className="topbar">
         <button className="btn soft icon" onClick={onBack}>
-          ← Kembali
+          ← Back
         </button>
-        <button className="btn soft icon">🔗 Bagikan</button>
+        <button className="btn soft icon">🔗 Share</button>
       </div>
 
       <div className="hero">
         <div className="hero-left">
-          <h1 className="hero-title">Quiz Prep Ujian Program Linear Lanjutan</h1>
+          <h1 className="hero-title">Quiz Prep: Advanced Linear Programming</h1>
           <div className="hero-illustration" />
         </div>
 
         <div className="hero-right">
           <section className="panel">
             <header>
-              <span>ℹ️</span> Informasi Detail
+              <span>ℹ️</span> Detailed Information
             </header>
             <ul className="info">
               <li>
                 <span>📘</span>
                 <div>
-                  <strong>Mata Pelajaran</strong>
-                  <div>Matematika Wajib</div>
+                  <strong>Subject</strong>
+                  <div>Compulsory Mathematics</div>
                 </div>
               </li>
               <li>
                 <span>📚</span>
                 <div>
-                  <strong>Materi</strong>
-                  <div>Program Linear Lanjutan</div>
+                  <strong>Topic</strong>
+                  <div>Advanced Linear Programming</div>
                 </div>
               </li>
               <li>
                 <span>📋</span>
                 <div>
-                  <strong>Tipe Tugas</strong>
+                  <strong>Task Type</strong>
                   <div>Scheduled Quiz</div>
                 </div>
               </li>
               <li>
                 <span>🔢</span>
                 <div>
-                  <strong>Jumlah Soal</strong>
+                  <strong>Number of Questions</strong>
                   <div>20</div>
                 </div>
               </li>
               <li>
                 <span>🎓</span>
                 <div>
-                  <strong>Ditujukan Untuk Kelas</strong>
+                  <strong>Intended Grade</strong>
                   <div>12</div>
                 </div>
               </li>
@@ -405,28 +405,28 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
 
           <section className="panel">
             <header>
-              <span>⏱️</span> Waktu Pengerjaan
+              <span>⏱️</span> Time Window
             </header>
             <ul className="info">
               <li>
                 <span>🕐</span>
                 <div>
-                  <strong>Waktu Mulai</strong>
-                  <div>1 November 2025 (13:00 WIB)</div>
+                  <strong>Start Time</strong>
+                  <div>November 1, 2025 (13:00 WIB)</div>
                 </div>
               </li>
               <li>
                 <span>🕑</span>
                 <div>
-                  <strong>Waktu Selesai</strong>
-                  <div>1 November 2025 (14:00 WIB)</div>
+                  <strong>End Time</strong>
+                  <div>November 1, 2025 (14:00 WIB)</div>
                 </div>
               </li>
               <li>
                 <span>⏳</span>
                 <div>
-                  <strong>Jangka Waktu</strong>
-                  <div>1 Jam</div>
+                  <strong>Duration</strong>
+                  <div>1 Hour</div>
                 </div>
               </li>
             </ul>
@@ -435,17 +435,16 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
       </div>
 
       <section className="desc">
-        <h3>📝 Deskripsi</h3>
+        <h3>📝 Description</h3>
         <p>
-          Kuis ini dirancang untuk membantu teman-teman memahami konsep dan
-          penyelesaian soal-soal Program Linear Lanjutan. Tetap teliti, fokus,
-          dan semangat dalam mengerjakannya!
+          This quiz is designed to help you understand the concepts and problem-solving
+          techniques of Advanced Linear Programming. Stay careful, focused, and do your best!
         </p>
       </section>
 
       <hr className="hr" />
 
-      <h2 className="section-title">Daftar Soal</h2>
+      <h2 className="section-title">Question List</h2>
 
       <div className="q-list">
         <QuestionCard
@@ -454,11 +453,10 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
           image
           prompt={
             <>
-              Seseorang ingin membeli dua jenis buah, apel dan jeruk. Harga apel
-              Rp4.000/buah dan jeruk Rp3.000/buah. Ia hanya memiliki Rp30.000
-              dan ingin membeli paling sedikit 3 buah jeruk. Jika <em>x</em>{" "}
-              adalah jumlah apel dan <em>y</em> adalah jumlah jeruk, manakah
-              sistem pertidaksamaan yang tepat?
+              A person wants to buy apples and oranges. Apples cost Rp4,000 each
+              and oranges Rp3,000 each. They have Rp30,000 and want to buy at
+              least 3 oranges. If <em>x</em> is the number of apples and <em>y</em> the
+              number of oranges, which system of inequalities is correct?
             </>
           }
           options={[
@@ -476,12 +474,12 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
           image
           prompt={
             <>
-              Jika fungsi objektif maksimum Z=3x+4y memiliki nilai maksimum
-              pada titik (2, 5), maka nilai maksimum dari Z adalah 26.{" "}
-              <strong>Pernyataan ini Benar atau Salah?</strong>
+              If the objective function Z = 3x + 4y attains its maximum at the
+              point (2, 5), then the maximum value of Z is 26.{" "}
+              <strong>Is this statement True or False?</strong>
             </>
           }
-          options={["Benar", "Salah"]}
+          options={["True", "False"]}
         />
 
         <QuestionCard
@@ -490,8 +488,8 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
           image
           prompt={
             <>
-              Diketahui sistem kendala: x+y ≤ 6, x ≥ 0, y ≥ 0. Jika fungsi
-              objektif adalah Z=5x+2y, maka nilai maksimum dari Z adalah ___.
+              Given the constraints: x + y ≤ 6, x ≥ 0, y ≥ 0. If the objective
+              function is Z = 5x + 2y, then the maximum value of Z is ___.
             </>
           }
           options={[""]}
@@ -503,13 +501,13 @@ function QuizDetail({ onBack }: { onBack: () => void }) {
           image
           prompt={
             <>
-              Dina ingin memaksimalkan keuntungan dari menjual dua jenis produk:
-              A dan B. Produk A memberikan keuntungan Rp10.000/unit dan produk
-              B Rp15.000/unit. Ia hanya memiliki 40 jam kerja dan bahan baku
-              untuk 30 unit. Produksi A membutuhkan 2 jam dan 1 bahan, B
-              membutuhkan 1 jam dan 2 bahan. Tuliskan model matematika (fungsi
-              objektif dan sistem kendala) dari masalah tersebut dan tentukan
-              kombinasi produk yang memberikan keuntungan maksimum.
+              Dina wants to maximize profit from selling two products: A and B.
+              Product A yields a profit of Rp10,000 per unit and product B
+              Rp15,000 per unit. She has only 40 hours of labor and materials
+              for 30 units. Producing A requires 2 hours and 1 unit of material,
+              while B requires 1 hour and 2 units of material. Write the
+              mathematical model (objective function and constraints) and
+              determine the product combination that gives the maximum profit.
             </>
           }
           options={[""]}
@@ -645,8 +643,8 @@ function QuestionCard({
   return (
     <article className="q">
       <header className="q-head">
-        <div className="q-title">Soal {number}</div>
-        <div className="q-point">{points} Poin</div>
+        <div className="q-title">Question {number}</div>
+        <div className="q-point">{points} Points</div>
       </header>
 
       <div className="q-body">

@@ -3,9 +3,9 @@ import z from "zod";
 export const loginSchema = z.object({
   email: z
     .string()
-    .nonempty("Email wajib diisi")
-    .email("Masukkan alamat email yang valid!"),
-  password: z.string().nonempty("Silakan masukkan kata sandi Anda!"),
+    .nonempty("Email is required")
+    .email("Please enter a valid email address!"),
+  password: z.string().nonempty("Please enter your password!"),
   remember: z.boolean().optional(),
 });
 

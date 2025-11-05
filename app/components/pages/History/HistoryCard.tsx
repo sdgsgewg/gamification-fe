@@ -45,8 +45,8 @@ const HistoryCard = ({ attempt }: HistoryCardProps) => {
           <h4 className="text-lg font-bold text-start">{title}</h4>
           <p className="text-dark text-sm font-medium">
             {completedTime
-              ? `Dikumpul pada: ${completedTime}`
-              : `Terakhir diakses: ${lastAccessedTime}`}
+              ? `Submitted on: ${completedTime}`
+              : `Last accessed: ${lastAccessedTime}`}
           </p>
         </div>
         <div className="flex items-start justify-start">

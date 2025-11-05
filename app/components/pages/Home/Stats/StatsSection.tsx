@@ -64,7 +64,7 @@ const StatsSection = () => {
         <>
           <DataRow text={`Level ${level}`} textVariant="text-4xl-bold" />
           <DataRow
-            text={`XP:${currXp} / ${nextLvlMinXp}`}
+            text={`XP: ${currXp} / ${nextLvlMinXp}`}
             textVariant="text-xl-semibold"
           />
           <div className="w-full bg-background rounded-2xl h-8 overflow-hidden mt-2">
@@ -83,13 +83,13 @@ const StatsSection = () => {
           <DataRow text={userName} textVariant="text-4xl-bold" />
           <div className="flex flex-col gap-4">
             <DataRow
-              icon={{ src: IMAGES.PEOPLE, alt: "siswa aktif" }}
-              text={`Siswa Aktif: 142`}
+              icon={{ src: IMAGES.PEOPLE, alt: "active students" }}
+              text={`Active Students: 142`}
               textVariant="text-xl-semibold"
             />
             <DataRow
-              icon={{ src: IMAGES.TASK, alt: "tugas aktif" }}
-              text={`Tugas Aktif: 6 tugas berlangsung`}
+              icon={{ src: IMAGES.TASK, alt: "active tasks" }}
+              text={`Active Tasks: 6 ongoing tasks`}
               textVariant="text-xl-semibold"
             />
           </div>
@@ -101,18 +101,18 @@ const StatsSection = () => {
       return (
         <>
           <DataRow
-            icon={{ src: IMAGES.PEOPLE, alt: "total pengguna terdaftar" }}
-            text={`Total Pengguna Terdaftar: 3120`}
+            icon={{ src: IMAGES.PEOPLE, alt: "total registered users" }}
+            text={`Total Registered Users: 3,120`}
             textVariant="text-xl-semibold"
           />
           <DataRow
-            icon={{ src: IMAGES.SUBJECT, alt: "jumlah mata pelajaran" }}
-            text={`Jumah Mata Pelajaran: ${subjects.length}`}
+            icon={{ src: IMAGES.SUBJECT, alt: "total subjects" }}
+            text={`Total Subjects: ${subjects.length}`}
             textVariant="text-xl-semibold"
           />
           <DataRow
-            icon={{ src: IMAGES.TASK, alt: "tugas terpopuler" }}
-            text={`Tugas Terpopuler: Tryout MTK 2025`}
+            icon={{ src: IMAGES.TASK, alt: "most popular task" }}
+            text={`Most Popular Task: Math Tryout 2025`}
             textVariant="text-xl-semibold"
           />
         </>
@@ -171,13 +171,10 @@ const StatsSection = () => {
           <div className="flex flex-col gap-4">
             <DataRow
               icon={{ src: IMAGES.LEADERBOARD, alt: "top student" }}
-              text={`Siswa Terbaik Minggu Ini`}
+              text={`Top Student of the Week`}
               textVariant="text-[1.8rem]-semibold"
             />
-            <DataRow
-              text={`Zahra L. - 3.200 pts`}
-              textVariant="text-base-semibold"
-            />
+            <DataRow text={`Zahra L. - 3,200 pts`} textVariant="text-base-semibold" />
           </div>
         </>
       );
@@ -205,13 +202,13 @@ const StatsSection = () => {
             className="!px-8 !rounded-3xl"
             onClick={handleClickCTA}
           >
-            <span className="text-lg font-semibold">{`Lihat ${
+            <span className="text-lg font-semibold">{`View ${
               userRole === Role.STUDENT
-                ? "Profil"
+                ? "Profile"
                 : userRole === Role.TEACHER
-                ? "Kelas"
+                ? "Class"
                 : "Dashboard"
-            } `}</span>
+            }`}</span>
             <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Button>
         </div>

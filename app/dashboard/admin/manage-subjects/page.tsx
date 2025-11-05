@@ -18,23 +18,22 @@ const ManageSubjectPage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
+
   const [searchText, setSearchText] = useState<string>("");
   const { data: subjects = [], isLoading, refetch } = useSubjects(searchText);
   const { mutateAsync: deleteSubject } = useDeleteSubject();
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
-  const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
-  const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(
-    null
-  );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
 
-  const handleNavigateToCreateManageSubjectPage = () => {
+  const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
+  const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(null);
+  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
+    useState(false);
+
+  const handleNavigateToCreateSubjectPage = () => {
     router.push(`${baseRoute}/create`);
   };
 
@@ -71,14 +70,14 @@ const ManageSubjectPage = () => {
     const res = await deleteSubject(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
-      toast.success(message ?? "Mata pelajaran berhasil dihapus");
+      toast.success(message ?? "Subject deleted successfully");
       refetch();
     } else {
-      toast.error(message ?? "Gagal menghapus mata pelajaran");
+      toast.error(message ?? "Failed to delete subject");
     }
   };
 
-  // Kolom tabel
+  // Table columns
   const columns: ColumnType<SubjectOverviewResponse>[] = [
     {
       title: "No",
@@ -90,7 +89,7 @@ const ManageSubjectPage = () => {
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Nama",
+      title: "Name",
       dataIndex: "name",
       key: "name",
       width: 300,
@@ -99,7 +98,7 @@ const ManageSubjectPage = () => {
       }),
     },
     {
-      title: "Aksi",
+      title: "Actions",
       key: "actions",
       width: 200,
       render: (_, record) => (
@@ -115,7 +114,7 @@ const ManageSubjectPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Daftar Mata Pelajaran" showBackButton={false} />
+      <DashboardTitle title="Subjects List" showBackButton={false} />
 
       <Table
         columns={columns}
@@ -129,16 +128,16 @@ const ManageSubjectPage = () => {
             setPagination({ current: page, pageSize });
           },
         }}
-        onAddButtonClick={handleNavigateToCreateManageSubjectPage}
+        onAddButtonClick={handleNavigateToCreateSubjectPage}
         searchable
-        searchPlaceholder="Cari mata pelajaran…"
+        searchPlaceholder="Search subjects…"
         onSearch={(value) => setSearchText(value)}
         onRefresh={() => refetch()}
       />
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus mata pelajaran dengan nama '${deleteSubjectName}'?`}
+        modalText={`Are you sure you want to delete the subject named '${deleteSubjectName}'?`}
         onConfirm={confirmDeleteSubject}
         onCancel={cancelDelete}
       />

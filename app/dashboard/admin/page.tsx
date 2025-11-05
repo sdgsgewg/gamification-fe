@@ -7,26 +7,26 @@ import React from "react";
 
 const AdminDashboardPage = () => {
   const stats = [
-    { label: "Guru", value: 200 },
-    { label: "Siswa", value: 300 },
-    { label: "Mata Pelajaran", value: 12 },
-    { label: "Materi", value: 36 },
+    { label: "Teachers", value: 200 },
+    { label: "Students", value: 300 },
+    { label: "Subjects", value: 12 },
+    { label: "Materials", value: 36 },
   ];
 
-  const kelasData = [
-    { label: "XII A", value: 27 },
-    { label: "XII B", value: 38 },
-    { label: "XII C", value: 32 },
-    { label: "XII D", value: 13 },
-    { label: "XII E", value: 18 },
-    { label: "XII F", value: 39 },
+  const classData = [
+    { label: "12A", value: 27 },
+    { label: "12B", value: 38 },
+    { label: "12C", value: 32 },
+    { label: "12D", value: 13 },
+    { label: "12E", value: 18 },
+    { label: "12F", value: 39 },
   ];
 
   return (
     <>
       <DashboardTitle title="Dashboard" showBackButton={false} />
 
-      {/* Statistik */}
+      {/* Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((s, idx) => (
           <StatsCard key={idx} label={s.label} value={s.value} />
@@ -36,9 +36,9 @@ const AdminDashboardPage = () => {
       {/* Chart */}
       <div className="bg-surface rounded-xl border border-light-muted p-6">
         <h2 className="text-sm font-semibold text-dark mb-4">
-          Jumlah Siswa Per Kelas
+          Number of Students per Class
         </h2>
-        <BarChart data={kelasData} />
+        <BarChart data={classData} />
       </div>
     </>
   );

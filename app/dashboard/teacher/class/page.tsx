@@ -9,24 +9,24 @@ const TeacherDashboardPage = () => {
   const { user } = useGetCachedUser();
 
   const classes = [
-    { name: "XII IPA 1", slug: "xii-ipa-1" },
-    { name: "XII IPA 2", slug: "xii-ipa-2" },
-    { name: "XII IPS 1", slug: "xii-ips-1" },
+    { name: "XII Science 1", slug: "xii-ipa-1" },
+    { name: "XII Science 2", slug: "xii-ipa-2" },
+    { name: "XII Social 1", slug: "xii-ips-1" },
   ];
 
   return (
     <div className="p-6">
-      <DashboardTitle title="Kelas Saya (Guru)" showBackButton={false} />
+      <DashboardTitle title="My Classes" showBackButton={false} />
 
       <div className="mb-6 text-sm text-gray-600">
-        Mengajar sebagai{" "}
-        <span className="font-semibold text-black">{user?.name ?? "Guru"}</span>
+        Teaching as{" "}
+        <span className="font-semibold text-black">{user?.name ?? "Teacher"}</span>
       </div>
 
       <div className="flex items-center gap-2 mb-6">
         <input
           type="text"
-          placeholder="Cari kelas atau siswa..."
+          placeholder="Search for a class or student..."
           className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
         <button className="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
@@ -36,7 +36,7 @@ const TeacherDashboardPage = () => {
           href="/dashboard/classes/create"
           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
         >
-          + Buat Kelas
+          + Create Class
         </Link>
       </div>
 

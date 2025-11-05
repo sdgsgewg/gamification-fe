@@ -47,7 +47,7 @@ export const LeaderboardPreviewTable = ({
       },
     },
     {
-      title: "Nama",
+      title: "Name",
       dataIndex: "name",
       key: "name",
       align: "left",
@@ -55,7 +55,7 @@ export const LeaderboardPreviewTable = ({
       render: (text) => <span className="font-medium">{text}</span>,
     },
     {
-      title: "Poin",
+      title: "Points",
       dataIndex: "points",
       key: "points",
       align: "left",

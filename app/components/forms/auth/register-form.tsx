@@ -1,4 +1,4 @@
-"use cliet";
+"use client";
 
 import { Form } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
@@ -38,8 +38,8 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   const router = useRouter();
   const { register } = useAuth();
-
   const { toast } = useToast();
+
   const {
     control,
     handleSubmit,
@@ -54,7 +54,7 @@ export default function RegisterForm({
   const onSubmit = async (data: RegisterFormInputs) => {
     setIsLoading(true);
 
-    // Kirim hanya field yang dibutuhkan BE
+    // Send only the fields required by the backend
     const payload: RegisterRequest = {
       email: data.email,
       password: data.password,
@@ -62,14 +62,13 @@ export default function RegisterForm({
     };
 
     const result = await register(payload);
-
     const { isSuccess, message } = result;
 
     if (isSuccess) {
-      toast.success(message ?? "Registrasi berhasil!");
+      toast.success(message ?? "Registration successful!");
       onFinish(data);
     } else {
-      toast.error(message ?? "Registrasi gagal.");
+      toast.error(message ?? "Registration failed.");
     }
 
     setIsLoading(false);
@@ -97,8 +96,8 @@ export default function RegisterForm({
           top={
             <>
               <FormTitle
-                title="Selamat Datang di Gamification"
-                subtitle="Silahkan buat akun anda."
+                title="Welcome to Gamification"
+                subtitle="Please create your account."
               />
 
               {/* Role Field */}
@@ -111,7 +110,7 @@ export default function RegisterForm({
               <TextField
                 control={control}
                 name="email"
-                placeholder="Masukkan email"
+                placeholder="Enter your email"
                 errors={errors}
                 required
                 prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
@@ -120,7 +119,7 @@ export default function RegisterForm({
               <PasswordField
                 control={control}
                 name="password"
-                placeholder="Masukkan kata sandi"
+                placeholder="Enter your password"
                 errors={errors}
                 required
                 prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
@@ -129,7 +128,7 @@ export default function RegisterForm({
               <PasswordField
                 control={control}
                 name="confirmPassword"
-                placeholder="Masukkan konfirmasi kata sandi"
+                placeholder="Confirm your password"
                 errors={errors}
                 required
                 prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
@@ -143,7 +142,7 @@ export default function RegisterForm({
                   size="large"
                   variant="primary"
                 >
-                  Daftar
+                  Register
                 </Button>
               </Form.Item>
 
@@ -157,8 +156,8 @@ export default function RegisterForm({
           }
           bottom={
             <AuthRedirect
-              message="Sudah punya akun?"
-              linkText="Masuk sekarang"
+              message="Already have an account?"
+              linkText="Sign in now"
               onClick={handleNavigateToLogin}
             />
           }

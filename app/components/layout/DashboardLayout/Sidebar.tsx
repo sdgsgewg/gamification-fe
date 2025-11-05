@@ -121,9 +121,9 @@ const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
 const PersonalizationMenuItemWrapper = () => {
   return (
     <ul className="pt-4 border-t-2 border-br-primary">
-      <p className="text-xs font-semibold px-4 mb-1">Personalisasi</p>
+      <p className="text-xs font-semibold px-4 mb-1">Personalization</p>
       <div className="flex items-center justify-between gap-2 px-4 py-3 w-full text-left text-dark">
-        <span className="text-sm text-tx-secondary">Tema</span>
+        <span className="text-sm text-tx-secondary">Theme</span>
         <ThemeSwitcher />
       </div>
     </ul>

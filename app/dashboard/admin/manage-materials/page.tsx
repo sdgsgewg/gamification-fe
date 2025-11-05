@@ -40,13 +40,9 @@ const MaterialPage = () => {
   });
 
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
-  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
-    null
-  );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(null);
+  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
+    useState(false);
 
   const formRef = useRef<FormRef>(null);
 
@@ -56,7 +52,7 @@ const MaterialPage = () => {
   const handleApplyFilter = (values: FilterMaterialFormInputs) => {
     setFilters((prev) => ({
       ...prev,
-      ...values, // gabungkan filter baru dengan search text
+      ...values, // merge new filters with search text
     }));
     setIsFilterModalVisible(false);
   };
@@ -98,14 +94,14 @@ const MaterialPage = () => {
     const res = await deleteMaterial(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
-      toast.success(message ?? "Materi berhasil dihapus");
+      toast.success(message ?? "Material deleted successfully");
       refetch();
     } else {
-      toast.error(message ?? "Gagal menghapus materi pelajaran");
+      toast.error(message ?? "Failed to delete material");
     }
   };
 
-  // Kolom tabel
+  // Table columns
   const columns: ColumnType<MaterialOverviewResponse>[] = [
     {
       title: "No",
@@ -117,7 +113,7 @@ const MaterialPage = () => {
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Nama",
+      title: "Name",
       dataIndex: "name",
       key: "name",
       width: 300,
@@ -126,7 +122,7 @@ const MaterialPage = () => {
       }),
     },
     {
-      title: "Mata Pelajaran",
+      title: "Subject",
       key: "subject",
       width: 300,
       render: (_, record) => record.subject || "-",
@@ -135,7 +131,7 @@ const MaterialPage = () => {
       }),
     },
     {
-      title: "Kelas",
+      title: "Class",
       key: "grade",
       width: 150,
       render: (_, record) => record.materialGrade || "-",
@@ -144,7 +140,7 @@ const MaterialPage = () => {
       }),
     },
     {
-      title: "Aksi",
+      title: "Actions",
       key: "actions",
       width: 200,
       render: (_, record) => (
@@ -160,7 +156,7 @@ const MaterialPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Daftar Materi Pelajaran" showBackButton={false} />
+      <DashboardTitle title="Materials List" showBackButton={false} />
 
       <Table
         columns={columns}
@@ -176,7 +172,7 @@ const MaterialPage = () => {
         }}
         onAddButtonClick={handleNavigateToCreateMaterialPage}
         searchable
-        searchPlaceholder="Cari materi pelajaran…"
+        searchPlaceholder="Search materials…"
         onSearch={(value) =>
           setFilters((prev) => ({ ...prev, searchText: value }))
         }
@@ -186,11 +182,11 @@ const MaterialPage = () => {
 
       <FilterModal
         visible={isFilterModalVisible}
-        title="Filter Materi Pelajaran"
+        title="Filter Materials"
         formId="filter-material-form"
         onCancel={handleCloseFilter}
         onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form using ref
         }}
       >
         <FilterMaterialForm
@@ -203,7 +199,7 @@ const MaterialPage = () => {
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
+        modalText={`Are you sure you want to delete the material named '${deleteMaterialName}'?`}
         onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
       />

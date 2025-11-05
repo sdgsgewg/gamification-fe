@@ -5,13 +5,13 @@ import {
 import { HowItWorksCardWrapper } from "./HowItWorksCardWrapper";
 
 const howItWorksSectionHeader: CenteredContentSectionProps = {
-  title: "Cara Kerja",
+  title: "How It Works",
   subtitle: (
     <>
       <p>
-        Kami senantiasa mendukung dan menyukseskan proses pembelajaran Anda.
+        We are always here to support and help you succeed in your learning journey.
       </p>
-      <p>Berikut cara kerjanya.</p>
+      <p>Here’s how it works.</p>
     </>
   ),
   children: <HowItWorksCardWrapper />,

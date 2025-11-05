@@ -14,11 +14,11 @@ export const BadgeSection: React.FC = () => {
   };
 
   const badgeSectionHeader: CenteredContentSectionProps = {
-    title: "Koleksi Badge",
+    title: "Badge Collection",
     subtitle:
-      "Kumpulkan berbagai badge atas pencapaian belajar kamu dan tunjukkan sejauh mana progresmu.",
+      "Collect various badges for your learning achievements and showcase your progress.",
     children: <BadgeCardWrapper />,
-    cta: "Lihat Semua Badge",
+    cta: "View All Badges",
     onClickCTA: handleClickCTA,
   };
 

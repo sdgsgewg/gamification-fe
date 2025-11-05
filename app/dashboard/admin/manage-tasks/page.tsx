@@ -58,7 +58,7 @@ const TaskPage = () => {
   const handleApplyFilter = (values: FilterTaskFormInputs) => {
     setFilters((prev) => ({
       ...prev,
-      ...values, // gabungkan filter baru dengan search text
+      ...values, // merge new filters with search text
     }));
     setIsFilterModalVisible(false);
   };
@@ -99,14 +99,14 @@ const TaskPage = () => {
     const res = await deleteTask(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
-      toast.success(message ?? "Tugas berhasil dihapus");
+      toast.success(message ?? "Task deleted successfully");
       refetch();
     } else {
-      toast.error(message || "Gagal menghapus tugas");
+      toast.error(message || "Failed to delete task");
     }
   };
 
-  // Kolom tabel
+  // Table columns
   const columns: ColumnType<TaskOverviewResponse>[] = [
     {
       title: "No",
@@ -118,7 +118,7 @@ const TaskPage = () => {
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Judul",
+      title: "Title",
       dataIndex: "title",
       key: "title",
       width: 300,
@@ -127,7 +127,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Tipe",
+      title: "Type",
       key: "taskType",
       width: 250,
       render: (_, record) => record.taskType || "-",
@@ -136,7 +136,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Mata Pelajaran",
+      title: "Subject",
       key: "subject",
       width: 250,
       render: (_, record) => record.subject || "-",
@@ -145,7 +145,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Materi Pelajaran",
+      title: "Material",
       key: "material",
       width: 250,
       render: (_, record) => record.material || "-",
@@ -154,7 +154,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Kelas",
+      title: "Class",
       key: "taskGrade",
       width: 150,
       render: (_, record) => record.taskGrade || "-",
@@ -163,7 +163,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Jumlah Soal",
+      title: "Question Count",
       key: "questionCount",
       width: 150,
       render: (_, record) => record.questionCount || "-",
@@ -172,7 +172,7 @@ const TaskPage = () => {
       }),
     },
     {
-      title: "Aksi",
+      title: "Actions",
       key: "actions",
       width: 200,
       render: (_, record) => (
@@ -188,7 +188,7 @@ const TaskPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Daftar Tugas" showBackButton={false} />
+      <DashboardTitle title="Task List" showBackButton={false} />
 
       <Table
         columns={columns}
@@ -204,7 +204,7 @@ const TaskPage = () => {
         }}
         onAddButtonClick={handleNavigateToCreateTaskPage}
         searchable
-        searchPlaceholder="Cari tugas…"
+        searchPlaceholder="Search tasks…"
         onSearch={(value) =>
           setFilters((prev) => ({ ...prev, searchText: value }))
         }
@@ -214,11 +214,11 @@ const TaskPage = () => {
 
       <FilterModal
         visible={isFilterModalVisible}
-        title="Filter Tugas"
+        title="Filter Tasks"
         formId="filter-task-form"
         onCancel={handleCloseFilter}
         onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form using ref
         }}
       >
         <FilterTaskForm
@@ -233,7 +233,7 @@ const TaskPage = () => {
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus tugas dengan judul '${deleteTaskTitle}'?`}
+        modalText={`Are you sure you want to delete the task titled '${deleteTaskTitle}'?`}
         onConfirm={confirmDeleteTask}
         onCancel={cancelDelete}
       />

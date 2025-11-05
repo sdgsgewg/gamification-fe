@@ -52,10 +52,10 @@ function DataTable<T extends object>({
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-  // hitung max kelipatan 5 terdekat dari data.length
+  // compute the nearest multiple of 5 from data.length
   const maxOption = Math.ceil((data?.length || 0) / 5) * 5 || 5;
 
-  // generate kelipatan 5, minimal 5, maksimal sesuai jumlah data
+  // generate multiples of 5, min 5, max equals total data length
   const pageSizeOptions = Array.from(
     { length: Math.ceil(maxOption / 5) },
     (_, i) => `${(i + 1) * 5}`
@@ -86,7 +86,7 @@ function DataTable<T extends object>({
               icon={<PlusCircleOutlined />}
               onClick={onAddButtonClick}
             >
-              Tambah
+              Add
             </Button>
             {onRefresh && (
               <Button
@@ -113,7 +113,7 @@ function DataTable<T extends object>({
             {onOpenFilter && (
               <Button
                 icon={<FilterOutlined />}
-                onClick={onOpenFilter} // <- callback ke parent
+                onClick={onOpenFilter} // callback to parent
                 className="!bg-surface !text-dark border"
               >
                 {""}

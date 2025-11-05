@@ -5,9 +5,9 @@ import {
 import { FeatureCardWrapper } from "./FeatureCardWrapper";
 
 const featureSectionHeader: CenteredContentSectionProps = {
-  title: "Fitur Unggulan",
+  title: "Key Features",
   subtitle:
-    "Kami berkomitmen untuk mendukung proses pembelajaran Anda melalui berbagai fitur unggulan yang dirancang untuk membuat belajar menjadi lebih menarik, interaktif, dan terarah.",
+    "We are committed to supporting your learning journey through a variety of key features designed to make studying more engaging, interactive, and well-structured.",
   children: <FeatureCardWrapper />,
 };
 

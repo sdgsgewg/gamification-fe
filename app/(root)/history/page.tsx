@@ -23,7 +23,7 @@ const HistoryPage = () => {
   const tabs: { key: ActivityAttemptStatus | null; label: string }[] = [
     {
       key: null,
-      label: "Semua",
+      label: "All",
     },
     {
       key: ActivityAttemptStatus.ON_PROGRESS,
@@ -37,7 +37,7 @@ const HistoryPage = () => {
 
   return (
     <PageLayout>
-      <h1 className="text-4xl font-bold mb-8">Riwayat Aktivitas</h1>
+      <h1 className="text-4xl font-bold mb-8">Activity History</h1>
 
       <div className="w-full flex items-center mb-6 border-b border-b-primary">
         <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">

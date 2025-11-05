@@ -29,12 +29,12 @@ const LeaderboardSection = () => {
     return (
       <div className="w-full lg:w-1/2">
         <h3 className="text-3xl sm:text-4xl font-bold mb-4">
-          Leaderboard Terkini
+          Latest Leaderboard
         </h3>
         <p className="text-tx-secondary text-base font-medium mb-6 sm:mb-8">
-          Jadikan proses belajar lebih seru dengan sistem leaderboard! Raih
-          peringkat teratas dengan mengerjakan berbagai tugas dan tantangan, dan
-          buktikan bahwa kamu bisa jadi yang terbaik.
+          Make learning more exciting with the leaderboard system! Climb to the
+          top by completing assignments and challenges — prove that you can be
+          the best.
         </p>
         <Button
           type="primary"
@@ -43,7 +43,7 @@ const LeaderboardSection = () => {
           className="!px-8 !rounded-3xl"
           onClick={navigateToLeaderboardPage}
         >
-          <span className="text-lg font-semibold">Lihat Leaderboard</span>
+          <span className="text-lg font-semibold">View Leaderboard</span>
           <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
         </Button>
       </div>

@@ -20,7 +20,7 @@ const UserGreetSection = () => {
         width={32}
         height={32}
       />
-      <p className="text-white text-base font-medium">Halo, {user.name}</p>
+      <p className="text-white text-base font-medium">Hello, {user.name}</p>
     </div>
   );
 };

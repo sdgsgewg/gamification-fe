@@ -14,11 +14,11 @@ export const SubjectSection: React.FC = () => {
   };
 
   const subjectSectionHeader: CenteredContentSectionProps = {
-    title: "Mata Pelajaran",
+    title: "Subjects",
     subtitle:
-      "Temukan berbagai mata pelajaran populer yang tersedia di platform kami. Setiap modul dirancang untuk membantu siswa memahami materi dengan lebih mudah melalui latihan soal, kuis, dan game edukatif yang menyenangkan.",
+      "Discover a variety of popular subjects available on our platform. Each module is designed to help students understand lessons more easily through practice questions, quizzes, and fun educational games.",
     children: <SubjectCardWrapper />,
-    cta: "Lihat Semua Mata Pelajaran",
+    cta: "View All Subjects",
     onClickCTA: handleClickCTA,
   };
 

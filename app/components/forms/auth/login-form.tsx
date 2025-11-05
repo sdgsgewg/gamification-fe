@@ -54,7 +54,7 @@ export default function LoginForm({
     const result = await login(data);
 
     if (result.isSuccess) {
-      toast.success(result.message ?? "Login berhasil!");
+      toast.success(result.message ?? "Login successful!");
       onFinish(data);
     } else {
       toast.error(result.message ?? "Invalid credentials");
@@ -85,12 +85,12 @@ export default function LoginForm({
         <FormLayout
           top={
             <>
-              <FormTitle title="Masuk ke Gamification" />
+              <FormTitle title="Sign in to Gamification" />
 
               <TextField
                 control={control}
                 name="email"
-                placeholder="Masukkan email"
+                placeholder="Enter your email"
                 errors={errors}
                 required
                 prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
@@ -99,7 +99,7 @@ export default function LoginForm({
               <PasswordField
                 control={control}
                 name="password"
-                placeholder="Masukkan kata sandi"
+                placeholder="Enter your password"
                 errors={errors}
                 required
                 prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
@@ -115,7 +115,7 @@ export default function LoginForm({
                       onChange={field.onChange}
                       className="!text-dark"
                     >
-                      Ingat Saya?
+                      Remember me?
                     </Checkbox>
                   )}
                 />
@@ -124,7 +124,7 @@ export default function LoginForm({
                   onClick={onForgotPasswordClick}
                   className="!text-tx-primary-accent"
                 >
-                  Lupa Password?
+                  Forgot Password?
                 </Button>
               </div>
 
@@ -136,7 +136,7 @@ export default function LoginForm({
                   size="large"
                   variant="primary"
                 >
-                  Masuk
+                  Sign In
                 </Button>
               </Form.Item>
 
@@ -150,8 +150,8 @@ export default function LoginForm({
           }
           bottom={
             <AuthRedirect
-              message="Belum punya akun?"
-              linkText="Daftar sekarang"
+              message="Don’t have an account?"
+              linkText="Register now"
               onClick={handleNavigateToRegister}
             />
           }

@@ -38,13 +38,9 @@ const TaskTypePage = () => {
   });
 
   const [deleteTaskTypeId, setDeleteTaskTypeId] = useState<string | null>(null);
-  const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
-    null
-  );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(null);
+  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
+    useState(false);
 
   const formRef = useRef<FormRef>(null);
 
@@ -54,7 +50,7 @@ const TaskTypePage = () => {
   const handleApplyFilter = (values: FilterTaskTypeFormInputs) => {
     setFilters((prev) => ({
       ...prev,
-      ...values, // gabungkan filter baru dengan search text
+      ...values, // merge new filters with search text
     }));
     setIsFilterModalVisible(false);
   };
@@ -96,14 +92,14 @@ const TaskTypePage = () => {
     const res = await deleteTaskType(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
-      toast.success(message ?? "Tipe Tugas berhasil dihapus");
+      toast.success(message ?? "Task type deleted successfully");
       refetch();
     } else {
-      toast.error(message ?? "Gagal menghapus tipe tugas");
+      toast.error(message ?? "Failed to delete task type");
     }
   };
 
-  // Kolom tabel
+  // Table columns
   const columns: ColumnType<TaskTypeOverviewResponse>[] = [
     {
       title: "No",
@@ -115,7 +111,7 @@ const TaskTypePage = () => {
         (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: "Nama",
+      title: "Name",
       dataIndex: "name",
       key: "name",
       width: 200,
@@ -139,11 +135,11 @@ const TaskTypePage = () => {
       render: (_, record) =>
         record.hasDeadline ? (
           <Tag icon={<CheckOutlined />} color="green">
-            Ya
+            Yes
           </Tag>
         ) : (
           <Tag icon={<CloseOutlined />} color="red">
-            Tidak
+            No
           </Tag>
         ),
       onCell: () => ({
@@ -157,11 +153,11 @@ const TaskTypePage = () => {
       render: (_, record) =>
         record.isCompetitive ? (
           <Tag icon={<CheckOutlined />} color="green">
-            Ya
+            Yes
           </Tag>
         ) : (
           <Tag icon={<CloseOutlined />} color="red">
-            Tidak
+            No
           </Tag>
         ),
       onCell: () => ({
@@ -175,11 +171,11 @@ const TaskTypePage = () => {
       render: (_, record) =>
         record.isRepeatable ? (
           <Tag icon={<CheckOutlined />} color="green">
-            Ya
+            Yes
           </Tag>
         ) : (
           <Tag icon={<CloseOutlined />} color="red">
-            Tidak
+            No
           </Tag>
         ),
       onCell: () => ({
@@ -196,7 +192,7 @@ const TaskTypePage = () => {
       }),
     },
     {
-      title: "Aksi",
+      title: "Actions",
       key: "actions",
       width: 200,
       render: (_, record) => (
@@ -212,7 +208,7 @@ const TaskTypePage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Daftar Tipe Tugas" showBackButton={false} />
+      <DashboardTitle title="Task Types List" showBackButton={false} />
 
       <Table
         columns={columns}
@@ -228,7 +224,7 @@ const TaskTypePage = () => {
         }}
         onAddButtonClick={handleNavigateToCreateTaskTypePage}
         searchable
-        searchPlaceholder="Cari tipe tugas…"
+        searchPlaceholder="Search task types…"
         onSearch={(value) =>
           setFilters((prev) => ({ ...prev, searchText: value }))
         }
@@ -238,11 +234,11 @@ const TaskTypePage = () => {
 
       <FilterModal
         visible={isFilterModalVisible}
-        title="Filter Tipe Tugas"
+        title="Filter Task Types"
         formId="filter-task-type-form"
         onCancel={handleCloseFilter}
         onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form pakai ref
+          if (formRef.current?.resetForm) formRef.current?.resetForm(); // reset form using ref
         }}
       >
         <FilterTaskTypeForm ref={formRef} onFinish={handleApplyFilter} />
@@ -250,7 +246,7 @@ const TaskTypePage = () => {
 
       <DeleteConfirmationModal
         visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus tipe tugas dengan nama '${deleteTaskTypeName}'?`}
+        modalText={`Are you sure you want to delete the task type named '${deleteTaskTypeName}'?`}
         onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
       />

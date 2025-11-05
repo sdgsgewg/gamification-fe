@@ -50,11 +50,11 @@ export default function ForgotPasswordForm({
 
     if (isSuccess) {
       toast.success(
-        message ?? "Jika email Anda terdaftar, tautan reset telah dikirim."
+        message ?? "If your email is registered, a reset link has been sent."
       );
       onFinish(data);
     } else {
-      toast.error(message ?? "Gagal mengirim tautan reset. Mohon coba lagi.");
+      toast.error(message ?? "Failed to send reset link. Please try again.");
     }
 
     setIsLoading(false);
@@ -78,14 +78,14 @@ export default function ForgotPasswordForm({
           top={
             <>
               <FormTitle
-                title="Lupa Password"
-                subtitle="Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda."
+                title="Forgot Password"
+                subtitle="Enter your email address and we’ll send you a link to reset your password."
               />
 
               <TextField
                 control={control}
                 name="email"
-                placeholder="Masukkan email"
+                placeholder="Enter your email"
                 errors={errors}
                 required
                 prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
@@ -99,15 +99,15 @@ export default function ForgotPasswordForm({
                   size="large"
                   variant="primary"
                 >
-                  Lanjut
+                  Continue
                 </Button>
               </Form.Item>
             </>
           }
           bottom={
             <AuthRedirect
-              message="Sudah ingat password Anda?"
-              linkText="Masuk sekarang"
+              message="Remembered your password?"
+              linkText="Sign in now"
               onClick={handleNavigateToLogin}
             />
           }

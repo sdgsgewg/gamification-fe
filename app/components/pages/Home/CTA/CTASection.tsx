@@ -24,14 +24,14 @@ const CTASection = () => {
 
   useEffect(() => {
     if (userRole === Role.GUEST) {
-      setTitle("Belajar Lebih Seru & Interaktif");
+      setTitle("Learn in a More Fun & Interactive Way");
       setSubtitle(
-        "Buat akunmu sekarang untuk kumpulkan XP serta badge dari berbagai aktivitas dan bergabung dalam leaderboard!"
+        "Create your account now to collect XP and badges from various activities — and join the leaderboard!"
       );
     } else {
-      setTitle("Siap Menyelesaikan Tantangan Hari Ini?");
+      setTitle("Ready to Take on Today’s Challenge?");
       setSubtitle(
-        "Kumpulkan XP dari tugas dan game yang tersedia. Selesaikan tantanganmu dan pantau progres belajarmu."
+        "Earn XP from available tasks and games. Complete your challenges and track your learning progress."
       );
     }
   }, [userRole]);
@@ -57,7 +57,7 @@ const CTASection = () => {
             className="!p-6 !rounded-[1.25rem]"
             onClick={handleClickStartNow}
           >
-            <span className="font-bold">Mulai Sekarang</span>
+            <span className="font-bold">Start Now</span>
           </Button>
         </div>
       </div>

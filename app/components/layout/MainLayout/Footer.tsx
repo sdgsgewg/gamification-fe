@@ -20,7 +20,7 @@ const AboutSection = () => {
     <div className="max-w-60 flex flex-col gap-2">
       <h1 className="text-white text-2xl font-bold uppercase">Gamification</h1>
       <p className="text-white text-sm">
-        Platform belajar interaktif berbasis game untuk siswa dan guru.
+        A game-based interactive learning platform for students and teachers.
       </p>
     </div>
   );
@@ -48,7 +48,7 @@ const MainMenuItemWrapper = ({ role }: MenuItemWrapperProps) => {
 
   return (
     <div>
-      <h2 className="text-white text-lg font-semibold mb-3">Navigasi</h2>
+      <h2 className="text-white text-lg font-semibold mb-3">Navigation</h2>
       <ul className="flex flex-col gap-2">
         {filteredItems.map((item) => (
           <MenuItem key={item.url} menu={item.menu} url={item.url} />
@@ -65,7 +65,7 @@ const HelpMenuItemWrapper = ({ role }: MenuItemWrapperProps) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-white text-lg font-semibold">Bantuan</h2>
+      <h2 className="text-white text-lg font-semibold">Help</h2>
       <ul className="flex flex-col gap-2">
         {filteredItems.map((item) => (
           <MenuItem key={item.url} menu={item.menu} url={item.url} />
@@ -91,7 +91,7 @@ const SocialMediaIcon = ({ url, icon }: SocialMediaIconProps) => {
 const FollowUsSection = () => {
   return (
     <div className="flex flex-col gap-3 ml-0 xl:ml-48">
-      <h2 className="text-white text-lg font-semibold">Ikuti Kami</h2>
+      <h2 className="text-white text-lg font-semibold">Follow Us</h2>
       <div className="flex gap-3">
         <SocialMediaIcon url="#" icon={faInstagram} />
         <SocialMediaIcon url="#" icon={faYoutube} />
@@ -105,7 +105,7 @@ const CopyrightSection = () => {
   return (
     <div className="flex items-center justify-center pt-8 border-t-2 border-br-tertiary mt-6">
       <p className="text-white text-sm font-normal text-center">
-        &copy; Copyright {new Date().getFullYear()}. All rights reserved.
+        &copy; {new Date().getFullYear()} Gamification. All rights reserved.
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ export enum Role {
 
 export const RoleLabels: Record<Role, string> = {
   [Role.GUEST]: "Guest",
-  [Role.STUDENT]: "Siswa",
-  [Role.TEACHER]: "Guru",
+  [Role.STUDENT]: "Student",
+  [Role.TEACHER]: "Teacher",
   [Role.ADMIN]: "Admin",
 };

@@ -3,7 +3,7 @@
 /** demo rows */
 const rows = Array.from({ length: 15 }).map((_, i) => ({
   rank: i + 4,
-  name: i % 2 === 0 ? "Kelas 12D SMAN 1" : "Kelas 12E SMAN 1",
+  name: i % 2 === 0 ? "Class 12D SMAN 1" : "Class 12E SMAN 1",
   points: i % 2 === 0 ? 110000 : 105000,
 }));
 
@@ -19,7 +19,7 @@ const CLASS_IMG =
       <circle cx='55' cy='80' r='26' fill='#9bb9f2'/>
       <rect x='84' y='65' width='50' height='30' rx='6' fill='#9bb9f2'/>
       <rect x='32' y='110' width='96' height='10' rx='5' fill='#99a8c8' opacity='.7'/>
-      <text x='50%' y='54%' font-size='12' text-anchor='middle' fill='#5b6b8a' font-family='Inter,Arial'>KELAS</text>
+      <text x='50%' y='54%' font-size='12' text-anchor='middle' fill='#5b6b8a' font-family='Inter,Arial'>CLASS</text>
     </svg>`
   );
 
@@ -28,24 +28,24 @@ export default function Page() {
     <div className="bg-[var(--background)] text-[var(--text-primary)]">
       <main className="mx-auto max-w-[1100px] px-6 pb-16 pt-7">
         <h1 className="mb-4 border-b-2 border-[var(--color-outline)] pb-3 text-[36px] font-extrabold">
-          Leaderboard Antar Kelas
+          Inter-Class Leaderboard
         </h1>
 
         {/* layout: left banners + right table */}
         <div className="grid grid-cols-[360px_1fr] gap-6 max-[980px]:grid-cols-1">
           {/* LEFT — three fixed banners */}
           <div className="grid grid-cols-3 gap-4">
-            <Banner tone="gold"   title1="Kelas 12A" title2="SMAN 1" points="125000" />
-            <Banner tone="silver" title1="Kelas 12B" title2="SMAN 1" points="120000" />
-            <Banner tone="bronze" title1="Kelas 12C" title2="SMAN 1" points="115000" />
+            <Banner tone="gold"   title1="Class 12A" title2="SMAN 1" points="125000" />
+            <Banner tone="silver" title1="Class 12B" title2="SMAN 1" points="120000" />
+            <Banner tone="bronze" title1="Class 12C" title2="SMAN 1" points="115000" />
           </div>
 
           {/* RIGHT — table */}
           <section className="overflow-hidden rounded-lg border-2 border-[var(--border-secondary)] bg-[var(--color-card)]">
             <div className="grid grid-cols-[120px_1fr_160px] bg-[var(--color-primary)] px-4 py-3 font-bold text-white">
               <div>Rank</div>
-              <div>Nama</div>
-              <div className="text-right">Poin</div>
+              <div>Name</div>
+              <div className="text-right">Points</div>
             </div>
 
             <div>

@@ -49,7 +49,7 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
         />
       </div>
       <h4 className="text-xl font-bold text-start mb-1">{name}</h4>
-      <p className="text-dark text-sm font-medium mb-6">{`${activityCount} Aktivitas Tersedia`}</p>
+      <p className="text-dark text-sm font-medium mb-6">{`${activityCount} Available Activities`}</p>
       <Button
         type="primary"
         size="middle"
@@ -57,7 +57,7 @@ const SubjectCard = ({ subject, fromPage }: SubjectCardProps) => {
         className="!px-4 !rounded-3xl !mt-auto"
         onClick={navigateToActivityPage}
       >
-        <span className="text-base font-semibold">Jelajahi</span>
+        <span className="text-base font-semibold">Explore</span>
         <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
       </Button>
     </div>

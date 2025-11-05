@@ -18,56 +18,56 @@ const features: FeatureContentData[] = [
   {
     icon: {
       src: IMAGES.RELEVANT_QUESTIONS,
-      alt: "Soal Lengkap & Relevan",
+      alt: "Comprehensive & Relevant Questions",
     },
-    title: "Soal Lengkap & Relevan",
+    title: "Comprehensive & Relevant Questions",
     description:
-      "Beragam soal berkualitas sesuai materi pelajaran yang dirancang untuk mengasah pemahaman dan keterampilan belajar.",
+      "A wide variety of high-quality questions aligned with learning materials, designed to strengthen understanding and learning skills.",
   },
   {
     icon: {
       src: IMAGES.LEADERBOARD,
-      alt: "Leaderboard Global & Kelas",
+      alt: "Global & Class Leaderboards",
     },
-    title: "Leaderboard Global & Kelas",
+    title: "Global & Class Leaderboards",
     description:
-      "Pantau posisi kamu di leaderboard global atau dalam kelas dan tingkatkan motivasi belajar melalui persaingan sehat.",
+      "Track your position on the global or class leaderboard and boost your motivation through healthy competition.",
   },
   {
     icon: {
       src: IMAGES.BADGE,
-      alt: "Koleksi Badge",
+      alt: "Badge Collection",
     },
-    title: "Koleksi Badge",
+    title: "Badge Collection",
     description:
-      "Raih pencapaian menarik dan kumpulkan badge sebagai bentuk penghargaan atas usaha dan konsistensimu.",
+      "Earn exciting achievements and collect badges as a reward for your effort and consistency.",
   },
   {
     icon: {
       src: IMAGES.MINI_GAME,
-      alt: "Mini Game Edukatif",
+      alt: "Educational Mini Games",
     },
-    title: "Mini Game Edukatif",
+    title: "Educational Mini Games",
     description:
-      "Belajar sambil bermain melalui mini game interaktif yang dirancang untuk melatih konsentrasi dan pemahaman konsep.",
+      "Learn while playing through interactive mini games designed to enhance focus and concept understanding.",
   },
   {
     icon: {
       src: IMAGES.TASK,
-      alt: "Latihan Harian & Tantangan",
+      alt: "Daily Practice & Challenges",
     },
-    title: "Latihan Harian & Tantangan",
+    title: "Daily Practice & Challenges",
     description:
-      "Dapatkan soal-soal harian dan tantangan seru yang mendorong kebiasaan belajar rutin dan konsisten setiap hari.",
+      "Get daily questions and fun challenges that help you build a consistent and effective study habit.",
   },
   {
     icon: {
       src: IMAGES.CLASS,
-      alt: "Kelas Interaktif",
+      alt: "Interactive Classes",
     },
-    title: "Kelas Interaktif",
+    title: "Interactive Classes",
     description:
-      "Ikuti kelas virtual, dapatkan tugas dari guru, dan terlibat aktif dalam lingkungan belajar yang kolaboratif.",
+      "Join virtual classes, complete assignments from teachers, and engage in a collaborative learning environment.",
   },
 ];
 

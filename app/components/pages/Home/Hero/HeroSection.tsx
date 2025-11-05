@@ -53,11 +53,11 @@ const HeroSection = () => {
     return (
       <div className="w-full lg:w-[55%] flex flex-col">
         <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4">
-          Buat Belajar Lebih Seru. <br /> Raih Nilai Lebih Tinggi.
+          Make Learning More Fun. <br /> Achieve Higher Scores.
         </h2>
         <p className="text-tx-secondary text-base font-medium">
-          Sistem belajar berbasis game untuk kamu yang suka tantangan. Kerjakan
-          tugas, kumpulkan badge, dan dominasi leaderboard.
+          A game-based learning system for those who love challenges. Complete
+          assignments, collect badges, and dominate the leaderboard.
         </p>
         <div className="flex xxs:flex-col flex-row sm:flex-row gap-4 mt-8">
           <Button
@@ -67,13 +67,13 @@ const HeroSection = () => {
             className="!p-6 !rounded-[1.25rem]"
             onClick={handleClickStartNow}
           >
-            <span className="text-white font-bold">Mulai Sekarang</span>
+            <span className="text-white font-bold">Start Now</span>
           </Button>
           {/* <button
             onClick={handleClickSeeFeature}
             className="bg-[#D7D3FF] text-[#556FD7] font-bold rounded-[1.25rem] px-6 py-3 hover:bg-[#c9c4ff] transition duration-300 ease-in-out cursor-pointer"
           >
-            Lihat Fitur
+            See Features
           </button> */}
         </div>
       </div>

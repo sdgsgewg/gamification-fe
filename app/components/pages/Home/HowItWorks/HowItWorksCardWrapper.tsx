@@ -10,19 +10,19 @@ export interface HowItWorksContentData {
 const howItWorksContent: HowItWorksContentData[] = [
   {
     title: "01",
-    description: "Pilih pelajaran sesuai dengan preferensimu",
+    description: "Choose a subject that matches your interests",
   },
   {
     title: "02",
-    description: "Kerjakan berbagai tugas yang tersedia",
+    description: "Complete the various assignments available",
   },
   {
     title: "03",
-    description: "Kumpulkan Poin & Badge dari setiap tugas",
+    description: "Earn Points & Badges from each task",
   },
   {
     title: "04",
-    description: "Pantau progres anda & naik level",
+    description: "Track your progress & level up",
   },
 ];
 

@@ -28,7 +28,7 @@ const formatDate = (d: any) => {
   if (!d) return "—";
   const date = typeof d === "string" || typeof d === "number" ? new Date(d) : d;
   if (isNaN(date?.getTime?.())) return toLabel(d);
-  return date.toLocaleDateString("id-ID", {
+  return date.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -186,9 +186,9 @@ const ProfilePage = () => {
   // Localized display label
   const displayRole =
     userRole === Role.STUDENT
-      ? "Siswa"
+      ? "Student"
       : userRole === Role.TEACHER
-      ? "Guru"
+      ? "Teacher"
       : "Admin";
 
   if (!cachedUser) return null;
@@ -248,22 +248,22 @@ const ProfilePage = () => {
     (cachedUser as any)?.activities ??
     (isTeacher
       ? [
-          "Memberikan Tugas Tata Surya ke Kelas XII A",
-          "Menilai Tugas Aritmatika untuk Kelas XII B",
-          "Berhasil Meraih 20 Pencapaian",
-          "Memberikan Tugas Listrik Statis ke Kelas XII C",
+          "Assigned Solar System homework to Class XII A",
+          "Graded Arithmetic assignments for Class XII B",
+          "Achieved 20 milestones",
+          "Assigned Static Electricity homework to Class XII C",
         ]
       : isAdmin
       ? [
-          "Mengupdate Mata Pelajaran IPS",
-          "Menambahkan Materi Bahasa Indonesia",
-          "Membuat Materi Statistika",
-          "Membuat Mata Pelajaran IPS",
+          "Updated Social Studies subject",
+          "Added Indonesian Language material",
+          "Created Statistics material",
+          "Created Social Studies subject",
         ]
       : [
-          "Menyelesaikan Kuis Fisika",
-          "Mengumpulkan Tugas Matematika",
-          "Mendapat Lencana Ketekunan",
+          "Completed Physics Quiz",
+          "Submitted Math Assignment",
+          "Earned Persistence Badge",
         ]);
 
   /** ===== UI ===== */
@@ -311,14 +311,14 @@ const ProfilePage = () => {
                   onClick={() => setIsEditing(true)}
                   className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
                 >
-                  Edit Profil
+                  Edit Profile
                 </button>
                 <button
                   onClick={handleCopyId}
                   className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] transition hover:bg-[var(--color-light-emphasis)]"
                   title="Copy User ID"
                 >
-                  {copied ? "Disalin!" : "Salin ID"}
+                  {copied ? "Copied!" : "Copy ID"}
                 </button>
               </div>
             </div>
@@ -333,21 +333,21 @@ const ProfilePage = () => {
             >
               {isTeacher && (
                 <>
-                  <StatBox value="3" label="Kelas" />
-                  <StatBox value="100" label="Murid" />
-                  <StatBox value="24" label="Pencapaian" />
+                  <StatBox value="3" label="Class" />
+                  <StatBox value="100" label="Students" />
+                  <StatBox value="24" label="Achievements" />
                 </>
               )}
               {isAdmin && (
                 <>
-                  <StatBox value="5" label="Mata Pelajaran" />
-                  <StatBox value="10" label="Materi" />
+                  <StatBox value="5" label="Subjects" />
+                  <StatBox value="10" label="Materials" />
                   <StatBox value="—" label=" " />
                 </>
               )}
               {isStudent && (
                 <>
-                  <StatBox value="12" label="Kelas" />
+                  <StatBox value="12" label="Class" />
                   <StatBox value="4" label="Badges" />
                 </>
               )}
@@ -357,13 +357,13 @@ const ProfilePage = () => {
 
         {/* ===== Content cards ===== */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* LEFT: Data Profil */}
+          {/* LEFT: Profile Data */}
           <div className="overflow-hidden rounded-xl border border-[var(--color-br-secondary)] bg-[var(--color-card)] shadow-sm">
-            <SectionHeader title="Informasi Detail" />
+            <SectionHeader title="Detailed Information" />
             <div className="px-5 py-4">
               <InfoRow
                 icon={<span>🧑‍🎓</span>}
-                label="Nama Lengkap"
+                label="Full Name"
                 value={toLabel(profile.name || cachedUser.name)}
               />
               <InfoRow
@@ -373,12 +373,12 @@ const ProfilePage = () => {
               />
               <InfoRow
                 icon={<span>🎂</span>}
-                label="Tanggal Lahir"
+                label="Birth Date"
                 value={formatDate(profile.birthDate)}
               />
               <InfoRow
                 icon={<span>⚧️</span>}
-                label="Jenis Kelamin"
+                label="Gender"
                 value={
                   profile.gender
                     ? toLabel(profile.gender)
@@ -388,7 +388,7 @@ const ProfilePage = () => {
               {(isStudent || isTeacher) && (
                 <InfoRow
                   icon={<span>🏷️</span>}
-                  label="Kelas"
+                  label="Class"
                   value={toLabel(profile.kelas)}
                 />
               )}
@@ -417,19 +417,17 @@ const ProfilePage = () => {
           {/* RIGHT: Security & Activity */}
           <div className="overflow-hidden rounded-xl border border-[var(--color-br-secondary)] bg-[var(--color-card)] shadow-sm">
             <SectionHeader
-              title={
-                isStudent ? "Aktivitas & Keamanan" : "Keamanan & Aktivitas"
-              }
+              title={isStudent ? "Activity & Security" : "Security & Activity"}
             />
             <div className="px-5 py-4">
               <div className="space-y-3 text-sm">
                 <div className="flex items-start justify-between rounded-lg bg-[var(--color-surface)] p-3">
                   <div>
                     <p className="font-medium text-[var(--text-primary)]">
-                      Peran Saat Ini
+                      Current Role
                     </p>
                     <p className="text-[var(--text-tertiary)]">
-                      Anda masuk sebagai{" "}
+                      You are signed in as{" "}
                       <span className="font-semibold">{displayRole}</span>.
                     </p>
                   </div>
@@ -441,10 +439,10 @@ const ProfilePage = () => {
                 <div className="flex items-start justify-between rounded-lg bg-[var(--color-surface)] p-3">
                   <div>
                     <p className="font-medium text-[var(--text-primary)]">
-                      Sesi
+                      Session
                     </p>
                     <p className="text-[var(--text-tertiary)]">
-                      Terautentikasi menggunakan cache profil lokal.
+                      Authenticated using local profile cache.
                     </p>
                   </div>
                   <span className="text-xs text-[var(--text-muted)]">
@@ -452,13 +450,13 @@ const ProfilePage = () => {
                       ? new Date(
                           (cachedUser as any).lastLoginAt
                         ).toLocaleString()
-                      : "Waktu tidak tersedia"}
+                      : "Time not available"}
                   </span>
                 </div>
 
                 <div className="rounded-lg border border-[var(--color-br-secondary)]">
                   <div className="border-b border-[var(--color-br-secondary)] bg-[var(--color-tertiary)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)]">
-                    Aktivitas Terbaru
+                    Recent Activity
                   </div>
                   <ul className="space-y-2 p-3">
                     {recentActivities.map((a: string, i: number) => (
@@ -469,10 +467,10 @@ const ProfilePage = () => {
                         {a}
                         <div className="text-[10px] text-[var(--text-muted)]">
                           {i === 0
-                            ? "2 Hari yang lalu"
+                            ? "2 days ago"
                             : i === 1
-                            ? "4 Hari yang lalu"
-                            : "1 Minggu yang lalu"}
+                            ? "4 days ago"
+                            : "1 week ago"}
                         </div>
                       </li>
                     ))}
@@ -484,10 +482,10 @@ const ProfilePage = () => {
                     onClick={() => window.location.reload()}
                     className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] transition hover:bg-[var(--color-light-emphasis)]"
                   >
-                    Muat Ulang Profil
+                    Reload Profile
                   </button>
                   <span className="text-xs text-[var(--text-muted)]">
-                    Data diperbarui dari cache auth / local override.
+                    Data updated from auth cache / local override.
                   </span>
                 </div>
               </div>
@@ -503,13 +501,13 @@ const ProfilePage = () => {
             <div className="flex items-center justify-between bg-[var(--color-primary)] px-4 py-3">
               <div className="flex items-center gap-2">
                 <HeaderIcon />
-                <p className="text-sm font-semibold text-white">Edit Profil</p>
+                <p className="text-sm font-semibold text-white">Edit Profile</p>
               </div>
               <button
                 onClick={() => setIsEditing(false)}
                 className="rounded-md bg-white/20 px-2 py-1 text-xs text-white hover:bg-white/30"
               >
-                Tutup
+                Close
               </button>
             </div>
 
@@ -517,7 +515,7 @@ const ProfilePage = () => {
               {/* Common */}
               <div>
                 <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                  Nama Lengkap
+                  Full Name
                 </label>
                 <input
                   className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -543,7 +541,7 @@ const ProfilePage = () => {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                    Tanggal Lahir
+                    Birth Date
                   </label>
                   <input
                     type="date"
@@ -559,7 +557,7 @@ const ProfilePage = () => {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                    Jenis Kelamin
+                    Gender
                   </label>
                   <select
                     className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -568,18 +566,18 @@ const ProfilePage = () => {
                       setProfile((p) => ({ ...p, gender: e.target.value }))
                     }
                   >
-                    <option value="">Pilih</option>
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                    <option value="Lainnya">Lainnya</option>
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
-                {/* Siswa only */}
+                {/* Student only */}
                 {isStudent && (
                   <div>
                     <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                      Kelas
+                      Class
                     </label>
                     <input
                       className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -592,12 +590,12 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              {/* Guru/Admin extras */}
+              {/* Teacher/Admin extras */}
               {(userRole === Role.TEACHER || userRole === Role.ADMIN) && (
                 <>
                   <div>
                     <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                      Institusi
+                      Institution
                     </label>
                     <input
                       className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -628,7 +626,7 @@ const ProfilePage = () => {
 
               <div>
                 <label className="mb-1 block text-sm text-[var(--text-secondary)]">
-                  URL Avatar
+                  Avatar URL
                 </label>
                 <input
                   className="w-full rounded-lg border border-[var(--color-light-accent)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -646,14 +644,14 @@ const ProfilePage = () => {
                   onClick={() => setIsEditing(false)}
                   className="rounded-lg bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] ring-1 ring-[var(--color-light-accent)] hover:bg-[var(--color-light-emphasis)]"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
                   className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
                 >
-                  {saving ? "Menyimpan…" : "Simpan"}
+                  {saving ? "Saving…" : "Save"}
                 </button>
               </div>
             </form>

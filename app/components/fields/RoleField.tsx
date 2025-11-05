@@ -20,7 +20,7 @@ export default function RoleField({
 }: RoleFieldProps) {
   return (
     <Form.Item
-      label={<Label label={`Anda membuat akun sebagai?`} />}
+      label={<Label label="You are creating an account as?" />}
       validateStatus={errors.roleId ? "error" : ""}
       help={errors.roleId?.message}
       style={{ marginBottom: errors.roleId ? "1rem" : "0rem" }}
@@ -28,7 +28,7 @@ export default function RoleField({
       <Controller
         name="roleId"
         control={control}
-        rules={{ required: "Silakan pilih peran Anda!" }}
+        rules={{ required: "Please select your role!" }}
         render={({ field }) => (
           <Radio.Group
             {...field}
@@ -40,7 +40,7 @@ export default function RoleField({
             }}
           >
             {roleData.map((role) => {
-              // casting supaya bisa akses RoleLabels
+              // Cast so we can access RoleLabels
               const roleKey = role.name as Role;
               const label = RoleLabels[roleKey] ?? role.name;
 

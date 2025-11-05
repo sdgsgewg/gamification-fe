@@ -21,18 +21,36 @@ type Person = { id: string; name: string; avatar: string };
 const MOCK_ACTIVE: Work[] = [
   {
     id: "w1",
-    title: "Prep UTS MTK 2025",
+    title: "Midterm Prep Math 2025",
     kind: "Tryout",
-    subject: "Matematika",
+    subject: "Mathematics",
     questions: 50,
-    deadline: "10 November 2025 (23:59 WIB)",
+    deadline: "November 10, 2025 (23:59 WIB)",
   },
 ];
 
 const MOCK_FINISHED: Work[] = [
-  { id: "w2", title: "Live Quiz Peluang Bersyarat", kind: "Live Quiz", subject: "Matematika", questions: 20 },
-  { id: "w3", title: "Review Quiz Statistika Inferensial", kind: "Review Quiz", subject: "Matematika", questions: 25 },
-  { id: "w4", title: "Tugas Fungsi dan Grafik", kind: "Assignment", subject: "Matematika", questions: 30 },
+  {
+    id: "w2",
+    title: "Live Quiz: Conditional Probability",
+    kind: "Live Quiz",
+    subject: "Mathematics",
+    questions: 20,
+  },
+  {
+    id: "w3",
+    title: "Review Quiz: Inferential Statistics",
+    kind: "Review Quiz",
+    subject: "Mathematics",
+    questions: 25,
+  },
+  {
+    id: "w4",
+    title: "Assignment: Functions and Graphs",
+    kind: "Assignment",
+    subject: "Mathematics",
+    questions: 30,
+  },
 ];
 
 const MOCK_STUDENTS: Person[] = [
@@ -58,9 +76,9 @@ export default function StudentClassPage() {
   const [who, setWho] = useState<"students" | "teachers">("students");
   const [page, setPage] = useState(1);
 
-  const className = "Kelas 12E SMAN 1";
+  const className = "Class 12E SMAN 1";
   const classTagline =
-    "Kelas dengan semangat belajar tinggi dan komitmen terhadap keunggulan.";
+    "A class with a strong learning spirit and a commitment to excellence.";
 
   const dataWorks = taskState === "active" ? MOCK_ACTIVE : MOCK_FINISHED;
   const dataPeople = who === "students" ? MOCK_STUDENTS : MOCK_TEACHERS;
@@ -86,7 +104,6 @@ export default function StudentClassPage() {
     <div className="px-7 pb-16 pt-6 text-[var(--text-primary)] bg-[var(--background)]">
       {/* Header row */}
       <div className="mb-4 grid gap-4">
-
         <div className="flex items-start justify-between border-b-2 border-[var(--color-outline)] pb-2">
           <div>
             <h1 className="text-3xl font-extrabold leading-tight">{className}</h1>
@@ -106,10 +123,10 @@ export default function StudentClassPage() {
       {/* Tabs */}
       <div className="mb-4 flex gap-8 border-b-2 border-[var(--color-outline)]">
         <TabButton active={tab === "tasks"} onClick={() => setTab("tasks")}>
-          Tugas
+          Tasks
         </TabButton>
         <TabButton active={tab === "people"} onClick={() => setTab("people")}>
-          Anggota
+          People
         </TabButton>
         <TabButton
           active={tab === "leaderboard"}
@@ -119,15 +136,15 @@ export default function StudentClassPage() {
         </TabButton>
       </div>
 
-      {/* TAB: TUGAS */}
+      {/* TAB: TASKS */}
       {tab === "tasks" && (
         <>
           <div className="mb-3 flex gap-3">
             <Pill active={taskState === "active"} onClick={() => setTaskState("active")}>
-              Aktif
+              Active
             </Pill>
             <Pill active={taskState === "done"} onClick={() => setTaskState("done")}>
-              Selesai
+              Completed
             </Pill>
           </div>
 
@@ -147,18 +164,18 @@ export default function StudentClassPage() {
         </>
       )}
 
-      {/* TAB: ANGGOTA */}
+      {/* TAB: PEOPLE */}
       {tab === "people" && (
         <>
           <div className="mb-3 flex gap-2">
             <CountToggle
-              label="Murid"
+              label="Students"
               count={MOCK_STUDENTS.length}
               active={who === "students"}
               onClick={() => setWho("students")}
             />
             <CountToggle
-              label="Guru"
+              label="Teachers"
               count={MOCK_TEACHERS.length}
               active={who === "teachers"}
               onClick={() => setWho("teachers")}
@@ -207,8 +224,8 @@ export default function StudentClassPage() {
           <div className="overflow-hidden rounded-lg border-2 border-[var(--border-secondary)]">
             <div className="grid grid-cols-[120px_1fr_140px] bg-[var(--color-primary)] px-3 py-2 font-bold text-white">
               <div>Rank</div>
-              <div>Nama</div>
-              <div>Poin</div>
+              <div>Name</div>
+              <div>Points</div>
             </div>
             <div>
               {leaderboardRows.map((r, i) => (
@@ -297,8 +314,8 @@ function TaskCard({ work, showDeadline }: { work: Work; showDeadline?: boolean }
         </span>
 
         <div className="mt-3 grid gap-1 text-[var(--text-secondary)]">
-          <div>Mata Pelajaran: {work.subject}</div>
-          <div>Jumlah Soal: {work.questions}</div>
+          <div>Subject: {work.subject}</div>
+          <div>Number of Questions: {work.questions}</div>
           {showDeadline && work.deadline && (
             <div className="mt-1 inline-flex items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -425,7 +442,7 @@ function Pager({
       <button
         onClick={() => onChange(Math.max(1, page - 1))}
         className="grid h-9 min-w-9 place-items-center rounded-md border border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-secondary)]"
-        aria-label="Sebelumnya"
+        aria-label="Previous"
       >
         ‹
       </button>
@@ -449,7 +466,7 @@ function Pager({
       <button
         onClick={() => onChange(Math.min(pages, page + 1))}
         className="grid h-9 min-w-9 place-items-center rounded-md border border-[var(--border-secondary)] bg-[var(--color-card)] text-[var(--text-secondary)]"
-        aria-label="Berikutnya"
+        aria-label="Next"
       >
         ›
       </button>

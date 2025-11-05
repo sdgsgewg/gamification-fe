@@ -211,7 +211,7 @@ const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
         <div className="flex items-center gap-3 text-dark cursor-pointer select-none">
           <Image src="/img/profile.png" alt="Profile" width={32} height={32} />
           <div className="flex flex-col gap-1">
-            <p className="text-base font-medium">Halo, {name}</p>
+            <p className="text-base font-medium">Hello, {name}</p>
             {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-tertiary text-[0.625rem] rounded-lg px-3">

@@ -71,27 +71,26 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
       const formData = new FormData();
       formData.append("data", JSON.stringify(data));
 
-      // Append file images
+      // Append uploaded image
       if (data.imageFile instanceof File) {
         formData.append("imageFile", data.imageFile);
       }
 
       const result = await materialProvider.createMaterial(formData);
-
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Materi pelajaran berhasil dibuat!");
+        toast.success(message ?? "Learning material created successfully!");
         onFinish(data);
         setFileList([]);
       } else {
-        toast.error(message ?? "Pembuatan materi pelajaran gagal.");
+        toast.error(message ?? "Failed to create learning material.");
       }
 
       setIsLoading(false);
     };
 
-    // Expose ke parent
+    // Expose to parent
     useImperativeHandle(ref, () => ({
       isDirty,
     }));
@@ -113,8 +112,8 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Nama"
-                  placeholder="Masukkan nama materi pelajaran"
+                  label="Name"
+                  placeholder="Enter learning material name"
                   errors={errors}
                   required
                 />
@@ -122,8 +121,8 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <SelectField
                   control={control}
                   name="subjectId"
-                  label="Mata Pelajaran"
-                  placeholder="Pilih mata pelajaran"
+                  label="Subject"
+                  placeholder="Select subject"
                   options={subjectOptions}
                   errors={errors}
                   loading={subjectOptions.length === 0}
@@ -134,16 +133,16 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi materi pelajaran"
+                  label="Description"
+                  placeholder="Enter description of the learning material"
                   errors={errors}
                 />
 
                 <SelectField
                   control={control}
                   name="gradeIds"
-                  label="Tingkat Kelas"
-                  placeholder="Pilih tingkat kelas"
+                  label="Grade Level"
+                  placeholder="Select grade level(s)"
                   options={gradeOptions}
                   errors={errors}
                   loading={gradeOptions.length === 0}
@@ -156,7 +155,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Gambar"
+                label="Upload Image"
                 fileList={fileList}
                 setFileList={setFileList}
                 errors={errors}

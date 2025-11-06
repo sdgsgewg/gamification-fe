@@ -64,20 +64,19 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
       setIsLoading(true);
 
       const result = await taskTypeProvider.createTaskType(data);
-
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Tipe tugas berhasil dibuat!");
+        toast.success(message ?? "Task type created successfully!");
         onFinish(data);
       } else {
-        toast.error(message ?? "Pembuatan tipe tugas gagal.");
+        toast.error(message ?? "Failed to create task type.");
       }
 
       setIsLoading(false);
     };
 
-    // Expose ke parent
+    // Expose to parent
     useImperativeHandle(ref, () => ({
       isDirty,
     }));
@@ -99,8 +98,8 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Nama"
-                  placeholder="Masukkan nama tipe tugas"
+                  label="Name"
+                  placeholder="Enter task type name"
                   errors={errors}
                   required
                 />
@@ -108,8 +107,8 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi tipe tugas"
+                  label="Description"
+                  placeholder="Enter task type description"
                   errors={errors}
                 />
 
@@ -117,7 +116,7 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                   control={control}
                   name="scope"
                   label="Scope"
-                  placeholder="Pilih scope"
+                  placeholder="Select scope"
                   options={scopeOptions}
                   errors={errors}
                   loading={scopeOptions.length === 0}
@@ -129,7 +128,7 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                   control={control}
                   name="hasDeadline"
                   label="Has Deadline"
-                  placeholder="Pilih nilai"
+                  placeholder="Select value"
                   options={booleanFieldOptions}
                   errors={errors}
                   loading={booleanFieldOptions.length === 0}
@@ -141,7 +140,7 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                   control={control}
                   name="isRepeatable"
                   label="Is Repeatable"
-                  placeholder="Pilih nilai"
+                  placeholder="Select value"
                   options={booleanFieldOptions}
                   errors={errors}
                   loading={booleanFieldOptions.length === 0}

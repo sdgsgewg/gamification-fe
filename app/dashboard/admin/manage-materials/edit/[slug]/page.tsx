@@ -48,7 +48,7 @@ const EditMaterialPage = () => {
   };
 
   const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
-    console.log("Edit material successful with:", values);
+    console.log("Material edit successful with:", values);
     router.push(`${baseRoute}`);
   };
 
@@ -57,7 +57,7 @@ const EditMaterialPage = () => {
       {isLoading && <Loading />}
 
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Materi Pelajaran" onBack={handleBack} />
+      <DashboardTitle title="Edit Learning Material" onBack={handleBack} />
       {materialData && (
         <EditMaterialForm
           ref={formRef}

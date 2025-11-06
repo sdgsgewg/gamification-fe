@@ -58,37 +58,39 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
       label: BooleanFieldLabels[value],
     }));
 
+    // Initialize form with data and inject updatedBy
     useInitializeForm<EditTaskTypeFormInputs>(reset, taskTypeData, (d) => ({
       ...d,
       updatedBy: getCachedUserProfile()?.name,
     }));
+
     const isDirty = Object.keys(dirtyFields).some(
       (field) => field !== "updatedBy"
     );
+
     useNavigationGuard(isDirty);
 
+    // Submit handler
     const onSubmit = async (data: EditTaskTypeFormInputs) => {
       if (!taskTypeData || !taskTypeData.taskTypeId) return;
 
       const taskTypeId = taskTypeData.taskTypeId;
-
       setIsLoading(true);
 
       const result = await taskTypeProvider.updateTaskType(taskTypeId, data);
-
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Tipe tugas berhasil diperbarui!");
+        toast.success(message ?? "Task type successfully updated!");
         onFinish(data);
       } else {
-        toast.error(message ?? "Pembaruan tipe tugas gagal.");
+        toast.error(message ?? "Failed to update task type.");
       }
 
       setIsLoading(false);
     };
 
-    // Expose ke parent
+    // Expose to parent
     useImperativeHandle(ref, () => ({
       isDirty,
     }));
@@ -110,8 +112,8 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Nama"
-                  placeholder="Masukkan nama tipe tugas"
+                  label="Name"
+                  placeholder="Enter task type name"
                   errors={errors}
                   required
                 />
@@ -119,8 +121,8 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi tipe tugas"
+                  label="Description"
+                  placeholder="Enter task type description"
                   errors={errors}
                 />
 
@@ -128,7 +130,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
                   control={control}
                   name="scope"
                   label="Scope"
-                  placeholder="Pilih scope"
+                  placeholder="Select scope"
                   options={scopeOptions}
                   errors={errors}
                   loading={scopeOptions.length === 0}
@@ -140,7 +142,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
                   control={control}
                   name="hasDeadline"
                   label="Has Deadline"
-                  placeholder="Pilih nilai"
+                  placeholder="Select value"
                   options={booleanFieldOptions}
                   errors={errors}
                   loading={booleanFieldOptions.length === 0}
@@ -152,7 +154,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
                   control={control}
                   name="isRepeatable"
                   label="Is Repeatable"
-                  placeholder="Pilih nilai"
+                  placeholder="Select value"
                   options={booleanFieldOptions}
                   errors={errors}
                   loading={booleanFieldOptions.length === 0}

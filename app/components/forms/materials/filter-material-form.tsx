@@ -10,7 +10,7 @@ import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISub
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import {
   filterMaterialDefaultValues,
-  FilterMaterialInputs,
+  FilterMaterialFormInputs,
   filterMaterialSchema,
 } from "@/app/schemas/materials/filterMaterial";
 import { FormRef } from "@/app/interface/forms/IFormRef";
@@ -18,7 +18,7 @@ import { FormRef } from "@/app/interface/forms/IFormRef";
 interface FilterMaterialFormProps {
   subjectData: SubjectOverviewResponse[];
   gradeData: GradeOverviewResponse[];
-  onFinish: (values: FilterMaterialInputs) => void;
+  onFinish: (values: FilterMaterialFormInputs) => void;
 }
 
 const FilterMaterialForm = forwardRef<FormRef, FilterMaterialFormProps>(
@@ -28,7 +28,7 @@ const FilterMaterialForm = forwardRef<FormRef, FilterMaterialFormProps>(
       handleSubmit,
       formState: { errors },
       reset,
-    } = useForm<FilterMaterialInputs>({
+    } = useForm<FilterMaterialFormInputs>({
       resolver: zodResolver(filterMaterialSchema),
       defaultValues: filterMaterialDefaultValues,
     });

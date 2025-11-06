@@ -4,16 +4,9 @@ import Image from "next/image";
 import { UpdateTaskRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
 import DetailPageWrapper from "../../../shared/detail-page/DetailPageWrapper";
 import {
-  DetailInformationTable,
   DurationTable,
+  TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
-import {
-  GradeRow,
-  MaterialRow,
-  NumberRow,
-  SubjectRow,
-  TaskTypeRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IMaterialOverviewResponse";
 import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
@@ -23,6 +16,10 @@ import { getDateTime, getDuration } from "@/app/utils/date";
 import QuestionCard from "./QuestionCard";
 import { getImageSrc } from "@/app/utils/image";
 import ModifyTaskNavigationBarWrapper from "./ModifyTaskNavigationBarWrapper";
+import {
+  TaskDifficulty,
+  TaskDifficultyLabels,
+} from "@/app/enums/TaskDifficulty";
 
 interface ModifyTaskSummaryContentProps {
   payload: CreateTaskRequest | UpdateTaskRequest;
@@ -120,25 +117,28 @@ const ModifyTaskSummaryContent = ({
   };
 
   const RightSideContent = () => {
+    const { questions, difficulty, startTime, endTime } = payload;
+
     return (
       <>
         {/* Informasi Detail */}
-        <DetailInformationTable>
-          <SubjectRow value={subjectName} />
-          <MaterialRow value={materialName} />
-          <TaskTypeRow value={taskTypeName} />
-          <NumberRow label="Jumlah Soal" value={payload.questions.length} />
-          <GradeRow value={taskGrade} />
-        </DetailInformationTable>
+        <TaskDetailInformationTable
+          subject={subjectName}
+          material={materialName}
+          type={taskTypeName}
+          questionCount={questions.length}
+          // difficulty={TaskDifficultyLabels[difficulty as TaskDifficulty]}
+          difficulty={
+            TaskDifficultyLabels[difficulty as TaskDifficulty] ?? difficulty
+          }
+          grade={taskGrade}
+        />
 
         {/* Waktu Pengerjaan */}
         <DurationTable
-          startTime={getDateTime(payload.startTime ?? null)}
-          endTime={getDateTime(payload.endTime ?? null)}
-          duration={getDuration(
-            payload.startTime ?? null,
-            payload.endTime ?? null
-          )}
+          startTime={getDateTime(startTime ?? null)}
+          endTime={getDateTime(endTime ?? null)}
+          duration={getDuration(startTime ?? null, endTime ?? null)}
         />
       </>
     );

@@ -172,6 +172,15 @@ const TaskPage = () => {
       }),
     },
     {
+      title: "Difficulty",
+      key: "difficulty",
+      width: 150,
+      render: (_, record) => record.difficulty || "-",
+      onCell: () => ({
+        style: { minWidth: 150 },
+      }),
+    },
+    {
       title: "Actions",
       key: "actions",
       width: 200,

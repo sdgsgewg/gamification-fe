@@ -31,6 +31,10 @@ import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 import { useInjectUser } from "@/app/hooks/form/useInjectUser";
 import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
 import { useInitializeFileListBetweenView } from "@/app/hooks/file/useInitializeFileList";
+import {
+  TaskDifficulty,
+  TaskDifficultyLabels,
+} from "@/app/enums/TaskDifficulty";
 
 interface CreateTaskOverviewFormProps {
   taskOverview: CreateTaskOverviewFormInputs;
@@ -130,6 +134,11 @@ const CreateTaskOverviewForm = forwardRef<
         })),
       [gradeData]
     );
+
+    const difficultyOptions = Object.values(TaskDifficulty).map((value) => ({
+      value,
+      label: TaskDifficultyLabels[value],
+    }));
 
     useInjectUser(setValue, ["creatorId", "createdBy"]);
     const excludedFields = ["creatorId", "createdBy"];
@@ -250,6 +259,18 @@ const CreateTaskOverviewForm = forwardRef<
                   loading={gradeOptions.length === 0}
                   disabled={gradeOptions.length === 0}
                   mode="multiple"
+                />
+
+                <SelectField
+                  control={control}
+                  name="difficulty"
+                  label="Tingkat Kesulitan"
+                  placeholder="Pilih tingkat kesulitan"
+                  options={difficultyOptions}
+                  errors={errors}
+                  loading={difficultyOptions.length === 0}
+                  disabled={difficultyOptions.length === 0}
+                  required
                 />
 
                 {selectedTaskTypeHasDeadline && (

@@ -5,16 +5,9 @@ import { useRouter, useParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import {
-  GradeRow,
-  MaterialRow,
-  NumberRow,
-  SubjectRow,
-  TaskTypeRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
-import {
-  DetailInformationTable,
   DurationTable,
   ProgressTable,
+  TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { getDateTime } from "@/app/utils/date";
 import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
@@ -27,11 +20,11 @@ import StatusBar from "@/app/components/shared/StatusBar";
 import Button from "@/app/components/shared/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import {
-  ActivityAttemptStatus,
-  ActivityAttemptStatusLabels,
-} from "@/app/enums/ActivityAttemptStatus";
 import PageLayout from "../../page-layout";
+import {
+  TaskAttemptStatus,
+  TaskAttemptStatusLabels,
+} from "@/app/enums/TaskAttemptStatus";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -128,6 +121,7 @@ const ActivityDetailPage = () => {
       material,
       type,
       questionCount,
+      difficulty,
       grade,
       currAttempt,
       recentAttempt,
@@ -152,23 +146,22 @@ const ActivityDetailPage = () => {
       : null;
     const completedAt = recentAttempt ? recentAttempt.completedAt : null;
     const statusLabel = currAttempt
-      ? ActivityAttemptStatusLabels[currAttempt.status as ActivityAttemptStatus]
+      ? TaskAttemptStatusLabels[currAttempt.status as TaskAttemptStatus]
       : recentAttempt
-      ? ActivityAttemptStatusLabels[
-          recentAttempt.status as ActivityAttemptStatus
-        ]
+      ? TaskAttemptStatusLabels[recentAttempt.status as TaskAttemptStatus]
       : "";
 
     return (
       <>
         {/* Informasi Detail */}
-        <DetailInformationTable>
-          <SubjectRow value={subject.name} />
-          <MaterialRow value={material?.name ?? ""} />
-          <TaskTypeRow value={type.name} />
-          <NumberRow label="Jumlah Soal" value={questionCount} />
-          <GradeRow value={grade} />
-        </DetailInformationTable>
+        <TaskDetailInformationTable
+          subject={subject.name}
+          material={material?.name}
+          type={type.name}
+          questionCount={questionCount}
+          difficulty={difficulty}
+          grade={grade}
+        />
 
         {/* Waktu Pengerjaan */}
         {(startTime || endTime || activityDuration) && (

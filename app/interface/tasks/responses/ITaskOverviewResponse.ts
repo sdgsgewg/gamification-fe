@@ -7,4 +7,5 @@ export interface TaskOverviewResponse {
   material?: string;
   taskGrade: string;
   questionCount: number;
+  difficulty: string;
 }

@@ -1,4 +1,4 @@
-import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
+import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 
 interface ActivityType {
   name: string;
@@ -9,14 +9,14 @@ interface CurrentAttempt {
   answeredCount: number;
   startedAt: string;
   lastAccessedAt: string;
-  status: ActivityAttemptStatus;
+  status: TaskAttemptStatus;
 }
 
 interface RecentAttempt {
   startedAt: string;
   lastAccessedAt: string;
   completedAt: string;
-  status: ActivityAttemptStatus;
+  status: TaskAttemptStatus;
 }
 
 interface ActivityDuration {
@@ -35,6 +35,7 @@ export interface ActivityDetailResponse {
   material?: { id: string; name: string };
   grade: string;
   questionCount: number;
+  difficulty: string;
   createdBy: string;
   type: ActivityType;
   currAttempt?: CurrentAttempt;

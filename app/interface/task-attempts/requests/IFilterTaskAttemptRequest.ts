@@ -1,8 +1,8 @@
-import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
+import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 
 export interface FilterTaskAttemptRequest {
   searchText?: string;
-  status?: ActivityAttemptStatus | null;
+  status?: TaskAttemptStatus | null;
   dateFrom?: Date;
   dateTo?: Date;
   orderBy?: "startedAt" | "lastAccesedAt" | "completedAt" | "name";

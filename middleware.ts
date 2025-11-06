@@ -77,9 +77,9 @@ export function middleware(req: NextRequest) {
   console.log("Current URL =>", url);
 
   // Batasi url khusus admin
-  // if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {
-  //   return NextResponse.redirect(new URL("/", req.url));
-  // }
+  if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 
   // const allowedPaths = roleAccess[role] || [];
   // const isAllowed = allowedPaths.some(

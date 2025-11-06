@@ -23,6 +23,7 @@ export interface UpdateTaskRequest {
   taskTypeId: string;
   gradeIds: string[];
   updatedBy: string;
+  difficulty: string;
   description?: string | null;
   materialId?: string;
   startTime?: Date;

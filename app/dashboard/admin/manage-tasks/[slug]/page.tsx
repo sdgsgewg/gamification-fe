@@ -8,16 +8,9 @@ import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
-  GradeRow,
-  MaterialRow,
-  NumberRow,
-  SubjectRow,
-  TaskTypeRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
-import {
-  DetailInformationTable,
   DurationTable,
   HistoryTable,
+  TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
@@ -99,29 +92,41 @@ const TaskDetailPage = () => {
   };
 
   const RightSideContent = () => {
+    const {
+      subject,
+      material,
+      taskType,
+      questionCount,
+      difficulty,
+      taskGrade,
+      startTime,
+      endTime,
+      duration,
+      createdBy,
+      updatedBy,
+    } = taskData;
+
     return (
       <>
         {/* Informasi Detail */}
-        <DetailInformationTable>
-          <SubjectRow value={taskData.subject.name} />
-          <MaterialRow value={taskData.material?.name ?? ""} />
-          <TaskTypeRow value={taskData.taskType.name} />
-          <NumberRow label="Jumlah Soal" value={taskData.questionCount} />
-          <GradeRow value={taskData.taskGrade} />
-        </DetailInformationTable>
+        <TaskDetailInformationTable
+          subject={subject.name}
+          material={material?.name}
+          type={taskType.name}
+          questionCount={questionCount}
+          difficulty={difficulty}
+          grade={taskGrade}
+        />
 
         {/* Waktu Pengerjaan */}
         <DurationTable
-          startTime={getDateTime(taskData.startTime ?? null)}
-          endTime={getDateTime(taskData.endTime ?? null)}
-          duration={taskData.duration}
+          startTime={getDateTime(startTime ?? null)}
+          endTime={getDateTime(endTime ?? null)}
+          duration={duration}
         />
 
         {/* Riwayat */}
-        <HistoryTable
-          createdBy={taskData.createdBy}
-          updatedBy={taskData.updatedBy}
-        />
+        <HistoryTable createdBy={createdBy} updatedBy={updatedBy} />
       </>
     );
   };

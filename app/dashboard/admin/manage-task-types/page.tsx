@@ -147,24 +147,6 @@ const TaskTypePage = () => {
       }),
     },
     {
-      title: "Is Competitive",
-      key: "isCompetitive",
-      width: 150,
-      render: (_, record) =>
-        record.isCompetitive ? (
-          <Tag icon={<CheckOutlined />} color="green">
-            Yes
-          </Tag>
-        ) : (
-          <Tag icon={<CloseOutlined />} color="red">
-            No
-          </Tag>
-        ),
-      onCell: () => ({
-        style: { minWidth: 150 },
-      }),
-    },
-    {
       title: "Is Repeatable",
       key: "isRepeatable",
       width: 150,
@@ -178,15 +160,6 @@ const TaskTypePage = () => {
             No
           </Tag>
         ),
-      onCell: () => ({
-        style: { minWidth: 150 },
-      }),
-    },
-    {
-      title: "Point Multiplier",
-      key: "pointMultiplier",
-      width: 150,
-      render: (_, record) => record.pointMultiplier ?? "-",
       onCell: () => ({
         style: { minWidth: 150 },
       }),

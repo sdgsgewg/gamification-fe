@@ -9,9 +9,9 @@ import { faCheck, faClock } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "@/app/constants/routes";
 import { Tag } from "antd";
 import {
-  ActivityAttemptStatus,
-  ActivityAttemptStatusLabels,
-} from "@/app/enums/ActivityAttemptStatus";
+  TaskAttemptStatus,
+  TaskAttemptStatusLabels,
+} from "@/app/enums/TaskAttemptStatus";
 import { IMAGES } from "@/app/constants/images";
 
 interface HistoryCardProps {
@@ -53,7 +53,7 @@ const HistoryCard = ({ attempt }: HistoryCardProps) => {
           <Tag color={completedTime ? "green" : "yellow"} className="!m-0">
             <FontAwesomeIcon icon={completedTime ? faCheck : faClock} />
             <span className="ms-1">
-              {ActivityAttemptStatusLabels[status as ActivityAttemptStatus]}
+              {TaskAttemptStatusLabels[status as TaskAttemptStatus]}
             </span>
           </Tag>
         </div>

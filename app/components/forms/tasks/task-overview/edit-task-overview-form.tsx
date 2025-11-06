@@ -37,6 +37,10 @@ import {
 } from "@/app/hooks/file/useInitializeFileList";
 import { EditTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/editTaskQuestion";
 import { isEqual } from "lodash";
+import {
+  TaskDifficulty,
+  TaskDifficultyLabels,
+} from "@/app/enums/TaskDifficulty";
 
 interface EditTaskOverviewFormProps {
   taskOverviewDefaultValue: EditTaskOverviewFormInputs;
@@ -145,6 +149,11 @@ const EditTaskOverviewForm = forwardRef<
         })),
       [gradeData]
     );
+
+    const difficultyOptions = Object.values(TaskDifficulty).map((value) => ({
+      value,
+      label: TaskDifficultyLabels[value],
+    }));
 
     useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
       ...d,
@@ -309,6 +318,18 @@ const EditTaskOverviewForm = forwardRef<
                   loading={gradeOptions.length === 0}
                   disabled={gradeOptions.length === 0}
                   mode="multiple"
+                />
+
+                <SelectField
+                  control={control}
+                  name="difficulty"
+                  label="Tingkat Kesulitan"
+                  placeholder="Pilih tingkat kesulitan"
+                  options={difficultyOptions}
+                  errors={errors}
+                  loading={difficultyOptions.length === 0}
+                  disabled={difficultyOptions.length === 0}
+                  required
                 />
 
                 {selectedTaskTypeHasDeadline && (

@@ -1,12 +1,18 @@
 "use client";
 
+import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import React from "react";
 
 export default function DashboardPage() {
   // Mock Data
   const tasks = [
     { id: 1, title: "Math Quiz 1", status: "Active", deadline: "Nov 10, 2025" },
-    { id: 2, title: "English Quiz 2", status: "Past Due", deadline: "Nov 1, 2025" },
+    {
+      id: 2,
+      title: "English Quiz 2",
+      status: "Past Due",
+      deadline: "Nov 1, 2025",
+    },
   ];
 
   const leaderboard = [
@@ -16,14 +22,22 @@ export default function DashboardPage() {
   ];
 
   const activities = [
-    { id: 1, message: "You completed 'English Essay' task", date: "Nov 3, 2025" },
-    { id: 2, message: "You earned 50 XP from 'Math Quiz 1'", date: "Nov 2, 2025" },
+    {
+      id: 1,
+      message: "You completed 'English Essay' task",
+      date: "Nov 3, 2025",
+    },
+    {
+      id: 2,
+      message: "You earned 50 XP from 'Math Quiz 1'",
+      date: "Nov 2, 2025",
+    },
     { id: 3, message: "Leaderboard updated", date: "Nov 1, 2025" },
   ];
 
   return (
-    <main className="p-6 min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
-      <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
+    <>
+      <DashboardTitle title="Dashboard" showBackButton={false} />
 
       {/* === Main Grid === */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -107,6 +121,6 @@ export default function DashboardPage() {
           ))}
         </ul>
       </div>
-    </main>
+    </>
   );
 }

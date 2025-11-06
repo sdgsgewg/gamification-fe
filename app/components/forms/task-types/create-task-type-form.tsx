@@ -17,7 +17,6 @@ import FormLayout from "@/app/dashboard/form-layout";
 import Loading from "../../shared/Loading";
 import SelectField from "../../fields/SelectField";
 import { taskTypeProvider } from "@/app/functions/TaskTypeProvider";
-import NumberField from "../../fields/NumberField";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { TaskTypeScope, TaskTypeScopeLabels } from "@/app/enums/TaskTypeScope";
 import { BooleanField, BooleanFieldLabels } from "@/app/enums/BooleanField";
@@ -140,18 +139,6 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
 
                 <SelectField
                   control={control}
-                  name="isCompetitive"
-                  label="Is Competitive"
-                  placeholder="Pilih nilai"
-                  options={booleanFieldOptions}
-                  errors={errors}
-                  loading={booleanFieldOptions.length === 0}
-                  disabled={booleanFieldOptions.length === 0}
-                  required
-                />
-
-                <SelectField
-                  control={control}
                   name="isRepeatable"
                   label="Is Repeatable"
                   placeholder="Pilih nilai"
@@ -160,17 +147,6 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                   loading={booleanFieldOptions.length === 0}
                   disabled={booleanFieldOptions.length === 0}
                   required
-                />
-
-                <NumberField
-                  control={control}
-                  name="pointMultiplier"
-                  label="Point Multiplier"
-                  placeholder="Masukkan angka"
-                  errors={errors}
-                  required
-                  min={0}
-                  step={1}
                 />
               </>
             }

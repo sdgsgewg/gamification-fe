@@ -1,11 +1,11 @@
 export enum TaskTypeScope {
-  GLOBAL = "global",
-  CLASS = "class",
-  BOTH = "both",
+  ACTIVITY = "ACTIVITY",
+  CLASS = "CLASS",
+  GLOBAL = "GLOBAL",
 }
 
 export const TaskTypeScopeLabels: Record<TaskTypeScope, string> = {
-  [TaskTypeScope.GLOBAL]: "Global",
+  [TaskTypeScope.ACTIVITY]: "Activity",
   [TaskTypeScope.CLASS]: "Class",
-  [TaskTypeScope.BOTH]: "Both",
+  [TaskTypeScope.GLOBAL]: "Global",
 };

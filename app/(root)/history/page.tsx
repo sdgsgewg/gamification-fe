@@ -5,11 +5,11 @@ import PageLayout from "../page-layout";
 import { useTaskAttemptsByUser } from "@/app/hooks/task-attempts/useTaskAttemptsByUser";
 import HistoryCard from "@/app/components/pages/History/HistoryCard";
 import { FilterTaskAttemptRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptRequest";
-import {
-  ActivityAttemptStatus,
-  ActivityAttemptStatusLabels,
-} from "@/app/enums/ActivityAttemptStatus";
 import Button from "@/app/components/shared/Button";
+import {
+  TaskAttemptStatus,
+  TaskAttemptStatusLabels,
+} from "@/app/enums/TaskAttemptStatus";
 
 const HistoryPage = () => {
   const [filters, setFilters] = useState<FilterTaskAttemptRequest>({
@@ -20,18 +20,18 @@ const HistoryPage = () => {
   });
   const { data: groupedAttempts = [] } = useTaskAttemptsByUser(filters);
 
-  const tabs: { key: ActivityAttemptStatus | null; label: string }[] = [
+  const tabs: { key: TaskAttemptStatus | null; label: string }[] = [
     {
       key: null,
       label: "All",
     },
     {
-      key: ActivityAttemptStatus.ON_PROGRESS,
-      label: ActivityAttemptStatusLabels["on_progress"],
+      key: TaskAttemptStatus.ON_PROGRESS,
+      label: TaskAttemptStatusLabels["on_progress"],
     },
     {
-      key: ActivityAttemptStatus.COMPLETED,
-      label: ActivityAttemptStatusLabels["completed"],
+      key: TaskAttemptStatus.COMPLETED,
+      label: TaskAttemptStatusLabels["completed"],
     },
   ];
 

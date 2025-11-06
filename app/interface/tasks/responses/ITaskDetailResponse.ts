@@ -26,6 +26,7 @@ export interface TaskDetailResponse {
   taskGradeIds: string[];
   taskGrade: string;
   questionCount: number;
+  difficulty: string;
   startTime?: Date | null;
   endTime?: Date | null;
   duration?: string;

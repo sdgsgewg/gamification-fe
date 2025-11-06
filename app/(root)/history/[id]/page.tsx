@@ -12,25 +12,21 @@ import {
   DetailInformationTable,
   DurationTable,
   ProgressTable,
+  TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
-import {
-  GradeRow,
-  MaterialRow,
-  NumberRow,
-  SubjectRow,
-  TaskTypeRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
+import { NumberRow } from "@/app/components/shared/table/detail-page/TableRowData";
 import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
 import { getDateTime } from "@/app/utils/date";
-import {
-  ActivityAttemptStatus,
-  ActivityAttemptStatusLabels,
-} from "@/app/enums/ActivityAttemptStatus";
+
 import Button from "@/app/components/shared/Button";
 import StatusBar from "@/app/components/shared/StatusBar";
 import { ROUTES } from "@/app/constants/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import {
+  TaskAttemptStatus,
+  TaskAttemptStatusLabels,
+} from "@/app/enums/TaskAttemptStatus";
 
 type BottomContentView = "stats" | "duration" | "progress" | "questions";
 
@@ -94,7 +90,7 @@ const HistoryDetailPage = () => {
     const status = progress.status;
 
     const buttonText =
-      status === ActivityAttemptStatus.ON_PROGRESS
+      status === TaskAttemptStatus.ON_PROGRESS
         ? "Lanjutkan"
         : type.isRepeatable
         ? "Kerja Ulang"
@@ -134,16 +130,18 @@ const HistoryDetailPage = () => {
   };
 
   const RightSideContent = () => {
-    const { subject, material, type, questionCount, grade } = attemptDetailData;
+    const { subject, material, type, questionCount, difficulty, grade } =
+      attemptDetailData;
 
     return (
-      <DetailInformationTable>
-        <SubjectRow value={subject} />
-        <MaterialRow value={material ?? ""} />
-        <TaskTypeRow value={type.name} />
-        <NumberRow label="Jumlah Soal" value={questionCount} />
-        <GradeRow value={grade} />
-      </DetailInformationTable>
+      <TaskDetailInformationTable
+        subject={subject}
+        material={material}
+        type={type.name}
+        questionCount={questionCount}
+        difficulty={difficulty}
+        grade={grade}
+      />
     );
   };
 
@@ -205,7 +203,7 @@ const HistoryDetailPage = () => {
         attemptDetailData.progress;
 
       const statusLabel =
-        ActivityAttemptStatusLabels[status as ActivityAttemptStatus] ?? "";
+        TaskAttemptStatusLabels[status as TaskAttemptStatus] ?? "";
 
       return (
         <ProgressTable

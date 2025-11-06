@@ -34,6 +34,9 @@ export const ROUTES = {
       HOME: "/dashboard/student",
       CLASS: "/dashboard/student/class",
       TASKS: "/dashboard/student/tasks",
+      TASKS_VIEW: "/dashboard/student/tasks/view",
+      TASKS_ATTEMPT: "/dashboard/student/tasks/attempt",
+      TASKS_SUMMARY: "/dashboard/student/tasks/summary",
       LEADERBOARD: "/dashboard/student/leaderboard",
     },
 
@@ -43,6 +46,9 @@ export const ROUTES = {
       HOME: "/dashboard/teacher",
       CLASS: "/dashboard/teacher/class",
       TASKS: "/dashboard/teacher/tasks",
+      TASKS_VIEW: "/dashboard/teacher/tasks/view",
+      TASKS_ATTEMPT: "/dashboard/teacher/tasks/attempt",
+      TASKS_SUMMARY: "/dashboard/teacher/tasks/summary",
       LEADERBOARD: "/dashboard/teacher/leaderboard",
     },
 

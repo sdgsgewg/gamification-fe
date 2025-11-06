@@ -15,4 +15,26 @@ export const leaderboardProvider = {
       return handleAxiosError<GlobalLeaderboardResponse[]>(error);
     }
   },
+
+  async getClassLeaderboard(): Promise<
+    ApiResponse<GlobalLeaderboardResponse[]>
+  > {
+    try {
+      const data = await getAxios(`${API_URL}/classes`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<GlobalLeaderboardResponse[]>(error);
+    }
+  },
+
+  async getClassStudentsLeaderboard(
+    classId: string
+  ): Promise<ApiResponse<GlobalLeaderboardResponse[]>> {
+    try {
+      const data = await getAxios(`${API_URL}/classes/${classId}/students`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<GlobalLeaderboardResponse[]>(error);
+    }
+  },
 };

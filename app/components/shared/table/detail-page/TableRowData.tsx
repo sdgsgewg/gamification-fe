@@ -9,8 +9,8 @@ export const SubjectRow = ({ value }: SubjectRowProps) => {
   return (
     <DetailPageTableContent
       imageSrc={IMAGES.SUBJECT}
-      imageAlt="Mata Pelajaran"
-      label="Mata Pelajaran"
+      imageAlt="Subject"
+      label="Subject"
       value={value}
     />
   );
@@ -24,8 +24,8 @@ export const MaterialRow = ({ value }: MaterialRowProps) => {
   return (
     <DetailPageTableContent
       imageSrc={IMAGES.MATERIAL}
-      imageAlt="Materi Pelajaran"
-      label="Materi Pelajaran"
+      imageAlt="Material"
+      label="Material"
       value={value}
     />
   );
@@ -39,8 +39,8 @@ export const GradeRow = ({ value }: GradeRowProps) => {
   return (
     <DetailPageTableContent
       imageSrc={IMAGES.GRADE}
-      imageAlt="Tingkatan Kelas"
-      label="Ditujukan Untuk Kelas"
+      imageAlt="Grade"
+      label="Grade"
       value={value}
     />
   );
@@ -54,8 +54,23 @@ export const TaskTypeRow = ({ value }: TaskTypeRowProps) => {
   return (
     <DetailPageTableContent
       imageSrc={IMAGES.TASK}
-      imageAlt="Tipe Tugas"
-      label="Tipe Tugas"
+      imageAlt="Task Type"
+      label="Task Type"
+      value={value}
+    />
+  );
+};
+
+interface DifficultyRowProps {
+  value: string;
+}
+
+export const DifficultyRow = ({ value }: DifficultyRowProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.DIFFICULTY}
+      imageAlt="Difficulty"
+      label="Difficulty"
       value={value}
     />
   );

@@ -8,9 +8,7 @@ import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
-  IsCompetitiveRow,
   IsRepeatableRow,
-  NumberRow,
   ScopeRow,
   TimeRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
@@ -103,12 +101,7 @@ const TaskTypeDetailPage = () => {
         <DetailInformationTable>
           <ScopeRow value={taskTypeData.scope} />
           <TimeRow label="Has Deadline" value={taskTypeData.hasDeadline} />
-          <IsCompetitiveRow value={taskTypeData.isCompetitive} />
           <IsRepeatableRow value={taskTypeData.isRepeatable} />
-          <NumberRow
-            label="Point Multiplier"
-            value={taskTypeData.pointMultiplier}
-          />
         </DetailInformationTable>
 
         {/* Riwayat */}

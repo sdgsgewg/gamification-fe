@@ -30,6 +30,8 @@ export const IMAGES = {
   GRADE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/grade.png",
   TASK: "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/task.png",
+  DIFFICULTY:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/difficulty.png",
   NUMBER:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/number.png",
   DATE: "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/date.png",
@@ -60,6 +62,10 @@ export const IMAGES = {
   REPEATBALE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/repeatable.png",
 
+  // Dashboard Class
+  DEFAULT_CLASS:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/classes/default.png",
+
   // Activity
   WORK_PROGRESS:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/activity/work_progress.png",
@@ -80,5 +86,5 @@ export const IMAGES = {
   BRONZE_MEDAL_CROP:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/leaderboard/bronze-medal-crop.png",
 
-    //Profile
+  //Profile
 };

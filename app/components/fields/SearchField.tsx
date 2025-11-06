@@ -11,6 +11,7 @@ interface SearchFieldProps {
   placeholder?: string;
   formId: string;
   className?: string;
+  inputClassName?: string;
 }
 
 const SearchField = ({
@@ -19,6 +20,7 @@ const SearchField = ({
   placeholder,
   formId,
   className,
+  inputClassName,
 }: SearchFieldProps) => {
   return (
     <Form.Item name={name} style={{ marginBottom: "0rem" }}>
@@ -31,7 +33,7 @@ const SearchField = ({
               {...field}
               placeholder={placeholder}
               size="large"
-              className="!rounded-r-none"
+              className={`${inputClassName} !rounded-r-none`}
             />
             <Button
               key="submit"
@@ -40,7 +42,7 @@ const SearchField = ({
               variant="primary"
               hasBorder
               size="large"
-              className="!border-l-0 !rounded-l-none"
+              className={`${inputClassName} !border-l-0 !rounded-l-none `}
               form={formId}
             >
               <SearchOutlined />

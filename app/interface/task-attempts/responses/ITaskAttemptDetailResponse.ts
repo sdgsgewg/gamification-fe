@@ -1,4 +1,4 @@
-import { ActivityAttemptStatus } from "@/app/enums/ActivityAttemptStatus";
+import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 
 interface TaskType {
   name: string;
@@ -26,7 +26,7 @@ interface TaskAttemptProgress {
   startedAt: string;
   lastAccessedAt: string;
   completedAt: string;
-  status: ActivityAttemptStatus;
+  status: TaskAttemptStatus;
 }
 
 interface AnswerLog {
@@ -64,6 +64,7 @@ export interface TaskAttemptDetailResponse {
   material: string;
   grade: string;
   questionCount: number;
+  difficulty: string;
   createdBy: string;
   type: TaskType;
   attempt?: Attempt;

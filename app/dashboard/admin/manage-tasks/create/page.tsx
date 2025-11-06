@@ -100,6 +100,7 @@ const CreateTaskPage = () => {
           taskOverview.materialId === "" ? null : taskOverview.materialId,
         taskTypeId: taskOverview.taskTypeId,
         gradeIds: taskOverview.gradeIds,
+        difficulty: taskOverview.difficulty,
         createdBy: taskOverview.createdBy,
         startTime: taskOverview.startTime ?? null,
         endTime: taskOverview.endTime ?? null,

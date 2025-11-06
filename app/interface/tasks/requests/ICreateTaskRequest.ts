@@ -22,6 +22,7 @@ export interface CreateTaskRequest {
   taskTypeId: string;
   gradeIds: string[];
   createdBy: string;
+  difficulty: string;
   description?: string;
   materialId?: string | null;
   startTime?: Date | null;

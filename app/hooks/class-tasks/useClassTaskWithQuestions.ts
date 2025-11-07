@@ -5,7 +5,7 @@ import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
 import { ClassTaskWithQuestionsResponseDto } from "@/app/interface/class-tasks/responses/IClassTaskWithQuestionResponse";
 import { getImageSrc } from "@/app/utils/image";
 
-export const useActivityWithQuestions = (
+export const useClassTaskWithQuestions = (
   classSlug: string,
   taskSlug: string
 ) => {
@@ -16,6 +16,9 @@ export const useActivityWithQuestions = (
         classSlug,
         taskSlug
       );
+
+      console.log("Class task with questions: ", JSON.stringify(res, null, 2));
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 

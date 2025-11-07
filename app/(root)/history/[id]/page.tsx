@@ -17,7 +17,6 @@ import {
 import { NumberRow } from "@/app/components/shared/table/detail-page/TableRowData";
 import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
 import { getDateTime } from "@/app/utils/date";
-
 import Button from "@/app/components/shared/Button";
 import StatusBar from "@/app/components/shared/StatusBar";
 import { ROUTES } from "@/app/constants/routes";
@@ -27,8 +26,7 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
-
-type BottomContentView = "stats" | "duration" | "progress" | "questions";
+import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 
 const HistoryDetailPage = () => {
   const params = useParams<{ id: string }>();
@@ -146,13 +144,13 @@ const HistoryDetailPage = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<BottomContentView>("stats");
+    const [view, setView] = useState<TaskDetailBottomContentView>("stats");
 
     const { duration, progress } = attemptDetailData;
     const isCompleted = !!progress?.completedAt; // true kalau sudah selesai
 
     // Buat daftar tab dinamis
-    const tabs: { key: BottomContentView; label: string }[] = [
+    const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
       ...(isCompleted ? [{ key: "stats" as const, label: "Statistik" }] : []),
       { key: "duration" as const, label: "Durasi" },
       { key: "progress" as const, label: "Progres" },

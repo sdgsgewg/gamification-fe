@@ -5,4 +5,6 @@ export interface LoginDetailResponse {
   accessToken: string;
   refreshToken?: string;
   user: UserDetailResponse;
+  remember: boolean;
+  cookieMaxAge: number;
 }

@@ -17,6 +17,7 @@ import {
 } from "../utils/axiosHelper";
 import { LoginDetailResponse } from "../interface/auth/responses/ILoginDetailResponse";
 import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
+import { deleteCookie, setCookie } from "../utils/cookie";
 
 const API_URL = "/auth";
 
@@ -174,19 +175,21 @@ export function useAuth() {
       if (!data || !data.accessToken)
         throw new Error("Invalid response structure - missing access token");
 
+      const { accessToken, user, cookieMaxAge } = data;
+
       // Simpan ke localStorage
-      setItem("sessionToken", data.accessToken);
+      setItem("sessionToken", accessToken);
       setItem("isLoggedIn", JSON.stringify(true));
-      setItem("userProfile", JSON.stringify(data.user));
+      setItem("userProfile", JSON.stringify(user));
 
       // Simpan ke state
-      setSessionToken(data.accessToken);
+      setSessionToken(accessToken);
       setIsLoggedIn(true);
-      setUserProfile(data.user);
+      setUserProfile(user);
       setIsGuest(false);
 
       // Set cookie role
-      document.cookie = `role=${data.user.role.name}; path=/;`;
+      setCookie("role", user.role.name, cookieMaxAge);
 
       return res;
     } catch (error) {
@@ -238,7 +241,7 @@ export function useAuth() {
       authEventTarget.dispatchEvent(new Event("authChanged"));
 
       // Hapus cookie role
-      document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      deleteCookie("role");
 
       const res: BaseResponseDto = await postAxios(`${API_URL}/logout`);
 

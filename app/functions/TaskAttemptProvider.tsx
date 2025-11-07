@@ -22,6 +22,8 @@ export const taskAttemptProvider = {
 
       if (params?.searchText) query.append("searchText", params.searchText);
       if (params?.status) query.append("status", params.status);
+      if (params?.isClassTask)
+        query.append("isClassTask", params?.isClassTask ? "true" : "false");
       if (params?.dateFrom)
         query.append("dateFrom", params.dateFrom.toDateString());
       if (params?.dateTo) query.append("dateTo", params.dateTo.toDateString());
@@ -48,25 +50,50 @@ export const taskAttemptProvider = {
     }
   },
 
-  async createTaskAttempt(
+  async createActivityAttempt(
     payload: CreateTaskAttemptFormInputs
   ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await postAxios(API_URL, payload);
+        await postAxios(`${API_URL}/activity`, payload);
       return res;
     } catch (error) {
       return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
     }
   },
 
-  async updateTaskAttempt(
+  async createClassTaskAttempt(
+    payload: CreateTaskAttemptFormInputs
+  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+    try {
+      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
+        await postAxios(`${API_URL}/class`, payload);
+      return res;
+    } catch (error) {
+      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+    }
+  },
+
+  async updateActivityAttempt(
     id: string,
     payload: UpdateTaskAttemptFormInputs
   ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await putAxios(`${API_URL}/${id}`, payload);
+        await putAxios(`${API_URL}/activity/${id}`, payload);
+      return res;
+    } catch (error) {
+      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+    }
+  },
+
+  async updateClassTaskAttempt(
+    id: string,
+    payload: UpdateTaskAttemptFormInputs
+  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+    try {
+      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
+        await putAxios(`${API_URL}/class/${id}`, payload);
       return res;
     } catch (error) {
       return handleAxiosError<UpsertTaskAttemptResponseDto>(error);

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useActivityWithQuestions } from "@/app/hooks/activities/useActivityWithQuestions";
+import { useRouter, useSearchParams } from "next/navigation";
 import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
 import AttemptQuestionCard from "@/app/components/pages/Activity/Attempt/ActivityQuestionCard";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
@@ -10,27 +9,38 @@ import { CreateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/createT
 import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateTaskAttempt";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
-import PageLayout from "@/app/(root)/page-layout";
 import AttemptActivityNavigationBarWrapper from "@/app/components/pages/Activity/Attempt/AttemptActivityNavigationBarWrapper";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { MessageModal } from "@/app/components/modals/MessageModal";
-import { LevelUpModal } from "@/app/components/modals/LevelUpModal";
+import { useClassTaskWithQuestions } from "@/app/hooks/class-tasks/useClassTaskWithQuestions";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
+import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 
-interface LevelUpModalState {
-  visible: boolean;
-  newLevel: number | null;
-  xpGained: number | null;
-}
-
-const AttemptActivityPage = () => {
-  const params = useParams<{ slug: string }>();
+const StudentAttemptTaskPage = () => {
+  const searchParams = useSearchParams();
   const { user } = useGetCachedUser();
   const router = useRouter();
 
-  const { data: activityData, isLoading: isActivityDataLoading } =
-    useActivityWithQuestions(params.slug);
+  const [classSlug, setClassSlug] = useState<string>("");
+  const [taskSlug, setTaskSlug] = useState<string>("");
+
+  useEffect(() => {
+    if (searchParams) {
+      const cSlug = searchParams.get("class") ?? "";
+      const tSlug = searchParams.get("task") ?? "";
+
+      setClassSlug(cSlug);
+      setTaskSlug(tSlug);
+    }
+  }, [searchParams]);
+
+  const { data: classTaskData, isLoading: isClassTaskDataLoading } =
+    useClassTaskWithQuestions(classSlug, taskSlug);
+  const { data: classData, isLoading: isClassDataLoading } = useClassDetail(
+    classSlug,
+    "detail"
+  );
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -49,7 +59,7 @@ const AttemptActivityPage = () => {
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin mengumpulkan aktivitas ini? Mohon dikoreksi kembali.",
+    text: "Apakah anda yakin ingin mengumpulkan tugas ini? Mohon dikoreksi kembali.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -59,15 +69,9 @@ const AttemptActivityPage = () => {
     type: null as "submit" | "back" | null,
   });
 
-  const [levelUpModal, setLevelUpModal] = useState<LevelUpModalState>({
-    visible: false,
-    newLevel: null,
-    xpGained: null,
-  });
-
   // Catat waktu attempt (startedAt & lastAccessedAt)
   useEffect(() => {
-    const key = `activity_${params.slug}_startedAt`;
+    const key = `activity_${taskSlug}_startedAt`;
     const existingStart = sessionStorage.getItem(key);
 
     if (existingStart) {
@@ -79,17 +83,17 @@ const AttemptActivityPage = () => {
       setStartedAt(now);
       setLastAccessedAt(now);
     }
-  }, [params.slug]);
+  }, [taskSlug]);
 
-  // Prefill answers ketika activityData berhasil dimuat
+  // Prefill answers ketika classTaskData berhasil dimuat
   useEffect(() => {
-    if (!activityData) return;
+    if (!classTaskData) return;
 
     // Hanya jalankan prefill kalau ada attempt sebelumnya
-    if (activityData.lastAttemptId) {
+    if (classTaskData.lastAttemptId) {
       const prefilledAnswers: Record<string, any> = {};
 
-      activityData.questions.forEach((q) => {
+      classTaskData.questions.forEach((q) => {
         if (q.userAnswer) {
           prefilledAnswers[q.questionId] = {
             optionId: q.userAnswer.optionId,
@@ -109,7 +113,7 @@ const AttemptActivityPage = () => {
 
       setAnswers(prefilledAnswers);
     }
-  }, [activityData]);
+  }, [classTaskData]);
 
   const handleOptionSelect = (questionId: string, optionId: string) => {
     setAnswers((prev) => ({
@@ -125,14 +129,14 @@ const AttemptActivityPage = () => {
     }));
   };
 
-  if (!activityData) return <Loading />;
+  if (!classTaskData || !classData) return <Loading />;
 
   const handleOpenBackConfirmation = () => {
     setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = async () => {
-    if (!user || !activityData || !startedAt || !lastAccessedAt) return;
+    if (!user || !classTaskData || !startedAt || !lastAccessedAt) return;
 
     setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
 
@@ -150,8 +154,8 @@ const AttemptActivityPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !activityData.lastAttemptId;
-      const answerLogs = activityData.questions.map((q) => ({
+      const isNewAttempt = !classTaskData.lastAttemptId;
+      const answerLogs = classTaskData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
         optionId: answers[q.questionId]?.optionId || null,
@@ -169,12 +173,16 @@ const AttemptActivityPage = () => {
           status: TaskAttemptStatus.ON_PROGRESS,
           startedAt,
           lastAccessedAt,
-          taskId: activityData.id,
+          taskId: classTaskData.id,
           studentId: user.userId,
           answerLogs,
         };
 
-        result = await taskAttemptProvider.createActivityAttempt(payload);
+        console.log(
+          "Payload (Autosave - Create): ",
+          JSON.stringify(payload, null, 2)
+        );
+        result = await taskAttemptProvider.createClassTaskAttempt(payload);
       } else {
         // Update progres yang sudah ada
         const payload: UpdateTaskAttemptFormInputs = {
@@ -191,8 +199,8 @@ const AttemptActivityPage = () => {
             })),
         };
 
-        result = await taskAttemptProvider.updateActivityAttempt(
-          activityData.lastAttemptId!,
+        result = await taskAttemptProvider.updateClassTaskAttempt(
+          classTaskData.lastAttemptId!,
           payload
         );
       }
@@ -223,11 +231,11 @@ const AttemptActivityPage = () => {
   };
 
   const handleSubmitConfirmation = async () => {
-    if (!user || !activityData || !startedAt || !lastAccessedAt) return;
+    if (!user || !classTaskData || !startedAt || !lastAccessedAt) return;
 
     setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }));
 
-    const totalQuestions = activityData.questions.length;
+    const totalQuestions = classTaskData.questions.length;
     const answeredCount = Object.values(answers).filter(
       (a) => a.optionId || a.answerText
     ).length;
@@ -237,7 +245,7 @@ const AttemptActivityPage = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Mohon jawab semua soal untuk dapat mengumpulkan aktivitas.",
+        text: "Mohon jawab semua soal untuk dapat mengumpulkan tugas.",
         type: "submit",
       });
       return;
@@ -246,8 +254,8 @@ const AttemptActivityPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !activityData.lastAttemptId;
-      const answerLogs = activityData.questions.map((q) => ({
+      const isNewAttempt = !classTaskData.lastAttemptId;
+      const answerLogs = classTaskData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
         optionId: answers[q.questionId]?.optionId || null,
@@ -261,21 +269,24 @@ const AttemptActivityPage = () => {
           answeredQuestionCount: answerLogs.filter(
             (a) => a.optionId || a.answerText
           ).length,
-          status: TaskAttemptStatus.COMPLETED,
+          status: TaskAttemptStatus.SUBMITTED,
           startedAt,
           lastAccessedAt,
-          taskId: activityData.id,
+          taskId: classTaskData.id,
           studentId: user.userId,
+          classId: classData.id,
           answerLogs,
         };
 
-        result = await taskAttemptProvider.createActivityAttempt(payload);
+        console.log("Payload (Create): ", JSON.stringify(payload, null, 2));
+
+        result = await taskAttemptProvider.createClassTaskAttempt(payload);
       } else {
         const payload: UpdateTaskAttemptFormInputs = {
           answeredQuestionCount: answerLogs.filter(
             (a) => a.optionId || a.answerText
           ).length,
-          status: TaskAttemptStatus.COMPLETED,
+          status: TaskAttemptStatus.SUBMITTED,
           lastAccessedAt,
           answerLogs: answerLogs
             .filter((a) => a.optionId || a.answerText)
@@ -285,37 +296,20 @@ const AttemptActivityPage = () => {
             })),
         };
 
-        result = await taskAttemptProvider.updateActivityAttempt(
-          activityData.lastAttemptId!,
+        console.log("Payload (Update): ", JSON.stringify(payload, null, 2));
+
+        result = await taskAttemptProvider.updateClassTaskAttempt(
+          classTaskData.lastAttemptId!,
           payload
         );
-      }
-
-      const data = result.data;
-
-      if (data) {
-        const { leveledUp, levelChangeSummary } = data;
-
-        if (leveledUp && levelChangeSummary) {
-          const { newLevel, previousXp, newXp } = levelChangeSummary;
-          const xpGained = newXp - previousXp;
-
-          setLevelUpModal({
-            visible: true,
-            newLevel: newLevel ?? null,
-            xpGained: xpGained,
-          });
-
-          return;
-        }
       }
 
       setMessageModal({
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Aktivitas Telah Berhasil Dikumpulkan"
-          : "Aktivitas Gagal Dikumpulkan",
+          ? "Tugas Telah Berhasil Dikumpulkan"
+          : "Tugas Gagal Dikumpulkan",
         type: "submit",
       });
     } catch (err) {
@@ -331,89 +325,81 @@ const AttemptActivityPage = () => {
     if (!messageModal.isSuccess) return;
 
     if (messageModal.type === "submit") {
-      router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
+      const query = new URLSearchParams();
+      query.append("class", classSlug);
+      query.append("task", taskSlug);
+      const url = `${ROUTES.DASHBOARD.STUDENT.TASKS_SUMMARY}?${query}`;
+      router.push(url);
     } else if (messageModal.type === "back") {
       router.back();
     }
   };
 
-  const handleLevelUpModalConfirmation = () => {
-    setLevelUpModal((prev) => ({ ...prev, visible: false }));
-    router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
-  };
-
-  const currentQuestion = activityData.questions[selectedQuestionIndex];
+  const currentQuestion = classTaskData.questions[selectedQuestionIndex];
 
   return (
     <>
-      {(isActivityDataLoading || isLoading) && <Loading />}
+      {(isClassTaskDataLoading || isClassDataLoading || isLoading) && (
+        <Loading />
+      )}
 
-      <PageLayout>
-        {/* Navigation Atas */}
-        <AttemptActivityNavigationBarWrapper
-          onBack={handleOpenBackConfirmation}
-          onNext={handleOpenSubmitConfirmation}
-        />
+      {/* Navigation Atas */}
+      <AttemptActivityNavigationBarWrapper
+        onBack={handleOpenBackConfirmation}
+        onNext={handleOpenSubmitConfirmation}
+      />
 
-        {/* Navigasi Soal */}
-        <ActivityQuestionNavigationBar
-          questions={activityData.questions}
-          selectedQuestionIndex={selectedQuestionIndex}
-          setSelectedQuestionIndex={setSelectedQuestionIndex}
-          answers={answers}
-          scrollContainerRef={scrollContainerRef}
-        />
+      {/* Navigasi Soal */}
+      <ActivityQuestionNavigationBar
+        questions={classTaskData.questions}
+        selectedQuestionIndex={selectedQuestionIndex}
+        setSelectedQuestionIndex={setSelectedQuestionIndex}
+        answers={answers}
+        scrollContainerRef={scrollContainerRef}
+      />
 
-        {/* Tampilan Soal */}
-        <AttemptQuestionCard
-          index={selectedQuestionIndex}
-          question={currentQuestion}
-          selectedOptionId={answers[currentQuestion.questionId]?.optionId}
-          answerText={answers[currentQuestion.questionId]?.answerText}
-          onOptionSelect={(optId) =>
-            handleOptionSelect(currentQuestion.questionId, optId)
-          }
-          onAnswerChange={(text) =>
-            handleAnswerChange(currentQuestion.questionId, text)
-          }
-        />
+      {/* Tampilan Soal */}
+      <AttemptQuestionCard
+        index={selectedQuestionIndex}
+        question={currentQuestion}
+        selectedOptionId={answers[currentQuestion.questionId]?.optionId}
+        answerText={answers[currentQuestion.questionId]?.answerText}
+        onOptionSelect={(optId) =>
+          handleOptionSelect(currentQuestion.questionId, optId)
+        }
+        onAnswerChange={(text) =>
+          handleAnswerChange(currentQuestion.questionId, text)
+        }
+      />
 
-        <ConfirmationModal
-          visible={backConfirmationModal.visible}
-          text={backConfirmationModal.text}
-          type="back"
-          onConfirm={handleBackConfirmation}
-          onCancel={() =>
-            setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
-          }
-        />
+      <ConfirmationModal
+        visible={backConfirmationModal.visible}
+        text={backConfirmationModal.text}
+        type="back"
+        onConfirm={handleBackConfirmation}
+        onCancel={() =>
+          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
 
-        <ConfirmationModal
-          visible={submitConfirmationModal.visible}
-          text={submitConfirmationModal.text}
-          type="submit"
-          onConfirm={handleSubmitConfirmation}
-          onCancel={() =>
-            setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
-          }
-        />
+      <ConfirmationModal
+        visible={submitConfirmationModal.visible}
+        text={submitConfirmationModal.text}
+        type="submit"
+        onConfirm={handleSubmitConfirmation}
+        onCancel={() =>
+          setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
 
-        <MessageModal
-          visible={messageModal.visible}
-          isSuccess={messageModal.isSuccess}
-          text={messageModal.text}
-          onConfirm={handleMessageModalConfirmation}
-        />
-
-        <LevelUpModal
-          visible={levelUpModal.visible}
-          newLevel={levelUpModal.newLevel}
-          xpGained={levelUpModal.xpGained}
-          onConfirm={handleLevelUpModalConfirmation}
-        />
-      </PageLayout>
+      <MessageModal
+        visible={messageModal.visible}
+        isSuccess={messageModal.isSuccess}
+        text={messageModal.text}
+        onConfirm={handleMessageModalConfirmation}
+      />
     </>
   );
 };
 
-export default AttemptActivityPage;
+export default StudentAttemptTaskPage;

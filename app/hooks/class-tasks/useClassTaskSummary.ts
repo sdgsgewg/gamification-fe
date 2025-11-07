@@ -5,7 +5,7 @@ import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
 import { ClassTaskSummaryResponseDto } from "@/app/interface/class-tasks/responses/IClassTaskWithSummaryResponse";
 import { getImageSrc } from "@/app/utils/image";
 
-export const useActivitySummary = (classSlug: string, taskSlug: string) => {
+export const useClassTaskSummary = (classSlug: string, taskSlug: string) => {
   return useQuery({
     queryKey: ["activitySummary", classSlug, taskSlug],
     queryFn: async () => {

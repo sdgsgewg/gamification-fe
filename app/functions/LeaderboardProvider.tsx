@@ -9,7 +9,7 @@ export const leaderboardProvider = {
     ApiResponse<GlobalLeaderboardResponse[]>
   > {
     try {
-      const data = await getAxios(`${API_URL}`);
+      const data = await getAxios(`${API_URL}/global`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<GlobalLeaderboardResponse[]>(error);

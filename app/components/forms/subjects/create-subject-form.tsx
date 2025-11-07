@@ -5,37 +5,29 @@ import { Form } from "antd";
 import { UploadFile } from "antd/es/upload";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import {
-  editMaterialDefaultValues,
-  EditMaterialFormInputs,
-  editMaterialSchema,
-} from "@/app/schemas/materials/editMaterial";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
-import { materialProvider } from "@/app/functions/MaterialProvider";
-import { useAuth } from "@/app/hooks/useAuth";
-import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
-import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
-import SelectField from "../../fields/SelectField";
 import Loading from "../../shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
-import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
 import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import {
+  createSubjectDefaultValues,
+  CreateSubjectFormInputs,
+  createSubjectSchema,
+} from "@/app/schemas/subjects/createSubject";
+import { useInjectUser } from "@/app/hooks/form/useInjectUser";
+import { subjectProvider } from "@/app/functions/SubjectProvider";
 
-interface EditMaterialFormProps {
-  materialData?: EditMaterialFormInputs;
-  subjectData: SubjectOverviewResponse[];
-  gradeData: GradeOverviewResponse[];
-  onFinish: (values: EditMaterialFormInputs) => void;
+interface CreateSubjectFormProps {
+  onFinish: (values: CreateSubjectFormInputs) => void;
 }
 
-const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
-  ({ materialData, subjectData, gradeData, onFinish }, ref) => {
+const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
+  ({ onFinish }, ref) => {
     const { toast } = useToast();
 
     const {
@@ -43,61 +35,40 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       handleSubmit,
       formState: { errors, dirtyFields },
       setValue,
-      reset,
-    } = useForm<EditMaterialFormInputs>({
-      resolver: zodResolver(editMaterialSchema),
-      defaultValues: materialData || editMaterialDefaultValues,
+    } = useForm<CreateSubjectFormInputs>({
+      resolver: zodResolver(createSubjectSchema),
+      defaultValues: createSubjectDefaultValues,
     });
-
-    const { getCachedUserProfile } = useAuth();
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Prepare options for select fields
-    const subjectOptions = subjectData.map((subject) => ({
-      value: subject.subjectId,
-      label: subject.name,
-    }));
-
-    const gradeOptions = gradeData.map((grade) => ({
-      value: grade.gradeId,
-      label: grade.name,
-    }));
-
-    useInitializeForm<EditMaterialFormInputs>(reset, materialData, (d) => ({
-      ...d,
-      updatedBy: getCachedUserProfile()?.name,
-    }));
-    useInitializeFileList(materialData, setFileList);
+    useInjectUser(setValue, ["createdBy"]);
     const isDirty = Object.keys(dirtyFields).some(
-      (field) => field !== "updatedBy"
+      (field) => field !== "createdBy"
     );
     useNavigationGuard(isDirty);
 
     // Handle image upload changes
-    const handleImageChange = (info: any) => {
-      let fileList = [...info.fileList];
+    // const handleImageChange = (info: any) => {
+    //   let fileList = [...info.fileList];
 
-      // Allow only one file
-      fileList = fileList.slice(-1);
+    //   // Allow only one file
+    //   fileList = fileList.slice(-1);
 
-      // Update fileList state
-      setFileList(fileList);
+    //   // Update fileList state
+    //   setFileList(fileList);
 
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        setValue("imageFile", fileList[0].originFileObj as File, {
-          shouldDirty: true,
-        });
-      } else {
-        setValue("imageFile", null, { shouldDirty: true });
-      }
-    };
+    //   if (fileList.length > 0 && fileList[0].originFileObj) {
+    //     setValue("imageFile", fileList[0].originFileObj as File, {
+    //       shouldDirty: true,
+    //     });
+    //   } else {
+    //     setValue("imageFile", null, { shouldDirty: true });
+    //   }
+    // };
 
-    const onSubmit = async (data: EditMaterialFormInputs) => {
-      if (!materialData || !materialData.materialId) return;
-
-      const materialId = materialData.materialId;
+    const onSubmit = async (data: CreateSubjectFormInputs) => {
       setIsLoading(true);
 
       const formData = new FormData();
@@ -108,15 +79,15 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
         formData.append("imageFile", data.imageFile);
       }
 
-      const result = await materialProvider.updateMaterial(materialId, formData);
+      const result = await subjectProvider.createSubject(formData);
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Learning material updated successfully!");
+        toast.success(message ?? "Subject created successfully!");
         onFinish(data);
         setFileList([]);
       } else {
-        toast.error(message ?? "Failed to update learning material.");
+        toast.error(message ?? "Failed to create subject.");
       }
 
       setIsLoading(false);
@@ -132,8 +103,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
         {isLoading && <Loading />}
 
         <Form
-          id="edit-material-form"
-          name="edit-material"
+          id="create-subject-form"
+          name="create-subject"
           onFinish={handleSubmit(onSubmit)}
           layout="vertical"
           requiredMark={false}
@@ -145,20 +116,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                   control={control}
                   name="name"
                   label="Name"
-                  placeholder="Enter learning material name"
+                  placeholder="Enter subject name"
                   errors={errors}
-                  required
-                />
-
-                <SelectField
-                  control={control}
-                  name="subjectId"
-                  label="Subject"
-                  placeholder="Select subject"
-                  options={subjectOptions}
-                  errors={errors}
-                  loading={subjectOptions.length === 0}
-                  disabled={subjectOptions.length === 0}
                   required
                 />
 
@@ -166,20 +125,8 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                   control={control}
                   name="description"
                   label="Description"
-                  placeholder="Enter learning material description"
+                  placeholder="Enter subject description"
                   errors={errors}
-                />
-
-                <SelectField
-                  control={control}
-                  name="gradeIds"
-                  label="Grade Level"
-                  placeholder="Select grade levels"
-                  options={gradeOptions}
-                  errors={errors}
-                  loading={gradeOptions.length === 0}
-                  disabled={gradeOptions.length === 0}
-                  mode="multiple"
                 />
               </>
             }
@@ -190,7 +137,6 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 label="Upload Image"
                 fileList={fileList}
                 setFileList={setFileList}
-                onChange={handleImageChange}
                 errors={errors}
                 mode="file"
               />
@@ -213,5 +159,5 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
   }
 );
 
-EditMaterialForm.displayName = "EditMaterialForm";
-export default EditMaterialForm;
+CreateSubjectForm.displayName = "CreateSubjectForm";
+export default CreateSubjectForm;

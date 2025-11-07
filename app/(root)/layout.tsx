@@ -2,8 +2,6 @@ import React from "react";
 import Header from "../components/layout/MainLayout/Header";
 import Footer from "../components/layout/MainLayout/Footer";
 
-// bg-[#F5F4FF] dark:bg-red-900
-
 export default function RootLayout({
   children,
 }: {

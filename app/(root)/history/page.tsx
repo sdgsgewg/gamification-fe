@@ -27,11 +27,11 @@ const HistoryPage = () => {
     },
     {
       key: TaskAttemptStatus.ON_PROGRESS,
-      label: TaskAttemptStatusLabels["on_progress"],
+      label: TaskAttemptStatusLabels[TaskAttemptStatus.ON_PROGRESS],
     },
     {
       key: TaskAttemptStatus.COMPLETED,
-      label: TaskAttemptStatusLabels["completed"],
+      label: TaskAttemptStatusLabels[TaskAttemptStatus.COMPLETED],
     },
   ];
 

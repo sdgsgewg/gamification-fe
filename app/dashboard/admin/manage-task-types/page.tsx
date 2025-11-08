@@ -11,7 +11,7 @@ import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/I
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import FilterTaskTypeForm from "@/app/components/forms/task-types/filter-task-type-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
@@ -38,9 +38,13 @@ const TaskTypePage = () => {
   });
 
   const [deleteTaskTypeId, setDeleteTaskTypeId] = useState<string | null>(null);
-  const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(null);
-  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
-    useState(false);
+  const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
+    null
+  );
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const formRef = useRef<FormRef>(null);
 
@@ -70,7 +74,7 @@ const TaskTypePage = () => {
   const showDeleteModal = (materialId: string, name: string) => {
     setDeleteTaskTypeId(materialId);
     setDeleteTaskTypeName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteMaterial = () => {
@@ -78,14 +82,14 @@ const TaskTypePage = () => {
       handleDelete(deleteTaskTypeId);
       setDeleteTaskTypeId(null);
       setDeleteTaskTypeName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteTaskTypeId(null);
     setDeleteTaskTypeName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -217,9 +221,10 @@ const TaskTypePage = () => {
         <FilterTaskTypeForm ref={formRef} onFinish={handleApplyFilter} />
       </FilterModal>
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Are you sure you want to delete the task type named '${deleteTaskTypeName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Are you sure you want to delete the task type named '${deleteTaskTypeName}'?`}
+        type="delete"
         onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
       />

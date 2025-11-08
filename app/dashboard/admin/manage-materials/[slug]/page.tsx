@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+
 import {
   GradeRow,
   SubjectRow,
@@ -19,6 +19,7 @@ import DetailPageLeftSideContent from "@/app/components/shared/detail-page/Detai
 import { ROUTES } from "@/app/constants/routes";
 import { useDeleteMaterial } from "@/app/hooks/materials/useDeleteMaterial";
 import { useMaterialDetail } from "@/app/hooks/materials/useMaterialDetail";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 
 const MaterialDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -36,10 +37,10 @@ const MaterialDetailPage = () => {
   const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
     null
   );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
@@ -48,7 +49,7 @@ const MaterialDetailPage = () => {
   const showDeleteModal = (materialId: string, name: string) => {
     setDeleteMaterialId(materialId);
     setDeleteMaterialName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDelete = () => {
@@ -56,14 +57,14 @@ const MaterialDetailPage = () => {
       handleDelete(deleteMaterialId);
       setDeleteMaterialId(null);
       setDeleteMaterialName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteMaterialId(null);
     setDeleteMaterialName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -133,9 +134,10 @@ const MaterialDetailPage = () => {
         />
       )}
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteMaterialName}'?`}
+        type="delete"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />

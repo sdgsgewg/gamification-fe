@@ -8,4 +8,5 @@ export interface TaskOverviewResponse {
   taskGrade: string;
   questionCount: number;
   difficulty: string;
+  assignedClassCount: number;
 }

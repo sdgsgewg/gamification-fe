@@ -19,13 +19,15 @@ import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
-import Button from "@/app/components/shared/Button";
+import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
+import SubmissionCard from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard";
+import SubmissionCardWrapper from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard/Wrapper";
 
-const TaskDetailPage = () => {
+const TeacherTaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const { toast } = useToast();
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
+  const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
 
   const { data: taskData, isLoading } = useTaskDetail(params.slug, "detail");
   const { mutateAsync: deleteTask } = useDeleteTask();
@@ -119,16 +121,38 @@ const TaskDetailPage = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<TaskDetailBottomContentView>("duration");
+    const [view, setView] = useState<TaskDetailBottomContentView>("submission");
 
-    const { duration, history, questions } = taskData;
+    const { assignedClasses, duration, history, questions } = taskData;
+    const isShared = assignedClasses ?? false;
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
+      ...(isShared
+        ? [{ key: "submission" as const, label: "Submission" }]
+        : []),
       { key: "duration" as const, label: "Duration" },
       { key: "history" as const, label: "History" },
       { key: "questions" as const, label: "Questions" },
     ];
+
+    const handleChangeTab = (key: TaskDetailBottomContentView) => {
+      setView(key);
+    };
+
+    const SubmissionView = () => {
+      if (!assignedClasses || assignedClasses.length === 0) {
+        return <p className="text-dark">No submission yet</p>;
+      }
+
+      return (
+        <SubmissionCardWrapper>
+          {assignedClasses.map((cls) => (
+            <SubmissionCard key={cls.id} cls={cls} />
+          ))}
+        </SubmissionCardWrapper>
+      );
+    };
 
     const DurationView = () => {
       if (!duration) return;
@@ -174,41 +198,21 @@ const TaskDetailPage = () => {
     };
 
     return (
-      <>
-        {/* Navigation tab antar view */}
-        <div className="w-full flex items-center mb-6 border-b border-b-primary">
-          <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.key}
-                size="middle"
-                onClick={() => setView(tab.key)}
-                className={`relative flex items-center gap-2 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
-                ${
-                  view === tab.key
-                    ? "!bg-primary !text-white"
-                    : "!bg-background hover:!bg-background-hover !text-dark"
-                }`}
-              >
-                <span>{tab.label}</span>
-                {view === tab.key && (
-                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-br-primary rounded-t-sm" />
-                )}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="w-full mx-0 md:max-w-[70%] lg:max-w-[60%] md:mx-auto">
-          {view === "duration" ? (
-            <DurationView />
-          ) : view === "history" ? (
-            <HistoryView />
-          ) : (
-            <QuestionView />
-          )}
-        </div>
-      </>
+      <TaskDetailPageBottomContentWrapper
+        tabs={tabs}
+        view={view}
+        onChangeTab={handleChangeTab}
+      >
+        {view === "submission" ? (
+          <SubmissionView />
+        ) : view === "duration" ? (
+          <DurationView />
+        ) : view === "history" ? (
+          <HistoryView />
+        ) : (
+          <QuestionView />
+        )}
+      </TaskDetailPageBottomContentWrapper>
     );
   };
 
@@ -229,18 +233,19 @@ const TaskDetailPage = () => {
           if (taskData) handleShare(taskData.taskId);
         }}
       />
+
       {taskData && (
         <DetailPageWrapper
           left={<LeftSideContent />}
           right={<RightSideContent />}
           bottom={<BottomContent />}
-          hasBottomDivider
+          //   hasBottomDivider
         />
       )}
 
       <ConfirmationModal
         visible={deleteConfirmationModal.visible}
-        text={`Apakah kamu yakin ingin menghapus tugas dengan nama '${deleteTaskName}'?`}
+        text={`Are you sure you want to delete task '${deleteTaskName}'?`}
         type="delete"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
@@ -249,4 +254,4 @@ const TaskDetailPage = () => {
   );
 };
 
-export default TaskDetailPage;
+export default TeacherTaskDetailPage;

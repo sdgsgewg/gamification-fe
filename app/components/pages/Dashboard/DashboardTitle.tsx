@@ -10,6 +10,7 @@ import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
 
 interface DashboardTitleProps {
   title?: string;
+  subtitle?: string;
   showBackButton?: boolean;
   onBack?: () => void;
   onEdit?: () => void;
@@ -19,6 +20,7 @@ interface DashboardTitleProps {
 
 const DashboardTitle = ({
   title,
+  subtitle,
   showBackButton,
   onBack,
   onEdit,
@@ -71,7 +73,12 @@ const DashboardTitle = ({
             <span className="text-base font-semibold">Hapus</span>
           </Button>
         )}
-        {title && <h1 className="text-3xl text-dark font-bold">{title}</h1>}
+        {title && (
+          <div>
+            <h1 className="text-3xl text-dark font-bold">{title}</h1>
+            {subtitle && <p className="text-tx-tertiary mt-2">{subtitle}</p>}
+          </div>
+        )}
       </div>
       {onShare && (
         <div>

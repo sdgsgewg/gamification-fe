@@ -11,7 +11,7 @@ import { ColumnType } from "antd/es/table";
 import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
 import FilterTaskForm from "@/app/components/forms/tasks/filter-task-form";
 import { FilterModal } from "@/app/components/modals/FilterModal";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterTaskFormInputs } from "@/app/schemas/tasks/filterTask";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ROUTES } from "@/app/constants/routes";
@@ -45,10 +45,10 @@ const TaskPage = () => {
 
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
   const [deleteTaskTitle, setDeleteTaskTitle] = useState<string | null>(null);
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const formRef = useRef<FormRef>(null);
 
@@ -78,7 +78,7 @@ const TaskPage = () => {
   const showDeleteModal = (taskId: string, title: string) => {
     setDeleteTaskId(taskId);
     setDeleteTaskTitle(title);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteTask = () => {
@@ -86,13 +86,13 @@ const TaskPage = () => {
       handleDelete(deleteTaskId);
       setDeleteTaskId(null);
       setDeleteTaskTitle(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteTaskId(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -240,9 +240,10 @@ const TaskPage = () => {
         />
       </FilterModal>
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Are you sure you want to delete the task titled '${deleteTaskTitle}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Are you sure you want to delete the task titled '${deleteTaskTitle}'?`}
+        type="delete"
         onConfirm={confirmDeleteTask}
         onCancel={cancelDelete}
       />

@@ -151,11 +151,11 @@ const HistoryDetailPage = () => {
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
-      ...(isCompleted ? [{ key: "stats" as const, label: "Statistik" }] : []),
-      { key: "duration" as const, label: "Durasi" },
-      { key: "progress" as const, label: "Progres" },
+      ...(isCompleted ? [{ key: "stats" as const, label: "Statistics" }] : []),
+      { key: "duration" as const, label: "Duration" },
+      { key: "progress" as const, label: "Progress" },
       ...(isCompleted
-        ? [{ key: "questions" as const, label: "Daftar Soal" }]
+        ? [{ key: "questions" as const, label: "Questions" }]
         : []),
     ];
 

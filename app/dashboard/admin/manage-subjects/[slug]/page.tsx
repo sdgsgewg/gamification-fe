@@ -9,7 +9,7 @@ import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import { ColumnType } from "antd/es/table";
 import DataTable from "@/app/components/shared/table/Table";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   DetailInformationTable,
   HistoryTable,
@@ -40,10 +40,10 @@ const SubjectDetailPage = () => {
   const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(
     null
   );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
@@ -52,7 +52,7 @@ const SubjectDetailPage = () => {
   const showDeleteModal = (subjectId: string, name: string) => {
     setDeleteSubjectId(subjectId);
     setDeleteSubjectName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteSubject = () => {
@@ -60,14 +60,14 @@ const SubjectDetailPage = () => {
       handleDelete(deleteSubjectId);
       setDeleteSubjectId(null);
       setDeleteSubjectName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteSubjectId(null);
     setDeleteSubjectName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -189,9 +189,10 @@ const SubjectDetailPage = () => {
         />
       )}
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteSubjectName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Apakah kamu yakin ingin menghapus materi pelajaran dengan nama '${deleteSubjectName}'?`}
+        type="delete"
         onConfirm={confirmDeleteSubject}
         onCancel={cancelDelete}
       />

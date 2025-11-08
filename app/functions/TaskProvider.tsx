@@ -27,6 +27,7 @@ export const taskProvider = {
       if (params?.subjectId) query.append("subjectId", params.subjectId);
       if (params?.materialId) query.append("materialId", params.materialId);
       if (params?.taskTypeId) query.append("taskTypeId", params.taskTypeId);
+      if (params?.creatorId) query.append("creatorId", params.creatorId);
 
       if (params?.gradeIds && params.gradeIds.length > 0) {
         params.gradeIds.forEach((id) => query.append("gradeIds", id));

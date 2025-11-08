@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   IsRepeatableRow,
   ScopeRow,
@@ -37,10 +37,10 @@ const TaskTypeDetailPage = () => {
   const [deleteTaskTypeName, setDeleteTaskTypeName] = useState<string | null>(
     null
   );
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
@@ -49,7 +49,7 @@ const TaskTypeDetailPage = () => {
   const showDeleteModal = (taskTypeId: string, name: string) => {
     setDeleteTaskTypeId(taskTypeId);
     setDeleteTaskTypeName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteTaskType = () => {
@@ -57,14 +57,14 @@ const TaskTypeDetailPage = () => {
       handleDelete(deleteTaskTypeId);
       setDeleteTaskTypeId(null);
       setDeleteTaskTypeName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteTaskTypeId(null);
     setDeleteTaskTypeName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -135,9 +135,10 @@ const TaskTypeDetailPage = () => {
         />
       )}
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus tipe tugas dengan nama '${deleteTaskTypeName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Apakah kamu yakin ingin menghapus tipe tugas dengan nama '${deleteTaskTypeName}'?`}
+        type="delete"
         onConfirm={confirmDeleteTaskType}
         onCancel={cancelDelete}
       />

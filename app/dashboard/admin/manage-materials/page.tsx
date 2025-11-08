@@ -9,7 +9,7 @@ import { MaterialOverviewResponse } from "@/app/interface/materials/responses/IM
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { FilterMaterialFormInputs } from "@/app/schemas/materials/filterMaterial";
@@ -40,9 +40,13 @@ const MaterialPage = () => {
   });
 
   const [deleteMaterialId, setDeleteMaterialId] = useState<string | null>(null);
-  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(null);
-  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
-    useState(false);
+  const [deleteMaterialName, setDeleteMaterialName] = useState<string | null>(
+    null
+  );
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const formRef = useRef<FormRef>(null);
 
@@ -72,7 +76,7 @@ const MaterialPage = () => {
   const showDeleteModal = (materialId: string, name: string) => {
     setDeleteMaterialId(materialId);
     setDeleteMaterialName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteMaterial = () => {
@@ -80,14 +84,14 @@ const MaterialPage = () => {
       handleDelete(deleteMaterialId);
       setDeleteMaterialId(null);
       setDeleteMaterialName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteMaterialId(null);
     setDeleteMaterialName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -197,9 +201,10 @@ const MaterialPage = () => {
         />
       </FilterModal>
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Are you sure you want to delete the material named '${deleteMaterialName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Are you sure you want to delete the material named '${deleteMaterialName}'?`}
+        type="delete"
         onConfirm={confirmDeleteMaterial}
         onCancel={cancelDelete}
       />

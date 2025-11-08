@@ -9,7 +9,7 @@ import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISub
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { ColumnType } from "antd/es/table";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useDeleteSubject } from "@/app/hooks/subjects/useDeleteSubject";
@@ -29,9 +29,13 @@ const ManageSubjectPage = () => {
   });
 
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
-  const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(null);
-  const [isDeleteConfirmationModalVisible, setIsDeleteConfirmationModalVisible] =
-    useState(false);
+  const [deleteSubjectName, setDeleteSubjectName] = useState<string | null>(
+    null
+  );
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const handleNavigateToCreateSubjectPage = () => {
     router.push(`${baseRoute}/create`);
@@ -48,7 +52,7 @@ const ManageSubjectPage = () => {
   const showDeleteModal = (subjectId: string, name: string) => {
     setDeleteSubjectId(subjectId);
     setDeleteSubjectName(name);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteSubject = () => {
@@ -56,14 +60,14 @@ const ManageSubjectPage = () => {
       handleDelete(deleteSubjectId);
       setDeleteSubjectId(null);
       setDeleteSubjectName(null);
-      setIsDeleteConfirmationModalVisible(false);
+      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
     setDeleteSubjectId(null);
     setDeleteSubjectName(null);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -135,9 +139,10 @@ const ManageSubjectPage = () => {
         onRefresh={() => refetch()}
       />
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Are you sure you want to delete the subject named '${deleteSubjectName}'?`}
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Are you sure you want to delete the subject named '${deleteSubjectName}'?`}
+        type="delete"
         onConfirm={confirmDeleteSubject}
         onCancel={cancelDelete}
       />

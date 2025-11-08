@@ -1,3 +1,24 @@
+export interface AssignedClassInfo {
+  id: string;
+  name: string;
+  slug: string;
+  submissionCount: number; // Jumlah siswa yang sudah submit
+  totalStudents: number; // Jumlah total siswa di kelas
+  gradedCount: number; // Jumlah submission yang sudah dinilai
+  deadline?: string; // Tenggat waktu tugas
+}
+
+export interface TaskDuration {
+  startTime?: Date;
+  endTime?: Date;
+  duration?: string;
+}
+
+export interface TaskHistory {
+  createdBy: string;
+  updatedBy?: string;
+}
+
 export interface TaskQuestionOptionResponse {
   optionId: string;
   text: string;
@@ -27,10 +48,8 @@ export interface TaskDetailResponse {
   taskGrade: string;
   questionCount: number;
   difficulty: string;
-  startTime?: Date | null;
-  endTime?: Date | null;
-  duration?: string;
-  createdBy: string;
-  updatedBy?: string;
+  assignedClasses?: AssignedClassInfo[];
+  duration?: TaskDuration;
+  history: TaskHistory;
   questions: TaskQuestionResponse[];
 }

@@ -92,7 +92,8 @@ const TeacherClassPage = () => {
               key={c.id}
               image={c.image}
               name={c.name}
-              onClick={() => handleNavigateToClassDetailPage(c.slug)}
+              slug={c.slug}
+              onClick={handleNavigateToClassDetailPage}
             />
           ))}
         </ClassCardWrapper>

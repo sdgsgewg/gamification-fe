@@ -19,9 +19,6 @@ const StudentTaskPage = () => {
   const [filters, setFilters] = useState<FilterTaskAttemptRequest>({
     searchText: "",
     status: null,
-    isClassTask: true,
-    dateFrom: undefined,
-    dateTo: undefined,
   });
   const { data: groupedAttempts = [] } = useTaskAttemptsByUser(filters);
 

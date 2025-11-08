@@ -46,6 +46,7 @@ export const ROUTES = {
       HOME: "/dashboard/teacher",
       CLASS: "/dashboard/teacher/class",
       TASKS: "/dashboard/teacher/tasks",
+      SUBMISSIONS: "/dashboard/teacher/submissions",
       LEADERBOARD: "/dashboard/teacher/leaderboard",
     },
 

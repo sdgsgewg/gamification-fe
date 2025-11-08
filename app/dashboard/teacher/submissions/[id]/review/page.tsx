@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useActivityWithQuestions } from "@/app/hooks/activities/useActivityWithQuestions";
 import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
 import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
@@ -9,38 +10,20 @@ import { CreateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/createT
 import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateTaskAttempt";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
+import PageLayout from "@/app/(root)/page-layout";
 import AttemptActivityNavigationBarWrapper from "@/app/components/pages/Activity/Attempt/AttemptActivityNavigationBarWrapper";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { MessageModal } from "@/app/components/modals/MessageModal";
-import { useClassTaskWithQuestions } from "@/app/hooks/class-tasks/useClassTaskWithQuestions";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
-import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 
-const StudentAttemptTaskPage = () => {
-  const searchParams = useSearchParams();
+const ReviewSubmissionPage = () => {
+  const params = useParams<{ slug: string }>();
   const { user } = useGetCachedUser();
   const router = useRouter();
 
-  const [classSlug, setClassSlug] = useState<string>("");
-  const [taskSlug, setTaskSlug] = useState<string>("");
-
-  useEffect(() => {
-    if (searchParams) {
-      const cSlug = searchParams.get("class") ?? "";
-      const tSlug = searchParams.get("task") ?? "";
-
-      setClassSlug(cSlug);
-      setTaskSlug(tSlug);
-    }
-  }, [searchParams]);
-
-  const { data: classTaskData, isLoading: isClassTaskDataLoading } =
-    useClassTaskWithQuestions(classSlug, taskSlug);
-  const { data: classData, isLoading: isClassDataLoading } = useClassDetail(
-    classSlug,
-    "detail"
-  );
+  const { data: activityData, isLoading: isActivityDataLoading } =
+    useActivityWithQuestions(params.slug);
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -59,7 +42,7 @@ const StudentAttemptTaskPage = () => {
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin mengumpulkan tugas ini? Mohon dikoreksi kembali.",
+    text: "Apakah anda yakin ingin mengumpulkan aktivitas ini? Mohon dikoreksi kembali.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -71,7 +54,7 @@ const StudentAttemptTaskPage = () => {
 
   // Catat waktu attempt (startedAt & lastAccessedAt)
   useEffect(() => {
-    const key = `activity_${taskSlug}_startedAt`;
+    const key = `activity_${params.slug}_startedAt`;
     const existingStart = sessionStorage.getItem(key);
 
     if (existingStart) {
@@ -83,17 +66,17 @@ const StudentAttemptTaskPage = () => {
       setStartedAt(now);
       setLastAccessedAt(now);
     }
-  }, [taskSlug]);
+  }, [params.slug]);
 
-  // Prefill answers ketika classTaskData berhasil dimuat
+  // Prefill answers ketika activityData berhasil dimuat
   useEffect(() => {
-    if (!classTaskData) return;
+    if (!activityData) return;
 
     // Hanya jalankan prefill kalau ada attempt sebelumnya
-    if (classTaskData.lastAttemptId) {
+    if (activityData.lastAttemptId) {
       const prefilledAnswers: Record<string, any> = {};
 
-      classTaskData.questions.forEach((q) => {
+      activityData.questions.forEach((q) => {
         if (q.userAnswer) {
           prefilledAnswers[q.questionId] = {
             optionId: q.userAnswer.optionId,
@@ -113,7 +96,7 @@ const StudentAttemptTaskPage = () => {
 
       setAnswers(prefilledAnswers);
     }
-  }, [classTaskData]);
+  }, [activityData]);
 
   const handleOptionSelect = (questionId: string, optionId: string) => {
     setAnswers((prev) => ({
@@ -129,14 +112,14 @@ const StudentAttemptTaskPage = () => {
     }));
   };
 
-  if (!classTaskData || !classData) return <Loading />;
+  if (!activityData) return <Loading />;
 
   const handleOpenBackConfirmation = () => {
     setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = async () => {
-    if (!user || !classTaskData || !startedAt || !lastAccessedAt) return;
+    if (!user || !activityData || !startedAt || !lastAccessedAt) return;
 
     setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
 
@@ -154,8 +137,8 @@ const StudentAttemptTaskPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !classTaskData.lastAttemptId;
-      const answerLogs = classTaskData.questions.map((q) => ({
+      const isNewAttempt = !activityData.lastAttemptId;
+      const answerLogs = activityData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
         optionId: answers[q.questionId]?.optionId || null,
@@ -173,16 +156,12 @@ const StudentAttemptTaskPage = () => {
           status: TaskAttemptStatus.ON_PROGRESS,
           startedAt,
           lastAccessedAt,
-          taskId: classTaskData.id,
+          taskId: activityData.id,
           studentId: user.userId,
           answerLogs,
         };
 
-        console.log(
-          "Payload (Autosave - Create): ",
-          JSON.stringify(payload, null, 2)
-        );
-        result = await taskAttemptProvider.createClassTaskAttempt(payload);
+        result = await taskAttemptProvider.createActivityAttempt(payload);
       } else {
         // Update progres yang sudah ada
         const payload: UpdateTaskAttemptFormInputs = {
@@ -199,8 +178,8 @@ const StudentAttemptTaskPage = () => {
             })),
         };
 
-        result = await taskAttemptProvider.updateClassTaskAttempt(
-          classTaskData.lastAttemptId!,
+        result = await taskAttemptProvider.updateActivityAttempt(
+          activityData.lastAttemptId!,
           payload
         );
       }
@@ -231,11 +210,11 @@ const StudentAttemptTaskPage = () => {
   };
 
   const handleSubmitConfirmation = async () => {
-    if (!user || !classTaskData || !startedAt || !lastAccessedAt) return;
+    if (!user || !activityData || !startedAt || !lastAccessedAt) return;
 
     setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }));
 
-    const totalQuestions = classTaskData.questions.length;
+    const totalQuestions = activityData.questions.length;
     const answeredCount = Object.values(answers).filter(
       (a) => a.optionId || a.answerText
     ).length;
@@ -245,7 +224,7 @@ const StudentAttemptTaskPage = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Mohon jawab semua soal untuk dapat mengumpulkan tugas.",
+        text: "Mohon jawab semua soal untuk dapat mengumpulkan aktivitas.",
         type: "submit",
       });
       return;
@@ -254,8 +233,8 @@ const StudentAttemptTaskPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !classTaskData.lastAttemptId;
-      const answerLogs = classTaskData.questions.map((q) => ({
+      const isNewAttempt = !activityData.lastAttemptId;
+      const answerLogs = activityData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
         optionId: answers[q.questionId]?.optionId || null,
@@ -269,24 +248,21 @@ const StudentAttemptTaskPage = () => {
           answeredQuestionCount: answerLogs.filter(
             (a) => a.optionId || a.answerText
           ).length,
-          status: TaskAttemptStatus.SUBMITTED,
+          status: TaskAttemptStatus.COMPLETED,
           startedAt,
           lastAccessedAt,
-          taskId: classTaskData.id,
+          taskId: activityData.id,
           studentId: user.userId,
-          classId: classData.id,
           answerLogs,
         };
 
-        console.log("Payload (Create): ", JSON.stringify(payload, null, 2));
-
-        result = await taskAttemptProvider.createClassTaskAttempt(payload);
+        result = await taskAttemptProvider.createActivityAttempt(payload);
       } else {
         const payload: UpdateTaskAttemptFormInputs = {
           answeredQuestionCount: answerLogs.filter(
             (a) => a.optionId || a.answerText
           ).length,
-          status: TaskAttemptStatus.SUBMITTED,
+          status: TaskAttemptStatus.COMPLETED,
           lastAccessedAt,
           answerLogs: answerLogs
             .filter((a) => a.optionId || a.answerText)
@@ -296,10 +272,8 @@ const StudentAttemptTaskPage = () => {
             })),
         };
 
-        console.log("Payload (Update): ", JSON.stringify(payload, null, 2));
-
-        result = await taskAttemptProvider.updateClassTaskAttempt(
-          classTaskData.lastAttemptId!,
+        result = await taskAttemptProvider.updateActivityAttempt(
+          activityData.lastAttemptId!,
           payload
         );
       }
@@ -308,8 +282,8 @@ const StudentAttemptTaskPage = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Tugas Telah Berhasil Dikumpulkan"
-          : "Tugas Gagal Dikumpulkan",
+          ? "Aktivitas Telah Berhasil Dikumpulkan"
+          : "Aktivitas Gagal Dikumpulkan",
         type: "submit",
       });
     } catch (err) {
@@ -325,81 +299,77 @@ const StudentAttemptTaskPage = () => {
     if (!messageModal.isSuccess) return;
 
     if (messageModal.type === "submit") {
-      const query = new URLSearchParams();
-      query.append("class", classSlug);
-      query.append("task", taskSlug);
-      const url = `${ROUTES.DASHBOARD.STUDENT.TASKS_SUMMARY}?${query}`;
-      router.push(url);
+      router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
     } else if (messageModal.type === "back") {
       router.back();
     }
   };
 
-  const currentQuestion = classTaskData.questions[selectedQuestionIndex];
+  const currentQuestion = activityData.questions[selectedQuestionIndex];
 
   return (
     <>
-      {(isClassTaskDataLoading || isClassDataLoading || isLoading) && (
-        <Loading />
-      )}
+      {(isActivityDataLoading || isLoading) && <Loading />}
 
-      {/* Navigation Atas */}
-      <AttemptActivityNavigationBarWrapper
-        onBack={handleOpenBackConfirmation}
-        onNext={handleOpenSubmitConfirmation}
-      />
+      <PageLayout>
+        {/* Navigation Atas */}
+        <AttemptActivityNavigationBarWrapper
+          onBack={handleOpenBackConfirmation}
+          onNext={handleOpenSubmitConfirmation}
+        />
 
-      {/* Navigasi Soal */}
-      <ActivityQuestionNavigationBar
-        questions={classTaskData.questions}
-        selectedQuestionIndex={selectedQuestionIndex}
-        setSelectedQuestionIndex={setSelectedQuestionIndex}
-        answers={answers}
-        scrollContainerRef={scrollContainerRef}
-      />
+        {/* Navigasi Soal */}
+        <ActivityQuestionNavigationBar
+          questions={activityData.questions}
+          selectedQuestionIndex={selectedQuestionIndex}
+          setSelectedQuestionIndex={setSelectedQuestionIndex}
+          answers={answers}
+          scrollContainerRef={scrollContainerRef}
+        />
 
-      {/* Tampilan Soal */}
-      <AttemptTaskQuestionCard
-        index={selectedQuestionIndex}
-        question={currentQuestion}
-        selectedOptionId={answers[currentQuestion.questionId]?.optionId}
-        answerText={answers[currentQuestion.questionId]?.answerText}
-        onOptionSelect={(optId) =>
-          handleOptionSelect(currentQuestion.questionId, optId)
-        }
-        onAnswerChange={(text) =>
-          handleAnswerChange(currentQuestion.questionId, text)
-        }
-      />
+        {/* Tampilan Soal */}
+        <AttemptTaskQuestionCard
+          index={selectedQuestionIndex}
+          question={currentQuestion}
+          selectedOptionId={answers[currentQuestion.questionId]?.optionId}
+          answerText={answers[currentQuestion.questionId]?.answerText}
+          onOptionSelect={(optId) =>
+            handleOptionSelect(currentQuestion.questionId, optId)
+          }
+          onAnswerChange={(text) =>
+            handleAnswerChange(currentQuestion.questionId, text)
+          }
+        />
 
-      <ConfirmationModal
-        visible={backConfirmationModal.visible}
-        text={backConfirmationModal.text}
-        type="back"
-        onConfirm={handleBackConfirmation}
-        onCancel={() =>
-          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
-        }
-      />
+        <ConfirmationModal
+          visible={backConfirmationModal.visible}
+          text={backConfirmationModal.text}
+          type="back"
+          onConfirm={handleBackConfirmation}
+          onCancel={() =>
+            setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+          }
+        />
 
-      <ConfirmationModal
-        visible={submitConfirmationModal.visible}
-        text={submitConfirmationModal.text}
-        type="submit"
-        onConfirm={handleSubmitConfirmation}
-        onCancel={() =>
-          setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
-        }
-      />
+        <ConfirmationModal
+          visible={submitConfirmationModal.visible}
+          text={submitConfirmationModal.text}
+          type="submit"
+          onConfirm={handleSubmitConfirmation}
+          onCancel={() =>
+            setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
+          }
+        />
 
-      <MessageModal
-        visible={messageModal.visible}
-        isSuccess={messageModal.isSuccess}
-        text={messageModal.text}
-        onConfirm={handleMessageModalConfirmation}
-      />
+        <MessageModal
+          visible={messageModal.visible}
+          isSuccess={messageModal.isSuccess}
+          text={messageModal.text}
+          onConfirm={handleMessageModalConfirmation}
+        />
+      </PageLayout>
     </>
   );
 };
 
-export default StudentAttemptTaskPage;
+export default ReviewSubmissionPage;

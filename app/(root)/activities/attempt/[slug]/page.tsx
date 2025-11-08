@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useActivityWithQuestions } from "@/app/hooks/activities/useActivityWithQuestions";
 import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
-import AttemptQuestionCard from "@/app/components/pages/Activity/Attempt/ActivityQuestionCard";
+import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
 import { CreateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/createTaskAttempt";
 import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateTaskAttempt";
@@ -365,7 +365,7 @@ const AttemptActivityPage = () => {
         />
 
         {/* Tampilan Soal */}
-        <AttemptQuestionCard
+        <AttemptTaskQuestionCard
           index={selectedQuestionIndex}
           question={currentQuestion}
           selectedOptionId={answers[currentQuestion.questionId]?.optionId}

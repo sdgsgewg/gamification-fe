@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
-import PageLayout from "@/app/(root)/page-layout";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
 import { IMAGES } from "@/app/constants/images";
@@ -12,7 +11,7 @@ import {
   DateRow,
   NumberRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
-import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
+import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
 import { useClassTaskSummary } from "@/app/hooks/class-tasks/useClassTaskSummary";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { ROUTES } from "@/app/constants/routes";
@@ -112,7 +111,7 @@ const StudentTaskSummaryPage = () => {
 
         <div className="flex flex-col gap-8">
           {classTaskSummaryData.questions.map((q, idx) => (
-            <ActivityQuestionCard
+            <TaskSummaryQuestionCard
               key={idx}
               index={idx}
               question={q}

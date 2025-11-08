@@ -6,7 +6,6 @@ import {
 import { FilterClassRequest } from "../interface/classes/requests/IFilterClassRequest";
 import { ClassOverviewResponse } from "../interface/classes/responses/IClassOverviewResponse";
 import { ClassDetailResponse } from "../interface/classes/responses/IClassDetailResponse";
-import { ClassTaskResponse } from "../interface/class-tasks/responses/IClassTaskResponse";
 import { ClassMemberResponse } from "../interface/classes/responses/IClassMemberResponse";
 import {
   getAxios,
@@ -14,8 +13,7 @@ import {
   putAxios,
   deleteAxios,
 } from "../utils/AxiosFunction";
-import { FilterClassTask } from "../interface/class-tasks/requests/IFilterClassTaskRequest";
-import { FilterClassMember } from "../interface/classes/requests/IFilterClassMemberRequest";
+import { FilterClassMemberRequest } from "../interface/classes/requests/IFilterClassMemberRequest";
 
 const API_URL = "/classes";
 
@@ -71,32 +69,9 @@ export const classProvider = {
     }
   },
 
-  async getClassTasks(
-    slug: string,
-    params?: FilterClassTask
-  ): Promise<ApiResponse<ClassTaskResponse[]>> {
-    try {
-      const query = new URLSearchParams();
-
-      if (params?.searchText) query.append("searchText", params.searchText);
-      if (params?.status) query.append("status", params.status);
-      if (params?.orderBy) query.append("orderBy", params.orderBy);
-      if (params?.orderState) query.append("orderState", params.orderState);
-
-      const url = query.toString()
-        ? `${API_URL}/${slug}/tasks?${query}`
-        : `${API_URL}/${slug}/tasks`;
-      const data = await getAxios(url);
-
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<ClassTaskResponse[]>(error);
-    }
-  },
-
   async getClassMembers(
     slug: string,
-    params?: FilterClassMember
+    params?: FilterClassMemberRequest
   ): Promise<ApiResponse<ClassMemberResponse>> {
     try {
       const query = new URLSearchParams();

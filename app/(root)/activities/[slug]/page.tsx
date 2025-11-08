@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
@@ -25,6 +25,8 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
+import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
+import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -186,31 +188,109 @@ const ActivityDetailPage = () => {
   };
 
   const BottomContent = () => {
-    if (filteredSimilarActivities.length === 0) return null;
+    const [view, setView] =
+      useState<TaskDetailBottomContentView>("similar-activities");
+
+    const { currAttempt, recentAttempt, duration } = activityData;
+
+    // Buat daftar tab dinamis
+    const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
+      { key: "similar-activities" as const, label: "Similar" },
+      { key: "duration" as const, label: "Duration" },
+      { key: "progress" as const, label: "Progres" },
+    ];
+
+    const handleChangeTab = (key: TaskDetailBottomContentView) => {
+      setView(key);
+    };
+
+    const SimilarActivitiesView = () => {
+      if (filteredSimilarActivities.length === 0) return null;
+
+      return (
+        <div className="flex flex-col gap-6">
+          <div className="pb-2 border-b-1 border-b-dark">
+            <h2 className="text-xl text-dark font-bold">Similar</h2>
+          </div>
+
+          <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
+            {similarActivities
+              .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
+              .map((sa) => (
+                <ActivityCard
+                  key={sa.id}
+                  type={sa.type}
+                  image={sa.image ?? ""}
+                  title={sa.title}
+                  slug={sa.slug}
+                  subject={sa.subject}
+                  grade={sa.grade}
+                  questionCount={sa.questionCount}
+                />
+              ))}
+          </div>
+        </div>
+      );
+    };
+
+    const DurationView = () => {
+      if (!duration) return;
+
+      const { startTime, endTime, duration: taskDuration } = duration;
+
+      return (
+        <DurationTable
+          startTime={getDateTime(startTime ?? null)}
+          endTime={getDateTime(endTime ?? null)}
+          duration={taskDuration}
+        />
+      );
+    };
+
+    const ProgressView = () => {
+      const startedAt = currAttempt
+        ? currAttempt.startedAt
+        : recentAttempt
+        ? recentAttempt.startedAt
+        : null;
+      const lastAccessedAt = currAttempt
+        ? currAttempt.lastAccessedAt
+        : recentAttempt
+        ? recentAttempt.lastAccessedAt
+        : null;
+      const completedAt = recentAttempt ? recentAttempt.completedAt : null;
+      const statusLabel = currAttempt
+        ? TaskAttemptStatusLabels[currAttempt.status as TaskAttemptStatus]
+        : recentAttempt
+        ? TaskAttemptStatusLabels[recentAttempt.status as TaskAttemptStatus]
+        : "";
+
+      return (
+        <ProgressTable
+          startedAt={startedAt}
+          lastAccessedAt={lastAccessedAt}
+          completedAt={completedAt}
+          status={statusLabel}
+        />
+      );
+    };
 
     return (
-      <div className="flex flex-col gap-6">
-        <div className="pb-2 border-b-1 border-b-dark">
-          <h2 className="text-xl text-dark font-bold">Similar</h2>
-        </div>
-
-        <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
-          {similarActivities
-            .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
-            .map((sa) => (
-              <ActivityCard
-                key={sa.id}
-                type={sa.type}
-                image={sa.image ?? ""}
-                title={sa.title}
-                slug={sa.slug}
-                subject={sa.subject}
-                grade={sa.grade}
-                questionCount={sa.questionCount}
-              />
-            ))}
-        </div>
-      </div>
+      <TaskDetailPageBottomContentWrapper
+        tabs={tabs}
+        view={view}
+        onChangeTab={handleChangeTab}
+      >
+        {view === "similar-activities" ? (
+          <SimilarActivitiesView />
+        ) : view === "duration" ? (
+          <DurationView />
+        ) : view === "progress" ? (
+          <ProgressView />
+        ) : (
+          <></>
+        )}
+      </TaskDetailPageBottomContentWrapper>
     );
   };
 

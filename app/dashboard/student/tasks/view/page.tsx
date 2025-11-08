@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
-import {
-  GradeRow,
-  MaterialRow,
-  NumberRow,
-  SubjectRow,
-  TaskTypeRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
+import { NumberRow } from "@/app/components/shared/table/detail-page/TableRowData";
 import {
   DetailInformationTable,
   DurationTable,
@@ -32,7 +26,8 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
-import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
+import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
+import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 
 const StudentTaskDetailPage = () => {
   const searchParams = useSearchParams();
@@ -204,6 +199,10 @@ const StudentTaskDetailPage = () => {
       }
     }, [isCompleted, view]);
 
+    const handleChangeTab = (key: TaskDetailBottomContentView) => {
+      setView(key);
+    };
+
     const StatsView = () => {
       const { pointGained, totalPoints, xpGained, score } = classTaskData.stats;
 
@@ -268,7 +267,7 @@ const StudentTaskDetailPage = () => {
 
           <div className="flex flex-col gap-8">
             {classTaskData.questions.map((q, idx) => (
-              <ActivityQuestionCard
+              <TaskSummaryQuestionCard
                 key={idx}
                 index={idx}
                 question={q}
@@ -282,43 +281,21 @@ const StudentTaskDetailPage = () => {
     };
 
     return (
-      <>
-        {/* Navigation tab antar view */}
-        <div className="w-full flex items-center mb-6 border-b border-b-primary">
-          <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.key}
-                size="middle"
-                onClick={() => setView(tab.key)}
-                className={`relative flex items-center gap-2 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
-                ${
-                  view === tab.key
-                    ? "!bg-primary !text-white"
-                    : "!bg-background hover:!bg-background-hover !text-dark"
-                }`}
-              >
-                <span>{tab.label}</span>
-                {view === tab.key && (
-                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-br-primary rounded-t-sm" />
-                )}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="w-full mx-0 md:max-w-[70%] lg:max-w-[60%] md:mx-auto">
-          {view === "stats" ? (
-            <StatsView />
-          ) : view === "duration" ? (
-            <DurationView />
-          ) : view === "progress" ? (
-            <ProgressView />
-          ) : (
-            <QuestionView />
-          )}
-        </div>
-      </>
+      <TaskDetailPageBottomContentWrapper
+        tabs={tabs}
+        view={view}
+        onChangeTab={handleChangeTab}
+      >
+        {view === "stats" ? (
+          <StatsView />
+        ) : view === "duration" ? (
+          <DurationView />
+        ) : view === "progress" ? (
+          <ProgressView />
+        ) : (
+          <QuestionView />
+        )}
+      </TaskDetailPageBottomContentWrapper>
     );
   };
 

@@ -4,14 +4,14 @@ import {
   MemberCard,
   MemberCardSkeleton,
   MemberCardWrapper,
-  StudentTaskCard,
-  StudentTaskCardSkeleton,
-  StudentTaskCardWrapper,
+  TeacherTaskCard,
+  TeacherTaskCardSkeleton,
+  TeacherTaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
-import { useStudentClassTasks } from "@/app/hooks/class-tasks/useStudentClassTasks";
+import { useTeacherClassTasks } from "@/app/hooks/class-tasks/useTeacherClassTasks";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import { useClassMember } from "@/app/hooks/classes/useClassMember";
 import { ClassDetailView, MemberRole } from "@/app/types/class-detail";
@@ -21,7 +21,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
 
-const StudentClassDetailPage = () => {
+const TeacherClassDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
 
@@ -40,15 +40,15 @@ const StudentClassDetailPage = () => {
   };
 
   const TaskView = () => {
-    const { data: classTasks, isLoading } = useStudentClassTasks(params.slug);
+    const { data: classTasks, isLoading } = useTeacherClassTasks(params.slug);
 
-    const handleNavigateToTaskDetailPage = (taskSlug: string) => {
+    const handleNavigateToSubmissionPage = (taskSlug: string) => {
       const query = new URLSearchParams({
         class: params.slug,
         task: taskSlug,
       });
 
-      router.push(`${ROUTES.DASHBOARD.STUDENT.TASKS_VIEW}?${query.toString()}`);
+      router.push(`${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?${query}`);
     };
 
     if (!classTasks) return;
@@ -57,28 +57,21 @@ const StudentClassDetailPage = () => {
       <div>
         {/* Task Grid */}
         {isLoading ? (
-          <StudentTaskCardWrapper>
+          <TeacherTaskCardWrapper>
             {Array.from({ length: 4 }).map((_, idx) => (
-              <StudentTaskCardSkeleton key={idx} />
+              <TeacherTaskCardSkeleton key={idx} />
             ))}
-          </StudentTaskCardWrapper>
+          </TeacherTaskCardWrapper>
         ) : classTasks.length > 0 ? (
-          <StudentTaskCardWrapper>
+          <TeacherTaskCardWrapper>
             {classTasks.map((ct) => (
-              <StudentTaskCard
+              <TeacherTaskCard
                 key={ct.slug}
-                image={ct.image}
-                title={ct.title}
-                slug={ct.slug}
-                type={ct.type}
-                // difficulty={ct.difficulty}
-                subject={ct.subject}
-                questionCount={ct.questionCount}
-                deadline={ct.deadline}
-                onClick={handleNavigateToTaskDetailPage}
+                task={ct}
+                onClick={handleNavigateToSubmissionPage}
               />
             ))}
-          </StudentTaskCardWrapper>
+          </TeacherTaskCardWrapper>
         ) : (
           <p className="text-center">Task not found.</p>
         )}
@@ -367,4 +360,4 @@ const StudentClassDetailPage = () => {
   );
 };
 
-export default StudentClassDetailPage;
+export default TeacherClassDetailPage;

@@ -13,7 +13,7 @@ import {
   DateRow,
   NumberRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
-import ActivityQuestionCard from "@/app/components/pages/Activity/Summary/ActivityQuestionCard";
+import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
 
 const ActivitySummaryPage = () => {
   const params = useParams<{ slug: string }>();
@@ -90,7 +90,7 @@ const ActivitySummaryPage = () => {
 
         <div className="flex flex-col gap-8">
           {activitySummaryData.questions.map((q, idx) => (
-            <ActivityQuestionCard
+            <TaskSummaryQuestionCard
               key={idx}
               index={idx}
               question={q}
@@ -105,7 +105,7 @@ const ActivitySummaryPage = () => {
 
   return (
     <>
-      {(isActivitySummaryDataLoading) && <Loading />}
+      {isActivitySummaryDataLoading && <Loading />}
 
       <PageLayout>
         <DetailPageWrapper

@@ -42,6 +42,7 @@ export const useClassDetail = <M extends ManageItemMode>(
       const mapped: ClassDetailResponse = {
         id: c.id,
         name: c.name,
+        slug: c.slug,
         description: c.description ?? "",
         image: c.image ? getImageSrc(c.image) : "",
       };

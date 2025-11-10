@@ -2,17 +2,17 @@
 
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreateSubjectFormInputs } from "@/app/schemas/subjects/createSubject";
 import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
-import CreateSubjectForm from "@/app/components/forms/subjects/create-subject-form";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ROUTES } from "@/app/constants/routes";
+import { CreateClassFormInputs } from "@/app/schemas/classes/createClass";
+import CreateClassForm from "@/app/components/forms/classes/create-class-form";
 
-const CreateSubjectPage = () => {
+const CreateClassPage = () => {
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS;
+  const baseRoute = ROUTES.DASHBOARD.TEACHER.CLASS;
   const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
     text: "",
@@ -36,16 +36,16 @@ const CreateSubjectPage = () => {
     router.back();
   };
 
-  const handleCreateSubjectSuccess = (values: CreateSubjectFormInputs) => {
-    console.log("Create subject successful with:", values);
+  const handleCreateClassSuccess = (values: CreateClassFormInputs) => {
+    console.log("Create class successful with:", values);
     router.push(`${baseRoute}`);
   };
 
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Buat Mata Pelajaran Baru" onBack={handleBack} />
-      <CreateSubjectForm ref={formRef} onFinish={handleCreateSubjectSuccess} />
+      <DashboardTitle title="Create New Class" onBack={handleBack} />
+      <CreateClassForm ref={formRef} onFinish={handleCreateClassSuccess} />
 
       <ConfirmationModal
         visible={backConfirmationModal.visible}
@@ -59,4 +59,4 @@ const CreateSubjectPage = () => {
   );
 };
 
-export default CreateSubjectPage;
+export default CreateClassPage;

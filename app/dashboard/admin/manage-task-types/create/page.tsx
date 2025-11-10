@@ -7,14 +7,16 @@ import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateTaskTypeForm from "@/app/components/forms/task-types/create-task-type-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 
 const CreateTaskTypePage = () => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES;
-  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
-    useState(false);
+  const [backConfirmationModal, setBackConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const formRef = useRef<FormRef>(null);
 
@@ -26,11 +28,11 @@ const CreateTaskTypePage = () => {
       return;
     }
 
-    setIsBackConfirmationModalVisible(true);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = () => {
-    setIsBackConfirmationModalVisible(false);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
     router.back();
   };
 
@@ -45,13 +47,14 @@ const CreateTaskTypePage = () => {
       <DashboardTitle title="Buat Tipe Tugas Baru" onBack={handleBack} />
       <CreateTaskTypeForm onFinish={handleCreateTaskTypeSuccess} />
 
-      {isBackConfirmationModalVisible && (
-        <BackConfirmationModal
-          visible={isBackConfirmationModalVisible}
-          onConfirm={handleBackConfirmation}
-          onCancel={() => setIsBackConfirmationModalVisible(false)}
-        />
-      )}
+      <ConfirmationModal
+        visible={backConfirmationModal.visible}
+        type="back"
+        onConfirm={handleBackConfirmation}
+        onCancel={() =>
+          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
     </>
   );
 };

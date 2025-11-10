@@ -8,7 +8,7 @@ import Loading from "@/app/components/shared/Loading";
 import EditTaskTypeForm from "@/app/components/forms/task-types/edit-task-type-form";
 import { EditTaskTypeFormInputs } from "@/app/schemas/task-types/editTaskType";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { useTaskTypeDetail } from "@/app/hooks/task-types/useTaskTypeDetail";
 
@@ -22,8 +22,10 @@ const EditTaskTypePage = () => {
     "edit"
   );
 
-  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
-    useState(false);
+  const [backConfirmationModal, setBackConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const formRef = useRef<FormRef>(null);
 
@@ -35,11 +37,11 @@ const EditTaskTypePage = () => {
       return;
     }
 
-    setIsBackConfirmationModalVisible(true);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = () => {
-    setIsBackConfirmationModalVisible(false);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
     router.back();
   };
 
@@ -62,13 +64,14 @@ const EditTaskTypePage = () => {
         />
       )}
 
-      {isBackConfirmationModalVisible && (
-        <BackConfirmationModal
-          visible={isBackConfirmationModalVisible}
-          onConfirm={handleBackConfirmation}
-          onCancel={() => setIsBackConfirmationModalVisible(false)}
-        />
-      )}
+      <ConfirmationModal
+        visible={backConfirmationModal.visible}
+        type="back"
+        onConfirm={handleBackConfirmation}
+        onCancel={() =>
+          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
     </>
   );
 };

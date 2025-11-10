@@ -112,12 +112,12 @@ export const classProvider = {
     }
   },
 
-  async deleteClass(id: string): Promise<ApiResponse<null>> {
-    try {
-      const res: BaseResponseDto = await deleteAxios(`${API_URL}/${id}`);
-      return res;
-    } catch (error) {
-      return handleAxiosError<null>(error);
-    }
-  },
+  // async deleteClass(id: string): Promise<ApiResponse<null>> {
+  //   try {
+  //     const res: BaseResponseDto = await deleteAxios(`${API_URL}/${id}`);
+  //     return res;
+  //   } catch (error) {
+  //     return handleAxiosError<null>(error);
+  //   }
+  // },
 };

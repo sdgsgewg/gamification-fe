@@ -5,12 +5,16 @@ import { FilterClassMemberRequest } from "@/app/interface/classes/requests/IFilt
 import { ClassMemberResponse } from "@/app/interface/classes/responses/IClassMemberResponse";
 import { useQuery } from "@tanstack/react-query";
 
-export const useClassMember = (slug: string, values?: FilterClassMemberRequest) => {
+export const useClassMember = (
+  slug: string,
+  values?: FilterClassMemberRequest
+) => {
   return useQuery({
     queryKey: ["class-member", slug, values],
     enabled: !!slug,
     queryFn: async () => {
       const res = await classProvider.getClassMembers(slug, values);
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat anggota kelas");
 

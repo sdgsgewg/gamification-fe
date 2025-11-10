@@ -14,8 +14,9 @@ import { ROUTES } from "@/app/constants/routes";
 import { useTeacherClassTasks } from "@/app/hooks/class-tasks/useTeacherClassTasks";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import { useClassMember } from "@/app/hooks/classes/useClassMember";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { ClassDetailView, MemberRole } from "@/app/types/class-detail";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -24,6 +25,7 @@ import React, { useMemo, useState } from "react";
 const TeacherClassDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
+  const { role: userRole } = useGetCachedUser();
 
   const { data: classDetailData } = useClassDetail(params.slug, "detail");
 
@@ -37,6 +39,12 @@ const TeacherClassDetailPage = () => {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleNavigateToEditPage = () => {
+    router.push(
+      `${ROUTES.DASHBOARD.TEACHER.CLASS}/edit/${classDetailData?.slug}`
+    );
   };
 
   const TaskView = () => {
@@ -144,7 +152,11 @@ const TeacherClassDetailPage = () => {
             ))}
           </MemberCardWrapper>
         ) : (
-          <p className="text-center">Member not found.</p>
+          <div className="mt-8">
+            <p className="text-center">{`${
+              view === "students" ? "Students" : "Teacher"
+            } not found.`}</p>
+          </div>
         )}
       </div>
     );
@@ -300,7 +312,7 @@ const TeacherClassDetailPage = () => {
     <div>
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-        <div>
+        <div className="flex flex-row sm:flex-col gap-4">
           <Button
             type="primary"
             size="middle"
@@ -310,8 +322,16 @@ const TeacherClassDetailPage = () => {
             <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
             <span className="text-base font-semibold">Kembali</span>
           </Button>
+          <Button
+            size="middle"
+            variant="warning"
+            onClick={handleNavigateToEditPage}
+          >
+            <FontAwesomeIcon icon={faPenToSquare} className="mr-1" />
+            <span className="text-base font-semibold">Edit</span>
+          </Button>
         </div>
-        <div className="w-full sm:max-w-[60%] lg:max-w-[40%] flex items-center gap-4 sm:ms-auto">
+        <div className="w-full sm:max-w-[60%] lg:max-w-[40%] flex items-center justify-end gap-4 sm:ms-auto">
           <div className="flex flex-col text-end gap-2">
             <h3 className="text-dark text-2xl md:text-3xl font-bold">{name}</h3>
             <p className="text-sm font-medium">{description}</p>

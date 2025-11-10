@@ -28,12 +28,8 @@ export const taskTypeProvider = {
       if (params?.searchText) query.append("searchText", params.searchText);
       if (params?.scope) query.append("scope", params.scope);
       if (params?.hasDeadline) query.append("hasDeadline", params.hasDeadline);
-      if (params?.isCompetitive)
-        query.append("isCompetitive", params.isCompetitive);
       if (params?.isRepeatable)
         query.append("isRepeatable", params.isRepeatable);
-      if (params?.pointMultiplier)
-        query.append("pointMultiplier", params.pointMultiplier.toString());
 
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
@@ -44,6 +40,17 @@ export const taskTypeProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<TaskTypeOverviewResponse[]>(error);
+    }
+  },
+
+  async getTaskTypeById(
+    id: string
+  ): Promise<ApiResponse<TaskTypeDetailResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/${id}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<TaskTypeDetailResponse>(error);
     }
   },
 

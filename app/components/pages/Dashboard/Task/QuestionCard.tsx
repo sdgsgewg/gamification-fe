@@ -70,11 +70,11 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <Tag color="blue">{`Poin: ${question.point}`}</Tag>
-            {question.timeLimit && (
+            {/* {question.timeLimit && question.timeLimit > 0 && (
               <Tag color="purple" icon={<ClockCircleOutlined />}>
                 {`${question.timeLimit} detik`}
               </Tag>
-            )}
+            )} */}
           </div>
         </div>
       }
@@ -104,7 +104,11 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               key={i}
               className="min-w-[10rem] bg-tertiary flex items-center justify-start rounded-lg px-4 py-2 text-sm font-semibold"
             >
-              <span className="text-dark me-1">{String.fromCharCode(65 + i)}.</span>
+              {question.type === QuestionType.MULTIPLE_CHOICE && (
+                <span className="text-dark me-1">
+                  {String.fromCharCode(65 + i)}.
+                </span>
+              )}
               <span className="text-dark me-3">{opt.text}</span>
               {opt.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />}
             </div>

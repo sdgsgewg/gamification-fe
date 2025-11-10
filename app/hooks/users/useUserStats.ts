@@ -1,4 +1,5 @@
 "use client";
+
 import { userProvider } from "@/app/functions/UserProvider";
 import { UserStatsResponse } from "@/app/interface/users/responses/IUserStatsResponse";
 import { useQuery } from "@tanstack/react-query";

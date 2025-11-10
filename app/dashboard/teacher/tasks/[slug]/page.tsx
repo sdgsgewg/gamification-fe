@@ -121,7 +121,7 @@ const TeacherTaskDetailPage = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<TaskDetailBottomContentView>("submission");
+    const [view, setView] = useState<TaskDetailBottomContentView>("submissions");
 
     const { assignedClasses, duration, history, questions } = taskData;
     const isShared = assignedClasses ?? false;
@@ -129,7 +129,7 @@ const TeacherTaskDetailPage = () => {
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
       ...(isShared
-        ? [{ key: "submission" as const, label: "Submission" }]
+        ? [{ key: "submissions" as const, label: "Submissions" }]
         : []),
       { key: "duration" as const, label: "Duration" },
       { key: "history" as const, label: "History" },
@@ -203,7 +203,7 @@ const TeacherTaskDetailPage = () => {
         view={view}
         onChangeTab={handleChangeTab}
       >
-        {view === "submission" ? (
+        {view === "submissions" ? (
           <SubmissionView />
         ) : view === "duration" ? (
           <DurationView />

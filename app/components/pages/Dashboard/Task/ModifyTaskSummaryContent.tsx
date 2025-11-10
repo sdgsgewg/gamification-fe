@@ -127,7 +127,6 @@ const ModifyTaskSummaryContent = ({
           material={materialName}
           type={taskTypeName}
           questionCount={questions.length}
-          // difficulty={TaskDifficultyLabels[difficulty as TaskDifficulty]}
           difficulty={
             TaskDifficultyLabels[difficulty as TaskDifficulty] ?? difficulty
           }

@@ -1,14 +1,14 @@
 import {
   ApiResponse,
   BaseResponseDto,
-  DetailResponseDto,
   handleAxiosError,
 } from "../utils/axiosHelper";
 import { getAxios, putAxios } from "../utils/AxiosFunction";
-import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
 import { UpdateTaskSubmissionFormInputs } from "../schemas/task-submissions/updateTaskSubmission";
 import { FilterTaskSubmissionRequest } from "../interface/task-submissions/requests/IFilterTaskSubmissionRequest";
 import { GroupedTaskSubmissionResponseDto } from "../interface/task-submissions/responses/IGroupedTaskSubmissionResponse";
+import { TaskSubmissionDetailResponse } from "../interface/task-submissions/responses/ITaskSubmissionDetailResponse";
+import { TaskSubmissionWithAnswersResponse } from "../interface/task-submissions/responses/TaskSubmissionWithAnswersResponse";
 
 const API_URL = "/task-submissions";
 
@@ -37,14 +37,25 @@ export const taskSubmissionProvider = {
     }
   },
 
-  async getTaskAttemptDetail(
+  async getTaskSubmissionDetail(
     id: string
-  ): Promise<ApiResponse<TaskAttemptDetailResponse>> {
+  ): Promise<ApiResponse<TaskSubmissionDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<TaskAttemptDetailResponse>(error);
+      return handleAxiosError<TaskSubmissionDetailResponse>(error);
+    }
+  },
+
+  async getTaskSubmissionWithAnswers(
+    id: string
+  ): Promise<ApiResponse<TaskSubmissionWithAnswersResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/review/${id}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<TaskSubmissionWithAnswersResponse>(error);
     }
   },
 

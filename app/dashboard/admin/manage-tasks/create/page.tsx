@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
 import CreateTaskOverviewForm from "@/app/components/forms/tasks/task-overview/create-task-overview-form";
 import CreateTaskQuestionForm from "@/app/components/forms/tasks/task-question/create-task-question-form";
-import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { CreateTaskRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
 import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
@@ -34,8 +34,10 @@ const CreateTaskPage = () => {
   const { data: gradeData = [] } = useGrades();
 
   const [view, setView] = useState<ViewState>("task-overview");
-  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
-    useState(false);
+  const [backConfirmationModal, setBackConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const [taskOverview, setTaskOverview] =
     useState<CreateTaskOverviewFormInputs>(createTaskOverviewDefaultValues);
@@ -60,11 +62,11 @@ const CreateTaskPage = () => {
       return;
     }
 
-    setIsBackConfirmationModalVisible(true);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = () => {
-    setIsBackConfirmationModalVisible(false);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
     router.back();
   };
 
@@ -222,13 +224,14 @@ const CreateTaskPage = () => {
         <TaskSummaryView />
       )}
 
-      {isBackConfirmationModalVisible && (
-        <BackConfirmationModal
-          visible={isBackConfirmationModalVisible}
-          onConfirm={handleBackConfirmation}
-          onCancel={() => setIsBackConfirmationModalVisible(false)}
-        />
-      )}
+      <ConfirmationModal
+        visible={backConfirmationModal.visible}
+        type="back"
+        onConfirm={handleBackConfirmation}
+        onCancel={() =>
+          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
     </>
   );
 };

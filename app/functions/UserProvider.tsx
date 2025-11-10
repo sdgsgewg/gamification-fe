@@ -1,4 +1,5 @@
 import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
+import { UserRecentActivityResponse } from "../interface/users/responses/IUserRecentActivityResponse";
 import { UserStatsResponse } from "../interface/users/responses/IUserStatsResponse";
 import { getAxios } from "../utils/AxiosFunction";
 import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
@@ -32,6 +33,15 @@ export const userProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserStatsResponse>(error);
+    }
+  },
+
+  async getUserRecentActivities(): Promise<ApiResponse<UserRecentActivityResponse[]>> {
+    try {
+      const data = await getAxios(`${API_URL}/recent-activities`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserRecentActivityResponse[]>(error);
     }
   },
 };

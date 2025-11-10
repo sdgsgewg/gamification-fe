@@ -16,7 +16,7 @@ import { QuestionType } from "@/app/enums/QuestionType";
 import ModifyTaskNavigationBarWrapper from "@/app/components/pages/Dashboard/Task/ModifyTaskNavigationBarWrapper";
 import ModifyTaskQuestionNavigationBar from "@/app/components/pages/Dashboard/Task/ModifyTaskQuestionNavigationBar";
 import ModifyTaskQuestionCard from "@/app/components/pages/Dashboard/Task/ModifyTaskQuestionCard";
-import { DeleteConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { useScrollToEnd } from "@/app/hooks/form/useScrollToEnd";
 import { useInitTaskQuestionsForm } from "@/app/hooks/form/useInitTaskQuestionsForm";
 
@@ -54,10 +54,10 @@ export default function CreateTaskQuestionForm({
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [deleteQuestionIndex, setDeleteQuestionIndex] = useState<number>(0);
-  const [
-    isDeleteConfirmationModalVisible,
-    setIsDeleteConfirmationModalVisible,
-  ] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -79,19 +79,19 @@ export default function CreateTaskQuestionForm({
 
   const showDeleteModal = (questionIdx: number) => {
     setDeleteQuestionIndex(questionIdx);
-    setIsDeleteConfirmationModalVisible(true);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDeleteQuestion = () => {
     if (!deleteQuestionIndex) return;
     remove(deleteQuestionIndex);
     setSelectedQuestionIndex(deleteQuestionIndex - 1);
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     toast.success("Soal berhasil dihapus!");
   };
 
   const cancelDelete = () => {
-    setIsDeleteConfirmationModalVisible(false);
+    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleFileListChange = (questionId: string, fileList: UploadFile[]) => {
@@ -223,11 +223,12 @@ export default function CreateTaskQuestionForm({
         </Form>
       </FormProvider>
 
-      <DeleteConfirmationModal
-        visible={isDeleteConfirmationModalVisible}
-        modalText={`Apakah kamu yakin ingin menghapus 'Soal #${
+      <ConfirmationModal
+        visible={deleteConfirmationModal.visible}
+        text={`Are you sure you want to delete 'Question #${
           deleteQuestionIndex + 1
         }'?`}
+        type="delete"
         onConfirm={confirmDeleteQuestion}
         onCancel={cancelDelete}
       />

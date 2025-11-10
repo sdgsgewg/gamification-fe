@@ -78,13 +78,13 @@ export const TrueOrFalseField = ({
   questionIndex,
 }: FieldProps) => {
   const trueFalseOptions = [
-    { value: "true", label: "Benar" },
-    { value: "false", label: "Salah" },
+    { value: "true", label: "True" },
+    { value: "false", label: "False" },
   ];
 
   return (
     <div className="mt-4 p-4 border rounded-md bg-gray-50">
-      <h4 className="font-medium mb-3">Jawaban yang Benar</h4>
+      <h4 className="font-medium mb-3">Choose correct answer</h4>
       <RadioField
         control={control}
         name={`questions.${questionIndex}.correctAnswer`}
@@ -101,23 +101,43 @@ export const FillInTheBlankField = ({
   questionIndex,
 }: FieldProps) => {
   return (
-    <div className="mt-4 p-4 border rounded-md bg-gray-50">
-      <h4 className="font-medium mb-3">Jawaban yang Benar</h4>
-      <TextField
-        control={control}
-        name={`questions.${questionIndex}.correctAnswer`}
-        placeholder="Masukkan jawaban yang benar"
-        errors={errors}
-      />
+    <div className="flex flex-col gap-8 mt-4">
+      <div className="p-4 border rounded-md bg-gray-50">
+        <h4 className="font-medium mb-3">Input correct answer</h4>
+        <TextField
+          control={control}
+          name={`questions.${questionIndex}.correctAnswer`}
+          placeholder="Please input a correct answer"
+          errors={errors}
+        />
+      </div>
+      <div className="p-4 border rounded-md bg-gray-50">
+        <p className="text-sm text-tx-tertiary">
+          For fill in the blank questions, the answers will be graded manually
+          by the instructor.
+        </p>
+      </div>
     </div>
   );
 };
 
+// export const FillInTheBlankField = () => {
+//   return (
+//     <div className="p-4 border rounded-md bg-gray-50">
+//       <p className="text-sm text-tx-tertiary">
+//         For fill in the blank questions, the answers will be graded manually by the
+//         instructor.
+//       </p>
+//     </div>
+//   );
+// };
+
 export const EssayField = () => {
   return (
     <div className="p-4 border rounded-md bg-gray-50">
-      <p className="text-sm text-gray-600">
-        Untuk soal esai, jawaban akan dinilai secara manual oleh pengajar.
+      <p className="text-sm text-tx-tertiary">
+        For essay questions, the answers will be graded manually by the
+        instructor.
       </p>
     </div>
   );

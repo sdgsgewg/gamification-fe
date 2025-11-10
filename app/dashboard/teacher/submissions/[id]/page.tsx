@@ -22,69 +22,22 @@ import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContent
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 import SubmissionCard from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard";
 import SubmissionCardWrapper from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard/Wrapper";
+import { useTaskSubmissionDetail } from "@/app/hooks/task-submissions/useTaskSubmissionDetail";
 
 const SubmissionDetailPage = () => {
-  const params = useParams<{ slug: string }>();
+  const params = useParams<{ id: string }>();
   const { toast } = useToast();
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
+  const baseRoute = ROUTES.DASHBOARD.TEACHER.SUBMISSIONS;
 
-  const { data: taskData, isLoading } = useTaskDetail(params.slug, "detail");
-  const { mutateAsync: deleteTask } = useDeleteTask();
+  const { data: submissionDetail, isLoading } = useTaskSubmissionDetail(params.id);
 
-  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
-  const [deleteTaskName, setDeleteTaskName] = useState<string | null>(null);
-  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
-    visible: false,
-    text: "",
-  });
-
-  const handleEdit = (slug: string) => {
-    router.push(`${baseRoute}/edit/${slug}`);
-  };
-
-  const showDeleteModal = (materialId: string, name: string) => {
-    setDeleteTaskId(materialId);
-    setDeleteTaskName(name);
-    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
-  };
-
-  const confirmDelete = () => {
-    if (deleteTaskId !== null) {
-      handleDelete(deleteTaskId);
-      setDeleteTaskId(null);
-      setDeleteTaskName(null);
-      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
-    }
-  };
-
-  const cancelDelete = () => {
-    setDeleteTaskId(null);
-    setDeleteTaskName(null);
-    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
-  };
-
-  const handleDelete = async (id: string) => {
-    const res = await deleteTask(id);
-    const { isSuccess, message } = res;
-    if (isSuccess) {
-      toast.success(message ?? "Tugas berhasil dihapus");
-      router.push(`${baseRoute}`);
-    } else {
-      toast.error(message ?? "Gagal menghapus tugas");
-    }
-  };
-
-  const handleShare = (id: string) => {
-    console.log("Share task with id: ", id);
-  };
-
-  if (!taskData) {
+  if (!submissionDetail) {
     return <Loading />;
   }
 
   const LeftSideContent = () => {
-    const { title, image, description } = taskData;
+    const { title, image, description } = submissionDetail.taskDetail;
 
     return (
       <DetailPageLeftSideContent
@@ -99,31 +52,31 @@ const SubmissionDetailPage = () => {
     const {
       subject,
       material,
-      taskType,
+      type,
       questionCount,
       difficulty,
-      taskGrade,
-    } = taskData;
+      grade,
+    } = submissionDetail.taskDetail;
 
     return (
       <>
         {/* Informasi Detail */}
         <TaskDetailInformationTable
-          subject={subject.name}
-          material={material?.name}
-          type={taskType.name}
+          subject={subject}
+          material={material}
+          type={type}
           questionCount={questionCount}
           difficulty={difficulty}
-          grade={taskGrade}
+          grade={grade}
         />
       </>
     );
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<TaskDetailBottomContentView>("submission");
+    const [view, setView] = useState<TaskDetailBottomContentView>("");
 
-    const { assignedClasses, duration, history, questions } = taskData;
+    const { assignedClasses, duration, history, questions } = submissionDetail;
     const isShared = assignedClasses ?? false;
 
     // Buat daftar tab dinamis
@@ -224,17 +177,17 @@ const SubmissionDetailPage = () => {
       <DashboardTitle
         showBackButton={true}
         onEdit={() => {
-          if (taskData) handleEdit(taskData.slug);
+          if (submissionDetail) handleEdit(submissionDetail.slug);
         }}
         onDelete={() => {
-          if (taskData) showDeleteModal(taskData.taskId, taskData.title);
+          if (submissionDetail) showDeleteModal(submissionDetail.taskId, submissionDetail.title);
         }}
         onShare={() => {
-          if (taskData) handleShare(taskData.taskId);
+          if (submissionDetail) handleShare(submissionDetail.taskId);
         }}
       />
 
-      {taskData && (
+      {submissionDetail && (
         <DetailPageWrapper
           left={<LeftSideContent />}
           right={<RightSideContent />}

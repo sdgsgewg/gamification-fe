@@ -1,4 +1,5 @@
 import { QuestionType } from "@/app/enums/QuestionType";
+import { getDefaultOptionsByType } from "@/app/utils/tasks/getDefaultOptionsByQuestionType";
 import z from "zod";
 
 const optionSchema = z.object({
@@ -24,18 +25,24 @@ const questionSchema = z
     ]),
     image: z.string().optional(),
     imageFile: z.any().optional(),
-    options: z.array(optionSchema).optional(),
-    correctAnswer: z.union([z.string(), z.boolean()]).optional(),
+    options: z.array(optionSchema).optional().nullable(),
+    correctAnswer: z
+      .union([z.string(), z.boolean(), z.null()])
+      .optional()
+      .nullable(),
   })
-  .refine(
-    (data) => {
-      if (data.type === QuestionType.MULTIPLE_CHOICE) {
-        return data.options && data.options.length >= 2;
+  .superRefine((data, ctx) => {
+    // Pilihan ganda: harus punya minimal 2 opsi
+    if (data.type === QuestionType.MULTIPLE_CHOICE) {
+      if (!data.options || data.options.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Minimal 2 opsi untuk pilihan ganda",
+          path: ["options"],
+        });
       }
-      return true;
-    },
-    { message: "Minimal 2 opsi untuk pilihan ganda", path: ["options"] }
-  );
+    }
+  });
 
 export const editTaskQuestionSchema = z.object({
   questions: z.array(questionSchema).min(1, "Minimal ada satu pertanyaan"),
@@ -52,7 +59,8 @@ export const editTaskQuestionDefaultValues: EditTaskQuestionFormInputs = {
       type: QuestionType.MULTIPLE_CHOICE,
       image: "",
       imageFile: null,
-      options: [],
+      options: getDefaultOptionsByType(QuestionType.MULTIPLE_CHOICE),
+      correctAnswer: "",
     },
   ],
 };

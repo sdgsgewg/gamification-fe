@@ -15,6 +15,7 @@ export const useTaskDetail = <M extends ManageItemMode>(
     enabled: !!slug,
     queryFn: async () => {
       const res = await taskProvider.getTaskDetail(slug);
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 
@@ -23,7 +24,6 @@ export const useTaskDetail = <M extends ManageItemMode>(
         // Mode edit
         const mapped: TaskDetailResponse = {
           ...t,
-          updatedBy: "",
           image: t.image ? getImageSrc(t.image) : "",
         };
         return mapped;

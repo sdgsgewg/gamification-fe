@@ -33,9 +33,7 @@ export const useTaskTypeDetail = <M extends ManageItemMode>(
           description: tt.description || "",
           scope: tt.scope || "",
           hasDeadline: tt.hasDeadline.toString(),
-          isCompetitive: tt.isCompetitive.toString(),
           isRepeatable: tt.isRepeatable.toString(),
-          pointMultiplier: tt.pointMultiplier,
           updatedBy: "",
         };
         return mapped as ModeReturnType<M>;
@@ -49,9 +47,7 @@ export const useTaskTypeDetail = <M extends ManageItemMode>(
         description: tt.description ?? "",
         scope: tt.scope,
         hasDeadline: tt.hasDeadline,
-        isCompetitive: tt.isCompetitive,
         isRepeatable: tt.isRepeatable,
-        pointMultiplier: tt.pointMultiplier,
         createdBy: tt.createdBy,
         updatedBy: tt.updatedBy ?? "-",
       };

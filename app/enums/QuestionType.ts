@@ -6,8 +6,8 @@ export enum QuestionType {
 }
 
 export const QuestionTypeLabels: Record<QuestionType, string> = {
-  [QuestionType.MULTIPLE_CHOICE]: "Pilihan Ganda",
-  [QuestionType.TRUE_FALSE]: "Benar/Salah",
-  [QuestionType.FILL_BLANK]: "Isian",
-  [QuestionType.ESSAY]: "Esai",
+  [QuestionType.MULTIPLE_CHOICE]: "Multiple Choice",
+  [QuestionType.TRUE_FALSE]: "True/False",
+  [QuestionType.FILL_BLANK]: "Fill in The Blanks",
+  [QuestionType.ESSAY]: "Essay",
 };

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
-import { BackConfirmationModal } from "@/app/components/modals/ConfirmationModal";
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import toast from "react-hot-toast";
 import { taskProvider } from "@/app/functions/TaskProvider";
 import ModifyTaskSummaryContent from "@/app/components/pages/Dashboard/Task/ModifyTaskSummaryContent";
@@ -33,15 +33,20 @@ const EditTaskPage = () => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
 
-  const { data: taskData, isLoading } = useTaskDetail(params.slug, "edit");
+  const { data: taskData, isLoading: isTaskDataLoading } = useTaskDetail(
+    params.slug,
+    "edit"
+  );
   const { data: subjectData = [] } = useSubjects();
   const { data: materialData = [] } = useMaterials();
   const { data: taskTypeData = [] } = useTaskTypes();
   const { data: gradeData = [] } = useGrades();
 
   const [view, setView] = useState<ViewState>("task-overview");
-  const [isBackConfirmationModalVisible, setIsBackConfirmationModalVisible] =
-    useState(false);
+  const [backConfirmationModal, setBackConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
 
   const [taskOverviewDefaultValue, setTaskOverviewDefaultValue] =
     useState<EditTaskOverviewFormInputs>(editTaskOverviewDefaultValues);
@@ -52,6 +57,8 @@ const EditTaskPage = () => {
     useState<EditTaskQuestionFormInputs | null>(null);
   const [taskQuestions, setTaskQuestions] =
     useState<EditTaskQuestionFormInputs | null>(null);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formRef = useRef<FormRef<EditTaskOverviewFormInputs>>(null);
 
@@ -71,11 +78,11 @@ const EditTaskPage = () => {
       return;
     }
 
-    setIsBackConfirmationModalVisible(true);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const handleBackConfirmation = () => {
-    setIsBackConfirmationModalVisible(false);
+    setBackConfirmationModal((prev) => ({ ...prev, visible: false }));
     router.back();
   };
 
@@ -91,6 +98,69 @@ const EditTaskPage = () => {
     setView("task-overview");
   };
 
+  // STEP 2: Questions
+  // const handleTaskQuestionsBack = (qs: EditTaskQuestionFormInputs) => {
+  //   // Transformasi data untuk memastikan konsistensi
+  //   const transformedQuestions = {
+  //     ...qs,
+  //     questions: qs.questions.map((q) => {
+  //       // multiple choice
+  //       if (
+  //         q.type === QuestionType.MULTIPLE_CHOICE &&
+  //         q.correctAnswer !== undefined
+  //       ) {
+  //         const correctIndex = parseInt(q.correctAnswer as string, 10);
+
+  //         return {
+  //           ...q,
+  //           options: q.options
+  //             ? q.options.map((opt, i) => ({
+  //                 ...opt,
+  //                 isCorrect: i === correctIndex,
+  //               }))
+  //             : [],
+  //         };
+  //       }
+
+  //       // true/false
+  //       if (q.type === QuestionType.TRUE_FALSE) {
+  //         return {
+  //           ...q,
+  //           options: q.options
+  //             ? q.options.map((opt) => ({
+  //                 ...opt,
+  //                 isCorrect:
+  //                   ((opt.text === "True" || opt.text === "Benar") &&
+  //                     q.correctAnswer === "true") ||
+  //                   ((opt.text === "False" || opt.text === "Salah") &&
+  //                     q.correctAnswer === "false"),
+  //               }))
+  //             : [],
+  //         };
+  //       }
+
+  //       // fill in the blank
+  //       if (q.type === QuestionType.FILL_BLANK) {
+  //         return {
+  //           ...q,
+  //           options: [
+  //             {
+  //               text: String(q.correctAnswer),
+  //               isCorrect: true,
+  //             },
+  //           ],
+  //         };
+  //       }
+
+  //       // essay biarkan default
+  //       return q;
+  //     }),
+  //   };
+
+  //   setTaskQuestions(transformedQuestions);
+  //   setView("task-overview");
+  // };
+
   const handleTaskQuestionsSubmit = (qs: EditTaskQuestionFormInputs) => {
     setTaskQuestions(qs);
     setView("task-summary");
@@ -99,6 +169,8 @@ const EditTaskPage = () => {
   // STEP 3: Final Submit
   const handleFinalSubmit = async () => {
     if (!taskData || !taskOverview || !taskQuestions) return;
+
+    setIsLoading(true);
 
     try {
       // Append semua data text sebagai JSON
@@ -155,6 +227,8 @@ const EditTaskPage = () => {
     } catch (error) {
       console.error("Error submitting task:", error);
       toast.error("Terjadi kesalahan saat mengirim data");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -187,6 +261,7 @@ const EditTaskPage = () => {
       <>
         <DashboardTitle title="Edit Soal" showBackButton={false} />
         <EditTaskQuestionForm
+          taskOverview={taskOverview}
           taskQuestions={taskQuestions}
           onBack={handleTaskQuestionsBack}
           onNext={handleTaskQuestionsSubmit}
@@ -251,20 +326,33 @@ const EditTaskPage = () => {
   useEffect(() => {
     if (!taskData) return;
 
+    const {
+      title,
+      description,
+      subject,
+      material,
+      taskType,
+      taskGradeIds,
+      difficulty,
+      duration,
+      image,
+    } = taskData;
+    const { updatedBy } = taskData.history;
+
     const defaultTaskOverview = {
-      title: taskData.title,
-      description: taskData.description ?? "",
-      subjectId: taskData.subject.subjectId,
-      materialId: taskData.material?.materialId,
-      taskTypeId: taskData.taskType.taskTypeId,
-      gradeIds: taskData.taskGradeIds,
-      difficulty: taskData.difficulty,
-      updatedBy: taskData.updatedBy ?? "",
-      startDate: parseDate(taskData.startTime),
-      startTime: parseDate(taskData.startTime),
-      endDate: parseDate(taskData.endTime),
-      endTime: parseDate(taskData.endTime),
-      image: taskData.image,
+      title: title,
+      description: description ?? "",
+      subjectId: subject.subjectId,
+      materialId: material?.materialId,
+      taskTypeId: taskType.taskTypeId,
+      gradeIds: taskGradeIds,
+      difficulty: difficulty.toUpperCase(),
+      updatedBy: updatedBy ?? "",
+      startDate: parseDate(duration?.startTime),
+      startTime: parseDate(duration?.startTime),
+      endDate: parseDate(duration?.endTime),
+      endTime: parseDate(duration?.endTime),
+      image: image,
       imageFile: undefined,
     };
 
@@ -291,7 +379,22 @@ const EditTaskPage = () => {
             ...q,
             type: q.type as QuestionType,
             imageFile: undefined,
-            correctAnswer: correctOpt?.text === "Benar" ? "true" : "false",
+            options: [
+              {
+                text: "True",
+                isCorrect:
+                  correctOpt?.text === "Benar" || correctOpt?.text === "True",
+              },
+              {
+                text: "False",
+                isCorrect:
+                  correctOpt?.text === "Salah" || correctOpt?.text === "False",
+              },
+            ],
+            correctAnswer:
+              correctOpt?.text === "Benar" || correctOpt?.text === "True"
+                ? "true"
+                : "false",
           };
         }
 
@@ -322,7 +425,7 @@ const EditTaskPage = () => {
 
   return (
     <>
-      {isLoading && <Loading />}
+      {isTaskDataLoading || (isLoading && <Loading />)}
 
       <Toaster position="top-right" />
       {view === "task-overview" ? (
@@ -333,13 +436,14 @@ const EditTaskPage = () => {
         <TaskSummaryView />
       )}
 
-      {isBackConfirmationModalVisible && (
-        <BackConfirmationModal
-          visible={isBackConfirmationModalVisible}
-          onConfirm={handleBackConfirmation}
-          onCancel={() => setIsBackConfirmationModalVisible(false)}
-        />
-      )}
+      <ConfirmationModal
+        visible={backConfirmationModal.visible}
+        type="back"
+        onConfirm={handleBackConfirmation}
+        onCancel={() =>
+          setBackConfirmationModal((prev) => ({ ...prev, visible: false }))
+        }
+      />
     </>
   );
 };

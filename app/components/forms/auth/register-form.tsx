@@ -146,12 +146,12 @@ export default function RegisterForm({
                 </Button>
               </Form.Item>
 
-              <AuthDivider />
+              {/* <AuthDivider />
 
               <OAuthButton
                 message="Continue with Google"
                 onClick={handleOAuthRegister}
-              />
+              /> */}
             </>
           }
           bottom={

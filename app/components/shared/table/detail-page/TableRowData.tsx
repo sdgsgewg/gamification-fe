@@ -187,3 +187,21 @@ export const StatusRow = ({ value }: StatusRowProps) => {
     />
   );
 };
+
+
+// TEACHER SUBMISSION ROWS
+
+interface FeedbackRowProps {
+  value: string;
+}
+
+export const FeedbackRow = ({ value }: FeedbackRowProps) => {
+  return (
+    <DetailPageTableContent
+      imageSrc={IMAGES.DESCRIPTION}
+      imageAlt="Feedback"
+      label="Feedback"
+      value={value}
+    />
+  );
+};

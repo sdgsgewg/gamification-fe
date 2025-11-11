@@ -50,8 +50,8 @@ const JoinClassForm = forwardRef<FormRef, JoinClassFormProps>(
         <SelectField
           control={control}
           name="classIds"
-          label="Kelas"
-          placeholder="Pilih kelas"
+          label="Class"
+          placeholder="Choose class"
           options={classOptions}
           loading={classOptions.length === 0}
           disabled={classOptions.length === 0}

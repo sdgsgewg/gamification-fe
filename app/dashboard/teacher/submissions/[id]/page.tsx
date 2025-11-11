@@ -1,36 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
-import { Toaster, useToast } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import {
-  DurationTable,
-  HistoryTable,
+  DetailInformationTable,
+  ProgressTable,
   TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
-import { getDateTime } from "@/app/utils/date";
-import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
 import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
-import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
-import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
-import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
-import SubmissionCard from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard";
-import SubmissionCardWrapper from "@/app/components/pages/Dashboard/Task/Teacher/Cards/SubmissionCard/Wrapper";
 import { useTaskSubmissionDetail } from "@/app/hooks/task-submissions/useTaskSubmissionDetail";
+import { IMAGES } from "@/app/constants/images";
+import StatusBar from "@/app/components/shared/StatusBar";
+import { TaskSubmissionStatus } from "@/app/enums/TaskSubmissionStatus";
+import Button from "@/app/components/shared/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
+import {
+  FeedbackRow,
+  NumberRow,
+} from "@/app/components/shared/table/detail-page/TableRowData";
 
 const SubmissionDetailPage = () => {
   const params = useParams<{ id: string }>();
-  const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.TEACHER.SUBMISSIONS;
 
-  const { data: submissionDetail, isLoading } = useTaskSubmissionDetail(params.id);
+  const { data: submissionDetail, isLoading } = useTaskSubmissionDetail(
+    params.id
+  );
+
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  // Prefill answers ketika attemptDetailData berhasil dimuat
+  useEffect(() => {
+    if (!submissionDetail) return;
+
+    // Hanya jalankan prefill kalau ada attempt sebelumnya
+
+    const prefilledAnswers: Record<string, any> = {};
+
+    submissionDetail.questions.forEach((q) => {
+      if (q.userAnswer) {
+        prefilledAnswers[q.questionId] = {
+          optionId: q.userAnswer.optionId,
+          answerText: q.userAnswer.text,
+        };
+      } else if (q.options) {
+        // Backup: cek dari option yang memiliki isSelected = true
+        const selectedOption = q.options.find((opt) => opt.isSelected);
+        if (selectedOption) {
+          prefilledAnswers[q.questionId] = {
+            optionId: selectedOption.optionId,
+            answerText: null,
+          };
+        }
+      }
+    });
+
+    setAnswers(prefilledAnswers);
+  }, [submissionDetail]);
 
   if (!submissionDetail) {
     return <Loading />;
@@ -38,25 +73,63 @@ const SubmissionDetailPage = () => {
 
   const LeftSideContent = () => {
     const { title, image, description } = submissionDetail.taskDetail;
+    const { reviewedQuestionCount, totalQuestionCount, status } =
+      submissionDetail.progress;
+
+    // === Tentukan teks & visibilitas tombol ===
+    let buttonLabel: string | null = null;
+
+    if (status === TaskSubmissionStatus.ON_PROGRESS) {
+      buttonLabel = "Continue";
+    } else {
+      buttonLabel = "Review";
+    }
+
+    const shouldShowButton = buttonLabel !== null;
+
+    const handleNavigateToSubmissionReviewPage = () => {
+      router.push(`${baseRoute}/${params.id}/review`);
+    };
 
     return (
-      <DetailPageLeftSideContent
-        name={title}
-        image={image}
-        description={description}
-      />
+      <>
+        <DetailPageLeftSideContent
+          name={title}
+          image={image !== "" ? image : IMAGES.ACTIVITY}
+          description={description}
+        />
+
+        {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
+        {status === TaskSubmissionStatus.ON_PROGRESS && (
+          <StatusBar
+            current={reviewedQuestionCount}
+            total={totalQuestionCount}
+            labelClassName="text-base font-medium"
+            bgClassName="bg-white"
+            height={"h-6"}
+          />
+        )}
+
+        {/* Tombol hanya muncul jika sesuai kondisi */}
+        {shouldShowButton && (
+          <Button
+            type="primary"
+            size="large"
+            variant="primary"
+            className="!py-4 !px-6 !rounded-[1.5rem]"
+            onClick={handleNavigateToSubmissionReviewPage}
+          >
+            <FontAwesomeIcon icon={faPlay} />
+            <span className="text-base font-semibold ms-3">{buttonLabel}</span>
+          </Button>
+        )}
+      </>
     );
   };
 
   const RightSideContent = () => {
-    const {
-      subject,
-      material,
-      type,
-      questionCount,
-      difficulty,
-      grade,
-    } = submissionDetail.taskDetail;
+    const { subject, material, type, questionCount, difficulty, grade } =
+      submissionDetail.taskDetail;
 
     return (
       <>
@@ -74,18 +147,20 @@ const SubmissionDetailPage = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<TaskDetailBottomContentView>("");
+    const [view, setView] =
+      useState<TaskDetailBottomContentView>("submission-summary");
 
-    const { assignedClasses, duration, history, questions } = submissionDetail;
-    const isShared = assignedClasses ?? false;
+    const { summary, progress, questions } = submissionDetail;
+    const { finishGradedAt } = progress;
+    const isCompleted = finishGradedAt ?? false;
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
-      ...(isShared
-        ? [{ key: "submission" as const, label: "Submission" }]
-        : []),
-      { key: "duration" as const, label: "Duration" },
-      { key: "history" as const, label: "History" },
+      // ...(isCompleted
+      //   ? [{ key: "submission-summary" as const, label: "Summary" }]
+      //   : []),
+      { key: "submission-summary" as const, label: "Summary" },
+      { key: "submission-progress" as const, label: "Progress" },
       { key: "questions" as const, label: "Questions" },
     ];
 
@@ -93,40 +168,33 @@ const SubmissionDetailPage = () => {
       setView(key);
     };
 
-    const SubmissionView = () => {
-      if (!assignedClasses || assignedClasses.length === 0) {
-        return <p className="text-dark">No submission yet</p>;
-      }
+    const SummaryView = () => {
+      const { score, feedback, pointGained, totalPoints, xpGained } = summary;
 
       return (
-        <SubmissionCardWrapper>
-          {assignedClasses.map((cls) => (
-            <SubmissionCard key={cls.id} cls={cls} />
-          ))}
-        </SubmissionCardWrapper>
+        <DetailInformationTable>
+          <NumberRow
+            label="Point Gained"
+            value={pointGained ? `${pointGained}/${totalPoints}` : "-"}
+          />
+          <NumberRow label="Score" value={score} />
+          <NumberRow label="XP Gained" value={xpGained} />
+          <FeedbackRow value={feedback} />
+        </DetailInformationTable>
       );
     };
 
-    const DurationView = () => {
-      if (!duration) return;
-
-      const { startTime, endTime, duration: taskDuration } = duration;
+    const ProgressView = () => {
+      const { startGradedAt, lastGradedAt, finishGradedAt, status } = progress;
 
       return (
-        <DurationTable
-          startTime={getDateTime(startTime ?? null)}
-          endTime={getDateTime(endTime ?? null)}
-          duration={taskDuration}
+        <ProgressTable
+          startedAt={startGradedAt}
+          lastAccessedAt={lastGradedAt}
+          completedAt={finishGradedAt}
+          status={status}
         />
       );
-    };
-
-    const HistoryView = () => {
-      if (!history) return;
-
-      const { createdBy, updatedBy } = history;
-
-      return <HistoryTable createdBy={createdBy} updatedBy={updatedBy} />;
     };
 
     const QuestionView = () => {
@@ -138,11 +206,12 @@ const SubmissionDetailPage = () => {
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (
-              <QuestionCard
-                key={q.questionId}
+              <TaskSummaryQuestionCard
+                key={idx}
                 index={idx}
                 question={q}
-                fromPage="detail"
+                selectedOptionId={answers[q.questionId]?.optionId}
+                answerText={answers[q.questionId]?.answerText}
               />
             ))}
           </div>
@@ -156,12 +225,10 @@ const SubmissionDetailPage = () => {
         view={view}
         onChangeTab={handleChangeTab}
       >
-        {view === "submission" ? (
-          <SubmissionView />
-        ) : view === "duration" ? (
-          <DurationView />
-        ) : view === "history" ? (
-          <HistoryView />
+        {view === "submission-summary" ? (
+          <SummaryView />
+        ) : view === "submission-progress" ? (
+          <ProgressView />
         ) : (
           <QuestionView />
         )}
@@ -173,36 +240,15 @@ const SubmissionDetailPage = () => {
     <>
       {isLoading && <Loading />}
 
-      <Toaster position="top-right" />
-      <DashboardTitle
-        showBackButton={true}
-        onEdit={() => {
-          if (submissionDetail) handleEdit(submissionDetail.slug);
-        }}
-        onDelete={() => {
-          if (submissionDetail) showDeleteModal(submissionDetail.taskId, submissionDetail.title);
-        }}
-        onShare={() => {
-          if (submissionDetail) handleShare(submissionDetail.taskId);
-        }}
-      />
+      <DashboardTitle showBackButton={true} />
 
       {submissionDetail && (
         <DetailPageWrapper
           left={<LeftSideContent />}
           right={<RightSideContent />}
           bottom={<BottomContent />}
-          //   hasBottomDivider
         />
       )}
-
-      <ConfirmationModal
-        visible={deleteConfirmationModal.visible}
-        text={`Are you sure you want to delete task '${deleteTaskName}'?`}
-        type="delete"
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-      />
     </>
   );
 };

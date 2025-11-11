@@ -15,7 +15,7 @@ export interface SubmissionProgress {
   reviewedQuestionCount: number;
   totalQuestionCount: number;
   startGradedAt: string;
-  lastGradedAt?: string;
+  lastGradedAt: string;
   finishGradedAt?: string;
   status: string;
 }
@@ -59,5 +59,5 @@ export interface TaskSubmissionDetailResponse {
   taskDetail: TaskDetail;
   progress: SubmissionProgress;
   summary: SubmissionSummary;
-  questions?: Question[];
+  questions: Question[];
 }

@@ -18,8 +18,13 @@ import {
   ClassCardSkeleton,
   ClassCardWrapper,
 } from "@/app/components/pages/Dashboard/Class/Cards";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/app/constants/routes";
 
 const StudentClassPage = () => {
+  const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.STUDENT.CLASS;
+
   const [isJoinClassModalVisible, setIsJoinClassModalVisible] = useState(false);
 
   const { data: notJoinedClasses = [], isLoading: isNotJoinedClassesLoading } =
@@ -46,6 +51,10 @@ const StudentClassPage = () => {
   });
 
   const formRef = useRef<FormRef>(null);
+
+  const handleNavigateToClassDetailPage = (slug: string) => {
+    router.push(`${baseRoute}/${slug}`);
+  };
 
   const handleOpenJoinClassModal = () => setIsJoinClassModalVisible(true);
   const handleCloseJoinClassModal = () => setIsJoinClassModalVisible(false);
@@ -93,7 +102,13 @@ const StudentClassPage = () => {
       ) : classes.length > 0 ? (
         <ClassCardWrapper>
           {classes.map((c) => (
-            <ClassCard key={c.id} image={c.image} name={c.name} slug={c.slug} />
+            <ClassCard
+              key={c.id}
+              image={c.image}
+              name={c.name}
+              slug={c.slug}
+              onClick={handleNavigateToClassDetailPage}
+            />
           ))}
         </ClassCardWrapper>
       ) : (

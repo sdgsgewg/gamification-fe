@@ -27,6 +27,11 @@ import {
   TaskCard,
   TaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Task/Teacher/Cards";
+import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
+import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
+import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
+import { ShareTaskFormInputs } from "@/app/schemas/class-tasks/shareTask";
+import Loading from "@/app/components/shared/Loading";
 
 const TeacherTaskPage = () => {
   const { toast } = useToast();
@@ -55,6 +60,37 @@ const TeacherTaskPage = () => {
   });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
+  const [selectedTaskId, setSelectedTaskId] = useState<string>("");
+  const [isShareTaskModalVisible, setIsShareTaskModalVisible] = useState(false);
+
+  const { data: availableClasses = [], refetch: refetchAvailableClasses } =
+    useAvailableClasses(selectedTaskId);
+
+  const handleOpenShareTaskModal = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setIsShareTaskModalVisible(true);
+    refetchAvailableClasses();
+  };
+  const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
+
+  // useEffect(() => {
+  //   if (!selectedTaskId) return;
+
+  //   const getAvailableClasses = async () => {
+  //     const res = await classTaskProvider.getAvailableClasses(selectedTaskId);
+  //     const data = res.data;
+  //     if (data) setAvailableClasses(data);
+  //   };
+
+  //   getAvailableClasses();
+  // }, [selectedTaskId]);
+
+  const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
+    console.log("Share task successful with: ", values);
+    handleCloseShareTaskModal();
+    refetchTasks();
+  };
+
   // Update filters when user is found
   useEffect(() => {
     if (!user) return;
@@ -72,7 +108,11 @@ const TeacherTaskPage = () => {
     }));
   }, [debouncedSearch]);
 
-  const { data: tasks = [], isLoading, refetch } = useTasks(filters);
+  const {
+    data: tasks = [],
+    isLoading: isTaskLoading,
+    refetch: refetchTasks,
+  } = useTasks(filters);
   const { mutateAsync: deleteTask } = useDeleteTask();
   const { data: subjectData = [] } = useSubjects();
   const { data: materialData = [] } = useMaterials();
@@ -85,7 +125,7 @@ const TeacherTaskPage = () => {
 
   // Automatically refetch every time filters updated
   useEffect(() => {
-    refetch();
+    refetchTasks();
   }, [filters]);
 
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
@@ -94,6 +134,8 @@ const TeacherTaskPage = () => {
     visible: false,
     text: "",
   });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formRef = useRef<FormRef>(null);
 
@@ -120,8 +162,6 @@ const TeacherTaskPage = () => {
     router.push(`${baseRoute}/edit/${slug}`);
   };
 
-  const handleShareTask = () => {};
-
   const handleOpenDeleteConfirmation = (taskId: string, title: string) => {
     setDeleteTaskId(taskId);
     setDeleteTaskTitle(title);
@@ -143,18 +183,22 @@ const TeacherTaskPage = () => {
   };
 
   const handleDelete = async (id: string) => {
+    setIsLoading(true);
     const res = await deleteTask(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
       toast.success(message ?? "Task deleted successfully");
-      refetch();
+      refetchTasks();
     } else {
       toast.error(message || "Failed to delete task");
     }
+    setIsLoading(false);
   };
 
   return (
     <>
+      {(isLoading || isTaskLoading) && <Loading />}
+
       {/* Header */}
       <Toaster position="top-right" />
       <DashboardTitle
@@ -194,7 +238,7 @@ const TeacherTaskPage = () => {
           <TaskCard
             key={i}
             task={task}
-            onShare={handleShareTask}
+            onShare={() => handleOpenShareTaskModal(task.taskId)}
             onDelete={handleOpenDeleteConfirmation}
             onEdit={handleNavigateToEditTaskPage}
             onView={handleNavigateToViewTaskPage}
@@ -211,6 +255,7 @@ const TeacherTaskPage = () => {
         +
       </button>
 
+      {/* Filter Modal */}
       <FilterModal
         visible={isFilterModalVisible}
         title="Filter Tasks"
@@ -230,6 +275,25 @@ const TeacherTaskPage = () => {
         />
       </FilterModal>
 
+      {/* Share Task Modal */}
+      <ShareTaskModal
+        visible={isShareTaskModalVisible}
+        title="Share Task"
+        formId="share-task-form"
+        onCancel={handleCloseShareTaskModal}
+        onResetFilters={() => {
+          if (formRef.current?.resetForm) formRef.current?.resetForm();
+        }}
+      >
+        <ShareTaskForm
+          ref={formRef}
+          taskId={selectedTaskId}
+          classData={availableClasses}
+          onFinish={handleShareTaskIntoClasses}
+        />
+      </ShareTaskModal>
+
+      {/* Delete Confirmation Modal */}
       <ConfirmationModal
         visible={deleteConfirmationModal.visible}
         text={`Are you sure you want to delete the task titled '${deleteTaskTitle}'?`}

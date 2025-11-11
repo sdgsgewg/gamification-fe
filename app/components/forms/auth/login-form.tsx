@@ -140,12 +140,12 @@ export default function LoginForm({
                 </Button>
               </Form.Item>
 
-              <AuthDivider />
+              {/* <AuthDivider />
 
               <OAuthButton
                 message="Continue with Google"
                 onClick={handleOAuthLogin}
-              />
+              /> */}
             </>
           }
           bottom={

@@ -1,13 +1,20 @@
-import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
+import {
+  ApiResponse,
+  BaseResponseDto,
+  handleAxiosError,
+} from "../utils/axiosHelper";
 import { StudentClassTaskResponse } from "../interface/class-tasks/responses/IStudentClassTaskResponse";
-import { getAxios } from "../utils/AxiosFunction";
+import { getAxios, postAxios } from "../utils/AxiosFunction";
 import { FilterClassTask } from "../interface/class-tasks/requests/IFilterClassTaskRequest";
 import { ClassTaskDetailResponseDto } from "../interface/class-tasks/responses/IClassTaskDetailResponse";
 import { ClassTaskWithQuestionsResponseDto } from "../interface/class-tasks/responses/IClassTaskWithQuestionResponse";
 import { ClassTaskSummaryResponseDto } from "../interface/class-tasks/responses/IClassTaskWithSummaryResponse";
 import { TeacherClassTaskResponse } from "../interface/class-tasks/responses/ITeacherClassTaskResponse";
+import { AvailableClassesResponse } from "../interface/class-tasks/responses/IAvailableClassesResponse";
+import { FilterClassRequest } from "../interface/classes/requests/IFilterClassRequest";
+import { ShareTaskFormInputs } from "../schemas/class-tasks/shareTask";
 
-const API_URL = "/classes";
+const API_URL = "/class-tasks";
 
 export const classTaskProvider = {
   async getStudentClassTasks(
@@ -22,9 +29,9 @@ export const classTaskProvider = {
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 
-      const url = query.toString()
-        ? `${API_URL}/${classSlug}/tasks/student?${query}`
-        : `${API_URL}/${classSlug}/tasks/student`;
+      const baseUrl = `${API_URL}/classes/${classSlug}/tasks/student`;
+
+      const url = query.toString() ? `${baseUrl}?${query}` : `${baseUrl}`;
       const data = await getAxios(url);
 
       return { isSuccess: true, data };
@@ -45,9 +52,9 @@ export const classTaskProvider = {
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 
-      const url = query.toString()
-        ? `${API_URL}/${classSlug}/tasks/teacher?${query}`
-        : `${API_URL}/${classSlug}/tasks/teacher`;
+      const baseUrl = `${API_URL}/classes/${classSlug}/tasks/teacher`;
+
+      const url = query.toString() ? `${baseUrl}?${query}` : `${baseUrl}`;
       const data = await getAxios(url);
 
       return { isSuccess: true, data };
@@ -61,7 +68,9 @@ export const classTaskProvider = {
     taskSlug: string
   ): Promise<ApiResponse<ClassTaskDetailResponseDto>> {
     try {
-      const data = await getAxios(`${API_URL}/${classSlug}/tasks/${taskSlug}`);
+      const data = await getAxios(
+        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`
+      );
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ClassTaskDetailResponseDto>(error);
@@ -74,7 +83,7 @@ export const classTaskProvider = {
   ): Promise<ApiResponse<ClassTaskWithQuestionsResponseDto>> {
     try {
       const data = await getAxios(
-        `${API_URL}/${classSlug}/tasks/${taskSlug}/attempt`
+        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}/attempt`
       );
       return { isSuccess: true, data };
     } catch (error) {
@@ -88,11 +97,41 @@ export const classTaskProvider = {
   ): Promise<ApiResponse<ClassTaskSummaryResponseDto>> {
     try {
       const data = await getAxios(
-        `${API_URL}/${classSlug}/tasks/${taskSlug}/summary`
+        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}/summary`
       );
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ClassTaskSummaryResponseDto>(error);
+    }
+  },
+
+  async getAvailableClasses(
+    taskId: string,
+    params?: FilterClassRequest
+  ): Promise<ApiResponse<AvailableClassesResponse[]>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+
+      const baseUrl = `${API_URL}/available-classes/${taskId}`;
+      const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+      const data = await getAxios(url);
+
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<AvailableClassesResponse[]>(error);
+    }
+  },
+
+  async shareTaskIntoClasses(
+    payload: ShareTaskFormInputs
+  ): Promise<ApiResponse<null>> {
+    try {
+      const res: BaseResponseDto = await postAxios(API_URL, payload);
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   },
 };

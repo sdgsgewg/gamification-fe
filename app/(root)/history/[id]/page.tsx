@@ -15,7 +15,6 @@ import {
   TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
 import { NumberRow } from "@/app/components/shared/table/detail-page/TableRowData";
-
 import { getDateTime } from "@/app/utils/date";
 import Button from "@/app/components/shared/Button";
 import StatusBar from "@/app/components/shared/StatusBar";

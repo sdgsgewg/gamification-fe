@@ -49,25 +49,6 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
     );
     useNavigationGuard(isDirty);
 
-    // Handle image upload changes
-    // const handleImageChange = (info: any) => {
-    //   let fileList = [...info.fileList];
-
-    //   // Allow only one file
-    //   fileList = fileList.slice(-1);
-
-    //   // Update fileList state
-    //   setFileList(fileList);
-
-    //   if (fileList.length > 0 && fileList[0].originFileObj) {
-    //     setValue("imageFile", fileList[0].originFileObj as File, {
-    //       shouldDirty: true,
-    //     });
-    //   } else {
-    //     setValue("imageFile", null, { shouldDirty: true });
-    //   }
-    // };
-
     const onSubmit = async (data: CreateSubjectFormInputs) => {
       setIsLoading(true);
 

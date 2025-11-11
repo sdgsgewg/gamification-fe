@@ -204,6 +204,16 @@ const StudentTaskDetailPage = () => {
     };
 
     const StatsView = () => {
+      if (!classTaskData.stats) {
+        return (
+          <DetailInformationTable>
+            <NumberRow label="Jumlah Poin" value="-" />
+            <NumberRow label="Jumlah XP" value="-" />
+            <NumberRow label="Nilai" value="-" />
+          </DetailInformationTable>
+        );
+      }
+
       const { pointGained, totalPoints, xpGained, score } = classTaskData.stats;
 
       return (

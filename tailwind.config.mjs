@@ -1,8 +1,10 @@
 /** @type {import('tailwindcss').Config} */
+import lineClamp from "@tailwindcss/line-clamp";
+
 const config = {
   darkMode: "class",
   content: [
-    "./index.html", // kalau pakai HTML biasa
+    "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "./app/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -16,7 +18,7 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [lineClamp],
   important: true,
 };
 

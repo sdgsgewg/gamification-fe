@@ -53,6 +53,8 @@ export const IMAGES = {
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/default-profile.png",
   PEOPLE:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/people.png",
+  NOT_FOUND:
+    "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/general/not-found.png",
 
   // Task Type
   SCOPE:

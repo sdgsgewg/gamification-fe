@@ -21,14 +21,18 @@ import { useGrades } from "@/app/hooks/grades/useGrades";
 import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
 import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
 const TaskPage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
 
+  const { user } = useGetCachedUser();
+
   const [filters, setFilters] = useState<FilterTaskFormInputs>({
     searchText: "",
+    creatorId: user?.userId,
   });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 

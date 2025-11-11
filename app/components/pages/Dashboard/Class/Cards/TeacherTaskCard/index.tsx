@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/app/components/shared/Button";
 import { TeacherClassTaskResponse } from "@/app/interface/class-tasks/responses/ITeacherClassTaskResponse";
+import { TaskAttemptStatusLabels } from "@/app/enums/TaskAttemptStatus";
 
 interface TeacherTaskCardProps {
   task: TeacherClassTaskResponse;
@@ -32,7 +33,7 @@ const TeacherTaskCard = ({ task, onClick }: TeacherTaskCardProps) => {
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClass}`}
         >
-          {isCompleted ? "Completed" : "In Progress"}
+          {isCompleted ? TaskAttemptStatusLabels["COMPLETED"] : TaskAttemptStatusLabels["ON_PROGRESS"]}
         </span>
       </div>
 

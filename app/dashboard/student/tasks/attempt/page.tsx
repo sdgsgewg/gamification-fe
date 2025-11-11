@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
 import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
-import { CreateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/createTaskAttempt";
 import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateTaskAttempt";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
@@ -154,7 +153,6 @@ const StudentAttemptTaskPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !classTaskData.lastAttemptId;
       const answerLogs = classTaskData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
@@ -164,46 +162,26 @@ const StudentAttemptTaskPage = () => {
 
       let result = null;
 
-      if (isNewAttempt) {
-        // Simpan progres awal
-        const payload: CreateTaskAttemptFormInputs = {
-          answeredQuestionCount: answerLogs.filter(
-            (a) => a.optionId || a.answerText
-          ).length,
-          status: TaskAttemptStatus.ON_PROGRESS,
-          startedAt,
-          lastAccessedAt,
-          taskId: classTaskData.id,
-          studentId: user.userId,
-          answerLogs,
-        };
+      // Update progres yang sudah ada
+      const payload: UpdateTaskAttemptFormInputs = {
+        answeredQuestionCount: answerLogs.filter(
+          (a) => a.optionId || a.answerText
+        ).length,
+        status: TaskAttemptStatus.ON_PROGRESS,
+        startedAt,
+        lastAccessedAt,
+        answerLogs: answerLogs
+          .filter((a) => a.optionId || a.answerText)
+          .map((a) => ({
+            ...a,
+            ...(a.answerLogId ? { answerLogId: a.answerLogId } : {}),
+          })),
+      };
 
-        console.log(
-          "Payload (Autosave - Create): ",
-          JSON.stringify(payload, null, 2)
-        );
-        result = await taskAttemptProvider.createClassTaskAttempt(payload);
-      } else {
-        // Update progres yang sudah ada
-        const payload: UpdateTaskAttemptFormInputs = {
-          answeredQuestionCount: answerLogs.filter(
-            (a) => a.optionId || a.answerText
-          ).length,
-          status: TaskAttemptStatus.ON_PROGRESS,
-          lastAccessedAt,
-          answerLogs: answerLogs
-            .filter((a) => a.optionId || a.answerText)
-            .map((a) => ({
-              ...a,
-              ...(a.answerLogId ? { answerLogId: a.answerLogId } : {}),
-            })),
-        };
-
-        result = await taskAttemptProvider.updateClassTaskAttempt(
-          classTaskData.lastAttemptId!,
-          payload
-        );
-      }
+      result = await taskAttemptProvider.updateClassTaskAttempt(
+        classTaskData.lastAttemptId!,
+        payload
+      );
 
       setMessageModal({
         visible: true,
@@ -254,7 +232,6 @@ const StudentAttemptTaskPage = () => {
     setIsLoading(true);
 
     try {
-      const isNewAttempt = !classTaskData.lastAttemptId;
       const answerLogs = classTaskData.questions.map((q) => ({
         questionId: q.questionId,
         answerLogId: q.userAnswer?.answerLogId ?? undefined,
@@ -264,45 +241,26 @@ const StudentAttemptTaskPage = () => {
 
       let result = null;
 
-      if (isNewAttempt) {
-        const payload: CreateTaskAttemptFormInputs = {
-          answeredQuestionCount: answerLogs.filter(
-            (a) => a.optionId || a.answerText
-          ).length,
-          status: TaskAttemptStatus.SUBMITTED,
-          startedAt,
-          lastAccessedAt,
-          taskId: classTaskData.id,
-          studentId: user.userId,
-          classId: classData.id,
-          answerLogs,
-        };
+      const payload: UpdateTaskAttemptFormInputs = {
+        answeredQuestionCount: answerLogs.filter(
+          (a) => a.optionId || a.answerText
+        ).length,
+        status: TaskAttemptStatus.SUBMITTED,
+        lastAccessedAt,
+        answerLogs: answerLogs
+          .filter((a) => a.optionId || a.answerText)
+          .map((a) => ({
+            ...a,
+            ...(a.answerLogId ? { answerLogId: a.answerLogId } : {}),
+          })),
+      };
 
-        console.log("Payload (Create): ", JSON.stringify(payload, null, 2));
+      console.log("Payload (Update): ", JSON.stringify(payload, null, 2));
 
-        result = await taskAttemptProvider.createClassTaskAttempt(payload);
-      } else {
-        const payload: UpdateTaskAttemptFormInputs = {
-          answeredQuestionCount: answerLogs.filter(
-            (a) => a.optionId || a.answerText
-          ).length,
-          status: TaskAttemptStatus.SUBMITTED,
-          lastAccessedAt,
-          answerLogs: answerLogs
-            .filter((a) => a.optionId || a.answerText)
-            .map((a) => ({
-              ...a,
-              ...(a.answerLogId ? { answerLogId: a.answerLogId } : {}),
-            })),
-        };
-
-        console.log("Payload (Update): ", JSON.stringify(payload, null, 2));
-
-        result = await taskAttemptProvider.updateClassTaskAttempt(
-          classTaskData.lastAttemptId!,
-          payload
-        );
-      }
+      result = await taskAttemptProvider.updateClassTaskAttempt(
+        classTaskData.lastAttemptId!,
+        payload
+      );
 
       setMessageModal({
         visible: true,

@@ -12,6 +12,7 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
 import TaskHistoryCard from "@/app/components/pages/Dashboard/Task/TaskHistoryCard";
+import NotFound from "@/app/components/shared/NotFound";
 
 const StudentTaskPage = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const StudentTaskPage = () => {
   const [filters, setFilters] = useState<FilterTaskAttemptRequest>({
     searchText: "",
     status: null,
+    isClassTask: true,
   });
   const { data: groupedAttempts = [] } = useTaskAttemptsByUser(filters);
 
@@ -92,33 +94,37 @@ const StudentTaskPage = () => {
 
       {/* Task Card */}
       <div className="flex flex-col gap-8">
-        {groupedAttempts.map((groupedAttempt, idx) => {
-          const { dateLabel, dayLabel, attempts } = groupedAttempt;
+        {groupedAttempts && groupedAttempts.length > 0 ? (
+          groupedAttempts.map((groupedAttempt, idx) => {
+            const { dateLabel, dayLabel, attempts } = groupedAttempt;
 
-          return (
-            <div key={idx} className="flex flex-col gap-4">
-              <div className="flex gap-2">
-                <p className="text-dark text-lg font-semibold">{dateLabel}</p>
-                <p className="text-tx-tertiary text-lg">{dayLabel}</p>
-              </div>
+            return (
+              <div key={idx} className="flex flex-col gap-4">
+                <div className="flex gap-2">
+                  <p className="text-dark text-lg font-semibold">{dateLabel}</p>
+                  <p className="text-tx-tertiary text-lg">{dayLabel}</p>
+                </div>
 
-              <div className="flex flex-col gap-4">
-                {attempts.map((attempt, idx) => (
-                  <TaskHistoryCard
-                    key={idx}
-                    attempt={attempt}
-                    onClick={() =>
-                      handleNavigateToTaskDetailPage(
-                        attempt.classSlug,
-                        attempt.taskSlug
-                      )
-                    }
-                  />
-                ))}
+                <div className="flex flex-col gap-4">
+                  {attempts.map((attempt, idx) => (
+                    <TaskHistoryCard
+                      key={idx}
+                      attempt={attempt}
+                      onClick={() =>
+                        handleNavigateToTaskDetailPage(
+                          attempt.classSlug,
+                          attempt.taskSlug
+                        )
+                      }
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <NotFound text="Task not found" />
+        )}
       </div>
     </>
   );

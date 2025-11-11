@@ -88,6 +88,7 @@ const EditTaskPage = () => {
 
   // STEP 1: Overview
   const handleTaskOverviewSubmit = (values: EditTaskOverviewFormInputs) => {
+    console.log("Task overview values: ", JSON.stringify(values, null, 2));
     setTaskOverview(values);
     setView("task-question");
   };

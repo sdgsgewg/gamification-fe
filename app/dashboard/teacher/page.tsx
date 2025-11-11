@@ -8,39 +8,60 @@ import {
   FaPlusCircle,
 } from "react-icons/fa";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle"; // adjust import path if different
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/app/constants/routes";
+import Button from "@/app/components/shared/Button";
+import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
+import { useUserMasterHistories } from "@/app/hooks/master-histories/useUserMasterHistories";
+import {
+  UserActivityCard,
+  UserActivityCardWrapper,
+} from "@/app/components/shared/cards";
 
 interface DashboardCard {
   title: string;
   description: string;
   icon: React.ReactNode;
   buttonLabel: string;
+  onClick: () => void;
 }
 
 const TeacherDashboard: React.FC = () => {
+  const router = useRouter();
+
+  const { data: masterHistoryData, isLoading: isMasterHistoryLoading } =
+    useUserMasterHistories();
+  const { data: activityLogData, isLoading: isActivityLogLoading } =
+    useUserActivityLogs();
+
   const cards: DashboardCard[] = [
     {
       title: "Manage Classes",
       description: "View, organize, and edit your teaching classes.",
-      icon: <FaBookOpen className="w-8 h-8 text-[var(--color-primary)]" />,
+      icon: <FaBookOpen className="w-8 h-8 text-primary" />,
       buttonLabel: "Go to Classes",
+      onClick: () => router.push(ROUTES.DASHBOARD.TEACHER.CLASS),
     },
     {
       title: "Review Tasks",
       description: "Check student submissions and provide feedback.",
-      icon: <FaClipboardList className="w-8 h-8 text-[var(--color-warning)]" />,
+      icon: <FaClipboardList className="w-8 h-8 text-warning" />,
       buttonLabel: "Review Now",
+      onClick: () => router.push(ROUTES.DASHBOARD.TEACHER.SUBMISSIONS),
     },
     {
       title: "Leaderboard",
       description: "Monitor student performance and rankings.",
-      icon: <FaTrophy className="w-8 h-8 text-[var(--color-success)]" />,
+      icon: <FaTrophy className="w-8 h-8 text-success" />,
       buttonLabel: "View Leaderboard",
+      onClick: () => router.push(ROUTES.DASHBOARD.TEACHER.LEADERBOARD),
     },
     {
       title: "Create New Task",
       description: "Add assignments and challenges for your students.",
-      icon: <FaPlusCircle className="w-8 h-8 text-[var(--color-activity-type)]" />,
+      icon: <FaPlusCircle className="w-8 h-8 text-activity-type" />,
       buttonLabel: "Create Task",
+      onClick: () => router.push(`${ROUTES.DASHBOARD.TEACHER.TASKS}/create`),
     },
   ];
 
@@ -51,10 +72,7 @@ const TeacherDashboard: React.FC = () => {
 
       {/* === Main Grid Section === */}
       <section>
-        <h2
-          className="text-2xl font-semibold mb-4"
-          style={{ color: "var(--text-primary-accent)" }}
-        >
+        <h2 className="text-tx-primary-accent text-2xl font-semibold mb-4">
           Main
         </h2>
 
@@ -62,62 +80,60 @@ const TeacherDashboard: React.FC = () => {
           {cards.map((card, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 bg-[var(--color-card)] border-[var(--border-tertiary)]"
+              className="p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 bg-card border-br-tertiary"
             >
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-tertiary)] mb-4">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-tertiary mb-4">
                   {card.icon}
                 </div>
-                <h3
-                  className="text-lg font-semibold mb-2"
-                  style={{ color: "var(--text-primary)" }}
-                >
+                <h3 className="text-tx-primary text-lg font-semibold mb-2">
                   {card.title}
                 </h3>
-                <p
-                  className="text-sm mb-4"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="text-tx-secondary text-sm mb-4">
                   {card.description}
                 </p>
-                <button
-                  className="px-4 py-2 rounded-xl text-white font-medium transition-all duration-200"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                  }}
-                  onMouseEnter={(e) =>
-                    ((e.target as HTMLButtonElement).style.backgroundColor =
-                      "var(--color-primary-hover)")
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.target as HTMLButtonElement).style.backgroundColor =
-                      "var(--color-primary)")
-                  }
+                <Button
+                  variant="primary"
+                  size="large"
+                  className="!px-5 !rounded-xl"
                 >
                   {card.buttonLabel}
-                </button>
+                </Button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* === Recent Activity Section === */}
-      <section className="mt-8">
-        <h2
-          className="text-2xl font-semibold mb-4"
-          style={{ color: "var(--text-primary-accent)" }}
-        >
-          Recent Activity
-        </h2>
+      <div className="flex flex-col lg:flex-row gap-8 mt-8">
+        <UserActivityCardWrapper title="Recent Submissions" isHalfWidth>
+          {activityLogData && activityLogData.length > 0 ? (
+            activityLogData.map((data) => (
+              <UserActivityCard
+                key={data.id}
+                description={data.description}
+                createdAt={data.createdAt}
+              />
+            ))
+          ) : (
+            <p className="text-tx-tertiary text-sm">No submission yet.</p>
+          )}
+        </UserActivityCardWrapper>
 
-        <div className="bg-[var(--color-card)] border border-[var(--color-outline)] rounded-2xl p-5 shadow-sm">
-          <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
-            No recent submissions yet. Once students submit their work, their
-            activity will appear here.
-          </p>
-        </div>
-      </section>
+        <UserActivityCardWrapper title="Recent Activities" isHalfWidth>
+          {masterHistoryData && masterHistoryData.length > 0 ? (
+            masterHistoryData.map((data) => (
+              <UserActivityCard
+                key={data.id}
+                description={data.description}
+                createdAt={data.createdAt}
+              />
+            ))
+          ) : (
+            <p className="text-tx-tertiary text-sm">No activities yet.</p>
+          )}
+        </UserActivityCardWrapper>
+      </div>
     </div>
   );
 };

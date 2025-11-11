@@ -73,18 +73,6 @@ const TeacherTaskPage = () => {
   };
   const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
 
-  // useEffect(() => {
-  //   if (!selectedTaskId) return;
-
-  //   const getAvailableClasses = async () => {
-  //     const res = await classTaskProvider.getAvailableClasses(selectedTaskId);
-  //     const data = res.data;
-  //     if (data) setAvailableClasses(data);
-  //   };
-
-  //   getAvailableClasses();
-  // }, [selectedTaskId]);
-
   const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
     console.log("Share task successful with: ", values);
     handleCloseShareTaskModal();

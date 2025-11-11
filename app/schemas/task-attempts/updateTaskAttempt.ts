@@ -11,6 +11,7 @@ const answerLogSchema = z.object({
 export const updateTaskAttemptSchema = z.object({
   answeredQuestionCount: z.number(),
   status: z.string(),
+  startedAt: z.date().optional().nullable(),
   lastAccessedAt: z.date(),
   answerLogs: z.array(answerLogSchema).min(1, "Minimal ada satu pertanyaan"),
 });
@@ -22,6 +23,7 @@ export type UpdateTaskAttemptFormInputs = z.infer<
 export const updateTaskAttemptDefaultValues: UpdateTaskAttemptFormInputs = {
   answeredQuestionCount: 0,
   status: "",
+  startedAt: new Date(),
   lastAccessedAt: new Date(),
   answerLogs: [
     {

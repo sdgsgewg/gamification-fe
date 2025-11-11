@@ -48,7 +48,9 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
           <p className="text-dark text-sm font-medium">
             {completedTime
               ? `Submitted on: ${completedTime}`
-              : `Last accessed: ${lastAccessedTime}`}
+              : lastAccessedTime
+              ? `Last accessed: ${lastAccessedTime}`
+              : ""}
           </p>
         </div>
         <div className="flex items-start justify-start">

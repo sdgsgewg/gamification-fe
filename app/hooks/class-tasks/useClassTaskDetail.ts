@@ -14,6 +14,7 @@ export const useClassTaskDetail = (classSlug: string, taskSlug: string) => {
         classSlug,
         taskSlug
       );
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 

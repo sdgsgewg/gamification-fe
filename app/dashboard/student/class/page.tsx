@@ -20,6 +20,7 @@ import {
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
+import NotFound from "@/app/components/shared/NotFound";
 
 const StudentClassPage = () => {
   const router = useRouter();
@@ -112,7 +113,7 @@ const StudentClassPage = () => {
           ))}
         </ClassCardWrapper>
       ) : (
-        <p className="text-center">Class not found.</p>
+        <NotFound text="Class Not Found" />
       )}
 
       {/* Join Class Modal */}

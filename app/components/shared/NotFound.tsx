@@ -8,7 +8,7 @@ interface NotFoundProps {
 
 const NotFound = ({ text }: NotFoundProps) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-8">
+    <div className="flex flex-col items-center justify-center gap-4">
       <div className="max-w-lg">
         <Image
           src={IMAGES.NOT_FOUND}
@@ -19,7 +19,7 @@ const NotFound = ({ text }: NotFoundProps) => {
         />
       </div>
       <div>
-        <span className="text-lg font-medium">{text}</span>
+        <span className="text-lg font-semibold">{text}</span>
       </div>
     </div>
   );

@@ -13,10 +13,37 @@ import { TeacherClassTaskResponse } from "../interface/class-tasks/responses/ITe
 import { AvailableClassesResponse } from "../interface/class-tasks/responses/IAvailableClassesResponse";
 import { FilterClassRequest } from "../interface/classes/requests/IFilterClassRequest";
 import { ShareTaskFormInputs } from "../schemas/class-tasks/shareTask";
+import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
+import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 
 const API_URL = "/class-tasks";
 
 export const classTaskProvider = {
+  async getTasksFromAllClasses(
+    params?: FilterTaskAttemptRequest
+  ): Promise<ApiResponse<GroupedTaskAttemptResponseDto[]>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.status) query.append("status", params.status);
+      if (params?.isClassTask)
+        query.append("isClassTask", params?.isClassTask ? "true" : "false");
+      if (params?.dateFrom)
+        query.append("dateFrom", params.dateFrom.toDateString());
+      if (params?.dateTo) query.append("dateTo", params.dateTo.toDateString());
+      if (params?.orderBy) query.append("orderBy", params.orderBy);
+      if (params?.orderState) query.append("orderState", params.orderState);
+
+      const url = query.toString() ? `${API_URL}?${query}` : API_URL;
+      const data = await getAxios(url);
+
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<GroupedTaskAttemptResponseDto[]>(error);
+    }
+  },
+
   async getStudentClassTasks(
     classSlug: string,
     params?: FilterClassTask

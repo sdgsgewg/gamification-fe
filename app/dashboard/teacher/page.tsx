@@ -72,10 +72,6 @@ const TeacherDashboard: React.FC = () => {
 
       {/* === Main Grid Section === */}
       <section>
-        <h2 className="text-tx-primary-accent text-2xl font-semibold mb-4">
-          Main
-        </h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {cards.map((card, i) => (
             <div

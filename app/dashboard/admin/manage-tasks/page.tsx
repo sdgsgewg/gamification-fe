@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useToast } from "@/app/hooks/use-toast";
 import Table from "@/app/components/shared/table/Table";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,6 @@ const TaskPage = () => {
 
   const [filters, setFilters] = useState<FilterTaskFormInputs>({
     searchText: "",
-    creatorId: user?.userId,
   });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
@@ -55,6 +54,15 @@ const TaskPage = () => {
   });
 
   const formRef = useRef<FormRef>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFilters((prev) => ({
+      ...prev,
+      creatorId: user.userId,
+    }));
+  }, [user]);
 
   const handleOpenFilter = () => setIsFilterModalVisible(true);
   const handleCloseFilter = () => setIsFilterModalVisible(false);

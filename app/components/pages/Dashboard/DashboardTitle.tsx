@@ -48,7 +48,7 @@ const DashboardTitle = ({
             onClick={handleBack}
           >
             <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
-            <span className="text-base font-semibold">Kembali</span>
+            <span className="text-base font-semibold">Back</span>
           </Button>
         )}
         {onEdit && (
@@ -70,7 +70,7 @@ const DashboardTitle = ({
             onClick={onDelete}
           >
             <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />
-            <span className="text-base font-semibold">Hapus</span>
+            <span className="text-base font-semibold">Delete</span>
           </Button>
         )}
         {title && (
@@ -89,7 +89,7 @@ const DashboardTitle = ({
             onClick={onShare}
           >
             <FontAwesomeIcon icon={faShareNodes} className="mr-1" />
-            <span className="text-base font-semibold">Bagikan</span>
+            <span className="text-base font-semibold">Share</span>
           </Button>
         </div>
       )}

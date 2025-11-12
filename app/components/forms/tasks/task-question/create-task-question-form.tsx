@@ -19,14 +19,18 @@ import ModifyTaskQuestionCard from "@/app/components/pages/Dashboard/Task/Modify
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { useScrollToEnd } from "@/app/hooks/form/useScrollToEnd";
 import { useInitTaskQuestionsForm } from "@/app/hooks/form/useInitTaskQuestionsForm";
+import { CreateTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/createTaskOverview";
+import { getDefaultOptionsByType } from "@/app/utils/tasks/getDefaultOptionsByQuestionType";
 
 interface CreateTaskQuestionFormProps {
+  taskOverview: CreateTaskOverviewFormInputs;
   taskQuestions: CreateTaskQuestionFormInputs | null;
   onBack: (values: CreateTaskQuestionFormInputs) => void;
   onNext: (values: CreateTaskQuestionFormInputs) => void;
 }
 
 export default function CreateTaskQuestionForm({
+  taskOverview,
   taskQuestions,
   onBack,
   onNext,
@@ -64,13 +68,15 @@ export default function CreateTaskQuestionForm({
   useScrollToEnd(scrollContainerRef, [selectedQuestionIndex, fields.length]);
 
   const addNewQuestion = () => {
+    const defaultType = QuestionType.MULTIPLE_CHOICE;
+
     append({
       text: "",
       point: 0,
       timeLimit: undefined,
-      type: "",
-      imageFile: null,
-      options: [],
+      type: defaultType,
+      imageFile: "",
+      options: getDefaultOptionsByType(defaultType),
       correctAnswer: "", // default kosong
     });
 
@@ -131,7 +137,7 @@ export default function CreateTaskQuestionForm({
               ? q.options.map((opt) => ({
                   ...opt,
                   isCorrect:
-                    opt.text === "Benar"
+                    opt.text === "True"
                       ? q.correctAnswer === "true"
                       : q.correctAnswer === "false",
                 }))
@@ -140,15 +146,28 @@ export default function CreateTaskQuestionForm({
         }
 
         // fill in the blank
+        // if (q.type === QuestionType.FILL_BLANK) {
+        //   return {
+        //     ...q,
+        //     options: q.options
+        //       ? q.options.map(() => ({
+        //           text: String(q.correctAnswer),
+        //           isCorrect: true,
+        //         }))
+        //       : [],
+        //   };
+        // }
+
+        // fill in the blank
         if (q.type === QuestionType.FILL_BLANK) {
           return {
             ...q,
-            options: q.options
-              ? q.options.map(() => ({
-                  text: String(q.correctAnswer),
-                  isCorrect: true,
-                }))
-              : [],
+            options: [
+              {
+                text: String(q.correctAnswer),
+                isCorrect: true,
+              },
+            ],
           };
         }
 
@@ -215,6 +234,7 @@ export default function CreateTaskQuestionForm({
                 index={idx}
                 fieldsLength={fields.length}
                 fileList={fileList}
+                taskOverview={taskOverview}
                 onFileListChange={handleFileListChange}
                 showDeleteModal={showDeleteModal}
               />

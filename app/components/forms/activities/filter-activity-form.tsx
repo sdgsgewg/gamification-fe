@@ -217,7 +217,7 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
             disabled={materialOptions.length === 0}
             helpText={
               selectedSubjectId !== "" && materialOptions.length === 0
-                ? "Belum ada materi yang tersedia untuk mata pelajaran ini."
+                ? "There are no materials available for this subject yet."
                 : undefined
             }
           />

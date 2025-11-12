@@ -19,27 +19,27 @@ const ModifyTaskNavigationBarWrapper = ({
       {fromView === "task-question" ? (
         <div className="w-full flex flex-row justify-between mb-8">
           <ModifyTaskNavigationBar
-            label="Masih Ingin merubah data mengenai tugas anda?"
+            label="Do you still want to modify the data about your task?"
             navigationType="back"
             buttonIcon={faArrowLeft}
-            buttonText="Kembali"
+            buttonText="Back"
             onBack={onBack}
           />
           <ModifyTaskNavigationBar
-            label="Lanjut Review?"
+            label="Continue reviewing?"
             navigationType="next"
             buttonIcon={faArrowRight}
-            buttonText="Lanjut"
+            buttonText="Continue"
             onNext={onNext}
           />
         </div>
       ) : (
         <div className="w-full flex flex-row justify-between mb-8">
           <ModifyTaskNavigationBar
-            label="Masih Ingin merubah data mengenai tugas anda?"
+            label="Do you still want to modify the data about your task?"
             navigationType="back"
             buttonIcon={faArrowLeft}
-            buttonText="Kembali"
+            buttonText="Back"
             onBack={onBack}
           />
         </div>

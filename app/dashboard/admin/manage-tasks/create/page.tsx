@@ -141,22 +141,24 @@ const CreateTaskPage = () => {
 
       const result = await taskProvider.createTask(formData);
 
-      if (result.isSuccess) {
-        toast.success("Tugas berhasil dibuat!");
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Task created successfully.");
         router.push(`${baseRoute}`);
       } else {
-        toast.error(result.message || "Gagal membuat tugas");
+        toast.error(result.message || "Failed to create the task.");
       }
     } catch (error) {
       console.error("Error submitting task:", error);
-      toast.error("Terjadi kesalahan saat mengirim data");
+      toast.error("An error occurred while sending the data.");
     }
   };
 
   const TaskOverviewView = () => {
     return (
       <>
-        <DashboardTitle title="Buat Tugas" onBack={handleBack} />
+        <DashboardTitle title="Create Task" onBack={handleBack} />
         <CreateTaskOverviewForm
           ref={formRef}
           taskOverview={taskOverview}
@@ -173,8 +175,9 @@ const CreateTaskPage = () => {
   const TaskQuestionView = () => {
     return (
       <>
-        <DashboardTitle title="Buat Soal" showBackButton={false} />
+        <DashboardTitle title="Create Questions" showBackButton={false} />
         <CreateTaskQuestionForm
+          taskOverview={taskOverview}
           taskQuestions={taskQuestions}
           onBack={handleTaskQuestionsBack}
           onNext={handleTaskQuestionsSubmit}
@@ -199,7 +202,7 @@ const CreateTaskPage = () => {
 
     return (
       <>
-        <DashboardTitle title="Ringkasan Tugas" showBackButton={false} />
+        <DashboardTitle title="Task Summary" showBackButton={false} />
         <ModifyTaskSummaryContent
           payload={payload}
           subjectData={subjectData}

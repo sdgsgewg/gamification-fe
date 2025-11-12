@@ -23,12 +23,13 @@ import { getDefaultOptionsByType } from "@/app/utils/tasks/getDefaultOptionsByQu
 import { EditTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/editTaskOverview";
 import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
 import { useTaskTypeById } from "@/app/hooks/task-types/useTaskTypeById";
+import { CreateTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/createTaskOverview";
 
 interface ModifyTaskQuestionCardProps {
   index: number;
   fieldsLength: number;
   fileList: Record<string, UploadFile[]>;
-  taskOverview: EditTaskOverviewFormInputs;
+  taskOverview: CreateTaskOverviewFormInputs | EditTaskOverviewFormInputs;
   onFileListChange: (questionId: string, fileList: UploadFile[]) => void;
   showDeleteModal: (questionIdx: number) => void;
 }
@@ -60,6 +61,51 @@ export default function ModifyTaskQuestionCard({
   const [availableQuestionTypes, setAvailableQuestionTypes] = useState<
     { value: QuestionType; label: string }[]
   >([]);
+
+  const renderQuestionTypeFields = (
+    questionIndex: number,
+    questionType: QuestionType
+  ) => {
+    switch (questionType) {
+      case QuestionType.MULTIPLE_CHOICE:
+        return (
+          <MultipleChoiceField
+            control={control}
+            errors={errors}
+            questionIndex={questionIndex}
+          />
+        );
+      case QuestionType.TRUE_FALSE:
+        return (
+          <TrueOrFalseField
+            control={control}
+            errors={errors}
+            questionIndex={questionIndex}
+          />
+        );
+      case QuestionType.FILL_BLANK:
+        return (
+          <FillInTheBlankField
+            control={control}
+            errors={errors}
+            questionIndex={questionIndex}
+          />
+        );
+      //       case QuestionType.FILL_BLANK:
+      // return <FillInTheBlankField />;
+      case QuestionType.ESSAY:
+        return <EssayField />;
+      default:
+        return null;
+    }
+  };
+
+  // Ambil scope taskType dari data API
+  useEffect(() => {
+    if (taskType?.data?.scope) {
+      setTaskTypeScope(taskType.data.scope as TaskTypeScope);
+    }
+  }, [taskType]);
 
   // Tentukan tipe pertanyaan yang boleh digunakan berdasarkan scope
   useEffect(() => {
@@ -100,72 +146,28 @@ export default function ModifyTaskQuestionCard({
     }
   }, [taskTypeScope, questionType, setValue, index]);
 
-  // Ambil scope taskType dari data API
-  useEffect(() => {
-    if (taskType?.data?.scope) {
-      setTaskTypeScope(taskType.data.scope as TaskTypeScope);
-    }
-  }, [taskType]);
-
-  const renderQuestionTypeFields = (
-    questionIndex: number,
-    questionType: QuestionType
-  ) => {
-    switch (questionType) {
-      case QuestionType.MULTIPLE_CHOICE:
-        return (
-          <MultipleChoiceField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      case QuestionType.TRUE_FALSE:
-        return (
-          <TrueOrFalseField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      case QuestionType.FILL_BLANK:
-        return (
-          <FillInTheBlankField
-            control={control}
-            errors={errors}
-            questionIndex={questionIndex}
-          />
-        );
-      //       case QuestionType.FILL_BLANK:
-      // return <FillInTheBlankField />;
-      case QuestionType.ESSAY:
-        return <EssayField />;
-      default:
-        return null;
-    }
-  };
-
+  // Render dari data DB atau hasil edit user
   useEffect(() => {
     if (!questionType) return;
 
     const optionsPath = `questions.${index}.options`;
     const correctAnswerPath = `questions.${index}.correctAnswer`;
+
     const currentOptions = (control._formValues?.questions?.[index]?.options ??
       []) as any[];
     const currentCorrectAnswer =
       control._formValues?.questions?.[index]?.correctAnswer;
 
-    // Cek apakah ini adalah pertanyaan baru atau pertanyaan dari database
     const isFromDatabase =
       !!control._formValues?.questions?.[index]?.questionId;
 
-    // Jika dari database dan opsi sudah ada, jangan overwrite
-    if (
-      isFromDatabase &&
-      currentOptions.length > 0 &&
-      currentOptions.some((o) => o.text)
-    ) {
-      // Tetapi sinkronisasi opsi dengan correctAnswer
+    const hasValidOptions =
+      isFromDatabase ||
+      (currentOptions.length > 0 &&
+        currentOptions.some((o) => o.text && o.text.trim() !== ""));
+
+    // Kalau dari DB atau user udah edit opsi, render seperti biasa tanpa reset
+    if (hasValidOptions) {
       if (questionType === QuestionType.TRUE_FALSE && currentCorrectAnswer) {
         setValue(optionsPath, [
           { text: "True", isCorrect: currentCorrectAnswer === "true" },
@@ -184,25 +186,118 @@ export default function ModifyTaskQuestionCard({
           }))
         );
       }
-      return;
     }
+  }, [control, index, questionType, setValue]);
 
-    // Jika bukan dari database atau opsi kosong, set default options
-    const newOptions = getDefaultOptionsByType(questionType);
-    setValue(optionsPath, newOptions);
+  // Handle perubahan tipe soal (reset & isi default baru)
+  // useEffect(() => {
+  //   if (!questionType) return;
 
-    // Reset correctAnswer juga untuk True/False
-    if (questionType === QuestionType.TRUE_FALSE) {
-      setValue(correctAnswerPath, ""); // Kosongkan dulu
-    } else {
-      setValue(correctAnswerPath, null);
-    }
-  }, [questionType, index, setValue]);
+  //   const optionsPath = `questions.${index}.options`;
+  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
+
+  //   // Ambil opsi lama
+  //   const prevOptions = control._formValues?.questions?.[index]?.options ?? [];
+
+  //   // Kalau user ganti tipe soal dan tipe sebelumnya berbeda, reset semua opsi
+  //   if (prevOptions.length > 0) {
+  //     const newOptions = getDefaultOptionsByType(questionType);
+  //     setValue(optionsPath, newOptions, { shouldDirty: true });
+
+  //     // Reset correctAnswer agar gak bentrok sama struktur baru
+  //     if (
+  //       questionType === QuestionType.TRUE_FALSE ||
+  //       questionType === QuestionType.FILL_BLANK
+  //     ) {
+  //       setValue(correctAnswerPath, "");
+  //     } else {
+  //       setValue(correctAnswerPath, null);
+  //     }
+  //   }
+  // }, [questionType, index, setValue]);
+
+  // Yang udah pasti aman buat render question, options, tapi masih bug pas ubah tipe soal
+  // useEffect(() => {
+  //   if (!questionType) return;
+
+  //   const optionsPath = `questions.${index}.options`;
+  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
+
+  //   const currentOptions = (control._formValues?.questions?.[index]?.options ??
+  //     []) as any[];
+  //   const currentCorrectAnswer =
+  //     control._formValues?.questions?.[index]?.correctAnswer;
+
+  //   // Cek apakah ini adalah pertanyaan baru atau pertanyaan dari database
+  //   const isFromDatabase =
+  //     !!control._formValues?.questions?.[index]?.questionId;
+
+  //   // Cek apakah opsi sudah ada & valid (baik dari DB maupun hasil edit user)
+  //   const hasValidOptions =
+  //     isFromDatabase ||
+  //     (currentOptions.length > 0 &&
+  //       currentOptions.some((o) => o.text && o.text.trim() !== ""));
+
+  //   // Jika dari database dan opsi sudah ada, jangan overwrite
+  //   if (hasValidOptions) {
+  //     // Sinkronisasi correct answer jika perlu, tapi jangan reset opsi
+  //     if (questionType === QuestionType.TRUE_FALSE && currentCorrectAnswer) {
+  //       setValue(optionsPath, [
+  //         { text: "True", isCorrect: currentCorrectAnswer === "true" },
+  //         { text: "False", isCorrect: currentCorrectAnswer === "false" },
+  //       ]);
+  //     } else if (
+  //       questionType === QuestionType.MULTIPLE_CHOICE &&
+  //       currentCorrectAnswer !== undefined
+  //     ) {
+  //       const correctIndex = parseInt(currentCorrectAnswer as string, 10);
+  //       setValue(
+  //         optionsPath,
+  //         currentOptions.map((opt, i) => ({
+  //           ...opt,
+  //           isCorrect: i === correctIndex,
+  //         }))
+  //       );
+  //     }
+  //     return;
+  //   }
+
+  //   // Jika tidak ada opsi valid, baru set default
+  //   const newOptions = getDefaultOptionsByType(questionType);
+  //   setValue(optionsPath, newOptions);
+
+  //   if (questionType === QuestionType.TRUE_FALSE) {
+  //     setValue(correctAnswerPath, ""); // Kosongkan dulu
+  //   } else {
+  //     setValue(correctAnswerPath, null);
+  //   }
+  // }, [questionType, index, setValue]);
+
+  // CHATGPT -> reset opsi setiap kali ganti tipe soal
+  // useEffect(() => {
+  //   if (!questionType) return;
+
+  //   const optionsPath = `questions.${index}.options`;
+  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
+
+  //   // Set default options baru setiap kali tipe soal berubah
+  //   const newOptions = getDefaultOptionsByType(questionType);
+  //   setValue(optionsPath, newOptions, { shouldDirty: true });
+
+  //   // Reset correctAnswer agar tidak pakai jawaban lama
+  //   if (questionType === QuestionType.TRUE_FALSE) {
+  //     setValue(correctAnswerPath, "");
+  //   } else if (questionType === QuestionType.FILL_BLANK) {
+  //     setValue(correctAnswerPath, "");
+  //   } else {
+  //     setValue(correctAnswerPath, null);
+  //   }
+  // }, [questionType, index, setValue]);
 
   return (
-    <div className="relative bg-[#F5F4FF] border border-[#BCB4FF] shadow-sm rounded-lg">
-      <div className="bg-[#E9E8FF] border-b border-[#BCB4FF] flex justify-between items-center rounded-t-lg py-3 px-6">
-        <h3 className="text-lg font-semibold">{`Soal #${index + 1}`}</h3>
+    <div className="relative bg-outline border border-br-primary shadow-sm rounded-lg">
+      <div className="bg-tertiary border-b border-br-primary flex justify-between items-center rounded-t-lg py-3 px-6">
+        <h3 className="text-lg font-semibold">{`Question #${index + 1}`}</h3>
         <Button
           variant="danger"
           size="small"
@@ -221,8 +316,8 @@ export default function ModifyTaskQuestionCard({
               <TextAreaField
                 control={control}
                 name={`questions.${index}.text`}
-                label="Pertanyaan"
-                placeholder="Masukkan pertanyaan"
+                label="Question"
+                placeholder="Enter question"
                 errors={errors}
                 required
               />
@@ -230,8 +325,8 @@ export default function ModifyTaskQuestionCard({
               <NumberField
                 control={control}
                 name={`questions.${index}.point`}
-                label="Jumlah poin"
-                placeholder="Masukkan jumlah poin untuk pertanyaan"
+                label="Points"
+                placeholder="Enter the number of points for the question."
                 errors={errors}
                 required
                 min={0}
@@ -251,8 +346,8 @@ export default function ModifyTaskQuestionCard({
               <SelectField
                 control={control}
                 name={`questions.${index}.type`}
-                label="Tipe Pertanyaan"
-                placeholder="Pilih tipe pertanyaan"
+                label="Question Type"
+                placeholder="Choose question type"
                 options={availableQuestionTypes}
                 errors={errors}
                 required
@@ -267,7 +362,7 @@ export default function ModifyTaskQuestionCard({
             <ImageField
               control={control}
               name={`questions.${index}.imageFile`}
-              label="Upload Gambar"
+              label="Upload Image"
               fileList={fileList[`question-${index}`] || []}
               setFileList={(fileList) =>
                 onFileListChange(`question-${index}`, fileList)

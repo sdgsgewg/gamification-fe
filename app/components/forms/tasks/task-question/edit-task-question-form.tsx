@@ -9,7 +9,7 @@ import {
   editTaskQuestionSchema,
 } from "@/app/schemas/tasks/task-questions/editTaskQuestion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Loading from "../../../shared/Loading";
 import { QuestionType } from "@/app/enums/QuestionType";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
@@ -66,13 +66,6 @@ export default function EditTaskQuestionForm({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   useScrollToEnd(scrollContainerRef, [selectedQuestionIndex, fields.length]);
-
-  // useEffect(() => {
-  //   if (!taskQuestions) return;
-
-  //   // Reset form dengan data yang sudah ditransformasi
-  //   reset(taskQuestions);
-  // }, [taskQuestions, reset]);
 
   const addNewQuestion = () => {
     const defaultType = QuestionType.MULTIPLE_CHOICE;
@@ -200,12 +193,6 @@ export default function EditTaskQuestionForm({
     onNext(transformed);
     setIsLoading(false);
   };
-
-  useEffect(() => {
-    if (Object.keys(methods.formState.errors).length > 0) {
-      console.warn("❌ Form Validation Errors:", methods.formState.errors);
-    }
-  }, [methods.formState.errors]);
 
   return (
     <>

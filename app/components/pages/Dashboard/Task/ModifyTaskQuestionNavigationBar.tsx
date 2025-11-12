@@ -38,7 +38,7 @@ const ModifyTaskQuestionNavigationBar = ({
                 : "!bg-background hover:!bg-background-hover !text-dark"
             }`}
           >
-            <span>Soal {idx + 1}</span>
+            <span>Question {idx + 1}</span>
             <span
               onClick={(e) => {
                 e.stopPropagation();

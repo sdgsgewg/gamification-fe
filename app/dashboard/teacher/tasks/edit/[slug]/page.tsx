@@ -155,15 +155,17 @@ const EditTaskPage = () => {
 
       const result = await taskProvider.updateTask(taskData.taskId, formData);
 
-      if (result.isSuccess) {
-        toast.success("Tugas berhasil diperbarui!");
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Task updated successfully.");
         router.push(`${baseRoute}`);
       } else {
-        toast.error(result.message || "Gagal memperbarui tugas");
+        toast.error(message || "Failed to update the task.");
       }
     } catch (error) {
       console.error("Error submitting task:", error);
-      toast.error("Terjadi kesalahan saat mengirim data");
+      toast.error("An error occurred while sending the data.");
     } finally {
       setIsLoading(false);
     }
@@ -173,7 +175,7 @@ const EditTaskPage = () => {
     return (
       <>
         <DashboardTitle
-          title="Edit Tugas"
+          title="Edit Task"
           showBackButton={true}
           onBack={handleBack}
         />
@@ -246,7 +248,7 @@ const EditTaskPage = () => {
 
     return (
       <>
-        <DashboardTitle title="Ringkasan Tugas" showBackButton={false} />
+        <DashboardTitle title="Task Summary" showBackButton={false} />
         <ModifyTaskSummaryContent
           payload={payload}
           subjectData={subjectData}
@@ -319,19 +321,14 @@ const EditTaskPage = () => {
             options: [
               {
                 text: "True",
-                isCorrect:
-                  correctOpt?.text === "Benar" || correctOpt?.text === "True",
+                isCorrect: correctOpt?.text === "True",
               },
               {
                 text: "False",
-                isCorrect:
-                  correctOpt?.text === "Salah" || correctOpt?.text === "False",
+                isCorrect: correctOpt?.text === "False",
               },
             ],
-            correctAnswer:
-              correctOpt?.text === "Benar" || correctOpt?.text === "True"
-                ? "true"
-                : "false",
+            correctAnswer: correctOpt?.text === "True" ? "true" : "false",
           };
         }
 

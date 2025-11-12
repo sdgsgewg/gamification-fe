@@ -88,7 +88,6 @@ const EditTaskPage = () => {
 
   // STEP 1: Overview
   const handleTaskOverviewSubmit = (values: EditTaskOverviewFormInputs) => {
-    console.log("Task overview values: ", JSON.stringify(values, null, 2));
     setTaskOverview(values);
     setView("task-question");
   };
@@ -98,69 +97,6 @@ const EditTaskPage = () => {
     setTaskQuestions(qs);
     setView("task-overview");
   };
-
-  // STEP 2: Questions
-  // const handleTaskQuestionsBack = (qs: EditTaskQuestionFormInputs) => {
-  //   // Transformasi data untuk memastikan konsistensi
-  //   const transformedQuestions = {
-  //     ...qs,
-  //     questions: qs.questions.map((q) => {
-  //       // multiple choice
-  //       if (
-  //         q.type === QuestionType.MULTIPLE_CHOICE &&
-  //         q.correctAnswer !== undefined
-  //       ) {
-  //         const correctIndex = parseInt(q.correctAnswer as string, 10);
-
-  //         return {
-  //           ...q,
-  //           options: q.options
-  //             ? q.options.map((opt, i) => ({
-  //                 ...opt,
-  //                 isCorrect: i === correctIndex,
-  //               }))
-  //             : [],
-  //         };
-  //       }
-
-  //       // true/false
-  //       if (q.type === QuestionType.TRUE_FALSE) {
-  //         return {
-  //           ...q,
-  //           options: q.options
-  //             ? q.options.map((opt) => ({
-  //                 ...opt,
-  //                 isCorrect:
-  //                   ((opt.text === "True" || opt.text === "Benar") &&
-  //                     q.correctAnswer === "true") ||
-  //                   ((opt.text === "False" || opt.text === "Salah") &&
-  //                     q.correctAnswer === "false"),
-  //               }))
-  //             : [],
-  //         };
-  //       }
-
-  //       // fill in the blank
-  //       if (q.type === QuestionType.FILL_BLANK) {
-  //         return {
-  //           ...q,
-  //           options: [
-  //             {
-  //               text: String(q.correctAnswer),
-  //               isCorrect: true,
-  //             },
-  //           ],
-  //         };
-  //       }
-
-  //       // essay biarkan default
-  //       return q;
-  //     }),
-  //   };
-
-  //   setTaskQuestions(transformedQuestions);
-  //   setView("task-overview");
-  // };
 
   const handleTaskQuestionsSubmit = (qs: EditTaskQuestionFormInputs) => {
     setTaskQuestions(qs);
@@ -219,15 +155,17 @@ const EditTaskPage = () => {
 
       const result = await taskProvider.updateTask(taskData.taskId, formData);
 
-      if (result.isSuccess) {
-        toast.success("Tugas berhasil diperbarui!");
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Task updated successfully.");
         router.push(`${baseRoute}`);
       } else {
-        toast.error(result.message || "Gagal memperbarui tugas");
+        toast.error(message ?? "Failed to update the task.");
       }
     } catch (error) {
       console.error("Error submitting task:", error);
-      toast.error("Terjadi kesalahan saat mengirim data");
+      toast.error("An error occurred while sending the data.");
     } finally {
       setIsLoading(false);
     }
@@ -237,7 +175,7 @@ const EditTaskPage = () => {
     return (
       <>
         <DashboardTitle
-          title="Edit Tugas"
+          title="Edit Task"
           showBackButton={true}
           onBack={handleBack}
         />
@@ -260,7 +198,7 @@ const EditTaskPage = () => {
   const TaskQuestionView = () => {
     return (
       <>
-        <DashboardTitle title="Edit Soal" showBackButton={false} />
+        <DashboardTitle title="Edit Questions" showBackButton={false} />
         <EditTaskQuestionForm
           taskOverview={taskOverview}
           taskQuestions={taskQuestions}
@@ -310,7 +248,7 @@ const EditTaskPage = () => {
 
     return (
       <>
-        <DashboardTitle title="Ringkasan Tugas" showBackButton={false} />
+        <DashboardTitle title="Task Summary" showBackButton={false} />
         <ModifyTaskSummaryContent
           payload={payload}
           subjectData={subjectData}
@@ -383,19 +321,14 @@ const EditTaskPage = () => {
             options: [
               {
                 text: "True",
-                isCorrect:
-                  correctOpt?.text === "Benar" || correctOpt?.text === "True",
+                isCorrect: correctOpt?.text === "True",
               },
               {
                 text: "False",
-                isCorrect:
-                  correctOpt?.text === "Salah" || correctOpt?.text === "False",
+                isCorrect: correctOpt?.text === "False",
               },
             ],
-            correctAnswer:
-              correctOpt?.text === "Benar" || correctOpt?.text === "True"
-                ? "true"
-                : "false",
+            correctAnswer: correctOpt?.text === "True" ? "true" : "false",
           };
         }
 

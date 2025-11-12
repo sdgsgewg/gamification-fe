@@ -287,6 +287,11 @@ const EditTaskOverviewForm = forwardRef<
                   options={materialOptions}
                   errors={errors}
                   disabled={materialOptions.length === 0}
+                  helpText={
+                    selectedSubjectId !== "" && materialOptions.length === 0
+                      ? "There are no materials available for this subject yet."
+                      : undefined
+                  }
                 />
 
                 <SelectField

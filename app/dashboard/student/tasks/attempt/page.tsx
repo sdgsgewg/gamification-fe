@@ -2,19 +2,19 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
 import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
 import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateTaskAttempt";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
-import AttemptActivityNavigationBarWrapper from "@/app/components/pages/Activity/Attempt/AttemptActivityNavigationBarWrapper";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { MessageModal } from "@/app/components/modals/MessageModal";
 import { useClassTaskWithQuestions } from "@/app/hooks/class-tasks/useClassTaskWithQuestions";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
+import QuestionNavigationBar from "@/app/components/shared/navigation-bar/QuestionNavigationBar";
+import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 
 const StudentAttemptTaskPage = () => {
   const searchParams = useSearchParams();
@@ -72,16 +72,15 @@ const StudentAttemptTaskPage = () => {
   useEffect(() => {
     const key = `activity_${taskSlug}_startedAt`;
     const existingStart = sessionStorage.getItem(key);
+    const now = new Date();
 
     if (existingStart) {
       setStartedAt(new Date(existingStart));
-      setLastAccessedAt(new Date(existingStart));
     } else {
-      const now = new Date();
       sessionStorage.setItem(key, now.toISOString());
       setStartedAt(now);
-      setLastAccessedAt(now);
     }
+    setLastAccessedAt(now);
   }, [taskSlug]);
 
   // Prefill answers ketika classTaskData berhasil dimuat
@@ -302,13 +301,13 @@ const StudentAttemptTaskPage = () => {
       )}
 
       {/* Navigation Atas */}
-      <AttemptActivityNavigationBarWrapper
+      <NavigationBarWrapper
         onBack={handleOpenBackConfirmation}
         onNext={handleOpenSubmitConfirmation}
       />
 
       {/* Navigasi Soal */}
-      <ActivityQuestionNavigationBar
+      <QuestionNavigationBar
         questions={classTaskData.questions}
         selectedQuestionIndex={selectedQuestionIndex}
         setSelectedQuestionIndex={setSelectedQuestionIndex}

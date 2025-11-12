@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useActivityWithQuestions } from "@/app/hooks/activities/useActivityWithQuestions";
-import ActivityQuestionNavigationBar from "@/app/components/pages/Activity/Attempt/ActivityQuestionNavigationBar";
 import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
 import { CreateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/createTaskAttempt";
@@ -11,12 +10,13 @@ import { UpdateTaskAttemptFormInputs } from "@/app/schemas/task-attempts/updateT
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import Loading from "@/app/components/shared/Loading";
 import PageLayout from "@/app/(root)/page-layout";
-import AttemptActivityNavigationBarWrapper from "@/app/components/pages/Activity/Attempt/AttemptActivityNavigationBarWrapper";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { ROUTES } from "@/app/constants/routes";
 import { MessageModal } from "@/app/components/modals/MessageModal";
 import { LevelUpModal } from "@/app/components/modals/LevelUpModal";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
+import QuestionNavigationBar from "@/app/components/shared/navigation-bar/QuestionNavigationBar";
+import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 
 interface LevelUpModalState {
   visible: boolean;
@@ -350,13 +350,13 @@ const AttemptActivityPage = () => {
 
       <PageLayout>
         {/* Navigation Atas */}
-        <AttemptActivityNavigationBarWrapper
+        <NavigationBarWrapper
           onBack={handleOpenBackConfirmation}
           onNext={handleOpenSubmitConfirmation}
         />
 
         {/* Navigasi Soal */}
-        <ActivityQuestionNavigationBar
+        <QuestionNavigationBar
           questions={activityData.questions}
           selectedQuestionIndex={selectedQuestionIndex}
           setSelectedQuestionIndex={setSelectedQuestionIndex}

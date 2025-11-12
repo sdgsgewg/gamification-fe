@@ -1,27 +1,29 @@
 import React from "react";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { TaskNavigationBar } from "./TaskNavigationBar";
+import { NavigationBar } from "@/app/components/shared/NavigationBar";
 
-interface TaskNavigationBarWrapperProps {
+interface NavigationBarWrapperProps {
   onBack?: () => void;
   onNext?: () => void;
 }
 
-const TaskNavigationBarWrapper = ({
+const NavigationBarWrapper = ({
   onBack,
   onNext,
-}: TaskNavigationBarWrapperProps) => {
+}: NavigationBarWrapperProps) => {
   return (
     <div className="w-full flex flex-row justify-between mb-8">
-      <TaskNavigationBar
-        label="Ingin Kembali?"
+      <NavigationBar
+        // label="Ingin Kembali?"
+        label="Go Back?"
         navigationType="back"
         buttonIcon={faArrowLeft}
-        buttonText="Kembali"
+        buttonText="Back"
         onBack={onBack}
       />
-      <TaskNavigationBar
-        label="Kumpul Sekarang?"
+      <NavigationBar
+        // label="Kumpul Sekarang?"
+        label="Submit Now?"
         navigationType="next"
         buttonIcon={faArrowRight}
         buttonText="Submit"
@@ -31,4 +33,4 @@ const TaskNavigationBarWrapper = ({
   );
 };
 
-export default TaskNavigationBarWrapper;
+export default NavigationBarWrapper;

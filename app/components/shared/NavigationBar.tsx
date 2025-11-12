@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type NavigationType = "back" | "next";
 
-interface TaskNavigationBarProps {
+interface NavigationBarProps {
   label: string;
   navigationType: NavigationType;
   buttonIcon: IconDefinition;
@@ -13,14 +13,14 @@ interface TaskNavigationBarProps {
   onNext?: () => void;
 }
 
-export const TaskNavigationBar = ({
+export const NavigationBar = ({
   label,
   navigationType,
   buttonIcon,
   buttonText,
   onBack,
   onNext,
-}: TaskNavigationBarProps) => {
+}: NavigationBarProps) => {
   const handleClick = () => {
     if (onBack) {
       onBack();
@@ -31,7 +31,13 @@ export const TaskNavigationBar = ({
 
   return (
     <div>
-      <p className="text-sm text-black mb-2">{label}</p>
+      <p
+        className={`text-sm text-black ${
+          onBack ? "text-start" : "text-end"
+        } mb-2`}
+      >
+        {label}
+      </p>
       <Button
         type="primary"
         htmlType={navigationType === "next" ? "submit" : "button"}

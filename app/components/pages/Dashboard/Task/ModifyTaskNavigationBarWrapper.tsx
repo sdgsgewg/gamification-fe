@@ -1,7 +1,7 @@
 import React from "react";
-import { ModifyTaskNavigationBar } from "./ModifyTaskNavigationBar";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ViewState } from "@/app/types/task";
+import { NavigationBar } from "@/app/components/shared/NavigationBar";
 
 interface ModifyTaskNavigationBarWrapperProps {
   fromView: ViewState;
@@ -18,14 +18,14 @@ const ModifyTaskNavigationBarWrapper = ({
     <>
       {fromView === "task-question" ? (
         <div className="w-full flex flex-row justify-between mb-8">
-          <ModifyTaskNavigationBar
+          <NavigationBar
             label="Do you still want to modify the data about your task?"
             navigationType="back"
             buttonIcon={faArrowLeft}
             buttonText="Back"
             onBack={onBack}
           />
-          <ModifyTaskNavigationBar
+          <NavigationBar
             label="Continue reviewing?"
             navigationType="next"
             buttonIcon={faArrowRight}
@@ -35,7 +35,7 @@ const ModifyTaskNavigationBarWrapper = ({
         </div>
       ) : (
         <div className="w-full flex flex-row justify-between mb-8">
-          <ModifyTaskNavigationBar
+          <NavigationBar
             label="Do you still want to modify the data about your task?"
             navigationType="back"
             buttonIcon={faArrowLeft}

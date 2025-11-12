@@ -3,24 +3,30 @@
 import React, { RefObject } from "react";
 import Button from "@/app/components/shared/Button";
 
-interface Props {
+interface QuestionNavigationBarProps {
   questions: { questionId: string }[];
   selectedQuestionIndex: number;
   setSelectedQuestionIndex: (idx: number) => void;
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   answers: Record<
     string,
-    { optionId?: string | null; answerText?: string | null }
-  >; // ✅ tambahkan prop ini
+    {
+      optionId?: string | null;
+      answerText?: string | null;
+      isCorrect?: boolean;
+      pointAwarded?: number | null;
+      teacherNotes?: string | null;
+    }
+  >;
 }
 
-const ActivityQuestionNavigationBar = ({
+const QuestionNavigationBar = ({
   questions,
   selectedQuestionIndex,
   setSelectedQuestionIndex,
   scrollContainerRef,
   answers,
-}: Props) => {
+}: QuestionNavigationBarProps) => {
   return (
     <div className="w-full flex items-center mb-6 border-b border-b-primary">
       <div
@@ -29,7 +35,11 @@ const ActivityQuestionNavigationBar = ({
       >
         {questions.map((q, idx) => {
           const answer = answers[q.questionId];
-          const isAnswered = !!(answer?.optionId || answer?.answerText);
+          const isAnswered = !!(
+            answer?.optionId ||
+            answer?.answerText ||
+            (answer?.isCorrect !== undefined && answer?.pointAwarded != null)
+          );
 
           return (
             <div key={q.questionId} className="relative">
@@ -39,13 +49,13 @@ const ActivityQuestionNavigationBar = ({
                 className={`relative flex items-center gap-3 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
                   ${
                     selectedQuestionIndex === idx
-                      ? "!bg-primary !text-light"
+                      ? "!bg-primary !text-white"
                       : "!bg-background hover:!bg-background-hover !text-dark"
                   }
                   ${isAnswered ? "border-b-4 border-green-500" : ""}
                 `}
               >
-                Soal {idx + 1}
+                Question {idx + 1}
                 {isAnswered && (
                   <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" />
                 )}
@@ -58,4 +68,4 @@ const ActivityQuestionNavigationBar = ({
   );
 };
 
-export default ActivityQuestionNavigationBar;
+export default QuestionNavigationBar;

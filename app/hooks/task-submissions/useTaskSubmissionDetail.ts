@@ -16,11 +16,13 @@ export const useTaskSubmissionDetail = (id: string) => {
 
       const ts = res.data;
 
+      console.log("Submission detail data: ", JSON.stringify(res, null, 2));
+
       const mapped: TaskSubmissionDetailResponse = {
         ...ts,
         taskDetail: {
-            ...ts.taskDetail,
-            image: ts.taskDetail.image ? getImageSrc(ts.taskDetail.image) : "",
+          ...ts.taskDetail,
+          image: ts.taskDetail.image ? getImageSrc(ts.taskDetail.image) : "",
         },
         questions: ts.questions
           ? ts.questions.map((q) => ({

@@ -65,7 +65,7 @@ export const taskSubmissionProvider = {
   ): Promise<ApiResponse<null>> {
     try {
       const res: BaseResponseDto = await putAxios(
-        `${API_URL}/activity/${id}`,
+        `${API_URL}/${id}`,
         payload
       );
       return res;

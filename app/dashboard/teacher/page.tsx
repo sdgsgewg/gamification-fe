@@ -13,10 +13,7 @@ import { ROUTES } from "@/app/constants/routes";
 import Button from "@/app/components/shared/Button";
 import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
 import { useUserMasterHistories } from "@/app/hooks/master-histories/useUserMasterHistories";
-import {
-  UserActivityCard,
-  UserActivityCardWrapper,
-} from "@/app/components/shared/cards";
+import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
 
 interface DashboardCard {
   title: string;
@@ -29,9 +26,9 @@ interface DashboardCard {
 const TeacherDashboard: React.FC = () => {
   const router = useRouter();
 
-  const { data: masterHistoryData, isLoading: isMasterHistoryLoading } =
+  const { data: masterHistoryData = [], isLoading: isMasterHistoryLoading } =
     useUserMasterHistories();
-  const { data: activityLogData, isLoading: isActivityLogLoading } =
+  const { data: activityLogData = [], isLoading: isActivityLogLoading } =
     useUserActivityLogs();
 
   const cards: DashboardCard[] = [
@@ -102,33 +99,19 @@ const TeacherDashboard: React.FC = () => {
       </section>
 
       <div className="flex flex-col lg:flex-row gap-8 mt-8">
-        <UserActivityCardWrapper title="Recent Submissions" isHalfWidth>
-          {activityLogData && activityLogData.length > 0 ? (
-            activityLogData.map((data) => (
-              <UserActivityCard
-                key={data.id}
-                description={data.description}
-                createdAt={data.createdAt}
-              />
-            ))
-          ) : (
-            <p className="text-tx-tertiary text-sm">No submission yet.</p>
-          )}
-        </UserActivityCardWrapper>
+        {/* Recent Submissions */}
+        <RecentActivitiesSection
+          title="Recent Submissions"
+          noDataText="No submission yet"
+          data={activityLogData}
+          isLoading={isActivityLogLoading}
+        />
 
-        <UserActivityCardWrapper title="Recent Activities" isHalfWidth>
-          {masterHistoryData && masterHistoryData.length > 0 ? (
-            masterHistoryData.map((data) => (
-              <UserActivityCard
-                key={data.id}
-                description={data.description}
-                createdAt={data.createdAt}
-              />
-            ))
-          ) : (
-            <p className="text-tx-tertiary text-sm">No activities yet.</p>
-          )}
-        </UserActivityCardWrapper>
+        {/* Recent Activities */}
+        <RecentActivitiesSection
+          data={masterHistoryData}
+          isLoading={isMasterHistoryLoading}
+        />
       </div>
     </div>
   );

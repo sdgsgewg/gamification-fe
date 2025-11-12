@@ -18,6 +18,15 @@ import { FilterClassMemberRequest } from "../interface/classes/requests/IFilterC
 const API_URL = "/classes";
 
 export const classProvider = {
+  async getAllClasses(): Promise<ApiResponse<ClassOverviewResponse[]>> {
+    try {
+      const data = await getAxios(API_URL);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ClassOverviewResponse[]>(error);
+    }
+  },
+
   async getUserClasses(
     params?: FilterClassRequest
   ): Promise<ApiResponse<ClassOverviewResponse[]>> {
@@ -28,7 +37,8 @@ export const classProvider = {
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 
-      const url = query.toString() ? `${API_URL}?${query}` : API_URL;
+      const baseUrl = `${API_URL}/user`;
+      const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
       const data = await getAxios(url);
 
       return { isSuccess: true, data };

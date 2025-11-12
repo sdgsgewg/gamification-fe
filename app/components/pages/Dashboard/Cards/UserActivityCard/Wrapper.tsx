@@ -13,7 +13,7 @@ const UserActivityCardWrapper = ({
 }: UserActivityCardWrapperProps) => {
   return (
     <div
-      className={`bg-card p-5 rounded-2xl shadow-md border border-outline  ${
+      className={`bg-card p-6 rounded-xl border border-light-muted shadow-sm  ${
         isHalfWidth ? "lg:w-[50%] lg:max-w-[50%]" : "w-full"
       } h-full flex flex-col`}
     >
@@ -21,9 +21,7 @@ const UserActivityCardWrapper = ({
         {title}
       </h2>
 
-      <div className="py-2 overflow-y-auto max-h-[24rem]">
-        {children}
-      </div>
+      <div className="py-2 overflow-y-auto max-h-[24rem]">{children}</div>
     </div>
   );
 };

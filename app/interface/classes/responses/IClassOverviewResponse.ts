@@ -3,4 +3,5 @@ export interface ClassOverviewResponse {
   name: string;
   slug: string;
   image?: string;
+  studentCount?: number;
 }

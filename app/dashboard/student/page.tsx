@@ -1,10 +1,8 @@
 "use client";
 
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
-import {
-  UserActivityCard,
-  UserActivityCardWrapper,
-} from "@/app/components/shared/cards";
+import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
+import LeaderboardSection from "@/app/components/pages/Dashboard/Sections/Student/LeaderboardSection";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
@@ -22,13 +20,13 @@ export default function DashboardPage() {
     status: TaskAttemptStatus.NOT_STARTED,
     isClassTask: true,
   });
-  const { data: activityLogData, isLoading: isActivityLogLoading } =
+  const { data: activityLogData = [], isLoading: isActivityLogLoading } =
     useUserActivityLogs();
 
   const leaderboard = [
-    { id: 1, name: "Sarah L.", points: 1200 },
-    { id: 2, name: "Rizky A.", points: 1150 },
-    { id: 3, name: "Kevin T.", points: 1120 },
+    { id: 1, name: "Sarah L.", point: 1200 },
+    { id: 2, name: "Rizky A.", point: 1150 },
+    { id: 3, name: "Kevin T.", point: 1120 },
   ];
 
   return (
@@ -83,47 +81,13 @@ export default function DashboardPage() {
         </div>
 
         {/* === Leaderboard === */}
-        <div className="bg-card p-5 rounded-2xl shadow-md border border-outline">
-          <h2 className="text-lg font-semibold text-primary mb-3">
-            Top Students
-          </h2>
-          <ul className="space-y-3">
-            {leaderboard.map((user, index) => (
-              <li
-                key={user.id}
-                className="flex justify-between items-center bg-tertiary p-3 rounded-xl border border-br-tertiary"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-primary">
-                    #{index + 1}
-                  </span>
-                  <span className="font-medium text-tx-primary">
-                    {user.name}
-                  </span>
-                </div>
-                <span className="text-sm text-tx-tertiary">
-                  {user.points} XP
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <LeaderboardSection data={leaderboard} />
       </div>
 
-      {/* === Recent Activity === */}
-      <UserActivityCardWrapper title="Recent Activities">
-        {activityLogData && activityLogData.length > 0 ? (
-          activityLogData.map((data) => (
-            <UserActivityCard
-              key={data.id}
-              description={data.description}
-              createdAt={data.createdAt}
-            />
-          ))
-        ) : (
-          <p className="text-tx-tertiary text-sm">No activities yet.</p>
-        )}
-      </UserActivityCardWrapper>
+      <RecentActivitiesSection
+        data={activityLogData}
+        isLoading={isActivityLogLoading}
+      />
     </>
   );
 }

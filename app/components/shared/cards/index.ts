@@ -7,8 +7,3 @@ export { default as AttemptTaskQuestionCard } from "./AttemptTaskQuestionCard";
 export { default as TaskSummaryQuestionCard } from "./TaskSummaryQuestionCard";
 // export { default as StudentTaskCardWrapper } from "./StudentTaskCard/Wrapper";
 // export { default as StudentTaskCardSkeleton } from "./StudentTaskCard/Skeleton";
-
-// User Activity Card
-export { default as UserActivityCard } from "./UserActivityCard";
-export { default as UserActivityCardWrapper } from "./UserActivityCard/Wrapper";
-// export { default as UserActivityCardSkeleton } from "./UserActivityCard/Skeleton";

@@ -8,7 +8,7 @@ const BarChart = ({ data }: BarChartProps) => {
   const max = Math.max(...data.map((d) => d.value)) || 1;
 
   return (
-    <div className="relative h-64 w-full bg-surface">
+    <div className="relative h-64 w-full bg-card">
       {/* gridlines */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(6)].map((_, i) => (

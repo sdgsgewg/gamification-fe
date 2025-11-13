@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResetPasswordFormInputs } from "@/app/schemas/auth/resetPassword";
 import ResetPasswordForm from "@/app/components/forms/auth/reset-password-form";

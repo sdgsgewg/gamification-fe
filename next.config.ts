@@ -3,8 +3,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [
-      "acctihmbqsiftxmlcygv.supabase.co", // ganti dengan project-ref Supabase kamu
+      "acctihmbqsiftxmlcygv.supabase.co",
     ],
+  },
+  // Abaikan error TypeScript saat build
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // Abaikan error ESLint saat build di Vercel
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 

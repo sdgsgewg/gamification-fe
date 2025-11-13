@@ -16,6 +16,8 @@ import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import QuestionNavigationBar from "@/app/components/shared/navigation-bar/QuestionNavigationBar";
 import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 
+export const dynamic = "force-dynamic";
+
 const StudentAttemptTaskPage = () => {
   const searchParams = useSearchParams();
   const { user } = useGetCachedUser();

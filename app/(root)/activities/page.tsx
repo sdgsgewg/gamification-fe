@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import {
@@ -25,7 +23,9 @@ import {
   ActivitySectionLabels,
 } from "@/app/enums/ActivitySectionType";
 
-const ActivityPage = () => {
+export const dynamic = "force-dynamic";
+
+const ActivityPageContent = () => {
   const searchParams = useSearchParams();
   const { user } = useGetCachedUser();
 
@@ -215,4 +215,10 @@ const ActivityPage = () => {
   );
 };
 
-export default ActivityPage;
+export default function ActivityPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ActivityPageContent />
+    </Suspense>
+  );
+}

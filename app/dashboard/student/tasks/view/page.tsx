@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
@@ -31,7 +29,9 @@ import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContent
 import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 
-const StudentTaskDetailPage = () => {
+export const dynamic = "force-dynamic";
+
+const StudentTaskDetailPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -326,4 +326,10 @@ const StudentTaskDetailPage = () => {
   );
 };
 
-export default StudentTaskDetailPage;
+export default function EmailVerificationPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <StudentTaskDetailPageContent />
+    </Suspense>
+  )
+}

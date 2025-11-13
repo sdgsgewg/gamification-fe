@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Button from "@/app/components/shared/Button";
 import {
   TaskSubmissionStatus,
@@ -20,8 +18,11 @@ import {
   TaskSubmissionCardWrapper,
 } from "@/app/components/pages/Dashboard/Submission/Cards";
 import NotFound from "@/app/components/shared/NotFound";
+import Loading from "@/app/components/shared/Loading";
 
-const SubmissionsPage = () => {
+export const dynamic = "force-dynamic";
+
+const SubmissionsPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -154,4 +155,10 @@ const SubmissionsPage = () => {
   );
 };
 
-export default SubmissionsPage;
+export default function SubmissionsPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <SubmissionsPageContent />
+    </Suspense>
+  );
+}

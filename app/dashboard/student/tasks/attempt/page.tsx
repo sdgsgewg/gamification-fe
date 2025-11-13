@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AttemptTaskQuestionCard } from "@/app/components/shared/cards";
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
@@ -18,7 +18,7 @@ import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 
 export const dynamic = "force-dynamic";
 
-const StudentAttemptTaskPage = () => {
+const StudentAttemptTaskPageContent = () => {
   const searchParams = useSearchParams();
   const { user } = useGetCachedUser();
   const router = useRouter();
@@ -361,4 +361,10 @@ const StudentAttemptTaskPage = () => {
   );
 };
 
-export default StudentAttemptTaskPage;
+export default function StudentAttemptTaskPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <StudentAttemptTaskPageContent />
+    </Suspense>
+  )
+}

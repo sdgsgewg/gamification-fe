@@ -2,19 +2,13 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/shared/Loading";
+import { Role } from "../enums/Role";
 
-enum Role {
-  ADMIN = "ADMIN",
-  TEACHER = "TEACHER",
-  STUDENT = "STUDENT",
-  GUEST = "GUEST",
-}
-
-export default function DashboardRedirectPage() {
+const DashboardRedirectPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -45,4 +39,12 @@ export default function DashboardRedirectPage() {
   }, [router, token]);
 
   return <Loading />;
+};
+
+export default function DashboardRedirectPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <DashboardRedirectPageContent />
+    </Suspense>
+  );
 }

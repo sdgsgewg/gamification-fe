@@ -1,7 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CompleteProfileFormInputs } from "@/app/schemas/auth/completeProfile";
@@ -13,10 +12,13 @@ import { userProvider } from "@/app/functions/UserProvider";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
+import Loading from "@/app/components/shared/Loading";
+
+export const dynamic = "force-dynamic";
 
 type ViewState = "form" | "success" | "error";
 
-const CompleteProfilePage = () => {
+const CompleteProfilePageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid");
@@ -118,4 +120,10 @@ const CompleteProfilePage = () => {
   );
 };
 
-export default CompleteProfilePage;
+export default function CompleteProfilePage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <CompleteProfilePageContent />
+    </Suspense>
+  );
+}

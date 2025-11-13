@@ -1,18 +1,18 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
-
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
 import { useAuth } from "@/app/hooks/useAuth";
+import Loading from "@/app/components/shared/Loading";
+
+export const dynamic = "force-dynamic";
 
 type ViewState = "prompt" | "verifying" | "success" | "error";
 
-const EmailVerificationPage = () => {
+const EmailVerificationPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { verifyEmail } = useAuth();
@@ -124,4 +124,10 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage;
+export default function EmailVerificationPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <EmailVerificationPageContent />
+    </Suspense>
+  )
+}

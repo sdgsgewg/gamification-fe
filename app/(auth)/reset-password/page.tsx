@@ -6,8 +6,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ResetPasswordFormInputs } from "@/app/schemas/auth/resetPassword";
 import ResetPasswordForm from "@/app/components/forms/auth/reset-password-form";
 import { ROUTES } from "@/app/constants/routes";
+import { Suspense } from "react";
+import Loading from "@/app/components/shared/Loading";
 
-export default function ResetPasswordPage() {
+const ResetPasswordPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -22,5 +24,13 @@ export default function ResetPasswordPage() {
       token={token ?? ""}
       onFinish={handleResetPasswordRequest}
     />
+  );
+};
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }

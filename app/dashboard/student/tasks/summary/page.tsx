@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
@@ -18,7 +16,9 @@ import { useClassTaskSummary } from "@/app/hooks/class-tasks/useClassTaskSummary
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { ROUTES } from "@/app/constants/routes";
 
-const StudentTaskSummaryPage = () => {
+export const dynamic = "force-dynamic";
+
+const StudentTaskSummaryPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -145,4 +145,10 @@ const StudentTaskSummaryPage = () => {
   );
 };
 
-export default StudentTaskSummaryPage;
+export default function StudentTaskSummaryPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <StudentTaskSummaryPageContent />
+    </Suspense>
+  )
+}

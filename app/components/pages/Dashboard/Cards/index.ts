@@ -8,9 +8,6 @@ export { default as UserActivityCard } from "./UserActivityCard";
 export { default as UserActivityCardWrapper } from "./UserActivityCard/Wrapper";
 export { default as UserActivityCardSkeleton } from "./UserActivityCard/Skeleton";
 
-// Review Task Question Card
-export { default as ReviewTaskQuestionCard } from "./ReviewTaskQuestionCard";
-
 // Quick Action Card
 export { default as QuickActionCard } from "./QuickActionCard";
 export { default as QuickActionCardWrapper } from "./QuickActionCard/Wrapper";

@@ -11,8 +11,13 @@ import { ROUTES } from "@/app/constants/routes";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { FilterTaskSubmissionRequest } from "@/app/interface/task-submissions/requests/IFilterTaskSubmissionRequest";
 import { useTaskSubmissionsInClass } from "@/app/hooks/task-submissions/useTaskSubmissionsInClass";
-import { TaskSubmissionCard } from "@/app/components/pages/Dashboard/Submission/Cards";
-import TaskSubmissionCardSkeleton from "@/app/components/pages/Dashboard/Submission/Cards/TaskSubmissionCard/Skeleton";
+import { useTaskSubmissions } from "@/app/hooks/task-submissions/useTaskSubmissions";
+import {
+  TaskSubmissionCard,
+  TaskSubmissionCardSkeleton,
+  TaskSubmissionCardWrapper,
+} from "@/app/components/pages/Dashboard/Submission/Cards";
+import NotFound from "@/app/components/shared/NotFound";
 
 const SubmissionsPage = () => {
   const searchParams = useSearchParams();
@@ -35,11 +40,14 @@ const SubmissionsPage = () => {
     searchText: "",
     status: null,
   });
-  const { data: groupedAttempts = [], isLoading } = useTaskSubmissionsInClass(
-    classSlug,
-    taskSlug,
-    filters
-  );
+  const {
+    data: groupedSubmissions = [],
+    isLoading: isGroupedSubmissionsLoading,
+  } = useTaskSubmissions(filters);
+  const {
+    data: groupedSubmissionsInClass = [],
+    isLoading: isGroupedSubmissionsInClassLoading,
+  } = useTaskSubmissionsInClass(classSlug, taskSlug, filters);
 
   const tabs: { key: TaskSubmissionStatus | null; label: string }[] = [
     {
@@ -63,6 +71,14 @@ const SubmissionsPage = () => {
   const handleNavigateToSubmissionDetailPage = (submissionId: string) => {
     router.push(`${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}/${submissionId}`);
   };
+
+  const groupedSubmissionData =
+    classSlug === "" && taskSlug === ""
+      ? groupedSubmissions
+      : groupedSubmissionsInClass;
+
+  const isLoading =
+    isGroupedSubmissionsLoading || isGroupedSubmissionsInClassLoading;
 
   return (
     <>
@@ -99,38 +115,38 @@ const SubmissionsPage = () => {
 
       {/* Submission Card */}
       <div className="flex flex-col gap-8">
-        {groupedAttempts.map((groupedAttempt, idx) => {
-          const { dateLabel, dayLabel, submissions } = groupedAttempt;
+        {isLoading ? (
+          <TaskSubmissionCardWrapper>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <TaskSubmissionCardSkeleton key={idx} />
+            ))}
+          </TaskSubmissionCardWrapper>
+        ) : groupedSubmissionData && groupedSubmissionData.length > 0 ? (
+          groupedSubmissionData.map((groupedSubmission, idx) => {
+            const { dateLabel, dayLabel, submissions } = groupedSubmission;
 
-          return (
-            <div key={idx} className="flex flex-col gap-4">
-              <div className="flex gap-2">
-                <p className="text-dark text-lg font-semibold">{dateLabel}</p>
-                <p className="text-tx-tertiary text-lg">{dayLabel}</p>
-              </div>
+            return (
+              <div key={idx} className="flex flex-col gap-4">
+                <div className="flex gap-2">
+                  <p className="text-dark text-lg font-semibold">{dateLabel}</p>
+                  <p className="text-tx-tertiary text-lg">{dayLabel}</p>
+                </div>
 
-              <div className="flex flex-col gap-4">
-                {isLoading ? (
-                  <div>
-                    {Array.from({ length: 4 }).map((_, idx) => (
-                      <TaskSubmissionCardSkeleton key={idx} />
-                    ))}
-                  </div>
-                ) : (
-                  <div>
-                    {submissions.map((submission, idx) => (
-                      <TaskSubmissionCard
-                        key={idx}
-                        submission={submission}
-                        onClick={handleNavigateToSubmissionDetailPage}
-                      />
-                    ))}
-                  </div>
-                )}
+                <TaskSubmissionCardWrapper>
+                  {submissions.map((submission, idx) => (
+                    <TaskSubmissionCard
+                      key={idx}
+                      submission={submission}
+                      onClick={handleNavigateToSubmissionDetailPage}
+                    />
+                  ))}
+                </TaskSubmissionCardWrapper>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <NotFound text="Submission Not Found" />
+        )}
       </div>
     </>
   );

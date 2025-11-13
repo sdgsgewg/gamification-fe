@@ -10,10 +10,10 @@ import {
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle"; // adjust import path if different
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import Button from "@/app/components/shared/Button";
 import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
 import { useUserMasterHistories } from "@/app/hooks/master-histories/useUserMasterHistories";
 import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
+import { QuickActionCard, QuickActionCardWrapper } from "@/app/components/pages/Dashboard/Cards";
 
 interface DashboardCard {
   title: string;
@@ -31,7 +31,7 @@ const TeacherDashboard: React.FC = () => {
   const { data: activityLogData = [], isLoading: isActivityLogLoading } =
     useUserActivityLogs();
 
-  const cards: DashboardCard[] = [
+  const quickActionCards: DashboardCard[] = [
     {
       title: "Manage Classes",
       description: "View, organize, and edit your teaching classes.",
@@ -63,40 +63,23 @@ const TeacherDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <>
       {/* Page Title */}
       <DashboardTitle title="Teacher Dashboard" showBackButton={false} />
 
       {/* === Main Grid Section === */}
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {cards.map((card, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 bg-card border-br-tertiary"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-tertiary mb-4">
-                  {card.icon}
-                </div>
-                <h3 className="text-tx-primary text-lg font-semibold mb-2">
-                  {card.title}
-                </h3>
-                <p className="text-tx-secondary text-sm mb-4">
-                  {card.description}
-                </p>
-                <Button
-                  variant="primary"
-                  size="large"
-                  className="!px-5 !rounded-xl"
-                >
-                  {card.buttonLabel}
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <QuickActionCardWrapper>
+        {quickActionCards.map((card, i) => (
+          <QuickActionCard
+            key={i}
+            title={card.title}
+            description={card.description}
+            icon={card.icon}
+            buttonLabel={card.buttonLabel}
+            onClick={card.onClick}
+          />
+        ))}
+      </QuickActionCardWrapper>
 
       <div className="flex flex-col lg:flex-row gap-8 mt-8">
         {/* Recent Submissions */}
@@ -113,7 +96,7 @@ const TeacherDashboard: React.FC = () => {
           isLoading={isMasterHistoryLoading}
         />
       </div>
-    </div>
+    </>
   );
 };
 

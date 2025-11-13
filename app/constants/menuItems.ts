@@ -35,7 +35,7 @@ export interface MenuItem {
 // HEADER (Main Layout)
 export const getMainMenuItems = (role: Role): MenuItem[] => [
   {
-    menu: "Aktivitas",
+    menu: "Activity",
     url: ROUTES.ROOT.ACTIVITY,
     roles: [Role.GUEST, Role.STUDENT],
   },
@@ -45,36 +45,36 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.GUEST, Role.STUDENT],
   },
   {
-    menu: "Kelas Saya",
+    menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  { menu: "Tugas", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
+  { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
   {
-    menu: "Leaderboard Kelas",
+    menu: "Class Leaderboard",
     url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
     roles: [Role.TEACHER],
   },
   { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
   {
-    menu: "Manajemen Konten",
+    menu: "Content Management",
     url: "#",
     roles: [Role.ADMIN],
     dropdownMenuItems: [
       {
-        menu: "Mata Pelajaran",
+        menu: "Subject",
         url: ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS,
         icon: IMAGES.SUBJECT,
         roles: [Role.ADMIN],
       },
       {
-        menu: "Materi Pelajaran",
+        menu: "Material",
         url: ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS,
         icon: IMAGES.MATERIAL,
         roles: [Role.ADMIN],
       },
       {
-        menu: "Tugas",
+        menu: "Task",
         url: ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS,
         icon: IMAGES.TASK,
         roles: [Role.ADMIN],
@@ -93,20 +93,20 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   Guest: [],
   Student: [
     {
-      menu: "Riwayat",
+      menu: "History",
       url: ROUTES.ROOT.HISTORY,
       icon: faClockRotateLeft,
       roles: [Role.STUDENT],
     },
     {
-      menu: "Profil",
+      menu: "Profile",
       url: "",
       dynamicPath: (username: string) => `/users/${username}`,
       icon: faUser,
       roles: [Role.STUDENT],
     },
     {
-      menu: "Keluar",
+      menu: "Log Out",
       url: "/",
       icon: faRightFromBracket,
       roles: [Role.STUDENT],
@@ -114,14 +114,14 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   ],
   Teacher: [
     {
-      menu: "Profil",
+      menu: "Profile",
       url: "",
       dynamicPath: (username: string) => `/users/${username}`,
       icon: faUser,
       roles: [Role.TEACHER],
     },
     {
-      menu: "Keluar",
+      menu: "Log Out",
       url: "/",
       icon: faRightFromBracket,
       roles: [Role.TEACHER],
@@ -129,13 +129,13 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   ],
   Admin: [
     {
-      menu: "Pengaturan Akun",
+      menu: "Account Settings",
       url: "/account-settings",
       icon: faGear,
       roles: [Role.ADMIN],
     },
     {
-      menu: "Keluar",
+      menu: "Log Out",
       url: "/",
       icon: faRightFromBracket,
       roles: [Role.ADMIN],
@@ -146,7 +146,7 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
 // FOOTER (Main Layout)
 export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
   {
-    menu: "Aktivitas",
+    menu: "Activity",
     url: ROUTES.ROOT.ACTIVITY,
     roles: [Role.GUEST, Role.STUDENT],
   },
@@ -155,28 +155,28 @@ export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
     url: ROUTES.ROOT.LEADERBOARD,
     roles: [Role.GUEST, Role.STUDENT],
   },
-  { menu: "Masuk/Daftar", url: ROUTES.AUTH.LOGIN, roles: [Role.GUEST] },
+  { menu: "Log In/Register", url: ROUTES.AUTH.LOGIN, roles: [Role.GUEST] },
   {
-    menu: "Kelas Saya",
+    menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
   {
-    menu: "Profil",
+    menu: "Profile",
     url: "",
     dynamicPath: (username: string) => `/users/${username}`,
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  { menu: "Tugas", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
+  { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
   {
-    menu: "Leaderboard Kelas",
+    menu: "Class Leaderboard",
     url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
     roles: [Role.TEACHER],
   },
   { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
   { menu: "Pengaturan Akun", url: "/account-settings", roles: [Role.ADMIN] },
   {
-    menu: "Keluar",
+    menu: "Log Out",
     url: "/",
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
@@ -189,17 +189,17 @@ export const footerHelpMenuItems: MenuItem[] = [
     roles: [Role.GUEST, Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
-    menu: "Kontak Kami",
+    menu: "Contact Us",
     url: "/contact-us",
     roles: [Role.GUEST, Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
-    menu: "Privasi",
+    menu: "Privacy",
     url: "/privacy",
     roles: [Role.GUEST, Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
-    menu: "Syarat & Ketentuan",
+    menu: "Terms & Conditions",
     url: "/terms-and-conditions",
     roles: [Role.GUEST, Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
@@ -214,16 +214,22 @@ export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
-    menu: "Kelas Saya",
+    menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
     icon: faChalkboard,
     roles: [Role.STUDENT, Role.TEACHER],
   },
   {
-    menu: "Tugas",
+    menu: "Task",
     url: resolveDashboardRoute(role, "/tasks"),
     icon: faClipboardList,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
+  },
+  {
+    menu: "Submissions",
+    url: resolveDashboardRoute(role, "/submissions"),
+    icon: faClipboardList,
+    roles: [Role.TEACHER],
   },
   {
     menu: "Leaderboard",
@@ -235,19 +241,19 @@ export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
 
 export const sidebarAdminMenuItems: MenuItem[] = [
   {
-    menu: "Mata Pelajaran",
+    menu: "Subject",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS,
     icon: faBook,
     roles: [Role.ADMIN],
   },
   {
-    menu: "Materi",
+    menu: "Material",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS,
     icon: faBookOpen,
     roles: [Role.ADMIN],
   },
   {
-    menu: "Tipe Tugas",
+    menu: "Task Type",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES,
     icon: faListCheck,
     roles: [Role.ADMIN],

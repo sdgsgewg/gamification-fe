@@ -11,8 +11,12 @@ import {
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import TaskHistoryCard from "@/app/components/pages/Dashboard/Task/TaskHistoryCard";
 import NotFound from "@/app/components/shared/NotFound";
+import {
+  TaskHistoryCard,
+  TaskHistoryCardSkeleton,
+  TaskHistoryCardWrapper,
+} from "@/app/components/pages/Dashboard/Task/Student";
 
 const StudentTaskPage = () => {
   const router = useRouter();
@@ -22,7 +26,8 @@ const StudentTaskPage = () => {
     status: null,
     isClassTask: true,
   });
-  const { data: groupedAttempts = [] } = useTaskAttemptsByUser(filters);
+  const { data: groupedAttempts = [], isLoading } =
+    useTaskAttemptsByUser(filters);
 
   const tabs: { key: TaskAttemptStatus | null; label: string }[] = [
     {
@@ -94,7 +99,13 @@ const StudentTaskPage = () => {
 
       {/* Task Card */}
       <div className="flex flex-col gap-8">
-        {groupedAttempts && groupedAttempts.length > 0 ? (
+        {isLoading ? (
+          <TaskHistoryCardWrapper>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <TaskHistoryCardSkeleton key={idx} />
+            ))}
+          </TaskHistoryCardWrapper>
+        ) : groupedAttempts && groupedAttempts.length > 0 ? (
           groupedAttempts.map((groupedAttempt, idx) => {
             const { dateLabel, dayLabel, attempts } = groupedAttempt;
 
@@ -123,7 +134,7 @@ const StudentTaskPage = () => {
             );
           })
         ) : (
-          <NotFound text="Task not found" />
+          <NotFound text="Task Not Found" />
         )}
       </div>
     </>

@@ -56,6 +56,8 @@ export interface Question {
 
 export interface TaskSubmissionDetailResponse {
   id: string;
+  studentName: string;
+  className: string;
   taskDetail: TaskDetail;
   progress: SubmissionProgress;
   summary: SubmissionSummary;

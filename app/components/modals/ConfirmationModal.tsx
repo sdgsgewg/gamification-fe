@@ -29,7 +29,7 @@ export const ConfirmationModal = ({
         break;
       case "submit":
         defaultText =
-          "Apakah anda yakin ingin mengumpulkan aktivitas ini? Mohon dikoreksi kembali.";
+          "All changes made will be lost. Are you sure you want to leave this page?";
         break;
       case "delete":
         defaultText = "Are you sure you want to delete this item?";
@@ -69,10 +69,10 @@ export const ConfirmationModal = ({
       <p className="text-base font-semibold mb-6">{getText()}</p>
       <div className="flex flex-col gap-3">
         <Button variant={getConfirmButtonVariant()} onClick={onConfirm}>
-          Iya
+          Yes
         </Button>
         <Button variant={getCancelButtonVariant()} onClick={onCancel}>
-          Tidak
+          No
         </Button>
       </div>
     </Modal>

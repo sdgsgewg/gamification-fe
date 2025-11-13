@@ -17,15 +17,18 @@ import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-p
 import { useTaskSubmissionDetail } from "@/app/hooks/task-submissions/useTaskSubmissionDetail";
 import { IMAGES } from "@/app/constants/images";
 import StatusBar from "@/app/components/shared/StatusBar";
-import { TaskSubmissionStatus } from "@/app/enums/TaskSubmissionStatus";
+import {
+  TaskSubmissionStatus,
+  TaskSubmissionStatusLabels,
+} from "@/app/enums/TaskSubmissionStatus";
 import Button from "@/app/components/shared/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
 import {
   FeedbackRow,
   NumberRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
+import { ReviewTaskSummaryQuestionCard } from "@/app/components/pages/Dashboard/Submission/Cards";
 
 const SubmissionDetailPage = () => {
   const params = useParams<{ id: string }>();
@@ -72,6 +75,7 @@ const SubmissionDetailPage = () => {
   }
 
   const LeftSideContent = () => {
+    const { studentName, className } = submissionDetail;
     const { title, image, description } = submissionDetail.taskDetail;
     const { reviewedQuestionCount, totalQuestionCount, status } =
       submissionDetail.progress;
@@ -79,9 +83,13 @@ const SubmissionDetailPage = () => {
     // === Tentukan teks & visibilitas tombol ===
     let buttonLabel: string | null = null;
 
-    if (status === TaskSubmissionStatus.ON_PROGRESS) {
+    if (
+      status === TaskSubmissionStatusLabels[TaskSubmissionStatus.ON_PROGRESS]
+    ) {
       buttonLabel = "Continue";
-    } else {
+    } else if (
+      status === TaskSubmissionStatusLabels[TaskSubmissionStatus.NOT_STARTED]
+    ) {
       buttonLabel = "Review";
     }
 
@@ -95,6 +103,7 @@ const SubmissionDetailPage = () => {
       <>
         <DetailPageLeftSideContent
           name={title}
+          additionalText={`Submitted by ${studentName} from class '${className}'`}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -160,7 +169,7 @@ const SubmissionDetailPage = () => {
       //   ? [{ key: "submission-summary" as const, label: "Summary" }]
       //   : []),
       { key: "submission-summary" as const, label: "Summary" },
-      { key: "submission-progress" as const, label: "Progress" },
+      { key: "progress" as const, label: "Progress" },
       { key: "questions" as const, label: "Questions" },
     ];
 
@@ -189,6 +198,7 @@ const SubmissionDetailPage = () => {
 
       return (
         <ProgressTable
+          title="Review Progress"
           startedAt={startGradedAt}
           lastAccessedAt={lastGradedAt}
           completedAt={finishGradedAt}
@@ -206,7 +216,7 @@ const SubmissionDetailPage = () => {
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (
-              <TaskSummaryQuestionCard
+              <ReviewTaskSummaryQuestionCard
                 key={idx}
                 index={idx}
                 question={q}
@@ -227,7 +237,7 @@ const SubmissionDetailPage = () => {
       >
         {view === "submission-summary" ? (
           <SummaryView />
-        ) : view === "submission-progress" ? (
+        ) : view === "progress" ? (
           <ProgressView />
         ) : (
           <QuestionView />

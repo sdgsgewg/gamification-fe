@@ -6,5 +6,4 @@ export type TaskDetailBottomContentView =
   | "progress" // menampilkan progress pengerjaan task attempt
   | "submissions" // khsusus untuk page "teacher task detail"
   | "submission-summary" // khsusus untuk page "teacher submission detail"
-  | "submission-progress" // khsusus untuk page "teacher submission detail"
   | "questions" // menampilkan daftar soal (jika task attempt sudah completed, disertakan jawaban juga)

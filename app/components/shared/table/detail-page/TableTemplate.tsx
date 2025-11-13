@@ -116,6 +116,7 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
 };
 
 interface ProgressTableProps {
+  title?: string;
   startedAt: string | null;
   lastAccessedAt: string | null;
   completedAt?: string | null;
@@ -123,6 +124,7 @@ interface ProgressTableProps {
 }
 
 export const ProgressTable = ({
+  title = "Attempt Progress",
   startedAt,
   lastAccessedAt,
   completedAt,
@@ -133,8 +135,8 @@ export const ProgressTable = ({
       {/* Header */}
       <DetailPageTableHeader
         imageSrc={IMAGES.WORK_PROGRESS}
-        imageAlt="Attempt Progress"
-        label="Attempt Progress"
+        imageAlt={title}
+        label={title}
       />
 
       {/* Isi */}

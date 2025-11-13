@@ -11,9 +11,9 @@ import { useTaskSubmissionWithAnswers } from "@/app/hooks/task-submissions/useTa
 import { UpdateTaskSubmissionFormInputs } from "@/app/schemas/task-submissions/updateTaskSubmission";
 import { TaskSubmissionStatus } from "@/app/enums/TaskSubmissionStatus";
 import { taskSubmissionProvider } from "@/app/functions/TaskSubmissionProvider";
-import { ReviewTaskQuestionCard } from "@/app/components/pages/Dashboard/Cards";
 import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 import QuestionNavigationBar from "@/app/components/shared/navigation-bar/QuestionNavigationBar";
+import { ReviewTaskQuestionCard } from "@/app/components/pages/Dashboard/Submission/Cards";
 
 const ReviewSubmissionPage = () => {
   const params = useParams<{ id: string }>();

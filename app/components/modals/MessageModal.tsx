@@ -29,7 +29,7 @@ export const MessageModal = ({
       }}
     >
       <h1 className="text-xl font-bold mb-4">
-        {isSuccess ? `Sukses` : `Gagal`}
+        {isSuccess ? `Success` : `Failed`}
       </h1>
       <p className="text-base font-semibold mb-6">{text}</p>
       <div className="flex flex-col gap-3">

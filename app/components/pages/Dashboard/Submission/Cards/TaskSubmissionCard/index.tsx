@@ -11,6 +11,7 @@ import {
   TaskSubmissionStatus,
   TaskSubmissionStatusLabels,
 } from "@/app/enums/TaskSubmissionStatus";
+import { FaBookOpen, FaUser } from "react-icons/fa";
 
 interface TaskSubmissionCardProps {
   submission: TaskSubmissionOverviewResponse;
@@ -21,8 +22,16 @@ const TaskSubmissionCard = ({
   submission,
   onClick,
 }: TaskSubmissionCardProps) => {
-  const { id, title, image, studentName, status, submittedTime, gradedTime } =
-    submission;
+  const {
+    id,
+    title,
+    image,
+    className,
+    studentName,
+    status,
+    submittedTime,
+    gradedTime,
+  } = submission;
 
   const getEventText = () => {
     switch (status) {
@@ -37,9 +46,12 @@ const TaskSubmissionCard = ({
     }
   };
 
+  const getClassText = () => {
+    return `From: ${className}`;
+  };
+
   const getUserText = () => {
-    if (TaskSubmissionStatus.NOT_STARTED) return `By: ${studentName}`;
-    return ``;
+    return `By: ${studentName}`;
   };
 
   const getStatusTagColor = () => {
@@ -57,10 +69,10 @@ const TaskSubmissionCard = ({
 
   return (
     <div
-      className={`h-24 sm:h-28 xl:h-32 bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
+      className={`min-h-24 max-h-24 sm:min-h-32 sm:max-h-32 xl:min-h-32 xl:max-h-32 bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
       onClick={() => onClick(id)}
     >
-      <div className="w-[15%] md:w-[12%] xl:w-[8%]">
+      <div className="w-[15%] sm:w-[18%] xl:w-[8%]">
         <Image
           src={image ?? IMAGES.ACTIVITY}
           alt={title}
@@ -70,10 +82,21 @@ const TaskSubmissionCard = ({
         />
       </div>
       <div className="flex-1 flex justify-between">
-        <div className="flex flex-col gap-1">
-          <h4 className="text-lg font-bold text-start">{title}</h4>
-          <p className="text-dark text-sm font-medium">{getEventText()}</p>
-          <p className="text-dark text-sm font-medium">{getUserText()}</p>
+        <div className="flex flex-col justify-between gap-1">
+          <div className="flex flex-col gap-0.5">
+            <h4 className="text-lg font-bold text-start">{title}</h4>
+            <p className="text-dark text-sm font-medium">{getEventText()}</p>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
+              <FaBookOpen className="w-3 h-3" />
+              <span>{getClassText()}</span>
+            </p>
+            <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
+              <FaUser className="w-3 h-3" />
+              <span>{getUserText()}</span>
+            </p>
+          </div>
         </div>
         <div className="flex items-start justify-start">
           <Tag color={getStatusTagColor()} className="!m-0">

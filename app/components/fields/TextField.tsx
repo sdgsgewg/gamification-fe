@@ -2,15 +2,19 @@
 
 import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
+import get from "lodash.get";
+import Label from "./Label";
 
 interface TextFieldProps {
   control: any;
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   errors?: Record<string, any>;
   required?: boolean;
   readonly?: boolean;
+  prefixIcon?: React.ReactNode;
+  className?: string;
 }
 
 const TextField = ({
@@ -21,22 +25,27 @@ const TextField = ({
   errors,
   required,
   readonly,
+  prefixIcon,
+  className,
 }: TextFieldProps) => {
+  const error = get(errors, name);
+
   return (
     <Form.Item
       label={
-        <span className="text-base font-medium">
-          {label}{" "}
-          {!readonly &&
-            (required ? (
-              <span className="text-red-500">*</span>
-            ) : (
-              <span className="text-gray-500">(opsional)</span>
-            ))}
-        </span>
+        label && (
+          <Label
+            label={label}
+            required={required}
+            readonly={readonly}
+          />
+        )
       }
-      validateStatus={errors?.[name] ? "error" : ""}
-      help={errors?.[name]?.message}
+      name={name}
+      validateStatus={error ? "error" : ""}
+      help={error?.message}
+      style={{ marginBottom: error ? "1rem" : "0rem" }}
+      className={className}
     >
       <Controller
         name={name}
@@ -44,9 +53,11 @@ const TextField = ({
         render={({ field }) => (
           <Input
             {...field}
+            prefix={prefixIcon}
             placeholder={placeholder}
             size="large"
             readOnly={readonly}
+            className={className}
           />
         )}
       />

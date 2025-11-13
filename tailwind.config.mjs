@@ -1,21 +1,24 @@
 /** @type {import('tailwindcss').Config} */
+import lineClamp from "@tailwindcss/line-clamp";
+
 const config = {
+  darkMode: "class",
   content: [
-    "./index.html", // kalau pakai HTML biasa
-    "./src/**/*.{js,ts,jsx,tsx}", // kalau pakai React/Vite/Next
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      colors: {
-        primary: "#1E40AF", // contoh warna custom
-        secondary: "#9333EA",
-      },
+      colors: {},
       fontFamily: {
         sans: ["Inter", "sans-serif"],
       },
     },
   },
-  plugins: [],
+  plugins: [lineClamp],
   important: true,
 };
 

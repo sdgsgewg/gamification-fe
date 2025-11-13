@@ -1,21 +1,21 @@
-import React from "react";
-import { withMetadata } from "../utils/withMetadata";
+"use client";
 
-export const metadata = withMetadata("Home", "Halaman tentang website ini");
+import React, { Suspense } from "react";
+import { Section } from "../components/pages/Home/Section";
+import { roleSectionsMap } from "../constants/roleSectionsMap";
+import { useGetCachedUser } from "../hooks/useGetCachedUser";
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
+  const { role } = useGetCachedUser();
+
   return (
-    <div>
-      <section className="container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-4">
-          Selamat Datang di Website Kami
-        </h1>
-        <p className="text-gray-700">
-          Ini adalah halaman utama website publik. Kamu bisa menampilkan
-          berbagai informasi penting seperti produk, fitur, atau kontak.
-        </p>
-      </section>
-    </div>
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      {roleSectionsMap[role].map(({ name, element }, index) => (
+        <Section key={name} sectionName={name} isOdd={index % 2 === 0}>
+          {element}
+        </Section>
+      ))}
+    </Suspense>
   );
 };
 

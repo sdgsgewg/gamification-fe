@@ -1,14 +1,16 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import CompleteProfileForm, {
-  CompleteProfileFormInputs,
-} from "@/app/components/forms/auth/complete-profile-form";
-import FormLayout from "../form-layout";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CompleteProfileFormInputs } from "@/app/schemas/auth/completeProfile";
+import CompleteProfileForm from "@/app/components/forms/auth/complete-profile-form";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
+import { gradeProvider } from "@/app/functions/GradeProvider";
 import { userProvider } from "@/app/functions/UserProvider";
-import { User } from "@/app/interface/users/IUser";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
+import { IMAGES } from "@/app/constants/images";
+import { ROUTES } from "@/app/constants/routes";
 
 type ViewState = "form" | "success" | "error";
 
@@ -16,7 +18,42 @@ const CompleteProfilePage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid");
+  const [userData, setUserData] = useState<UserDetailResponse | null>(null);
+  const [gradeData, setGradeData] = useState<GradeOverviewResponse[]>([]);
   const [view, setView] = useState<ViewState>("form");
+
+  useEffect(() => {
+    const fetchUserDetail = async () => {
+      if (!uid) return;
+      const result = await userProvider.getUserById(uid);
+
+      const { isSuccess, message, data } = result;
+
+      if (isSuccess && data) {
+        setUserData(data);
+      } else {
+        console.error("Failed to fetch user detail:", message);
+      }
+    };
+
+    fetchUserDetail();
+  }, [uid]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      const result = await gradeProvider.getGrades();
+
+      const { isSuccess, message, data } = result;
+
+      if (isSuccess && data) {
+        setGradeData(data);
+      } else {
+        console.error("Failed to fetch grades: ", message);
+      }
+    };
+
+    fetchGrades();
+  }, []);
 
   useEffect(() => {
     if (!uid) setView("error");
@@ -28,7 +65,7 @@ const CompleteProfilePage = () => {
   };
 
   const handleNavigateToLogin = () => {
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   const handleGoToGmail = () => {
@@ -36,17 +73,16 @@ const CompleteProfilePage = () => {
   };
 
   const FormView = () => (
-    <FormLayout>
-      <CompleteProfileForm
-        onFinish={handleCompleteProfileSuccess}
-        uid={uid ?? ""}
-      />
-    </FormLayout>
+    <CompleteProfileForm
+      userData={userData}
+      gradeData={gradeData}
+      onFinish={handleCompleteProfileSuccess}
+    />
   );
 
   const SuccessView = () => (
     <ShowInformationSection
-      imageUrl="/img/success-solid-icon.png"
+      imageUrl={IMAGES.SUCCESS_SOLID_ICON}
       imageAlt="Sukses"
       title="Pendaftaran Berhasil"
       subtitle1="Akun Anda telah berhasil dibuat."
@@ -57,7 +93,7 @@ const CompleteProfilePage = () => {
 
   const ErrorView = () => (
     <ShowInformationSection
-      imageUrl="/img/error-regular-icon.png"
+      imageUrl={IMAGES.ERROR_REGULAR_ICON}
       imageAlt="Error"
       title="Terjadi Kesalahan"
       subtitle1="User ID tidak ditemukan."

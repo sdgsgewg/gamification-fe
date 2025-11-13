@@ -1,31 +1,28 @@
 "use client";
 
-import LoginForm, {
-  LoginFormInputs,
-} from "@/app/components/forms/auth/login-form";
-import { useRouter } from "next/navigation";
 import React from "react";
-import FormLayout from "../form-layout";
+import { useRouter } from "next/navigation";
+import { LoginFormInputs } from "@/app/schemas/auth/login";
+import LoginForm from "@/app/components/forms/auth/login-form";
+import { ROUTES } from "@/app/constants/routes";
 
 const LoginPage = () => {
   const router = useRouter();
 
   const handleLoginSuccess = (values: LoginFormInputs) => {
     console.log("Login successful with:", values);
-    router.push("/dashboard");
+    router.push(ROUTES.DASHBOARD.BASE);
   };
 
   const handleNavigateToForgotPassword = () => {
-    router.push("/forgot-password");
+    router.push(ROUTES.AUTH.FORGOT_PASSWORD);
   };
 
   return (
-    <FormLayout>
-      <LoginForm
-        onFinish={handleLoginSuccess}
-        onForgotPasswordClick={handleNavigateToForgotPassword}
-      />
-    </FormLayout>
+    <LoginForm
+      onFinish={handleLoginSuccess}
+      onForgotPasswordClick={handleNavigateToForgotPassword}
+    />
   );
 };
 

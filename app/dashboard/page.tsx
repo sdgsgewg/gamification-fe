@@ -1,44 +1,46 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import DashboardTitle from "../components/pages/Dashboard/DashboardTitle";
+import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/shared/Loading";
 
-const DashboardHomePage = () => {
-  const [isLoading, setIsLoading] = useState(true);
+enum Role {
+  ADMIN = "ADMIN",
+  TEACHER = "TEACHER",
+  STUDENT = "STUDENT",
+  GUEST = "GUEST",
+}
+
+export default function DashboardRedirectPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+
+  const { getCachedUserProfile } = useAuth();
 
   useEffect(() => {
     if (token) {
       localStorage.setItem("access_token", token);
     }
 
-    // set loading hanya 3 detik
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+    const user = getCachedUserProfile();
+    const role = (user?.role?.name || "").toUpperCase();
 
-    // cleanup jika user pindah halaman sebelum 3 detik
-    return () => clearTimeout(timer);
-  }, [token]);
+    switch (role) {
+      case Role.ADMIN:
+        router.replace("/dashboard/admin");
+        break;
+      case Role.TEACHER:
+        router.replace("/dashboard/teacher");
+        break;
+      case Role.STUDENT:
+        router.replace("/dashboard/student");
+        break;
+      default:
+        router.replace("/auth/login");
+    }
+  }, [router, token]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  return (
-    <>
-      <DashboardTitle title="Dashboard" showBackButton={false} />
-      <h2 className="text-2xl font-bold">Dashboard Home</h2>
-      <p className="text-gray-700">
-        Ini adalah halaman utama dashboard setelah user login. Kamu bisa
-        menampilkan ringkasan data, statistik, atau navigasi cepat di sini.
-      </p>
-    </>
-  );
-};
-
-export default DashboardHomePage;
+  return <Loading />;
+}

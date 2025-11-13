@@ -1,69 +1,77 @@
-import { Form, Input, Divider, Radio } from "antd";
+"use client";
+
+import { Form } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import OAuthButton from "../../pages/Auth/OAuthButton";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
 import Button from "../../shared/Button";
-
-// --- Zod Schema ---
-const registerSchema = z
-  .object({
-    email: z
-      .string()
-      .nonempty("Email wajib diisi")
-      .email("Mohon masukkan email yang valid!"),
-    password: z
-      .string()
-      .nonempty("Kata sandi wajib diisi")
-      .min(8, "Kata sandi harus terdiri dari minimal 8 karakter")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>/?]).*$/,
-        "Kata sandi harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus"
-      ),
-    confirmPassword: z.string().nonempty("Konfirmasi kata sandi wajib diisi"),
-    role: z.string().nonempty("Peran wajib dipilih"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Kata sandi tidak cocok",
-    path: ["confirmPassword"],
-  });
-
-export type RegisterFormInputs = z.infer<typeof registerSchema>;
+import {
+  registerDefaultValues,
+  RegisterFormInputs,
+  RegisterRequest,
+  registerSchema,
+} from "@/app/schemas/auth/register";
+import { RoleOverviewResponse } from "@/app/interface/roles/responses/IRoleOverviewResponse";
+import { useState } from "react";
+import RoleField from "../../fields/RoleField";
+import TextField from "../../fields/TextField";
+import PasswordField from "../../fields/PasswordField";
+import FormLayout from "@/app/(auth)/form-layout";
+import Loading from "../../shared/Loading";
+import FormTitle from "../../pages/Auth/FormTitle";
+import { ROUTES } from "@/app/constants/routes";
+import AuthDivider from "../../pages/Auth/AuthDivider";
 
 interface RegisterFormProps {
+  roleData: RoleOverviewResponse[];
   onFinish: (values: RegisterFormInputs) => void;
 }
 
-export default function RegisterForm({ onFinish }: RegisterFormProps) {
+export default function RegisterForm({
+  roleData,
+  onFinish,
+}: RegisterFormProps) {
   const router = useRouter();
+  const { register } = useAuth();
   const { toast } = useToast();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      role: "",
-    },
+    defaultValues: registerDefaultValues,
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data: RegisterFormInputs) => {
-    const result = await auth.register(data);
-    if (result.ok) {
-      toast.success("Register successful!");
+    setIsLoading(true);
+
+    // Send only the fields required by the backend
+    const payload: RegisterRequest = {
+      email: data.email,
+      password: data.password,
+      roleId: data.roleId,
+    };
+
+    const result = await register(payload);
+    const { isSuccess, message } = result;
+
+    if (isSuccess) {
+      toast.success(message ?? "Registration successful!");
       onFinish(data);
     } else {
-      toast.error(result.error || "Registration failed.");
+      toast.error(message ?? "Registration failed.");
     }
+
+    setIsLoading(false);
   };
 
   const handleOAuthRegister = () => {
@@ -71,169 +79,90 @@ export default function RegisterForm({ onFinish }: RegisterFormProps) {
   };
 
   const handleNavigateToLogin = () => {
-    router.push("/login");
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   return (
-    <Form
-      name="register"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <div className="p-8 space-y-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold">Selamat Datang di Gamification</h1>
-          <p className="text-base font-medium">Silahkan buat akun anda.</p>
-        </div>
+    <>
+      {isLoading && <Loading />}
 
-        {/* Role Field */}
-        <Form.Item
-          label={
-            <span className="font-medium">Anda membuat akun sebagai?</span>
+      <Form
+        name="register"
+        onFinish={handleSubmit(onSubmit)}
+        layout="vertical"
+        requiredMark={false}
+      >
+        <FormLayout
+          top={
+            <>
+              <FormTitle
+                title="Welcome to Gamification"
+                subtitle="Please create your account."
+              />
+
+              {/* Role Field */}
+              <RoleField
+                control={control}
+                errors={errors}
+                roleData={roleData}
+              />
+
+              <TextField
+                control={control}
+                name="email"
+                placeholder="Enter your email"
+                errors={errors}
+                required
+                prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
+              />
+
+              <PasswordField
+                control={control}
+                name="password"
+                placeholder="Enter your password"
+                errors={errors}
+                required
+                prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
+              />
+
+              <PasswordField
+                control={control}
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                errors={errors}
+                required
+                prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
+              />
+
+              <Form.Item className="!m-0">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  size="large"
+                  variant="primary"
+                >
+                  Register
+                </Button>
+              </Form.Item>
+
+              {/* <AuthDivider />
+
+              <OAuthButton
+                message="Continue with Google"
+                onClick={handleOAuthRegister}
+              /> */}
+            </>
           }
-          validateStatus={errors.role ? "error" : ""}
-          help={errors.role?.message}
-          style={{ marginBottom: errors.role ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="role"
-            control={control}
-            rules={{ required: "Silakan pilih peran Anda!" }}
-            render={({ field }) => (
-              <Radio.Group
-                {...field}
-                size="large"
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  gap: "1rem",
-                }}
-              >
-                <Radio
-                  value="student"
-                  style={{
-                    padding: "0.7rem 1rem",
-                    color: field.value === "student" ? "#2563EB" : "#374151",
-                    fontWeight: field.value === "student" ? "600" : "400",
-                  }}
-                  className={`w-1/2 border rounded-md ${
-                    field.value === "student"
-                      ? "border-blue-600"
-                      : "border-gray-300"
-                  }`}
-                >
-                  Siswa
-                </Radio>
-
-                <Radio
-                  value="teacher"
-                  style={{
-                    padding: "0.7rem 1rem",
-                    color: field.value === "teacher" ? "#2563EB" : "#374151",
-                    fontWeight: field.value === "teacher" ? "600" : "400",
-                  }}
-                  className={`w-1/2 border rounded-md ${
-                    field.value === "teacher"
-                      ? "border-blue-600"
-                      : "border-gray-300"
-                  }`}
-                >
-                  Guru
-                </Radio>
-              </Radio.Group>
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item
-          validateStatus={errors.email ? "error" : ""}
-          help={errors.email?.message}
-          style={{ marginBottom: errors.email ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                prefix={<MailOutlined style={{ marginRight: 8 }} />}
-                placeholder="Email"
-                size="large"
-              />
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item
-          validateStatus={errors.password ? "error" : ""}
-          help={errors.password?.message}
-          style={{ marginBottom: errors.password ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <Input.Password
-                {...field}
-                prefix={<LockOutlined style={{ marginRight: 8 }} />}
-                placeholder="Password"
-                size="large"
-              />
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item
-          validateStatus={errors.confirmPassword ? "error" : ""}
-          help={errors.confirmPassword?.message}
-          style={{ marginBottom: errors.confirmPassword ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="confirmPassword"
-            control={control}
-            render={({ field }) => (
-              <Input.Password
-                {...field}
-                prefix={<LockOutlined style={{ marginRight: 8 }} />}
-                placeholder="Confirm Password"
-                size="large"
-              />
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            variant="primary"
-          >
-            Daftar
-          </Button>
-        </Form.Item>
-
-        <Divider
-          style={{
-            color: "#000000",
-          }}
-        >
-          OR
-        </Divider>
-
-        <OAuthButton
-          message="Continue with Google"
-          onClick={handleOAuthRegister}
+          bottom={
+            <AuthRedirect
+              message="Already have an account?"
+              linkText="Sign in now"
+              onClick={handleNavigateToLogin}
+            />
+          }
         />
-      </div>
-
-      <AuthRedirect
-        message="Sudah punya akun?"
-        linkText="Masuk sekarang"
-        onClick={handleNavigateToLogin}
-      />
-    </Form>
+      </Form>
+    </>
   );
 }

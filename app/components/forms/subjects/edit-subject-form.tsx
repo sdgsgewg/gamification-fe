@@ -1,182 +1,181 @@
 "use client";
 
 import { Form } from "antd";
-import { RcFile, UploadFile } from "antd/es/upload";
+import { UploadFile } from "antd/es/upload";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Button from "../../shared/Button";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
-import { useEffect, useState } from "react";
-import { auth } from "@/app/functions/AuthProvider";
-import { Subject } from "@/app/interface/subjects/ISubject";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { useAuth } from "@/app/hooks/useAuth";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import ImageField from "../../fields/ImageField";
 import FormLayout from "@/app/dashboard/form-layout";
-import { imageProvider } from "@/app/functions/ImageProvider";
-
-// --- Zod Schema ---
-const editSubjectSchema = z.object({
-  name: z.string().nonempty("Nama wajib diisi"),
-  description: z.string().optional(),
-  image: z.string().optional(),
-  updatedBy: z.string().nonempty("Pengguna wajib diisi"),
-});
-
-export type EditSubjectFormInputs = z.infer<typeof editSubjectSchema>;
+import {
+  editSubjectDefaultValues,
+  EditSubjectFormInputs,
+  editSubjectSchema,
+} from "@/app/schemas/subjects/editSubject";
+import Loading from "../../shared/Loading";
+import { FormRef } from "@/app/interface/forms/IFormRef";
+import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
+import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
+import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 
 interface EditSubjectFormProps {
+  subjectData?: EditSubjectFormInputs;
   onFinish: (values: EditSubjectFormInputs) => void;
-  defaultValues?: Subject;
 }
 
-export default function EditSubjectForm({
-  onFinish,
-  defaultValues,
-}: EditSubjectFormProps) {
-  const { toast } = useToast();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<EditSubjectFormInputs>({
-    resolver: zodResolver(editSubjectSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      image: "",
-      updatedBy: "",
-    },
-  });
+const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
+  ({ subjectData, onFinish }, ref) => {
+    const { toast } = useToast();
 
-  const [subjectId, setSubjectId] = useState<string | undefined>(undefined);
-  const [oldImageUrl, setOldImageUrl] = useState<string | undefined>();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const {
+      control,
+      handleSubmit,
+      formState: { errors, dirtyFields },
+      setValue,
+      reset,
+    } = useForm<EditSubjectFormInputs>({
+      resolver: zodResolver(editSubjectSchema),
+      defaultValues: subjectData || editSubjectDefaultValues,
+    });
 
-  const onSubmit = async (data: EditSubjectFormInputs) => {
-    if (!subjectId) return;
+    const { getCachedUserProfile } = useAuth();
 
-    try {
-      let finalImageUrl = data.image;
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-      // kalau user pilih gambar baru, upload ke supabase
+    useInitializeForm<EditSubjectFormInputs>(reset, subjectData, (d) => ({
+      ...d,
+      updatedBy: getCachedUserProfile()?.name,
+    }));
+    useInitializeFileList(subjectData, setFileList);
+    const isDirty = Object.keys(dirtyFields).some(
+      (field) => field !== "updatedBy"
+    );
+    useNavigationGuard(isDirty);
+
+    // Handler untuk perubahan upload
+    const handleImageChange = (info: any) => {
+      let fileList = [...info.fileList];
+
+      // Hanya izinkan satu file
+      fileList = fileList.slice(-1);
+
+      // Update fileList state
+      setFileList(fileList);
+
       if (fileList.length > 0 && fileList[0].originFileObj) {
-        const file = fileList[0].originFileObj as RcFile;
-
-        // hapus file lama kalau ada
-        if (oldImageUrl) {
-          await imageProvider.deleteImage(oldImageUrl, "subjects");
-        }
-
-        // upload file baru
-        finalImageUrl = await imageProvider.uploadImage(file, "subjects");
-      }
-
-      const result = await subjectProvider.updateSubject(subjectId, {
-        ...data,
-        image: finalImageUrl,
-      });
-
-      if (result.isSuccess) {
-        toast.success("Mata pelajaran berhasil diperbarui!");
-        onFinish({ ...data, image: finalImageUrl });
-        setFileList([]); // reset preview
+        // Set nilai imageFile ke form
+        setValue("imageFile", fileList[0].originFileObj as File, {
+          shouldDirty: true,
+        });
       } else {
-        toast.error(result.message || "Pembaruan mata pelajaran gagal.");
+        // Jika tidak ada file, set ke null
+        setValue("imageFile", null, { shouldDirty: true });
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
+    };
+
+    const onSubmit = async (data: EditSubjectFormInputs) => {
+      if (!subjectData || !subjectData.subjectId) return;
+
+      const subjectId = subjectData.subjectId;
+
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+
+      // Append file images
+      if (data.imageFile instanceof File) {
+        formData.append("imageFile", data.imageFile);
+      }
+
+      const result = await subjectProvider.updateSubject(subjectId, formData);
+
+      const { isSuccess, message } = result;
+
+      if (isSuccess) {
+        toast.success(message ?? "Mata pelajaran berhasil diperbarui!");
+        onFinish(data);
+        setFileList([]);
       } else {
-        toast.error("Gagal upload gambar");
+        toast.error(message ?? "Pembaruan mata pelajaran gagal.");
       }
-    }
-  };
 
-  // Set nilai awal dari props
-  useEffect(() => {
-    if (defaultValues) {
-      setValue("name", defaultValues.name);
-      setValue("description", defaultValues.description || "");
-      setValue("image", defaultValues.image || "");
-      setSubjectId(defaultValues.subjectId);
-      setOldImageUrl(defaultValues.image || "");
+      setIsLoading(false);
+    };
 
-      // kalau ada image lama, isi fileList supaya muncul preview gambar
-      if (defaultValues.image) {
-        setFileList([
-          {
-            uid: "-1",
-            name: "old-image.png",
-            status: "done",
-            url: defaultValues.image,
-          } as UploadFile,
-        ]);
-      }
-    }
-  }, [defaultValues, setValue]);
+    // Expose ke parent
+    useImperativeHandle(ref, () => ({
+      isDirty,
+    }));
 
-  useEffect(() => {
-    const user = auth.getCachedUserProfile();
-    if (user) {
-      setValue("updatedBy", user.name);
-    }
-  }, [setValue]);
+    return (
+      <>
+        {isLoading && <Loading />}
 
-  return (
-    <Form
-      name="edit-subject"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <FormLayout
-        left={
-          <>
-            <TextField
-              control={control}
-              name="name"
-              label="Nama"
-              placeholder="Masukkan nama mata pelajaran"
-              errors={errors}
-              required
-            />
+        <Form
+          id="edit-subject-form"
+          name="edit-subject"
+          onFinish={handleSubmit(onSubmit)}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <FormLayout
+            left={
+              <>
+                <TextField
+                  control={control}
+                  name="name"
+                  label="Nama"
+                  placeholder="Masukkan nama mata pelajaran"
+                  errors={errors}
+                  required
+                />
 
-            <TextAreaField
-              control={control}
-              name="description"
-              label="Deskripsi"
-              placeholder="Masukkan deskripsi mata pelajaran"
-              errors={errors}
-            />
-          </>
-        }
-        right={
-          <ImageField
-            control={control}
-            name="image"
-            label="Upload Gambar"
-            fileList={fileList}
-            setFileList={setFileList}
-            errors={errors}
-            setOldImageUrl={setOldImageUrl}
+                <TextAreaField
+                  control={control}
+                  name="description"
+                  label="Deskripsi"
+                  placeholder="Masukkan deskripsi mata pelajaran"
+                  errors={errors}
+                />
+              </>
+            }
+            right={
+              <ImageField
+                control={control}
+                name="imageFile"
+                label="Upload Gambar"
+                fileList={fileList}
+                setFileList={setFileList}
+                onChange={handleImageChange}
+                errors={errors}
+                mode="file"
+              />
+            }
+            bottom={
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                variant="primary"
+                className="!px-8"
+              >
+                Submit
+              </Button>
+            }
           />
-        }
-        bottom={
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            variant="primary"
-            className="!px-8"
-          >
-            Submit
-          </Button>
-        }
-      />
-    </Form>
-  );
-}
+        </Form>
+      </>
+    );
+  }
+);
+
+EditSubjectForm.displayName = "EditSubjectForm";
+export default EditSubjectForm;

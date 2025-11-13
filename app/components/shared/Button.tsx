@@ -4,16 +4,23 @@ import React from "react";
 import { Button as AntdButton } from "antd";
 import type { ButtonProps } from "antd";
 
-export type ButtonVariant = "primary" | "view" | "edit" | "delete";
+export type ButtonVariant =
+  | "primary"
+  | "outline"
+  | "view"
+  | "warning"
+  | "danger";
 
 interface CustomButtonProps extends ButtonProps {
   variant?: ButtonVariant;
+  hasBorder?: boolean;
   className?: string;
   children: React.ReactNode;
 }
 
 const Button: React.FC<CustomButtonProps> = ({
   variant = "",
+  hasBorder = false,
   className = "",
   children,
   ...props
@@ -22,20 +29,28 @@ const Button: React.FC<CustomButtonProps> = ({
 
   switch (variant) {
     case "primary":
+      variantClassName = `!bg-primary hover:!bg-primary-hover !text-white ${
+        hasBorder ? "" : "!border-none"
+      }`;
+      break;
+    case "outline":
       variantClassName =
-        "!bg-[#556FD7] hover:!bg-[#4559B5] !text-white !border-none";
+        "!bg-outline hover:!bg-outline-hover !text-tx-primary-accent !border !border-br-primary";
       break;
     case "view":
-      variantClassName =
-        "!bg-[#74C1FF] hover:!bg-[#4FA8F8] !text-black !border-none";
+      variantClassName = `!bg-view hover:!bg-view-hover !text-black ${
+        hasBorder ? "" : "!border-none"
+      }`;
       break;
-    case "edit":
-      variantClassName =
-        "!bg-[#FFC107] hover:!bg-[#E0A800] !text-black !border-none";
+    case "warning":
+      variantClassName = `!bg-warning hover:!bg-warning-hover !text-black ${
+        hasBorder ? "" : "!border-none"
+      }`;
       break;
-    case "delete":
-      variantClassName =
-        "!bg-[#DC3545] hover:!bg-[#B02A37] !text-white !border-none";
+    case "danger":
+      variantClassName = `!bg-danger hover:!bg-danger-hover !text-white ${
+        hasBorder ? "" : "!border-none"
+      }`;
       break;
   }
 

@@ -3,24 +3,29 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { Form, Select } from "antd";
+import get from "lodash.get";
+import Label from "./Label";
 
 interface Option {
-  value: string | number;
+  value: string | number | boolean;
   label: string;
 }
 
 interface SelectFieldProps {
   control: any;
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   size?: "small" | "middle" | "large";
   options: Option[];
   errors?: Record<string, any>;
+  helpText?: string;
   loading?: boolean;
   disabled?: boolean;
   mode?: "multiple" | "tags";
   required?: boolean;
+  className?: string;
+  onChange?: (value: string | number | boolean) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -31,22 +36,22 @@ const SelectField: React.FC<SelectFieldProps> = ({
   size = "large",
   options,
   errors,
+  helpText,
   loading = false,
   disabled = false,
   mode = undefined, // Default to single select
   required = false,
+  className,
+  onChange,
 }) => {
+  const error = get(errors, name);
+
   return (
     <Form.Item
-      label={
-        <span className="font-medium">
-          {label}
-          {required && <span className="text-red-500">*</span>}
-        </span>
-      }
-      validateStatus={errors ? "error" : ""}
-      help={errors?.message}
-      style={{ marginBottom: errors ? "2.5rem" : "2rem" }}
+      label={label && <Label label={label} required={required} />}
+      validateStatus={error ? "error" : ""}
+      help={error?.message ?? helpText}
+      style={{ marginBottom: error ? "1rem" : "0rem" }}
       required={required}
     >
       <Controller
@@ -65,11 +70,16 @@ const SelectField: React.FC<SelectFieldProps> = ({
             allowClear={mode === "multiple"}
             showSearch
             optionFilterProp="label"
+            className={className}
             filterOption={(input, option) =>
               (option?.label as string)
                 .toLowerCase()
                 .includes(input.toLowerCase())
             }
+            onChange={(value) => {
+              field.onChange(value);
+              onChange?.(value);
+            }}
           />
         )}
       />

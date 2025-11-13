@@ -1,56 +1,500 @@
 @import "tailwindcss";
 
+/* ===== Root theme variables ===== */
 :root {
-  --background: #ffffff;
+  --background: #f5f4ff;
+  --background-hover: #e4e2fd;
   --foreground: #171717;
+
+  --color-surface: #fafaff; /* sedikit lebih terang dari card */
+  --color-card: #ffffff;
+
+  /* Brand colors */
+  --color-primary: #556fd7;
+  --color-primary-hover: #4559b5;
+  --color-secondary: #d3d0ff;
+  --color-tertiary: #eae9ff;
+  --color-tertiary-hover: #dcd9ff;
+  --color-success: #34c759;
+  --color-light: #ededed;
+  --color-gray-50: #f9fafb; /* gray-50 */
+  --color-light-emphasis: #f3f4f6; /* gray-100 */
+  --color-light-muted: #e5e7eb; /* gray-200 */
+  --color-light-accent: #d1d5db; /* gray-300 */
+  --color-dark: #171717;
+
+  /* Custom UI */
+  --color-oauth: #c5c5c5;
+  --color-auth-redirect: #f0f0f0;
+  --color-scrollbar-track: #edebff;
+  --color-scrollbar-thumb: #dddbfc;
+  --color-scrollbar-thumb-hover: #ccc8fe;
+  --color-correct-answer: #f0fdf4;
+  --color-incorrect-answer: #fef2f2;
+  --color-correct-option: #dcfce7;
+
+  /* Activity Tag Colors */
+  --color-activity-type: #8a8ae1;
+  --color-activity-new: #64a4f6;
+  --color-activity-rank: #0a1a37; /* text-blue-950 */
+
+  /* Outline & borders */
+  --color-outline: #f5f4ff;
+  --color-outline-hover: #e1e0fa;
+
+  /* Accent colors */
+  --color-view: #74c1ff;
+  --color-view-hover: #4fa8f8;
+
+  /* Status colors */
+  --color-warning: #ffc107;
+  --color-warning-hover: #e0a800;
+  --color-danger: #dc3545;
+  --color-danger-hover: #b02a37;
+
+  /* Border */
+  --border-primary: #bcb4ff;
+  --border-secondary: #aca8ff;
+  --border-tertiary: #95a3da;
+
+  /* Text & neutral shades */
+  --text-primary: #171717;
+  --text-secondary: #374151; /* slate-700 */
+  --text-tertiary: #64748b; /* slate-500 */
+  --text-muted: #9ca3af; /* slate-400 */
+  --text-primary-accent: #556fd7;
 }
 
-@theme inline {
+/* ===== Dark theme overrides ===== */
+html.dark {
+  --background: #0c0d2b;
+  --background-hover: #17193f;
+  --foreground: #ededed;
+
+  --color-surface: #1a1b4a; /* di antara background & card */
+  --color-card: #11123e;
+
+  /* Brand colors */
+  --color-primary: #4c5de0;
+  --color-primary-hover: #3d4dc4;
+  --color-secondary: #6e6bff;
+  --color-tertiary: #3b3a6e;
+  --color-tertiary-hover: #5654a2;
+  --color-success: #30d158;
+  --color-light: #171717;
+  --color-gray-50: #18181b;
+  --color-light-emphasis: #2b2c5a;
+  --color-light-muted: #1f2937;
+  --color-light-accent: #d1d5db;
+  --color-dark: #ededed;
+
+  /* Custom UI */
+  --color-oauth: #9ca3af;
+  --color-auth-redirect: #1f2045;
+  --color-scrollbar-track: #302f6e;
+  --color-scrollbar-thumb: #21205b;
+  --color-scrollbar-thumb-hover: #0b0d46;
+  --color-correct-answer: #1a3b2c;
+  --color-incorrect-answer: #3b1a1a;
+  --color-correct-option: #14532d;
+
+  /* Activity Tag Colors */
+  --color-activity-type: #6b6bd4;
+  --color-activity-new: #2271e0;
+  --color-activity-rank: #e0f2fe;
+
+  /* Outline & borders */
+  --color-outline: #1f2937; /* slate-800 */
+  --color-outline-hover: #374151;
+
+  /* Accent colors */
+  --color-view: #60a5fa;
+  --color-view-hover: #3b82f6;
+
+  /* Status colors */
+  --color-warning: #facc15;
+  --color-warning-hover: #eab308;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+
+  /* Border */
+  --border-primary: #bcb4ff;
+  --border-secondary: #aca8ff;
+  --border-tertiary: #95a3da;
+
+  /* Text & neutral shades */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e7eb; /* slate-200 */
+  --text-tertiary: #9ca3af; /* slate-400 */
+  --text-muted: #9ca3af; /* slate-400 */
+  --text-primary-accent: #8795ff;
+}
+
+/* ===== Tailwind v4 theme bindings ===== */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-xxs: 360px;
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
   --color-background: var(--background);
+  --color-background-hover: var(--background-hover);
   --color-foreground: var(--foreground);
+
+  --color-surface: var(--color-surface);
+  --color-card: var(--color-card);
+
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-secondary: var(--color-secondary);
+  --color-tertiary: var(--color-tertiary);
+  --color-tertiary-hover: var(--color-tertiary-hover);
+  --color-success: var(--color-success);
+  --color-light: var(--color-light);
+  --color-gray-50: var(--color-gray-50);
+  --color-light-emphasis: var(--color-light-emphasis);
+  --color-light-muted: var(--color-light-muted);
+  --color-light-accent: var(--color-light-accent);
+  --color-dark: var(--color-dark);
+
+  --color-oauth: var(--color-oauth);
+  --color-auth-redirect: var(--color-auth-redirect);
+  --color-scrollbar-track: var(--color-scrollbar-track);
+  --color-scrollbar-thumb: var(--color-scrollbar-thumb);
+  --color-scrollbar-thumb-hover: var(--color-scrollbar-thumb-hover);
+  --color-correct-answer: var(--color-correct-answer);
+  --color-incorrect-answer: var(--color-incorrect-answer);
+  --color-correct-option: var(--color-correct-option);
+
+  --color-activity-type: var(--color-activity-type);
+  --color-activity-new: var(--color-activity-new);
+  --color-activity-rank: var(--color-activity-rank);
+
+  --color-outline: var(--color-outline);
+  --color-outline-hover: var(--color-outline-hover);
+
+  --color-view: var(--color-view);
+  --color-view-hover: var(--color-view-hover);
+
+  --color-warning: var(--color-warning);
+  --color-warning-hover: var(--color-warning-hover);
+  --color-danger: var(--color-danger);
+  --color-danger-hover: var(--color-danger-hover);
+
+  --color-br-primary: var(--border-primary);
+  --color-br-secondary: var(--border-secondary);
+  --color-br-tertiary: var(--border-tertiary);
+
+  --color-tx-primary: var(--text-primary);
+  --color-tx-secondary: var(--text-secondary);
+  --color-tx-tertiary: var(--text-tertiary);
+  --color-tx-muted: var(--text-muted);
+  --color-tx-primary-accent: var(--text-primary-accent);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ===== Base Styles ===== */
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
 
-/* Tambahkan ke file CSS global Anda */
-.ant-table-wrapper .ant-table {
-  min-width: 100%;
+/* ===== Ant Dropdown Styles ===== */
+.ant-dropdown-menu {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-outline);
 }
 
-.ant-table-wrapper .ant-table-container {
-  overflow-x: auto;
+.ant-dropdown-menu-item:hover {
+  background-color: var(--color-light-emphasis) !important;
 }
 
-/* ===== Custom scrollbar style ===== */
+/* Ubah warna divider menu dropdown */
+.ant-dropdown-menu-item-divider {
+  border-color: var(--color-light-emphasis); /* atau warna lain yang kamu mau */
+  opacity: 1; /* kadang default-nya terlalu transparan */
+}
+
+html.dark .ant-dropdown-menu-item-divider {
+  border-color: var(--color-dark); /* warna divider di dark mode */
+}
+
+/* ===== Scrollbar Styles ===== */
 ::-webkit-scrollbar {
   height: 8px;
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9; /* slate-100 */
+  background: var(--color-scrollbar-track);
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* slate-300 */
+  background: var(--color-scrollbar-thumb);
   border-radius: 8px;
   transition: background 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* slate-400 */
+  background: var(--color-scrollbar-thumb-hover);
+}
+
+/* Thin scrollbar utility */
+.custom-thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-thin-scrollbar::-webkit-scrollbar-thumb {
+  /* background-color: rgba(0, 0, 0, 0.2); */
+  border-radius: 9999px;
+}
+.custom-thin-scrollbar {
+  scrollbar-width: thin;
+  /* scrollbar-color: rgba(0, 0, 0, 0.2) transparent; */
+}
+
+/* ===== Ant Design Input adjustments ===== */
+/* Input & Select background styling */
+.ant-input,
+.ant-input-affix-wrapper {
+  background-color: var(--color-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--color-light-muted) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper-focused {
+  border-color: var(--color-primary) !important;
+}
+
+/* Warna ikon mata pada Input.Password */
+.ant-input-password-icon {
+  color: var(--text-muted) !important;
+  transition: color 0.2s ease-in-out;
+}
+
+.ant-input-password-icon:hover {
+  color: var(--text-primary) !important;
+}
+
+.ant-select-selector {
+  background-color: var(--color-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--color-light-muted) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Placeholder color */
+.ant-input::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+.ant-select-selection-placeholder {
+  color: var(--text-primary) !important;
+  opacity: 1;
+}
+
+/* Ant Design Select Icon (Chevron) color */
+.ant-select-arrow {
+  color: var(--text-primary) !important;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Hover effect (optional, biar ada interaksi halus) */
+.ant-select:hover .ant-select-arrow {
+  color: var(--color-primary) !important;
+}
+
+/* Disabled state */
+.ant-select-disabled .ant-select-arrow {
+  color: var(--text-muted) !important;
+}
+
+/* ===== Ant Design Table adjustments ===== */
+
+/* Hilangkan rounded bawaan Ant Design */
+.ant-table,
+.ant-table-container,
+.ant-table-thead > tr:first-child > *:first-child,
+.ant-table-thead > tr:first-child > *:last-child {
+  border-radius: 0 !important;
+}
+
+.ant-table,
+.ant-table-container {
+  background-color: var(--color-surface) !important;
+}
+
+.ant-table-tbody > tr:nth-child(odd) {
+  background-color: var(--color-tertiary);
+}
+
+.ant-table-tbody > tr:nth-child(even) {
+  background-color: var(--background);
+}
+
+/* Fix white background on fixed columns (No column) */
+.ant-table-cell-fix-left,
+.ant-table-cell-fix-right {
+  background-color: inherit !important;
+}
+
+/* ===== Dashboard Table (custom colors) ===== */
+
+.dashboard-table .ant-table-thead > tr > th {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+}
+
+.dashboard-table .ant-table-tbody > tr > td {
+  color: var(--color-dark) !important;
+  border-top: 1px solid var(--border-secondary) !important;
+  border-bottom: none !important;
+}
+
+.dashboard-table .ant-table-tbody > tr:hover > td {
+  background-color: inherit !important;
+  color: none !important;
+  transition: none !important;
+}
+
+/* ===== Leaderboard Table (custom colors) ===== */
+
+.leaderboard-table .ant-table-thead > tr > th {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 16px;
+  border: none !important;
+  border-right: none !important;
+}
+
+.leaderboard-table .ant-table-tbody > tr > td {
+  color: var(--color-dark) !important;
+  font-size: 0.875rem;
+  padding: 4px 16px;
+  border-top: 1px solid var(--border-secondary) !important;
+  border-bottom: none !important;
+}
+
+.leaderboard-table .ant-table-tbody > tr:hover > td {
+  background-color: inherit !important;
+  color: none !important;
+  transition: none !important;
+}
+
+/* Last child adjustment */
+
+.ant-table-tbody > tr:last-child > td {
+  border-bottom: 1px solid var(--border-secondary) !important;
+}
+
+/* ===== Ant Design Pagination Custom ===== */
+.ant-pagination {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.ant-pagination-item {
+  background-color: var(--color-surface) !important;
+  border: 0.2px solid var(--color-light-accent) !important;
+}
+
+.ant-pagination-item a {
+  color: var(--text-primary) !important;
+}
+
+.ant-pagination-item:hover {
+  border-color: var(--color-primary-hover) !important;
+}
+
+/* Active (selected) page */
+.ant-pagination-item-active {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.ant-pagination-item-active a {
+  color: white !important;
+}
+
+/* Pagination arrows (prev / next) */
+.ant-pagination-prev button,
+.ant-pagination-next button {
+  background-color: var(--color-surface) !important;
+  color: var(--text-primary) !important;
+  border: 0.2px solid var(--color-light-accent) !important;
+}
+
+.ant-pagination-prev button:hover,
+.ant-pagination-next button:hover {
+  border-color: var(--color-primary-hover) !important;
+  color: var(--color-primary-hover) !important;
+}
+
+/* Jumlah per halaman dropdown */
+.ant-pagination-options {
+  background-color: transparent !important;
+}
+
+/* --- Override warna modal di dark mode --- */
+.ant-modal-content {
+  background-color: var(--color-surface) !important;
+  color: var(--color-dark) !important;
+}
+
+.ant-modal-header {
+  background-color: var(--color-surface) !important;
+  color: var(--color-dark) !important;
+}
+
+.ant-modal-title {
+  color: var(--color-dark) !important;
+}
+
+.ant-modal-body {
+  background-color: var(--color-surface) !important;
+}
+
+.ant-modal-footer {
+  background-color: var(--color-surface) !important;
+}
+
+.ant-modal-close-x {
+  color: var(--color-dark) !important;
+  transition: color 0.2s ease;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ===== Ant Design Skeleton Custom ===== */
+
+.skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

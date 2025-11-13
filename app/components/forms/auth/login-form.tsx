@@ -1,26 +1,28 @@
-import { Form, Input, Checkbox, Divider } from "antd";
+"use client";
+
+import { Form, Checkbox } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
 import Button from "../../shared/Button";
 import OAuthButton from "../../pages/Auth/OAuthButton";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
-
-// --- Zod Schema ---
-const loginSchema = z.object({
-  email: z
-    .string()
-    .nonempty("Email wajib diisi")
-    .email("Masukkan alamat email yang valid!"),
-  password: z.string().nonempty("Silakan masukkan kata sandi Anda!"),
-  remember: z.boolean().optional(),
-});
-
-export type LoginFormInputs = z.infer<typeof loginSchema>;
+import FormLayout from "@/app/(auth)/form-layout";
+import TextField from "../../fields/TextField";
+import PasswordField from "../../fields/PasswordField";
+import {
+  loginDefaultValues,
+  LoginFormInputs,
+  loginSchema,
+} from "@/app/schemas/auth/login";
+import { useState } from "react";
+import Loading from "../../shared/Loading";
+import FormTitle from "../../pages/Auth/FormTitle";
+import { ROUTES } from "@/app/constants/routes";
+import AuthDivider from "../../pages/Auth/AuthDivider";
 
 interface LoginFormProps {
   onFinish: (values: LoginFormInputs) => void;
@@ -33,27 +35,32 @@ export default function LoginForm({
 }: LoginFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { login } = useAuth();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      remember: false,
-    },
+    defaultValues: loginDefaultValues,
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data: LoginFormInputs) => {
-    const result = await auth.login(data);
-    if (result.ok) {
-      toast.success("Login successful!");
+    setIsLoading(true);
+
+    const result = await login(data);
+
+    if (result.isSuccess) {
+      toast.success(result.message ?? "Login successful!");
       onFinish(data);
     } else {
-      toast.error(result.error || "Invalid credentials.");
+      toast.error(result.message ?? "Invalid credentials");
     }
+
+    setIsLoading(false);
   };
 
   const handleOAuthLogin = () => {
@@ -62,107 +69,94 @@ export default function LoginForm({
   };
 
   const handleNavigateToRegister = () => {
-    router.push("/register");
+    router.push(ROUTES.AUTH.REGISTER);
   };
 
   return (
-    <Form
-      name="login"
-      onFinish={handleSubmit(onSubmit)}
-      layout="vertical"
-      requiredMark={false}
-    >
-      <div className="p-8 space-y-8">
-        <h1 className="text-2xl font-bold">Masuk ke Gamification</h1>
+    <>
+      {isLoading && <Loading />}
 
-        <Form.Item
-          validateStatus={errors.email ? "error" : ""}
-          help={errors.email?.message}
-          style={{ marginBottom: errors.email ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                prefix={<MailOutlined style={{ marginRight: 8 }} />}
-                placeholder="Email"
-                size="large"
+      <Form
+        name="login"
+        onFinish={handleSubmit(onSubmit)}
+        layout="vertical"
+        requiredMark={false}
+      >
+        <FormLayout
+          top={
+            <>
+              <FormTitle title="Sign in to Gamification" />
+
+              <TextField
+                control={control}
+                name="email"
+                placeholder="Enter your email"
+                errors={errors}
+                required
+                prefixIcon={<MailOutlined style={{ marginRight: 8 }} />}
               />
-            )}
-          />
-        </Form.Item>
 
-        <Form.Item
-          validateStatus={errors.password ? "error" : ""}
-          help={errors.password?.message}
-          style={{ marginBottom: errors.password ? "2.5rem" : "2rem" }}
-        >
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <Input.Password
-                {...field}
-                prefix={<LockOutlined style={{ marginRight: 8 }} />}
-                placeholder="Password"
-                size="large"
+              <PasswordField
+                control={control}
+                name="password"
+                placeholder="Enter your password"
+                errors={errors}
+                required
+                prefixIcon={<LockOutlined style={{ marginRight: 8 }} />}
               />
-            )}
-          />
-        </Form.Item>
 
-        <div className="flex items-center justify-between">
-          <Controller
-            name="remember"
-            control={control}
-            render={({ field }) => (
-              <Checkbox checked={field.value} onChange={field.onChange}>
-                Ingat Saya?
-              </Checkbox>
-            )}
-          />
-          <Button
-            type="link"
-            onClick={onForgotPasswordClick}
-            className="!text-[#4F68F8]"
-          >
-            Lupa Password?
-          </Button>
-        </div>
+              <div className="flex items-center justify-between">
+                <Controller
+                  name="remember"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="!text-dark"
+                    >
+                      Remember me?
+                    </Checkbox>
+                  )}
+                />
+                <Button
+                  type="link"
+                  onClick={onForgotPasswordClick}
+                  className="!text-tx-primary-accent"
+                >
+                  Forgot Password?
+                </Button>
+              </div>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            variant="primary"
-          >
-            Masuk
-          </Button>
-        </Form.Item>
+              <Form.Item className="!m-0">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  size="large"
+                  variant="primary"
+                >
+                  Sign In
+                </Button>
+              </Form.Item>
 
-        <Divider
-          style={{
-            color: "#000000",
-          }}
-        >
-          OR
-        </Divider>
+              {/* <AuthDivider />
 
-        <OAuthButton
-          message="Continue with Google"
-          onClick={handleOAuthLogin}
+              <OAuthButton
+                message="Continue with Google"
+                onClick={handleOAuthLogin}
+              /> */}
+            </>
+          }
+          bottom={
+            <AuthRedirect
+              message="Don’t have an account?"
+              linkText="Register now"
+              onClick={handleNavigateToRegister}
+            />
+          }
         />
-      </div>
-
-      <AuthRedirect
-        message="Belum punya akun?"
-        linkText="Daftar sekarang"
-        onClick={handleNavigateToRegister}
-      />
-    </Form>
+      </Form>
+    </>
   );
 }

@@ -1,7 +1,12 @@
-import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
-import { Subject } from "../interface/subjects/ISubject";
-import { CreateSubjectFormInputs } from "../components/forms/subjects/create-subject-form";
-import { EditSubjectFormInputs } from "../components/forms/subjects/edit-subject-form";
+import {
+  ApiResponse,
+  BaseResponseDto,
+  DetailResponseDto,
+  handleAxiosError,
+} from "../utils/axiosHelper";
+import { FilterSubjectRequest } from "../interface/subjects/requests/IFilterSubjectRequest";
+import { SubjectOverviewResponse } from "../interface/subjects/responses/ISubjectOverviewResponse";
+import { SubjectDetailResponse } from "../interface/subjects/responses/ISubjectDetailResponse";
 import {
   getAxios,
   postAxios,
@@ -12,54 +17,69 @@ import {
 const API_URL = "/subjects";
 
 export const subjectProvider = {
-  async getSubjects(searchText?: string): Promise<ApiResponse<Subject[]>> {
+  async getSubjects(
+    params?: FilterSubjectRequest
+  ): Promise<ApiResponse<SubjectOverviewResponse[]>> {
     try {
-      const params = searchText
-        ? `?searchText=${encodeURIComponent(searchText)}`
-        : "";
-      const data = await getAxios(`${API_URL}${params}`);
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.orderBy) query.append("orderBy", params.orderBy);
+      if (params?.orderState) query.append("orderState", params.orderState);
+
+      const url = query.toString() ? `${API_URL}?${query}` : API_URL;
+      const data = await getAxios(url);
+
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<Subject[]>(error);
+      return handleAxiosError<SubjectOverviewResponse[]>(error);
     }
   },
 
-  async getSubject(id: string): Promise<ApiResponse<Subject>> {
+  async getSubjectDetail(
+    slug: string
+  ): Promise<ApiResponse<SubjectDetailResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/${id}`);
+      const data = await getAxios(`${API_URL}/${slug}`);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<Subject>(error);
+      return handleAxiosError<SubjectDetailResponse>(error);
     }
   },
 
   async createSubject(
-    payload: CreateSubjectFormInputs
-  ): Promise<ApiResponse<Subject>> {
+    formData: FormData
+  ): Promise<ApiResponse<SubjectDetailResponse>> {
     try {
-      const data = await postAxios(API_URL, payload);
-      return { isSuccess: true, data };
+      const res: DetailResponseDto<SubjectDetailResponse> = await postAxios(
+        API_URL,
+        formData
+      );
+      return res;
     } catch (error) {
-      return handleAxiosError<Subject>(error);
+      return handleAxiosError<SubjectDetailResponse>(error);
     }
   },
 
   async updateSubject(
     id: string,
-    payload: EditSubjectFormInputs
-  ): Promise<ApiResponse<Subject>> {
+    formData: FormData
+  ): Promise<ApiResponse<SubjectDetailResponse>> {
     try {
-      const data = await putAxios(`${API_URL}/${id}`, payload);
-      return { isSuccess: true, data };
+      const res: DetailResponseDto<SubjectDetailResponse> = await putAxios(
+        `${API_URL}/${id}`,
+        formData
+      );
+      return res;
     } catch (error) {
-      return handleAxiosError<Subject>(error);
+      return handleAxiosError<SubjectDetailResponse>(error);
     }
   },
 
   async deleteSubject(id: string): Promise<ApiResponse<null>> {
     try {
-      await deleteAxios(`${API_URL}/${id}`);
-      return { isSuccess: true };
+      const res: BaseResponseDto = await deleteAxios(`${API_URL}/${id}`);
+      return res;
     } catch (error) {
       return handleAxiosError<null>(error);
     }

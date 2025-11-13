@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   sidebarAdminMenuItems,
-  sidebarMainMenuItems,
+  getSidebarMainMenuItems,
 } from "@/app/constants/menuItems";
 import { usePathname, useRouter } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -12,13 +12,15 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
-import { Role } from "@/app/interface/users/IUser";
-import { auth } from "@/app/functions/AuthProvider";
+import { useAuth } from "@/app/hooks/useAuth";
+import { Role } from "@/app/enums/Role";
+import ThemeSwitcher from "../../shared/ThemeSwitcher";
 
 interface MainMenuItemProps {
   menu: string;
   icon: IconDefinition;
   url: string;
+  role: string;
   onClick?: () => void;
   onCloseSidebar?: () => void;
 }
@@ -27,13 +29,15 @@ const MainMenuItem = ({
   menu,
   icon,
   url,
+  role,
   onClick,
   onCloseSidebar,
 }: MainMenuItemProps) => {
+  const modifiedRole = role.toLowerCase();
   const pathname = usePathname();
 
   const isActive =
-    url === "/dashboard"
+    url == `/dashboard/${modifiedRole}`
       ? pathname === url
       : pathname === url || pathname.startsWith(url + "/");
 
@@ -42,30 +46,19 @@ const MainMenuItem = ({
     if (onCloseSidebar) onCloseSidebar();
   };
 
+  const baseClasses =
+    "flex items-center gap-2 px-4 py-3 w-full text-left text-dark cursor-pointer transition duration-300 ease-in-out";
+  const activeClasses = "!bg-secondary font-semibold";
+  const hoverClasses = "hover:bg-tertiary-hover hover:font-medium";
+
+  const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
+
   return (
     <li>
-      {onClick ? (
-        <button
-          onClick={handleClick}
-          className={`flex items-center gap-2 px-4 py-3 transition w-full text-left ${
-            isActive ? "bg-[#D3D0FF] font-semibold" : ""
-          } text-black cursor-pointer`}
-        >
-          <FontAwesomeIcon icon={icon} className="text-base" />
-          <span className="text-sm">{menu}</span>
-        </button>
-      ) : (
-        <Link
-          href={url}
-          onClick={handleClick}
-          className={`flex items-center gap-2 px-4 py-3 transition ${
-            isActive ? "bg-[#D3D0FF] font-semibold" : ""
-          } text-black`}
-        >
-          <FontAwesomeIcon icon={icon} className="text-base" />
-          <span className="text-sm">{menu}</span>
-        </Link>
-      )}
+      <Link href={url} onClick={handleClick} className={classes}>
+        <FontAwesomeIcon icon={icon} className="text-base" />
+        <span className="text-sm">{menu}</span>
+      </Link>
     </li>
   );
 };
@@ -76,7 +69,7 @@ interface MainMenuItemWrapperProps {
 }
 
 const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
-  const filteredItems = sidebarMainMenuItems.filter((item) =>
+  const filteredItems = getSidebarMainMenuItems(role).filter((item) =>
     item.roles.includes(role)
   );
 
@@ -86,9 +79,10 @@ const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
         <MainMenuItem
           key={item.url}
           menu={item.menu}
-          url={item.url}
           icon={item.icon ?? faQuestionCircle}
-          onCloseSidebar={onClose} // ✅ Tutup sidebar setelah klik menu
+          url={item.url}
+          role={role}
+          onCloseSidebar={onClose}
         />
       ))}
     </ul>
@@ -113,13 +107,26 @@ const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
           <MainMenuItem
             key={item.url}
             menu={item.menu}
-            url={item.url}
             icon={item.icon ?? faQuestionCircle}
-            onCloseSidebar={onClose} // ✅ Tutup sidebar juga
+            url={item.url}
+            role={role}
+            onCloseSidebar={onClose}
           />
         ))}
       </ul>
     </div>
+  );
+};
+
+const PersonalizationMenuItemWrapper = () => {
+  return (
+    <ul className="pt-4 border-t-2 border-br-primary">
+      <p className="text-xs font-semibold px-4 mb-1">Personalization</p>
+      <div className="flex items-center justify-between gap-2 px-4 py-3 w-full text-left text-dark">
+        <span className="text-sm text-tx-secondary">Theme</span>
+        <ThemeSwitcher />
+      </div>
+    </ul>
   );
 };
 
@@ -129,25 +136,31 @@ interface SidebarProps {
 
 const Sidebar = ({ onClose }: SidebarProps) => {
   const router = useRouter();
+  const { logout, getCachedUserProfile } = useAuth();
 
-  const [userRole, setUserRole] = useState<Role>("admin");
+  const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
 
   const handleNavigateToHomePage = () => {
     router.push("/");
   };
 
-  const handleLogout = async () => {
-    await auth.logout();
+  const handleLogout = () => {
+    const asyncLogout = async () => {
+      await logout();
+    };
+
+    asyncLogout();
+
     router.push("/");
   };
 
   useEffect(() => {
-    const user = auth.getCachedUserProfile();
-    if (user) setUserRole(user.role);
-  }, []);
+    const user = getCachedUserProfile();
+    if (user) setUserRole(user.role.name);
+  }, [getCachedUserProfile]);
 
   return (
-    <aside className="w-64 bg-[#EAE9FF] min-h-screen border-r-2 border-[#BCB4FF] text-black">
+    <aside className="bg-tertiary min-h-screen border-r-2 border-br-primary text-dark z-50">
       <div className="h-16 flex items-center justify-between ps-4 pe-2">
         <h1
           className="text-2xl font-bold uppercase cursor-pointer"
@@ -157,22 +170,24 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         </h1>
         <button
           onClick={onClose}
-          className="block lg:hidden text-gray-700 hover:text-gray-900 cursor-pointer"
+          className="block lg:hidden text-tx-primary  cursor-pointer"
         >
           <FontAwesomeIcon icon={faXmark} className="text-xl" />
         </button>
       </div>
       <nav className="flex flex-col gap-4">
         <MainMenuItemWrapper role={userRole} onClose={onClose} />
-        {userRole === "admin" && (
+        {userRole === Role.ADMIN && (
           <AdminMenuItemWrapper role={userRole} onClose={onClose} />
         )}
-        <ul className="pt-4 border-t-2 border-[#BCB4FF]">
+        <PersonalizationMenuItemWrapper />
+        <ul className="pt-4 border-t-2 border-br-primary">
           <MainMenuItem
             menu="Keluar"
             icon={faRightFromBracket}
-            url="#"
-            onClick={() => handleLogout()}
+            url="/"
+            role={userRole}
+            onClick={handleLogout}
             onCloseSidebar={onClose}
           />
         </ul>

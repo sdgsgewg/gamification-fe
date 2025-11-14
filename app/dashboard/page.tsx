@@ -7,36 +7,41 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/shared/Loading";
 import { Role } from "../enums/Role";
+import { useGetCachedUser } from "../hooks/useGetCachedUser";
+import { ROUTES } from "../constants/routes";
 
 const DashboardRedirectPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const { getCachedUserProfile } = useAuth();
+  const { user } = useGetCachedUser();
 
   useEffect(() => {
     if (token) {
       localStorage.setItem("access_token", token);
     }
 
-    const user = getCachedUserProfile();
-    const role = (user?.role?.name || "").toUpperCase();
+    if (!user) return;
+
+    console.log("User: ", JSON.stringify(user, null, 2));
+
+    const role = user.role.name ?? "";
 
     switch (role) {
       case Role.ADMIN:
-        router.replace("/dashboard/admin");
+        router.replace(`${ROUTES.DASHBOARD.ADMIN.HOME}`);
         break;
       case Role.TEACHER:
-        router.replace("/dashboard/teacher");
+        router.replace(`${ROUTES.DASHBOARD.TEACHER.HOME}`);
         break;
       case Role.STUDENT:
-        router.replace("/dashboard/student");
+        router.replace(`${ROUTES.DASHBOARD.STUDENT.HOME}`);
         break;
       default:
-        router.replace("/auth/login");
+        router.replace(`${ROUTES.AUTH.LOGIN}`);
     }
-  }, [router, token]);
+  }, [router, token, user]);
 
   return <Loading />;
 };

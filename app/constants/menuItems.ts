@@ -45,6 +45,11 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.GUEST, Role.STUDENT],
   },
   {
+    menu: "Dashboard",
+    url: ROUTES.DASHBOARD.BASE,
+    roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
+  },
+  {
     menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],

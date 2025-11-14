@@ -11,7 +11,7 @@ import {
 } from "@/app/schemas/tasks/task-overview/editTaskOverview";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/Button";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import TextField from "../../../fields/TextField";
 import TextAreaField from "../../../fields/TextAreaField";
 import ImageField from "../../../fields/ImageField";

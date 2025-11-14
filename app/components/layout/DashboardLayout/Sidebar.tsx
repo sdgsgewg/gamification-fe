@@ -12,7 +12,7 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import { Role } from "@/app/enums/Role";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
 
@@ -150,8 +150,6 @@ const Sidebar = ({ onClose }: SidebarProps) => {
     };
 
     asyncLogout();
-
-    router.push("/");
   };
 
   useEffect(() => {

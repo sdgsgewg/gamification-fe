@@ -12,7 +12,7 @@ import { Role } from "@/app/enums/Role";
 
 import Button from "@/app/components/shared/Button";
 import { ROUTES } from "@/app/constants/routes";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 
 const HeroSection = () => {
   const router = useRouter();

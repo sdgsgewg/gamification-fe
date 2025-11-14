@@ -13,7 +13,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { materialProvider } from "@/app/functions/MaterialProvider";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import { SubjectOverviewResponse } from "@/app/interface/subjects/responses/ISubjectOverviewResponse";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import TextField from "../../fields/TextField";

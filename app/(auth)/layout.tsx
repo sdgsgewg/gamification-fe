@@ -8,7 +8,7 @@ export default function AuthLayout({
   return (
     <>
       <Header />
-      <main className="bg-primary min-h-screen flex items-center justify-center pt-35 pb-20 transition-colors duration-300">
+      <main className="bg-primary min-h-screen flex items-center justify-center pt-35 pb-20 px-4 md:px-8 transition-colors duration-300">
         <Toaster position="top-right" />
         {children}
       </main>

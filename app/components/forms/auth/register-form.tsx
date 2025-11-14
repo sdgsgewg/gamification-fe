@@ -6,7 +6,7 @@ import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import OAuthButton from "../../pages/Auth/OAuthButton";
 import AuthRedirect from "../../pages/Auth/AuthRedirect";
 import Button from "../../shared/Button";

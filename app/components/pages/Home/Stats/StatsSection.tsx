@@ -3,7 +3,7 @@
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { Role } from "@/app/enums/Role";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";

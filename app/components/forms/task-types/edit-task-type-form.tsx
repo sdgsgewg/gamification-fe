@@ -11,7 +11,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
 import FormLayout from "@/app/dashboard/form-layout";

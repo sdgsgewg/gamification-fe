@@ -9,7 +9,7 @@ import {
   SideBySideContentSectionProps,
 } from "../Section";
 import { Role } from "@/app/enums/Role";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import Button from "@/app/components/shared/Button";
 import { ROUTES } from "@/app/constants/routes";
 

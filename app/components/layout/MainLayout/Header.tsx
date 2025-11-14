@@ -16,7 +16,7 @@ import {
 } from "@/app/constants/menuItems";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import { Role } from "@/app/enums/Role";
 import { ROUTES } from "@/app/constants/routes";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
@@ -142,14 +142,12 @@ const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
     };
 
     asyncLogout();
-
-    router.push("/");
   };
 
   const handleMenuClick = async (e: React.MouseEvent, item: MenuItem) => {
     e.preventDefault();
 
-    if (item.menu.toLowerCase() === "keluar") {
+    if (item.menu.toLowerCase() === "log out") {
       return handleLogout();
     }
 

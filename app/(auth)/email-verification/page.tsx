@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import Loading from "@/app/components/shared/Loading";
 
 export const dynamic = "force-dynamic";

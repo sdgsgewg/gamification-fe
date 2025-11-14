@@ -5,7 +5,7 @@ import { LockOutlined } from "@ant-design/icons";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import Button from "../../shared/Button";
 import {
   resetPasswordDefaultValues,

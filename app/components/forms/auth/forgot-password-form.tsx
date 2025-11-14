@@ -3,7 +3,7 @@ import { MailOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import Button from "../../shared/Button";
 import {
   forgotPasswordDefaultValues,

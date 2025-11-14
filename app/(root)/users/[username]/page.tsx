@@ -1,7 +1,7 @@
 "use client";
 
 import { Role } from "@/app/enums/Role";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 
 import React, { useEffect, useMemo, useState } from "react";

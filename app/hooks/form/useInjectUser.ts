@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Path, PathValue, UseFormSetValue } from "react-hook-form";
-import { useAuth } from "../useAuth";
+import { useAuth } from "../auth/useAuth";
 
 /**
  * Inject default creatorId / createdBy ke form (untuk create)

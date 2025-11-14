@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Role } from "@/app/enums/Role";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
-import { authEventTarget, useAuth } from "./useAuth";
+import { authEventTarget, useAuth } from "./auth/useAuth";
 
 interface UseGetCachedUserResult {
   user: UserDetailResponse | undefined;

@@ -6,7 +6,7 @@ import { useSectionContext } from "../Section";
 import { BadgeData } from "./BadgeCardWrapper";
 import { CheckSquareOutlined } from "@ant-design/icons";
 import { Role } from "@/app/enums/Role";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 
 interface BadgeCardProps {
   badge: BadgeData;

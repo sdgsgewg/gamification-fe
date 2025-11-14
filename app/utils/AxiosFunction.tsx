@@ -8,7 +8,7 @@ const getBaseUrl = () => {
     console.warn("NEXT_PUBLIC_API_URL is not defined, using default");
     return "http://localhost:3001/api";
   }
-  return `${apiUrl}/api`;
+  return `${apiUrl}`;
 };
 
 const BASE_URL = getBaseUrl();

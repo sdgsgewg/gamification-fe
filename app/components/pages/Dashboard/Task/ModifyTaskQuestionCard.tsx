@@ -24,6 +24,7 @@ import { EditTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/ed
 import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
 import { useTaskTypeById } from "@/app/hooks/task-types/useTaskTypeById";
 import { CreateTaskOverviewFormInputs } from "@/app/schemas/tasks/task-overview/createTaskOverview";
+import { UpdateTaskQuestionOptionRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
 
 interface ModifyTaskQuestionCardProps {
   index: number;
@@ -107,6 +108,17 @@ export default function ModifyTaskQuestionCard({
     }
   }, [taskType]);
 
+  const [defaultQuestionType, setDefaultQuestionType] = useState<string>("");
+  const [defaultQuestionOptions, setDefaultQuestionOptions] = useState<
+    UpdateTaskQuestionOptionRequest[]
+  >([]);
+
+  // Debug default question type dan question options
+  useEffect(() => {
+    setDefaultQuestionType(control._formValues?.questions?.[index]?.type);
+    setDefaultQuestionOptions(control._formValues?.questions?.[index]?.options);
+  }, []);
+
   // Tentukan tipe pertanyaan yang boleh digunakan berdasarkan scope
   useEffect(() => {
     if (!taskTypeScope) return;
@@ -141,17 +153,16 @@ export default function ModifyTaskQuestionCard({
     setAvailableQuestionTypes(filteredOptions);
 
     // Jika question type saat ini tidak cocok dengan scope, reset ke tipe pertama
-    if (questionType && !allowedTypes.includes(questionType)) {
-      setValue(`questions.${index}.type`, allowedTypes[0]);
-    }
-  }, [taskTypeScope, questionType, setValue, index]);
+    // if (questionType && !allowedTypes.includes(questionType)) {
+    //   setValue(`questions.${index}.type`, allowedTypes[0]);
+    // }
+  }, [taskTypeScope]);
 
   // Render dari data DB atau hasil edit user
   useEffect(() => {
     if (!questionType) return;
 
     const optionsPath = `questions.${index}.options`;
-    const correctAnswerPath = `questions.${index}.correctAnswer`;
 
     const currentOptions = (control._formValues?.questions?.[index]?.options ??
       []) as any[];
@@ -187,112 +198,24 @@ export default function ModifyTaskQuestionCard({
         );
       }
     }
-  }, [control, index, questionType, setValue]);
+  }, []);
+  // }, [control, index, questionType, setValue]);
 
-  // Handle perubahan tipe soal (reset & isi default baru)
-  // useEffect(() => {
-  //   if (!questionType) return;
+  // Cek apakah tipe soal saat ini sama dengan default question type atau tidak. Jika iya -> fallback ke default question options. Jika tidak -> pakai option default aja
+  useEffect(() => {
+    if (!defaultQuestionType || !defaultQuestionOptions || !questionType)
+      return;
 
-  //   const optionsPath = `questions.${index}.options`;
-  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
+    const optionsPath = `questions.${index}.options`;
 
-  //   // Ambil opsi lama
-  //   const prevOptions = control._formValues?.questions?.[index]?.options ?? [];
+    const currentQuestionType = control._formValues?.questions?.[index]?.type;
 
-  //   // Kalau user ganti tipe soal dan tipe sebelumnya berbeda, reset semua opsi
-  //   if (prevOptions.length > 0) {
-  //     const newOptions = getDefaultOptionsByType(questionType);
-  //     setValue(optionsPath, newOptions, { shouldDirty: true });
-
-  //     // Reset correctAnswer agar gak bentrok sama struktur baru
-  //     if (
-  //       questionType === QuestionType.TRUE_FALSE ||
-  //       questionType === QuestionType.FILL_BLANK
-  //     ) {
-  //       setValue(correctAnswerPath, "");
-  //     } else {
-  //       setValue(correctAnswerPath, null);
-  //     }
-  //   }
-  // }, [questionType, index, setValue]);
-
-  // Yang udah pasti aman buat render question, options, tapi masih bug pas ubah tipe soal
-  // useEffect(() => {
-  //   if (!questionType) return;
-
-  //   const optionsPath = `questions.${index}.options`;
-  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
-
-  //   const currentOptions = (control._formValues?.questions?.[index]?.options ??
-  //     []) as any[];
-  //   const currentCorrectAnswer =
-  //     control._formValues?.questions?.[index]?.correctAnswer;
-
-  //   // Cek apakah ini adalah pertanyaan baru atau pertanyaan dari database
-  //   const isFromDatabase =
-  //     !!control._formValues?.questions?.[index]?.questionId;
-
-  //   // Cek apakah opsi sudah ada & valid (baik dari DB maupun hasil edit user)
-  //   const hasValidOptions =
-  //     isFromDatabase ||
-  //     (currentOptions.length > 0 &&
-  //       currentOptions.some((o) => o.text && o.text.trim() !== ""));
-
-  //   // Jika dari database dan opsi sudah ada, jangan overwrite
-  //   if (hasValidOptions) {
-  //     // Sinkronisasi correct answer jika perlu, tapi jangan reset opsi
-  //     if (questionType === QuestionType.TRUE_FALSE && currentCorrectAnswer) {
-  //       setValue(optionsPath, [
-  //         { text: "True", isCorrect: currentCorrectAnswer === "true" },
-  //         { text: "False", isCorrect: currentCorrectAnswer === "false" },
-  //       ]);
-  //     } else if (
-  //       questionType === QuestionType.MULTIPLE_CHOICE &&
-  //       currentCorrectAnswer !== undefined
-  //     ) {
-  //       const correctIndex = parseInt(currentCorrectAnswer as string, 10);
-  //       setValue(
-  //         optionsPath,
-  //         currentOptions.map((opt, i) => ({
-  //           ...opt,
-  //           isCorrect: i === correctIndex,
-  //         }))
-  //       );
-  //     }
-  //     return;
-  //   }
-
-  //   // Jika tidak ada opsi valid, baru set default
-  //   const newOptions = getDefaultOptionsByType(questionType);
-  //   setValue(optionsPath, newOptions);
-
-  //   if (questionType === QuestionType.TRUE_FALSE) {
-  //     setValue(correctAnswerPath, ""); // Kosongkan dulu
-  //   } else {
-  //     setValue(correctAnswerPath, null);
-  //   }
-  // }, [questionType, index, setValue]);
-
-  // CHATGPT -> reset opsi setiap kali ganti tipe soal
-  // useEffect(() => {
-  //   if (!questionType) return;
-
-  //   const optionsPath = `questions.${index}.options`;
-  //   const correctAnswerPath = `questions.${index}.correctAnswer`;
-
-  //   // Set default options baru setiap kali tipe soal berubah
-  //   const newOptions = getDefaultOptionsByType(questionType);
-  //   setValue(optionsPath, newOptions, { shouldDirty: true });
-
-  //   // Reset correctAnswer agar tidak pakai jawaban lama
-  //   if (questionType === QuestionType.TRUE_FALSE) {
-  //     setValue(correctAnswerPath, "");
-  //   } else if (questionType === QuestionType.FILL_BLANK) {
-  //     setValue(correctAnswerPath, "");
-  //   } else {
-  //     setValue(correctAnswerPath, null);
-  //   }
-  // }, [questionType, index, setValue]);
+    if (questionType === defaultQuestionType) {
+      setValue(optionsPath, defaultQuestionOptions);
+    } else {
+      setValue(optionsPath, getDefaultOptionsByType(currentQuestionType));
+    }
+  }, [defaultQuestionType, defaultQuestionOptions, questionType]);
 
   return (
     <div className="relative bg-outline border border-br-primary shadow-sm rounded-lg">

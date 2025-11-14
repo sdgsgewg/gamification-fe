@@ -48,7 +48,7 @@ const StudentTaskPage = () => {
     },
     {
       key: TaskAttemptStatus.COMPLETED,
-      label: TaskAttemptStatusLabels[TaskAttemptStatus.COMPLETED],
+      label: "Graded",
     },
   ];
 
@@ -97,46 +97,44 @@ const StudentTaskPage = () => {
         </div>
       </div>
 
-      {/* Task Card */}
-      <div className="flex flex-col gap-8">
-        {isLoading ? (
-          <TaskHistoryCardWrapper>
-            {Array.from({ length: 4 }).map((_, idx) => (
-              <TaskHistoryCardSkeleton key={idx} />
-            ))}
-          </TaskHistoryCardWrapper>
-        ) : groupedAttempts && groupedAttempts.length > 0 ? (
-          groupedAttempts.map((groupedAttempt, idx) => {
-            const { dateLabel, dayLabel, attempts } = groupedAttempt;
+      {/* Task Cards Grouped By Date */}
+      {isLoading ? (
+        <TaskHistoryCardWrapper>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <TaskHistoryCardSkeleton key={idx} />
+          ))}
+        </TaskHistoryCardWrapper>
+      ) : groupedAttempts && groupedAttempts.length > 0 ? (
+        groupedAttempts.map((groupedAttempt, idx) => {
+          const { dateLabel, dayLabel, attempts } = groupedAttempt;
 
-            return (
-              <div key={idx} className="flex flex-col gap-4">
-                <div className="flex gap-2">
-                  <p className="text-dark text-lg font-semibold">{dateLabel}</p>
-                  <p className="text-tx-tertiary text-lg">{dayLabel}</p>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  {attempts.map((attempt, idx) => (
-                    <TaskHistoryCard
-                      key={idx}
-                      attempt={attempt}
-                      onClick={() =>
-                        handleNavigateToTaskDetailPage(
-                          attempt.classSlug,
-                          attempt.taskSlug
-                        )
-                      }
-                    />
-                  ))}
-                </div>
+          return (
+            <div key={idx} className="flex flex-col gap-4">
+              <div className="flex gap-2">
+                <p className="text-dark text-lg font-semibold">{dateLabel}</p>
+                <p className="text-tx-tertiary text-lg">{dayLabel}</p>
               </div>
-            );
-          })
-        ) : (
-          <NotFound text="Task Not Found" />
-        )}
-      </div>
+
+              <TaskHistoryCardWrapper>
+                {attempts.map((attempt, idx) => (
+                  <TaskHistoryCard
+                    key={idx}
+                    attempt={attempt}
+                    onClick={() =>
+                      handleNavigateToTaskDetailPage(
+                        attempt.classSlug,
+                        attempt.taskSlug
+                      )
+                    }
+                  />
+                ))}
+              </TaskHistoryCardWrapper>
+            </div>
+          );
+        })
+      ) : (
+        <NotFound text="Task Not Found" />
+      )}
     </>
   );
 };

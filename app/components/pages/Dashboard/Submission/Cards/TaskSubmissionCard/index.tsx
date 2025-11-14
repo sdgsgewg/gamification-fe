@@ -33,7 +33,7 @@ const TaskSubmissionCard = ({
     gradedTime,
   } = submission;
 
-  const getEventText = () => {
+  const getProgressText = () => {
     switch (status) {
       case TaskSubmissionStatus.NOT_STARTED:
         return `Submitted at ${submittedTime}`;
@@ -85,7 +85,7 @@ const TaskSubmissionCard = ({
         <div className="flex flex-col justify-between gap-1">
           <div className="flex flex-col gap-0.5">
             <h4 className="text-lg font-bold text-start">{title}</h4>
-            <p className="text-dark text-sm font-medium">{getEventText()}</p>
+            <p className="text-dark text-sm font-medium">{getProgressText()}</p>
           </div>
           <div className="flex flex-col gap-0.5">
             <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">

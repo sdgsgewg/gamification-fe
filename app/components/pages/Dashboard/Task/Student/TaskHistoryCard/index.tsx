@@ -4,13 +4,19 @@ import React from "react";
 import Image from "next/image";
 import { TaskAttemptOverviewResponse } from "@/app/interface/task-attempts/responses/ITaskAttemptOverviewResponse";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faClock } from "@fortawesome/free-solid-svg-icons";
 import { Tag } from "antd";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
 import { IMAGES } from "@/app/constants/images";
+import { FaClock } from "react-icons/fa";
+import {
+  getDeadlineText,
+  getProgressText,
+  getStatusIcon,
+  getStatusTagColor,
+} from "@/app/utils/taskAttemptHelper";
 
 interface TaskHistoryCardProps {
   attempt: TaskAttemptOverviewResponse;
@@ -24,9 +30,9 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
     status,
     classSlug,
     taskSlug,
-    lastAccessedTime,
-    completedTime,
   } = attempt;
+
+  const modifiedStatus = status as TaskAttemptStatus;
 
   return (
     <div
@@ -43,21 +49,27 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
         />
       </div>
       <div className="flex-1 flex justify-between">
-        <div className="flex flex-col gap-1">
-          <h4 className="text-lg font-bold text-start">{title}</h4>
-          <p className="text-dark text-sm font-medium">
-            {completedTime
-              ? `Submitted on: ${completedTime}`
-              : lastAccessedTime
-              ? `Last accessed: ${lastAccessedTime}`
-              : ""}
-          </p>
+        <div className="flex flex-col justify-between gap-1">
+          <div className="flex flex-col gap-0.5">
+            <h4 className="text-lg font-bold text-start">{title}</h4>
+            <p className="text-dark text-sm font-medium">
+              {getProgressText(attempt)}
+            </p>
+          </div>
+          {getDeadlineText(attempt) !== "" && (
+            <div className="flex flex-col gap-0.5">
+              <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
+                <FaClock className="w-3 h-3" />
+                <span>{getDeadlineText(attempt)}</span>
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex items-start justify-start">
-          <Tag color={completedTime ? "green" : "yellow"} className="!m-0">
-            <FontAwesomeIcon icon={completedTime ? faCheck : faClock} />
+          <Tag color={getStatusTagColor(modifiedStatus)} className="!m-0">
+            <FontAwesomeIcon icon={getStatusIcon(modifiedStatus)} />
             <span className="ms-1">
-              {TaskAttemptStatusLabels[status as TaskAttemptStatus]}
+              {TaskAttemptStatusLabels[modifiedStatus]}
             </span>
           </Tag>
         </div>

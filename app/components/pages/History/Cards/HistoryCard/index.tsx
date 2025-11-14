@@ -3,33 +3,33 @@
 import React from "react";
 import Image from "next/image";
 import { TaskAttemptOverviewResponse } from "@/app/interface/task-attempts/responses/ITaskAttemptOverviewResponse";
-import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faClock } from "@fortawesome/free-solid-svg-icons";
-import { ROUTES } from "@/app/constants/routes";
 import { Tag } from "antd";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
 import { IMAGES } from "@/app/constants/images";
+import {
+  getProgressText,
+  getStatusIcon,
+  getStatusTagColor,
+} from "@/app/utils/taskAttemptHelper";
 
 interface HistoryCardProps {
   attempt: TaskAttemptOverviewResponse;
+  onClick: (id: string) => void;
 }
 
-const HistoryCard = ({ attempt }: HistoryCardProps) => {
-  const { id, title, image, status, lastAccessedTime, completedTime } = attempt;
-  const router = useRouter();
+const HistoryCard = ({ attempt, onClick }: HistoryCardProps) => {
+  const { id, title, image, status } = attempt;
 
-  const navigateToHistoryDetailPage = () => {
-    router.push(`${ROUTES.ROOT.HISTORY}/${id}`);
-  };
+  const modifiedStatus = status as TaskAttemptStatus;
 
   return (
     <div
       className={`h-24 sm:h-28 xl:h-32 bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
-      onClick={navigateToHistoryDetailPage}
+      onClick={() => onClick(id)}
     >
       <div className="w-[15%] md:w-[12%] xl:w-[8%]">
         <Image
@@ -44,16 +44,14 @@ const HistoryCard = ({ attempt }: HistoryCardProps) => {
         <div className="flex flex-col gap-1">
           <h4 className="text-lg font-bold text-start">{title}</h4>
           <p className="text-dark text-sm font-medium">
-            {completedTime
-              ? `Submitted on: ${completedTime}`
-              : `Last accessed: ${lastAccessedTime}`}
+            {getProgressText(attempt)}
           </p>
         </div>
         <div className="flex items-start justify-start">
-          <Tag color={completedTime ? "green" : "yellow"} className="!m-0">
-            <FontAwesomeIcon icon={completedTime ? faCheck : faClock} />
+          <Tag color={getStatusTagColor(modifiedStatus)} className="!m-0">
+            <FontAwesomeIcon icon={getStatusIcon(modifiedStatus)} />
             <span className="ms-1">
-              {TaskAttemptStatusLabels[status as TaskAttemptStatus]}
+              {TaskAttemptStatusLabels[modifiedStatus]}
             </span>
           </Tag>
         </div>

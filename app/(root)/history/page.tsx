@@ -3,22 +3,32 @@
 import React, { useState } from "react";
 import PageLayout from "../page-layout";
 import { useTaskAttemptsByUser } from "@/app/hooks/task-attempts/useTaskAttemptsByUser";
-import HistoryCard from "@/app/components/pages/History/HistoryCard";
 import { FilterTaskAttemptRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptRequest";
 import Button from "@/app/components/shared/Button";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
+import {
+  HistoryCard,
+  HistoryCardSkeleton,
+  HistoryCardWrapper,
+} from "@/app/components/pages/History/Cards";
+import NotFound from "@/app/components/shared/NotFound";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/app/constants/routes";
 
 const HistoryPage = () => {
+  const router = useRouter();
+
   const [filters, setFilters] = useState<FilterTaskAttemptRequest>({
     searchText: "",
     status: null,
     dateFrom: undefined,
     dateTo: undefined,
   });
-  const { data: groupedAttempts = [] } = useTaskAttemptsByUser(filters);
+  const { data: groupedAttempts = [], isLoading } =
+    useTaskAttemptsByUser(filters);
 
   const tabs: { key: TaskAttemptStatus | null; label: string }[] = [
     {
@@ -34,6 +44,10 @@ const HistoryPage = () => {
       label: TaskAttemptStatusLabels[TaskAttemptStatus.COMPLETED],
     },
   ];
+
+  const handleNavigateToHistoryDetailPage = (id: string) => {
+    router.push(`${ROUTES.ROOT.HISTORY}/${id}`);
+  };
 
   return (
     <PageLayout>
@@ -67,8 +81,15 @@ const HistoryPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-8">
-        {groupedAttempts.map((groupedAttempt, idx) => {
+      {/* History Cards Grouped By Date */}
+      {isLoading ? (
+        <HistoryCardWrapper>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <HistoryCardSkeleton key={idx} />
+          ))}
+        </HistoryCardWrapper>
+      ) : groupedAttempts && groupedAttempts.length > 0 ? (
+        groupedAttempts.map((groupedAttempt, idx) => {
           const { dateLabel, dayLabel, attempts } = groupedAttempt;
 
           return (
@@ -78,15 +99,23 @@ const HistoryPage = () => {
                 <p className="text-tx-tertiary text-lg">{dayLabel}</p>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <HistoryCardWrapper>
                 {attempts.map((attempt, idx) => (
-                  <HistoryCard key={idx} attempt={attempt} />
+                  <HistoryCard
+                    key={idx}
+                    attempt={attempt}
+                    onClick={() =>
+                      handleNavigateToHistoryDetailPage(attempt.id)
+                    }
+                  />
                 ))}
-              </div>
+              </HistoryCardWrapper>
             </div>
           );
-        })}
-      </div>
+        })
+      ) : (
+        <NotFound text="Task Not Found" />
+      )}
     </PageLayout>
   );
 };

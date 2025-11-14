@@ -119,6 +119,7 @@ interface ProgressTableProps {
   title?: string;
   startedAt: string | null;
   lastAccessedAt: string | null;
+  submittedAt?: string | null;
   completedAt?: string | null;
   status: string;
 }
@@ -127,6 +128,7 @@ export const ProgressTable = ({
   title = "Attempt Progress",
   startedAt,
   lastAccessedAt,
+  submittedAt,
   completedAt,
   status,
 }: ProgressTableProps) => {
@@ -142,7 +144,13 @@ export const ProgressTable = ({
       {/* Isi */}
       <DateRow label="Started At" value={startedAt ?? "-"} />
       <DateRow label="Last Accessed At" value={lastAccessedAt ?? "-"} />
-      {completedAt && <DateRow label="Completed At" value={completedAt} />}
+      {submittedAt && <DateRow label="Submitted At" value={submittedAt} />}
+      {completedAt && (
+        <DateRow
+          label={`${submittedAt ? "Graded At" : "Completed At"}`}
+          value={completedAt}
+        />
+      )}
       <StatusRow value={status ?? TaskAttemptStatus.ON_PROGRESS} />
     </TableWrapper>
   );

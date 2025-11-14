@@ -49,7 +49,7 @@ const SubmissionDetailPage = () => {
 
     const prefilledAnswers: Record<string, any> = {};
 
-    submissionDetail.questions.forEach((q) => {
+    submissionDetail.questions?.forEach((q) => {
       if (q.userAnswer) {
         prefilledAnswers[q.questionId] = {
           optionId: q.userAnswer.optionId,

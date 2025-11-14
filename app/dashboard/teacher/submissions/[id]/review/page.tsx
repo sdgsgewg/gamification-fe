@@ -14,6 +14,7 @@ import { taskSubmissionProvider } from "@/app/functions/TaskSubmissionProvider";
 import NavigationBarWrapper from "@/app/components/shared/NavigationBarWrapper";
 import QuestionNavigationBar from "@/app/components/shared/navigation-bar/QuestionNavigationBar";
 import { ReviewTaskQuestionCard } from "@/app/components/pages/Dashboard/Submission/Cards";
+import { SubmitWithFeedbackModal } from "@/app/components/modals/SubmitWithFeedbackModal";
 
 const ReviewSubmissionPage = () => {
   const params = useParams<{ id: string }>();
@@ -46,9 +47,9 @@ const ReviewSubmissionPage = () => {
     text: "Are you sure you want to go back? All progress will be saved.",
   });
 
-  const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
+  const [submitFeedbackModal, setSubmitFeedbackModal] = useState({
     visible: false,
-    text: "Are you sure you want to submit? Please review it again.",
+    text: "Are you sure you want to submit? Add feedback below.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -82,9 +83,9 @@ const ReviewSubmissionPage = () => {
     submissionData.questions.forEach((q) => {
       prefilledAnswers[q.questionId] = {
         answerLogId: q.userAnswer?.answerLogId,
-        isCorrect: q.isCorrect ?? null,
-        pointAwarded: q.pointAwarded ?? null,
-        teacherNotes: q.teacherNotes ?? "",
+        isCorrect: q.userAnswer?.isCorrect ?? null,
+        pointAwarded: q.userAnswer?.pointAwarded ?? null,
+        teacherNotes: q.userAnswer?.teacherNotes ?? "",
       };
     });
 
@@ -111,6 +112,20 @@ const ReviewSubmissionPage = () => {
       ...prev,
       [questionId]: { ...prev[questionId], teacherNotes: notes },
     }));
+  };
+
+  const isAllQuestionsReviewed = () => {
+    if (!submissionData) return false;
+
+    return submissionData.questions.every((q) => {
+      const ans = answers[q.questionId];
+      return (
+        ans?.isCorrect !== null &&
+        ans?.isCorrect !== undefined &&
+        ans?.pointAwarded !== null &&
+        ans?.pointAwarded !== undefined
+      );
+    });
   };
 
   const handleOpenBackConfirmation = () => {
@@ -172,13 +187,33 @@ const ReviewSubmissionPage = () => {
   };
 
   const handleOpenSubmitConfirmation = () => {
-    setSubmitConfirmationModal((prev) => ({ ...prev, visible: true }));
+    if (!isAllQuestionsReviewed()) {
+      setMessageModal({
+        visible: true,
+        isSuccess: false,
+        text: "Please review all questions before submitting.",
+        type: null,
+      });
+      return;
+    }
+
+    setSubmitFeedbackModal((prev) => ({ ...prev, visible: true }));
   };
 
-  const handleSubmitConfirmation = async () => {
+  const handleSubmitWithFeedback = async (feedback: string | null) => {
     if (!user || !submissionData || !startGradedAt || !lastGradedAt) return;
 
-    setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }));
+    setSubmitFeedbackModal((prev) => ({ ...prev, visible: false }));
+
+    if (!isAllQuestionsReviewed()) {
+      setMessageModal({
+        visible: true,
+        isSuccess: false,
+        text: "Please complete the review for all questions first.",
+        type: null,
+      });
+      return;
+    }
 
     setIsLoading(true);
 
@@ -193,6 +228,7 @@ const ReviewSubmissionPage = () => {
       const payload: UpdateTaskSubmissionFormInputs = {
         status: TaskSubmissionStatus.COMPLETED,
         lastGradedAt,
+        feedback,
         answers: reviewLogs,
       };
 
@@ -283,13 +319,12 @@ const ReviewSubmissionPage = () => {
       />
 
       {/* Submit Confirmation Modal */}
-      <ConfirmationModal
-        visible={submitConfirmationModal.visible}
-        text={submitConfirmationModal.text}
-        type="submit"
-        onConfirm={handleSubmitConfirmation}
+      <SubmitWithFeedbackModal
+        visible={submitFeedbackModal.visible}
+        text={submitFeedbackModal.text}
+        onSubmit={handleSubmitWithFeedback}
         onCancel={() =>
-          setSubmitConfirmationModal((prev) => ({ ...prev, visible: false }))
+          setSubmitFeedbackModal((prev) => ({ ...prev, visible: false }))
         }
       />
 

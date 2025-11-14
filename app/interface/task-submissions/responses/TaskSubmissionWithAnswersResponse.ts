@@ -4,6 +4,8 @@ export interface AnswerLog {
   image: string | null;
   optionId: string | null;
   isCorrect: boolean | null;
+  pointAwarded?: number | null;
+  teacherNotes?: string | null;
 }
 
 export interface QuestionOption {
@@ -22,9 +24,6 @@ export interface Question {
   image?: string;
   options?: QuestionOption[];
   userAnswer?: AnswerLog;
-  isCorrect?: boolean | null;
-  pointAwarded?: number | null;
-  teacherNotes?: string | null;
 }
 
 export interface TaskSubmissionWithAnswersResponse {

@@ -20,6 +20,8 @@ export const useTaskSubmissionWithAnswers = (id: string) => {
 
       const ts = res.data;
 
+      console.log("Data: ",  JSON.stringify(ts, null, 2));
+
       const mapped: TaskSubmissionWithAnswersResponse = {
         ...ts,
         questions: ts.questions

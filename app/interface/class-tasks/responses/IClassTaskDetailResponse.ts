@@ -1,9 +1,31 @@
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 
+export interface TaskDetail {
+  title: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  subject: { id: string; name: string };
+  material?: { id: string; name: string };
+  grade: string;
+  questionCount: number;
+  difficulty: string;
+  createdBy: string;
+  type: TaskType;
+}
+
 export interface TaskType {
   id: string;
   name: string;
   isRepeatable: boolean;
+}
+
+export interface SubmissionSummary {
+  pointGained: number;
+  totalPoints: number;
+  score: number;
+  xpGained: number;
+  feedback: string;
 }
 
 export interface CurrentAttempt {
@@ -60,31 +82,14 @@ export interface Question {
   userAnswer?: AnswerLog;
 }
 
-interface TaskSubmission {
-  score: number;
-  feedback: string;
-  status: string;
-  gradedBy: string;
-  gradedAt: string;
-}
-
 export interface ClassTaskDetailResponseDto {
   id: string;
-  title: string;
-  slug: string;
-  description?: string;
-  image?: string;
-  subject: { id: string; name: string };
-  material?: { id: string; name: string };
-  grade: string;
-  questionCount: number;
-  difficulty: string;
-  createdBy: string;
-  type: TaskType;
+  teacherName: string;
+  className: string;
+  taskDetail: TaskDetail;
+  summary?: SubmissionSummary;
   currAttempt?: CurrentAttempt;
   recentAttempt?: RecentAttempt;
-  stats: TaskAttemptStats;
   duration?: TaskDuration;
-  questions: Question[];
-  submission?: TaskSubmission;
+  questions?: Question[];
 }

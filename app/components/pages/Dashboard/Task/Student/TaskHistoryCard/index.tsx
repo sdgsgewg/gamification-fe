@@ -24,15 +24,15 @@ interface TaskHistoryCardProps {
 }
 
 const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
-  const {
-    title,
-    image,
-    status,
-    classSlug,
-    taskSlug,
-  } = attempt;
+  const { title, image, status, classSlug, taskSlug } = attempt;
 
   const modifiedStatus = status as TaskAttemptStatus;
+
+  const getStatusText = () => {
+    if (TaskAttemptStatusLabels[modifiedStatus] === "Completed")
+      return "Graded";
+    return TaskAttemptStatusLabels[modifiedStatus];
+  };
 
   return (
     <div
@@ -68,9 +68,7 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
         <div className="flex items-start justify-start">
           <Tag color={getStatusTagColor(modifiedStatus)} className="!m-0">
             <FontAwesomeIcon icon={getStatusIcon(modifiedStatus)} />
-            <span className="ms-1">
-              {TaskAttemptStatusLabels[modifiedStatus]}
-            </span>
+            <span className="ms-1">{getStatusText()}</span>
           </Tag>
         </div>
       </div>

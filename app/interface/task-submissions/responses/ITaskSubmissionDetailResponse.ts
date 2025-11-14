@@ -11,6 +11,14 @@ export interface TaskDetail {
   type: string;
 }
 
+export interface SubmissionSummary {
+  pointGained: number;
+  totalPoints: number;
+  score: number;
+  xpGained: number;
+  feedback: string;
+}
+
 export interface SubmissionProgress {
   reviewedQuestionCount: number;
   totalQuestionCount: number;
@@ -18,14 +26,6 @@ export interface SubmissionProgress {
   lastGradedAt: string;
   finishGradedAt?: string;
   status: string;
-}
-
-export interface SubmissionSummary {
-  score: number;
-  feedback: string;
-  pointGained: number;
-  totalPoints: number;
-  xpGained: number;
 }
 
 export interface AnswerLog {
@@ -59,7 +59,7 @@ export interface TaskSubmissionDetailResponse {
   studentName: string;
   className: string;
   taskDetail: TaskDetail;
-  progress: SubmissionProgress;
   summary: SubmissionSummary;
-  questions: Question[];
+  progress: SubmissionProgress;
+  questions?: Question[];
 }

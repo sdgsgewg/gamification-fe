@@ -4,7 +4,10 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
-import { NumberRow } from "@/app/components/shared/table/detail-page/TableRowData";
+import {
+  FeedbackRow,
+  NumberRow,
+} from "@/app/components/shared/table/detail-page/TableRowData";
 import {
   DetailInformationTable,
   DurationTable,
@@ -61,7 +64,7 @@ const StudentTaskDetailPageContent = () => {
 
     const prefilledAnswers: Record<string, any> = {};
 
-    classTaskData.questions.forEach((q) => {
+    classTaskData.questions?.forEach((q) => {
       if (q.userAnswer) {
         prefilledAnswers[q.questionId] = {
           optionId: q.userAnswer.optionId,
@@ -95,15 +98,10 @@ const StudentTaskDetailPageContent = () => {
   }
 
   const LeftSideContent = () => {
-    const {
-      title,
-      image,
-      description,
-      questionCount,
-      type,
-      currAttempt,
-      recentAttempt,
-    } = classTaskData;
+    const { teacherName, className, currAttempt, recentAttempt } =
+      classTaskData;
+    const { title, image, description, questionCount, type } =
+      classTaskData.taskDetail;
 
     // === Tentukan teks & visibilitas tombol ===
     let buttonLabel: string | null = null;
@@ -126,6 +124,7 @@ const StudentTaskDetailPageContent = () => {
       <>
         <DetailPageLeftSideContent
           name={title}
+          additionalText={`Graded by ${teacherName} from class '${className}'`}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -160,7 +159,7 @@ const StudentTaskDetailPageContent = () => {
 
   const RightSideContent = () => {
     const { subject, material, type, questionCount, difficulty, grade } =
-      classTaskData;
+      classTaskData.taskDetail;
 
     return (
       <>
@@ -178,15 +177,19 @@ const StudentTaskDetailPageContent = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] = useState<TaskDetailBottomContentView>("stats");
+    const [view, setView] =
+      useState<TaskDetailBottomContentView>("submission-summary");
 
-    const { duration, currAttempt, recentAttempt } = classTaskData;
+    const { summary, duration, currAttempt, recentAttempt, questions } =
+      classTaskData;
     const isCompleted =
       recentAttempt?.status === TaskAttemptStatus.COMPLETED ? true : false;
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
-      ...(isCompleted ? [{ key: "stats" as const, label: "Statistics" }] : []),
+      ...(isCompleted
+        ? [{ key: "submission-summary" as const, label: "Sumamry" }]
+        : []),
       { key: "duration" as const, label: "Duration" },
       { key: "progress" as const, label: "Progres" },
       ...(isCompleted
@@ -205,27 +208,20 @@ const StudentTaskDetailPageContent = () => {
       setView(key);
     };
 
-    const StatsView = () => {
-      if (!classTaskData.stats) {
-        return (
-          <DetailInformationTable>
-            <NumberRow label="Jumlah Poin" value="-" />
-            <NumberRow label="Jumlah XP" value="-" />
-            <NumberRow label="Nilai" value="-" />
-          </DetailInformationTable>
-        );
-      }
+    const SummaryView = () => {
+      if (!summary) return;
 
-      const { pointGained, totalPoints, xpGained, score } = classTaskData.stats;
+      const { score, feedback, pointGained, totalPoints, xpGained } = summary;
 
       return (
         <DetailInformationTable>
           <NumberRow
-            label="Jumlah Poin"
+            label="Point Gained"
             value={pointGained ? `${pointGained}/${totalPoints}` : "-"}
           />
-          <NumberRow label="Jumlah XP" value={xpGained} />
-          <NumberRow label="Nilai" value={pointGained ? score : "-"} />
+          <NumberRow label="Score" value={score} />
+          <NumberRow label="XP Gained" value={xpGained} />
+          <FeedbackRow value={feedback} />
         </DetailInformationTable>
       );
     };
@@ -273,12 +269,14 @@ const StudentTaskDetailPageContent = () => {
     };
 
     const QuestionView = () => {
+      if (!questions) return;
+
       return (
         <>
           <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
 
           <div className="flex flex-col gap-8">
-            {classTaskData.questions.map((q, idx) => (
+            {questions.map((q, idx) => (
               <TaskSummaryQuestionCard
                 key={idx}
                 index={idx}
@@ -299,7 +297,7 @@ const StudentTaskDetailPageContent = () => {
         onChangeTab={handleChangeTab}
       >
         {view === "stats" ? (
-          <StatsView />
+          <SummaryView />
         ) : view === "duration" ? (
           <DurationView />
         ) : view === "progress" ? (
@@ -326,10 +324,10 @@ const StudentTaskDetailPageContent = () => {
   );
 };
 
-export default function EmailVerificationPage() {
+export default function StudentTaskDetailPage() {
   return (
     <Suspense fallback={<Loading />}>
       <StudentTaskDetailPageContent />
     </Suspense>
-  )
+  );
 }

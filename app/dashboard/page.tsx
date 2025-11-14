@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/shared/Loading";
 import { Role } from "../enums/Role";
 import { useGetCachedUser } from "../hooks/useGetCachedUser";
@@ -23,8 +22,6 @@ const DashboardRedirectPageContent = () => {
     }
 
     if (!user) return;
-
-    console.log("User: ", JSON.stringify(user, null, 2));
 
     const role = user.role.name ?? "";
 

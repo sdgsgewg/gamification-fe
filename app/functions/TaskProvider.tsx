@@ -91,4 +91,31 @@ export const taskProvider = {
       return handleAxiosError<null>(error);
     }
   },
+
+  async publishTask(id: string): Promise<ApiResponse<null>> {
+    try {
+      const res: BaseResponseDto = await putAxios(`${API_URL}/${id}/publish`);
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
+    }
+  },
+
+  async unpublishTask(id: string): Promise<ApiResponse<null>> {
+    try {
+      const res: BaseResponseDto = await putAxios(`${API_URL}/${id}/unpublish`);
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
+    }
+  },
+
+  async finalizeTask(id: string): Promise<ApiResponse<null>> {
+    try {
+      const res: BaseResponseDto = await putAxios(`${API_URL}/${id}/finalize`);
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
+    }
+  },
 };

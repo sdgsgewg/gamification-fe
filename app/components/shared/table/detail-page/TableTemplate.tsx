@@ -43,6 +43,7 @@ interface TaskDetailInformationTableProps {
   questionCount: number;
   difficulty: string;
   grade: string;
+  status?: string;
 }
 
 export const TaskDetailInformationTable = ({
@@ -52,6 +53,7 @@ export const TaskDetailInformationTable = ({
   questionCount,
   difficulty,
   grade,
+  status,
 }: TaskDetailInformationTableProps) => {
   return (
     <DetailInformationTable>
@@ -61,6 +63,7 @@ export const TaskDetailInformationTable = ({
       <NumberRow label="Questions" value={questionCount} />
       <DifficultyRow value={difficulty} />
       <GradeRow value={grade} />
+      <StatusRow value={status ?? ""} />
     </DetailInformationTable>
   );
 };
@@ -96,9 +99,16 @@ export const DurationTable = ({
 interface HistoryTableProps {
   createdBy: string;
   updatedBy?: string;
+  publishedAt?: string;
+  finalizedAt?: string;
 }
 
-export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
+export const HistoryTable = ({
+  createdBy,
+  updatedBy,
+  publishedAt,
+  finalizedAt,
+}: HistoryTableProps) => {
   return (
     <TableWrapper>
       {/* Header */}
@@ -111,6 +121,8 @@ export const HistoryTable = ({ createdBy, updatedBy }: HistoryTableProps) => {
       {/* Isi */}
       <DateRow label="Created By" value={createdBy} />
       <DateRow label="Last Updated" value={updatedBy ?? ""} />
+      <DateRow label="Published At" value={publishedAt ?? ""} />
+      <DateRow label="Finalized At" value={finalizedAt ?? ""} />
     </TableWrapper>
   );
 };

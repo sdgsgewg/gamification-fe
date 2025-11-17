@@ -20,6 +20,11 @@ import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 import Button from "@/app/components/shared/Button";
+import { usePublishTask } from "@/app/hooks/tasks/usePublishTask";
+import { ConfirmationModalState } from "@/app/interface/modals/IConfirmationModalState";
+import { useUnpublishTask } from "@/app/hooks/tasks/useUnpublishTask";
+import { useFinalizeTask } from "@/app/hooks/tasks/useFinalizeTask";
+import { TaskStatusLabels } from "@/app/enums/TaskStatus";
 
 const TaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -27,54 +32,182 @@ const TaskDetailPage = () => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.ADMIN.MANAGE_TASKS;
 
-  const { data: taskData, isLoading } = useTaskDetail(params.slug, "detail");
+  const { data: taskData, isLoading: isTaskDataLoading } = useTaskDetail(
+    params.slug,
+    "detail"
+  );
   const { mutateAsync: deleteTask } = useDeleteTask();
+  const { mutateAsync: publishTask } = usePublishTask(params.slug);
+  const { mutateAsync: unpublishTask } = useUnpublishTask(params.slug);
+  const { mutateAsync: finalizeTask } = useFinalizeTask(params.slug);
 
-  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
-  const [deleteTaskName, setDeleteTaskName] = useState<string | null>(null);
-  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
-    visible: false,
-    text: "",
-  });
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [taskName, setTaskName] = useState<string | null>(null);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] =
+    useState<ConfirmationModalState>({
+      visible: false,
+      text: "",
+    });
+  const [publishConfirmationModal, setPublishConfirmationModal] =
+    useState<ConfirmationModalState>({
+      visible: false,
+      text: "",
+    });
+  const [unpublishConfirmationModal, setUnpublishConfirmationModal] =
+    useState<ConfirmationModalState>({
+      visible: false,
+      text: "",
+    });
+  const [finalizeConfirmationModal, setFinalizeConfirmationModal] =
+    useState<ConfirmationModalState>({
+      visible: false,
+      text: "",
+    });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
   };
 
-  const showDeleteModal = (materialId: string, name: string) => {
-    setDeleteTaskId(materialId);
-    setDeleteTaskName(name);
+  // ----- DELETE TASK -----
+  const showDeleteModal = (taskId: string, name: string) => {
+    setTaskId(taskId);
+    setTaskName(name);
     setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
   };
 
   const confirmDelete = () => {
-    if (deleteTaskId !== null) {
-      handleDelete(deleteTaskId);
-      setDeleteTaskId(null);
-      setDeleteTaskName(null);
+    if (taskId !== null) {
+      handleDelete(taskId);
+      setTaskId(null);
+      setTaskName(null);
       setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
-    setDeleteTaskId(null);
-    setDeleteTaskName(null);
+    setTaskId(null);
+    setTaskName(null);
     setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
 
   const handleDelete = async (id: string) => {
+    setIsLoading(true);
     const res = await deleteTask(id);
     const { isSuccess, message } = res;
     if (isSuccess) {
-      toast.success(message ?? "Tugas berhasil dihapus");
+      toast.success(message ?? "Task deleted successfully");
       router.push(`${baseRoute}`);
     } else {
-      toast.error(message ?? "Gagal menghapus tugas");
+      toast.error(message ?? "Failed to delete task");
+    }
+    setIsLoading(false);
+  };
+
+  // ----- PUBLISH TASK -----
+  const showPublishModal = (taskId: string, name: string) => {
+    setTaskId(taskId);
+    setTaskName(name);
+    setPublishConfirmationModal((prev) => ({ ...prev, visible: true }));
+  };
+
+  const confirmPublish = () => {
+    if (taskId !== null) {
+      handlePublish(taskId);
+      setTaskId(null);
+      setTaskName(null);
+      setPublishConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
-  const handleShare = (id: string) => {
-    console.log("Share task with id: ", id);
+  const cancelPublish = () => {
+    setTaskId(null);
+    setTaskName(null);
+    setPublishConfirmationModal((prev) => ({ ...prev, visible: false }));
+  };
+
+  const handlePublish = async (id: string) => {
+    setIsLoading(true);
+    const res = await publishTask(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      setPublishConfirmationModal((prev) => ({ ...prev, visible: false }));
+      toast.success(message ?? "Task published successfully");
+    } else {
+      toast.error(message ?? "Failed to publish task");
+    }
+    setIsLoading(false);
+  };
+
+  // ----- UNPUBLISH TASK -----
+  const showUnpublishModal = (taskId: string, name: string) => {
+    setTaskId(taskId);
+    setTaskName(name);
+    setUnpublishConfirmationModal((prev) => ({ ...prev, visible: true }));
+  };
+
+  const confirmUnpublish = () => {
+    if (taskId !== null) {
+      handleUnpublish(taskId);
+      setTaskId(null);
+      setTaskName(null);
+      setUnpublishConfirmationModal((prev) => ({ ...prev, visible: false }));
+    }
+  };
+
+  const cancelUnpublish = () => {
+    setTaskId(null);
+    setTaskName(null);
+    setUnpublishConfirmationModal((prev) => ({ ...prev, visible: false }));
+  };
+
+  const handleUnpublish = async (id: string) => {
+    setIsLoading(true);
+    const res = await unpublishTask(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      setUnpublishConfirmationModal((prev) => ({ ...prev, visible: false }));
+      toast.success(message ?? "Task unpublished successfully");
+    } else {
+      toast.error(message ?? "Failed to unpublish task");
+    }
+    setIsLoading(false);
+  };
+
+  // ----- FINALIZE TASK -----
+  const showFinalizeModal = (taskId: string, name: string) => {
+    setTaskId(taskId);
+    setTaskName(name);
+    setFinalizeConfirmationModal((prev) => ({ ...prev, visible: true }));
+  };
+
+  const confirmFinalize = () => {
+    if (taskId !== null) {
+      handleFinalize(taskId);
+      setTaskId(null);
+      setTaskName(null);
+      setFinalizeConfirmationModal((prev) => ({ ...prev, visible: false }));
+    }
+  };
+
+  const cancelFinalize = () => {
+    setTaskId(null);
+    setTaskName(null);
+    setFinalizeConfirmationModal((prev) => ({ ...prev, visible: false }));
+  };
+
+  const handleFinalize = async (id: string) => {
+    setIsLoading(true);
+    const res = await finalizeTask(id);
+    const { isSuccess, message } = res;
+    if (isSuccess) {
+      setFinalizeConfirmationModal((prev) => ({ ...prev, visible: false }));
+      toast.success(message ?? "Task finalized successfully");
+    } else {
+      toast.error(message ?? "Failed to finalize task");
+    }
+    setIsLoading(false);
   };
 
   if (!taskData) {
@@ -82,7 +215,7 @@ const TaskDetailPage = () => {
   }
 
   const LeftSideContent = () => {
-    const { title, image, description } = taskData;
+    const { title, image, description } = taskData.taskDetail;
 
     return (
       <DetailPageLeftSideContent
@@ -101,7 +234,8 @@ const TaskDetailPage = () => {
       questionCount,
       difficulty,
       taskGrade,
-    } = taskData;
+      status,
+    } = taskData.taskDetail;
 
     return (
       <>
@@ -113,6 +247,7 @@ const TaskDetailPage = () => {
           questionCount={questionCount}
           difficulty={difficulty}
           grade={taskGrade}
+          status={TaskStatusLabels[status]}
         />
       </>
     );
@@ -147,9 +282,16 @@ const TaskDetailPage = () => {
     const HistoryView = () => {
       if (!history) return;
 
-      const { createdBy, updatedBy } = history;
+      const { createdBy, updatedBy, publishedAt, finalizedAt } = history;
 
-      return <HistoryTable createdBy={createdBy} updatedBy={updatedBy} />;
+      return (
+        <HistoryTable
+          createdBy={createdBy}
+          updatedBy={updatedBy}
+          publishedAt={publishedAt}
+          finalizedAt={finalizedAt}
+        />
+      );
     };
 
     const QuestionView = () => {
@@ -212,21 +354,30 @@ const TaskDetailPage = () => {
     );
   };
 
+  const { title, slug } = taskData.taskDetail;
+
   return (
     <>
-      {isLoading && <Loading />}
+      {(isTaskDataLoading || isLoading) && <Loading />}
 
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}
+        taskStatus={taskData.taskDetail.status}
         onEdit={() => {
-          if (taskData) handleEdit(taskData.slug);
+          if (taskData) handleEdit(slug);
         }}
         onDelete={() => {
-          if (taskData) showDeleteModal(taskData.taskId, taskData.title);
+          if (taskData) showDeleteModal(taskData.id, title);
         }}
-        onShare={() => {
-          if (taskData) handleShare(taskData.taskId);
+        onPublish={() => {
+          if (taskData) showPublishModal(taskData.id, title);
+        }}
+        onUnpublish={() => {
+          if (taskData) showUnpublishModal(taskData.id, title);
+        }}
+        onFinalize={() => {
+          if (taskData) showFinalizeModal(taskData.id, title);
         }}
       />
       {taskData && (
@@ -234,16 +385,39 @@ const TaskDetailPage = () => {
           left={<LeftSideContent />}
           right={<RightSideContent />}
           bottom={<BottomContent />}
-          hasBottomDivider
         />
       )}
 
       <ConfirmationModal
         visible={deleteConfirmationModal.visible}
-        text={`Apakah kamu yakin ingin menghapus tugas dengan nama '${deleteTaskName}'?`}
+        text={`Are you sure you want to delete task with title '${taskName}'?`}
         type="delete"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
+      />
+
+      <ConfirmationModal
+        visible={publishConfirmationModal.visible}
+        text={`Are you sure you want to publish task with title '${taskName}'? After publishing, it will become visible to users.`}
+        type="publish"
+        onConfirm={confirmPublish}
+        onCancel={cancelPublish}
+      />
+
+      <ConfirmationModal
+        visible={unpublishConfirmationModal.visible}
+        text={`Are you sure you want to unpublish task with title '${taskName}'? Users will no longer be able to access it until published again.`}
+        type="unpublish"
+        onConfirm={confirmUnpublish}
+        onCancel={cancelUnpublish}
+      />
+
+      <ConfirmationModal
+        visible={finalizeConfirmationModal.visible}
+        text={`Are you sure you want to finalize task with title '${taskName}'? Once finalized, it can no longer be edited.`}
+        type="finalize"
+        onConfirm={confirmFinalize}
+        onCancel={cancelFinalize}
       />
     </>
   );

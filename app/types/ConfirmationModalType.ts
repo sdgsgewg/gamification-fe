@@ -1,1 +1,7 @@
-export type ConfirmationModalType = "back" | "submit" | "delete";
+export type ConfirmationModalType =
+  | "back"
+  | "publish"
+  | "unpublish"
+  | "finalize"
+  | "submit"
+  | "delete";

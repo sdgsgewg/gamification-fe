@@ -27,6 +27,18 @@ export const ConfirmationModal = ({
         defaultText =
           "Semua perubahan yang dilakukan akan dihapus. Apakah anda yakin ingin keluar dari halaman ini?";
         break;
+      case "publish":
+        defaultText =
+          "Are you sure you want to publish this item? After publishing, it will become visible to users.";
+        break;
+      case "unpublish":
+        defaultText =
+          "Are you sure you want to unpublish this item? Users will no longer be able to access it until published again.";
+        break;
+      case "finalize":
+        defaultText =
+          "Are you sure you want to finalize this item? Once finalized, it can no longer be edited.";
+        break;
       case "submit":
         defaultText =
           "All changes made will be lost. Are you sure you want to leave this page?";

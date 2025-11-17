@@ -11,7 +11,7 @@ export const useTaskDetail = <M extends ManageItemMode>(
   mode: M
 ) => {
   return useQuery({
-    queryKey: ["taskDetail", slug],
+    queryKey: ["task-detail", slug],
     enabled: !!slug,
     queryFn: async () => {
       const res = await taskProvider.getTaskDetail(slug);
@@ -24,7 +24,10 @@ export const useTaskDetail = <M extends ManageItemMode>(
         // Mode edit
         const mapped: TaskDetailResponse = {
           ...t,
-          image: t.image ? getImageSrc(t.image) : "",
+          taskDetail: {
+            ...t.taskDetail,
+            image: t.taskDetail.image ? getImageSrc(t.taskDetail.image) : "",
+          },
         };
         return mapped;
       }
@@ -32,7 +35,10 @@ export const useTaskDetail = <M extends ManageItemMode>(
       // Mode detail
       const mapped: TaskDetailResponse = {
         ...t,
-        image: t.image ? getImageSrc(t.image) : "",
+        taskDetail: {
+          ...t.taskDetail,
+          image: t.taskDetail.image ? getImageSrc(t.taskDetail.image) : "",
+        },
       };
       return mapped;
     },

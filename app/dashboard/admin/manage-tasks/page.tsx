@@ -22,6 +22,7 @@ import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
 import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { TaskStatusLabels } from "@/app/enums/TaskStatus";
 
 const TaskPage = () => {
   const { toast } = useToast();
@@ -135,25 +136,35 @@ const TaskPage = () => {
       key: "title",
       width: 300,
       onCell: () => ({
-        style: { minWidth: 300 },
+        style: { minWidth: 300, paddingRight: 24 },
+      }),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 150,
+      render: (_, record) => TaskStatusLabels[record.status] || "-",
+      onCell: () => ({
+        style: { minWidth: 150 },
       }),
     },
     {
       title: "Type",
       key: "taskType",
-      width: 250,
+      width: 200,
       render: (_, record) => record.taskType || "-",
       onCell: () => ({
-        style: { minWidth: 250 },
+        style: { minWidth: 200 },
       }),
     },
     {
       title: "Subject",
       key: "subject",
-      width: 250,
+      width: 200,
       render: (_, record) => record.subject || "-",
       onCell: () => ({
-        style: { minWidth: 250 },
+        style: { minWidth: 200 },
       }),
     },
     {

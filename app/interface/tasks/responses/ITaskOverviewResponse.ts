@@ -1,3 +1,5 @@
+import { TaskStatus } from "@/app/enums/TaskStatus";
+
 export interface TaskOverviewResponse {
   taskId: string;
   title: string;
@@ -9,4 +11,5 @@ export interface TaskOverviewResponse {
   questionCount: number;
   difficulty: string;
   assignedClassCount: number;
+  status: TaskStatus;
 }

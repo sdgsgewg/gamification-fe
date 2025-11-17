@@ -132,11 +132,11 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
         <div className="w-full grid grid-cols-1 xxs:flex xxs:items-center md:grid md:grid-cols-4 gap-y-2 xxs:gap-y-0 gap-x-4 sm:gap-x-8 md:gap-x-4 lg:gap-x-8">
           {(isMediumTablet || isDesktop) && (
             <>
-              {/* Filter Mata Pelajaran */}
+              {/* Filter Subject */}
               <SelectField
                 control={control}
                 name="subjectId"
-                placeholder="Mata pelajaran"
+                placeholder="Subject"
                 options={subjectOptions}
                 loading={subjectOptions.length === 0}
                 disabled={subjectOptions.length === 0}
@@ -194,15 +194,15 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
           <TextField
             control={control}
             name="searchText"
-            label="Judul"
-            placeholder="Cari aktivitas..."
+            label="Title"
+            placeholder="Search activities..."
           />
 
           <SelectField
             control={control}
             name="subjectId"
-            label="Mata Pelajaran"
-            placeholder="Mata pelajaran"
+            label="Subject"
+            placeholder="Subject"
             options={subjectOptions}
             loading={subjectOptions.length === 0}
             disabled={subjectOptions.length === 0}
@@ -211,8 +211,8 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
           <SelectField
             control={control}
             name="materialId"
-            label="Materi Pelajaran"
-            placeholder="Materi pelajaran"
+            label="Material"
+            placeholder="Material"
             options={materialOptions}
             disabled={materialOptions.length === 0}
             helpText={
@@ -225,8 +225,8 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
           <SelectField
             control={control}
             name="taskTypeId"
-            label="Tipe Aktivitas"
-            placeholder="Tipe Aktivitas"
+            label="Activity Type"
+            placeholder="Activity Type"
             options={taskTypeOptions}
             loading={taskTypeOptions.length === 0}
             disabled={taskTypeOptions.length === 0}
@@ -235,8 +235,8 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
           <SelectField
             control={control}
             name="gradeIds"
-            label="Kelas"
-            placeholder="Kelas"
+            label="Class"
+            placeholder="Class"
             options={gradeOptions}
             loading={gradeOptions.length === 0}
             disabled={gradeOptions.length === 0}

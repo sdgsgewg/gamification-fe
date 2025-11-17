@@ -22,6 +22,7 @@ import {
   ActivitySectionType,
   ActivitySectionLabels,
 } from "@/app/enums/ActivitySectionType";
+import NotFound from "@/app/components/shared/NotFound";
 
 export const dynamic = "force-dynamic";
 
@@ -179,13 +180,11 @@ const ActivityPageContent = () => {
           <div className="flex-1">
             {filteredActivities.length > 0 ? (
               <ActivitySection
-                title="Hasil Pencarian"
+                title="Search Results"
                 activities={filteredActivities}
               />
             ) : (
-              <p className="text-center text-gray-500">
-                Aktivitas tidak ditemukan.
-              </p>
+              <NotFound text="Activity Not Found" />
             )}
           </div>
         )}
@@ -193,7 +192,7 @@ const ActivityPageContent = () => {
 
       <FilterModal
         visible={isFilterModalVisible}
-        title="Filter Aktivitas"
+        title="Filter Activities"
         formId="filter-activity-modal-form"
         onCancel={handleCloseFilter}
         onResetFilters={handleResetFilters}

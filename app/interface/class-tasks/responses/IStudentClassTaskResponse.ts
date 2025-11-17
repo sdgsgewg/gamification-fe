@@ -1,3 +1,5 @@
+import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
+
 export interface StudentClassTaskResponse {
   title: string;
   slug: string;
@@ -5,5 +7,7 @@ export interface StudentClassTaskResponse {
   type: string;
   subject: string;
   questionCount: number;
+  answeredCount: number;
   deadline?: string;
+  status: TaskAttemptStatus;
 }

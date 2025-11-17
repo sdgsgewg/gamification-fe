@@ -67,14 +67,7 @@ const StudentClassDetailPage = () => {
             {classTasks.map((ct) => (
               <StudentTaskCard
                 key={ct.slug}
-                image={ct.image}
-                title={ct.title}
-                slug={ct.slug}
-                type={ct.type}
-                // difficulty={ct.difficulty}
-                subject={ct.subject}
-                questionCount={ct.questionCount}
-                deadline={ct.deadline}
+                task={ct}
                 onClick={handleNavigateToTaskDetailPage}
               />
             ))}

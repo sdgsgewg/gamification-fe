@@ -46,7 +46,7 @@ export default function DashboardPage() {
 
               return (
                 <div key={idx}>
-                  {attempts.map((attempt, idx) => (
+                  {attempts.map((attempt) => (
                     <div
                       key={attempt.id}
                       className="flex justify-between items-center bg-tertiary hover:bg-[var(--color-tertiary-hover)] transition p-4 rounded-xl border border-br-tertiary"

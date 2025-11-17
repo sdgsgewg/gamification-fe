@@ -38,18 +38,20 @@ const DetailPageLeftSideContent = ({
           className="rounded-xl object-cover"
         />
       )}
-      <div className="flex flex-col gap-4 mt-4">
-        <div className="flex flex-row items-center gap-2">
-          <Image
-            src={IMAGES.DESCRIPTION}
-            alt="description"
-            width={24}
-            height={24}
-          />
-          <p className="text-base font-medium">Deskripsi</p>
+      {description && (
+        <div className="flex flex-col gap-4 mt-4">
+          <div className="flex flex-row items-center gap-2">
+            <Image
+              src={IMAGES.DESCRIPTION}
+              alt="description"
+              width={24}
+              height={24}
+            />
+            <p className="text-base font-medium">Deskripsi</p>
+          </div>
+          <p className="text-sm text-justify">{description}</p>
         </div>
-        <p className="text-sm text-justify">{description}</p>
-      </div>
+      )}
     </div>
   );
 };

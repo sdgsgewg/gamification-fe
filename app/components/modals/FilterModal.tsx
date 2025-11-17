@@ -45,7 +45,7 @@ export const FilterModal = ({
             className="flex-1 !px-4"
             form={formId}
           >
-            Terapkan
+            Apply
           </Button>
         </div>,
       ]}

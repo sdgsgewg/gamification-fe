@@ -78,7 +78,7 @@ const ActivityCard = ({
 
       <div className="flex flex-col gap-2 mt-auto">
         {/* Judul */}
-        <h4 className="text-lg font-bold">{title}</h4>
+        <h4 className="text-base md:text-lg font-bold line-clamp-2">{title}</h4>
 
         {/* Mata Pelajaran */}
         <span className="flex items-center gap-2">
@@ -94,7 +94,7 @@ const ActivityCard = ({
             width={20}
             height={20}
           />
-          <p className="text-xs font-medium">{`Kelas ${grade}`}</p>
+          <p className="text-xs font-medium">{`Class ${grade}`}</p>
         </span>
       </div>
     </div>

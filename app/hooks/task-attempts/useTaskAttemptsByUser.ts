@@ -6,17 +6,16 @@ import { GroupedTaskAttemptResponseDto } from "@/app/interface/task-attempts/res
 import { useQuery } from "@tanstack/react-query";
 
 export const useTaskAttemptsByUser = (values?: FilterTaskAttemptRequest) => {
+  const queryValues = values ?? {}; // default empty object
+
   return useQuery({
-    queryKey: ["task-attempts-by-user", values],
+    queryKey: ["task-attempts-by-user", JSON.stringify(queryValues)],
     queryFn: async () => {
-      const res = await taskAttemptProvider.getTaskAttemptsByUser(values);
+      const res = await taskAttemptProvider.getTaskAttemptsByUser(queryValues);
 
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: GroupedTaskAttemptResponseDto[]) =>
-      data.map((gta, idx) => ({
-        key: idx,
-        ...gta,
-      })),
+      data.map((gta, idx) => ({ key: idx, ...gta })),
   });
 };

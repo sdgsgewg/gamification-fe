@@ -24,8 +24,6 @@ const HistoryPage = () => {
   const [filters, setFilters] = useState<FilterTaskAttemptRequest>({
     searchText: "",
     status: null,
-    dateFrom: undefined,
-    dateTo: undefined,
   });
   const { data: groupedAttempts = [], isLoading } =
     useTaskAttemptsByUser(filters);

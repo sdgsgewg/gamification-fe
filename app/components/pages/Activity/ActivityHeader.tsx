@@ -33,9 +33,9 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
       <div className="absolute inset-0 bg-black/60"></div>
       <div className="relative z-10 w-full flex flex-col items-start gap-8">
         <div className="w-full flex flex-col gap-2 sm:gap-4 text-white">
-          <h1 className="text-3xl sm:text-4xl font-bold">Aktivitas Belajar</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">Activities</h1>
           <p className="text-base font-medium">
-            Temukan berbagai tugas, quiz, dan game seru!
+            Discover various and fun tasks or quizzes!
           </p>
         </div>
 
@@ -64,7 +64,7 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
               className="flex-1 !px-4"
               form={formId}
             >
-              Terapkan
+              Apply
             </Button>
           </div>
         )}

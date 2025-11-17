@@ -27,6 +27,7 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
+import NotFound from "@/app/components/shared/NotFound";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -76,7 +77,7 @@ const ActivityDetailPage = () => {
         buttonLabel = null; // Tidak render tombol
       }
     } else {
-      buttonLabel = "Mulai";
+      buttonLabel = "Start";
     }
 
     const shouldShowButton = buttonLabel !== null;
@@ -205,30 +206,28 @@ const ActivityDetailPage = () => {
     };
 
     const SimilarActivitiesView = () => {
-      if (filteredSimilarActivities.length === 0) return null;
-
       return (
-        <div className="flex flex-col gap-6">
-          <div className="pb-2 border-b-1 border-b-dark">
-            <h2 className="text-xl text-dark font-bold">Similar</h2>
-          </div>
-
-          <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
-            {similarActivities
-              .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
-              .map((sa) => (
-                <ActivityCard
-                  key={sa.id}
-                  type={sa.type}
-                  image={sa.image ?? ""}
-                  title={sa.title}
-                  slug={sa.slug}
-                  subject={sa.subject}
-                  grade={sa.grade}
-                  questionCount={sa.questionCount}
-                />
-              ))}
-          </div>
+        <div className="flex flex-col">
+          {filteredSimilarActivities && filteredSimilarActivities.length > 0 ? (
+            <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
+              {filteredSimilarActivities
+                .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
+                .map((sa) => (
+                  <ActivityCard
+                    key={sa.id}
+                    type={sa.type}
+                    image={sa.image ?? ""}
+                    title={sa.title}
+                    slug={sa.slug}
+                    subject={sa.subject}
+                    grade={sa.grade}
+                    questionCount={sa.questionCount}
+                  />
+                ))}
+            </div>
+          ) : (
+            <NotFound text="No Activity Found" />
+          )}
         </div>
       );
     };

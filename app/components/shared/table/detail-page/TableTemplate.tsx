@@ -63,7 +63,7 @@ export const TaskDetailInformationTable = ({
       <NumberRow label="Questions" value={questionCount} />
       <DifficultyRow value={difficulty} />
       <GradeRow value={grade} />
-      <StatusRow value={status ?? ""} />
+      {status && <StatusRow value={status} />}
     </DetailInformationTable>
   );
 };

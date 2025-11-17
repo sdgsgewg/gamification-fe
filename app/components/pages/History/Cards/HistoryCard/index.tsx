@@ -42,7 +42,7 @@ const HistoryCard = ({ attempt, onClick }: HistoryCardProps) => {
       </div>
       <div className="flex-1 flex justify-between">
         <div className="flex flex-col gap-1">
-          <h4 className="text-lg font-bold text-start">{title}</h4>
+          <h4 className="text-base md:text-lg font-bold text-start line-clamp-1">{title}</h4>
           <p className="text-dark text-sm font-medium">
             {getProgressText(attempt)}
           </p>

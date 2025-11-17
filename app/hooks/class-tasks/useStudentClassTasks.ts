@@ -2,7 +2,7 @@
 
 import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
 import { FilterClassTask } from "@/app/interface/class-tasks/requests/IFilterClassTaskRequest";
-import { ClassTaskResponse } from "@/app/interface/class-tasks/responses/IStudentClassTaskResponse";
+import { StudentClassTaskResponse } from "@/app/interface/class-tasks/responses/IStudentClassTaskResponse";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -20,7 +20,7 @@ export const useStudentClassTasks = (
 
       const tasks = res.data;
 
-      const mapped: ClassTaskResponse[] = tasks;
+      const mapped: StudentClassTaskResponse[] = tasks;
 
       return mapped;
     },

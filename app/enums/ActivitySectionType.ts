@@ -6,8 +6,8 @@ export enum ActivitySectionType {
 }
 
 export const ActivitySectionLabels: Record<ActivitySectionType, string> = {
-  [ActivitySectionType.CONTINUE]: "Lanjut Mengerjakan",
-  [ActivitySectionType.RECOMMENDED]: "Rekomendasi Untukmu",
-  [ActivitySectionType.TOP]: "Top 10 Aktivitas",
-  [ActivitySectionType.LATEST]: "Aktivitas Terbaru",
+  [ActivitySectionType.CONTINUE]: "Continue Attempt",
+  [ActivitySectionType.RECOMMENDED]: "Recommended For You",
+  [ActivitySectionType.TOP]: "Top 10 Activities",
+  [ActivitySectionType.LATEST]: "Latest Activities",
 };

@@ -55,12 +55,12 @@ const StudentAttemptTaskPageContent = () => {
 
   const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin kembali? Semua progres akan tetap disimpan.",
+    text: "Are you sure you want to go back? All progress will be saved.",
   });
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin mengumpulkan tugas ini? Mohon dikoreksi kembali.",
+    text: "Are you sure you want to submit this assignment? Please check it again.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -188,16 +188,16 @@ const StudentAttemptTaskPageContent = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Progres berhasil disimpan."
-          : "Gagal menyimpan progres.",
+          ? "Progress successfully saved."
+          : "Failed to save progress.",
         type: "back",
       });
     } catch (err) {
-      console.error("Error saat autosave sebelum kembali:", err);
+      console.error("Error during autosave before returning:", err);
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Terjadi kesalahan saat menyimpan progres.",
+        text: "An error occurred while saving progress.",
         type: "back",
       });
     } finally {
@@ -224,7 +224,7 @@ const StudentAttemptTaskPageContent = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Mohon jawab semua soal untuk dapat mengumpulkan tugas.",
+        text: "Please answer all questions to complete the assignment.",
         type: "submit",
       });
       return;
@@ -267,8 +267,8 @@ const StudentAttemptTaskPageContent = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Tugas Telah Berhasil Dikumpulkan"
-          : "Tugas Gagal Dikumpulkan",
+          ? "The assignment has been successfully submitted."
+          : "Assignment Not Submitted.",
         type: "submit",
       });
     } catch (err) {

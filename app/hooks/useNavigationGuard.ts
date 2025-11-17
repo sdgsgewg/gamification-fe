@@ -9,7 +9,7 @@ export function useNavigationGuard(isDirty: boolean) {
     if (!isDirty) return;
 
     const message =
-      "Perubahan belum disimpan. Yakin mau meninggalkan halaman ini?";
+      "Changes have not been saved. Are you sure you want to leave this page?";
 
     // ✅ Handle refresh / close tab
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {

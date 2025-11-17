@@ -25,7 +25,7 @@ export const ConfirmationModal = ({
     switch (type) {
       case "back":
         defaultText =
-          "Semua perubahan yang dilakukan akan dihapus. Apakah anda yakin ingin keluar dari halaman ini?";
+          "All changes made will be deleted. Are you sure you want to exit this page?";
         break;
       case "submit":
         defaultText =

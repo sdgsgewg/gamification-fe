@@ -181,7 +181,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         <PersonalizationMenuItemWrapper />
         <ul className="pt-4 border-t-2 border-br-primary">
           <MainMenuItem
-            menu="Keluar"
+            menu="Logout"
             icon={faRightFromBracket}
             url="/"
             role={userRole}

@@ -50,7 +50,7 @@ const TeacherClassPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Kelas Saya" showBackButton={false} />
+      <DashboardTitle title="My Class" showBackButton={false} />
 
       {/* Add and search content */}
       <div className="flex items-center gap-4 md:gap-12 mb-12">
@@ -61,7 +61,7 @@ const TeacherClassPage = () => {
           icon={<PlusCircleOutlined />}
           onClick={handleNavigateToCreateClassPage}
         >
-          Tambah
+          Add
         </Button>
 
         {/* Search Field mengambil sisa ruang */}
@@ -70,7 +70,7 @@ const TeacherClassPage = () => {
             <SearchField
               control={control}
               name="searchText"
-              placeholder="Cari berdasarkan nama..."
+              placeholder="Search by name..."
               formId="filter-class-form"
               inputClassName="!px-6 !rounded-3xl"
             />

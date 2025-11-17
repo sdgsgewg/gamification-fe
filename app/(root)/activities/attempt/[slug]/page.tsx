@@ -44,12 +44,12 @@ const AttemptActivityPage = () => {
 
   const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin kembali? Semua progres akan tetap disimpan.",
+    text: "Are you sure you want to go back? All progress will be saved.",
   });
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Apakah anda yakin ingin mengumpulkan aktivitas ini? Mohon dikoreksi kembali.",
+    text: "Are you sure you want to collect this activity? Please check again.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -201,16 +201,16 @@ const AttemptActivityPage = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Progres berhasil disimpan."
-          : "Gagal menyimpan progres.",
+          ? "Progress successfully saved."
+          : "Failed to save progress.",
         type: "back",
       });
     } catch (err) {
-      console.error("Error saat autosave sebelum kembali:", err);
+      console.error("Error during autosave before returning:", err);
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Terjadi kesalahan saat menyimpan progres.",
+        text: "An error occurred while saving progress.",
         type: "back",
       });
     } finally {
@@ -237,7 +237,7 @@ const AttemptActivityPage = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Mohon jawab semua soal untuk dapat mengumpulkan aktivitas.",
+        text: "Please answer all questions to collect activities.",
         type: "submit",
       });
       return;
@@ -314,8 +314,8 @@ const AttemptActivityPage = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Aktivitas Telah Berhasil Dikumpulkan"
-          : "Aktivitas Gagal Dikumpulkan",
+          ? "Activities have been successfully collected."
+          : "Activity Failed to be Collected.",
         type: "submit",
       });
     } catch (err) {

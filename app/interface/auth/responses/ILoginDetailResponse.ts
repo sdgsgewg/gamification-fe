@@ -3,7 +3,7 @@ import { UserDetailResponse } from "../../users/responses/IUserDetailResponse";
 
 export interface LoginDetailResponse {
   accessToken: string;
-  refreshToken?: string;
+  refreshToken: string;
   user: UserDetailResponse;
   remember: boolean;
   cookieMaxAge: number;

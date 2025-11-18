@@ -17,7 +17,7 @@ import {
 } from "../../utils/axiosHelper";
 import { LoginDetailResponse } from "../../interface/auth/responses/ILoginDetailResponse";
 import { UserDetailResponse } from "../../interface/users/responses/IUserDetailResponse";
-import { deleteCookie, setCookie } from "../../utils/cookie";
+import { deleteCookie, getCookie, setCookie } from "../../utils/cookie";
 import { useRouter } from "next/navigation";
 
 import {
@@ -182,17 +182,23 @@ export function useAuth() {
       const { isSuccess, data } = res;
 
       if (isSuccess && data) {
-        const { accessToken, user, cookieMaxAge } = data;
+        const { accessToken, refreshToken, user, cookieMaxAge } = data;
 
+        // accessToken → memory storage
         setMemToken(accessToken);
+
+        // refreshToken → FE cookie
+        setCookie("refreshToken", refreshToken, cookieMaxAge);
+
+        // role cookie (existing logic)
+        setCookie("role", user.role.name, cookieMaxAge);
+
         setItem("isLoggedIn", JSON.stringify(true));
         setItem("userProfile", JSON.stringify(user));
 
         setIsLoggedIn(true);
         setUserProfile(user);
         setIsGuest(false);
-
-        setCookie("role", user.role.name, cookieMaxAge);
 
         // notify listeners
         authEventTarget.dispatchEvent(new Event("authChanged"));
@@ -238,23 +244,27 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
+      const refreshToken = getCookie("refreshToken");
+
       clearStorage();
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);
       setIsGuest(true);
 
-      authEventTarget.dispatchEvent(new Event("authChanged"));
+      deleteCookie("refreshToken");
       deleteCookie("role");
 
-      // try server logout but don't block UI
-      try {
-        await postAxios(`${API_URL}/logout`);
-      } catch {
-        // swallow
-      }
+      authEventTarget.dispatchEvent(new Event("authChanged"));
 
-      router.push("/");
+      // Try server logout
+      try {
+        const res: BaseResponseDto = await postAxios(`${API_URL}/logout`, {
+          refreshToken,
+        });
+        const { isSuccess } = res;
+        if (isSuccess) router.push("/");
+      } catch {}
     } catch (error) {
       return handleAxiosError<null>(error);
     }

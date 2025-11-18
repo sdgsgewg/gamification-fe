@@ -132,10 +132,6 @@ const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
 
   const { data: userStats } = useUserStats();
 
-  if (!userStats) return;
-
-  const { level, currXp, nextLvlMinXp } = userStats;
-
   const handleLogout = () => {
     const asyncLogout = async () => {
       await logout();
@@ -213,10 +209,10 @@ const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
             {role === Role.STUDENT && (
               <div className="flex items-center gap-1">
                 <span className="bg-tertiary text-[0.625rem] rounded-lg px-3">
-                  {level}
+                  {userStats?.level ?? 0}
                 </span>
                 <p className="text-[0.625rem]">
-                  {currXp}/{nextLvlMinXp}
+                  {userStats?.currXp ?? 0}/{userStats?.nextLvlMinXp ?? 0}
                 </p>
               </div>
             )}

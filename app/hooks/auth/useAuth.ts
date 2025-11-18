@@ -245,6 +245,7 @@ export function useAuth() {
   const logout = async () => {
     try {
       const refreshToken = getCookie("refreshToken");
+      clearStorage();
 
       // Server logout dulu (token masih ada)
       try {
@@ -256,9 +257,6 @@ export function useAuth() {
       }
 
       // Baru hapus local session
-      clearStorage();
-      setItem("isLoggedIn", JSON.stringify(false));
-      setItem("userProfile", JSON.stringify(null));
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);

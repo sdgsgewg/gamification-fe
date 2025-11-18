@@ -184,6 +184,8 @@ export function useAuth() {
       if (isSuccess && data) {
         const { accessToken, refreshToken, user, cookieMaxAge } = data;
 
+        console.log("Login data:", JSON.stringify(data));
+
         // accessToken → memory storage
         setMemToken(accessToken);
 
@@ -242,9 +244,11 @@ export function useAuth() {
     }
   };
 
-  const logout = useCallback(async () => {
+  const logout = async () => {
     try {
       const refreshToken = getCookie("refreshToken");
+
+      console.log("Logging out, refreshToken:", refreshToken);
 
       clearStorage();
       setMemToken(null);
@@ -268,7 +272,7 @@ export function useAuth() {
     } catch (error) {
       return handleAxiosError<null>(error);
     }
-  }, [router]);
+  };
 
   const setFirstTimeUsed = () => {
     setItem("firstTimeUser", JSON.stringify(false));

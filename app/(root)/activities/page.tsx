@@ -23,12 +23,13 @@ import {
   ActivitySectionLabels,
 } from "@/app/enums/ActivitySectionType";
 import NotFound from "@/app/components/shared/NotFound";
+import { Role } from "@/app/enums/Role";
 
 export const dynamic = "force-dynamic";
 
 const ActivityPageContent = () => {
   const searchParams = useSearchParams();
-  const { user } = useGetCachedUser();
+  const { user, role } = useGetCachedUser();
 
   const [filters, setFilters] = useState<FilterActivityFormInputs>(
     filterActivityDefaultValues
@@ -149,7 +150,7 @@ const ActivityPageContent = () => {
         {/* Tampilan awal (default categories) */}
         {isDefault && (
           <div className="flex flex-col gap-8 sm:gap-12 xl:gap-16 flex-1">
-            {user && (
+            {user && role === Role.STUDENT && (
               <>
                 <ActivitySection
                   title={ActivitySectionLabels.continue}

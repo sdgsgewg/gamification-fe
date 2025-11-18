@@ -184,8 +184,6 @@ export function useAuth() {
       if (isSuccess && data) {
         const { accessToken, refreshToken, user, cookieMaxAge } = data;
 
-        console.log("Login data:", JSON.stringify(data));
-
         // accessToken → memory storage
         setMemToken(accessToken);
 
@@ -250,16 +248,17 @@ export function useAuth() {
 
       // Server logout dulu (token masih ada)
       try {
-        const res: BaseResponseDto = await postAxios(`${API_URL}/logout`, {
+        await postAxios(`${API_URL}/logout`, {
           refreshToken,
         });
-        console.log("Server logout:", res);
       } catch (err) {
         console.warn("Server logout failed:", err);
       }
 
       // Baru hapus local session
       clearStorage();
+      setItem("isLoggedIn", JSON.stringify(false));
+      setItem("userProfile", JSON.stringify(null));
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);

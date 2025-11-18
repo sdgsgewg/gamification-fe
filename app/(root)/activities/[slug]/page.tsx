@@ -29,11 +29,12 @@ import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-p
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 import NotFound from "@/app/components/shared/NotFound";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { Role } from "@/app/enums/Role";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const { user } = useGetCachedUser();
+  const { user, role } = useGetCachedUser();
 
   const { data: activityData, isLoading: isActivityDataLoading } =
     useActivityDetail(params.slug);
@@ -82,7 +83,8 @@ const ActivityDetailPage = () => {
       buttonLabel = "Start";
     }
 
-    const shouldShowButton = buttonLabel !== null && user !== undefined;
+    const shouldShowButton =
+      buttonLabel !== null && user !== undefined && role === Role.STUDENT;
 
     return (
       <>

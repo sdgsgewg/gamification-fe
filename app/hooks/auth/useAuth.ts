@@ -248,8 +248,17 @@ export function useAuth() {
     try {
       const refreshToken = getCookie("refreshToken");
 
-      console.log("Logging out, refreshToken:", refreshToken);
+      // Server logout dulu (token masih ada)
+      try {
+        const res: BaseResponseDto = await postAxios(`${API_URL}/logout`, {
+          refreshToken,
+        });
+        console.log("Server logout:", res);
+      } catch (err) {
+        console.warn("Server logout failed:", err);
+      }
 
+      // Baru hapus local session
       clearStorage();
       setMemToken(null);
       setIsLoggedIn(false);
@@ -260,15 +269,7 @@ export function useAuth() {
       deleteCookie("role");
 
       authEventTarget.dispatchEvent(new Event("authChanged"));
-
-      // Try server logout
-      try {
-        const res: BaseResponseDto = await postAxios(`${API_URL}/logout`, {
-          refreshToken,
-        });
-        const { isSuccess } = res;
-        if (isSuccess) router.push("/");
-      } catch {}
+      router.push("/");
     } catch (error) {
       return handleAxiosError<null>(error);
     }

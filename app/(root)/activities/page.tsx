@@ -40,14 +40,14 @@ const ActivityPageContent = () => {
     isLoading: isContinueActivitiesLoading,
   } = useActivities({
     section: ActivitySectionType.CONTINUE,
-    userId: user?.userId,
+    userId: user ? user.userId : undefined,
   });
   const {
     data: recommendedActivities = [],
     isLoading: isRecommendedActivitiesLoading,
   } = useActivities({
     section: ActivitySectionType.RECOMMENDED,
-    userId: user?.userId,
+    userId: user ? user.userId : undefined,
   });
   const { data: topActivities = [], isLoading: isTopActivitiesLoading } =
     useActivities({
@@ -149,17 +149,21 @@ const ActivityPageContent = () => {
         {/* Tampilan awal (default categories) */}
         {isDefault && (
           <div className="flex flex-col gap-8 sm:gap-12 xl:gap-16 flex-1">
-            <ActivitySection
-              title={ActivitySectionLabels.continue}
-              type={ActivitySectionType.CONTINUE}
-              activities={continueActivities}
-              showAnsweredCount
-            />
-            <ActivitySection
-              title={ActivitySectionLabels.recommended}
-              type={ActivitySectionType.RECOMMENDED}
-              activities={recommendedActivities}
-            />
+            {user && (
+              <>
+                <ActivitySection
+                  title={ActivitySectionLabels.continue}
+                  type={ActivitySectionType.CONTINUE}
+                  activities={continueActivities}
+                  showAnsweredCount
+                />
+                <ActivitySection
+                  title={ActivitySectionLabels.recommended}
+                  type={ActivitySectionType.RECOMMENDED}
+                  activities={recommendedActivities}
+                />
+              </>
+            )}
             <ActivitySection
               title={ActivitySectionLabels.top}
               type={ActivitySectionType.TOP}

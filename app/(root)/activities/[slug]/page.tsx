@@ -28,10 +28,12 @@ import {
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
 import NotFound from "@/app/components/shared/NotFound";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
+  const { user } = useGetCachedUser();
 
   const { data: activityData, isLoading: isActivityDataLoading } =
     useActivityDetail(params.slug);
@@ -72,7 +74,7 @@ const ActivityDetailPage = () => {
       buttonLabel = "Lanjutkan";
     } else if (recentAttempt) {
       if (type.isRepeatable) {
-        buttonLabel = "Kerja Ulang";
+        buttonLabel = "Repeat";
       } else {
         buttonLabel = null; // Tidak render tombol
       }
@@ -80,7 +82,7 @@ const ActivityDetailPage = () => {
       buttonLabel = "Start";
     }
 
-    const shouldShowButton = buttonLabel !== null;
+    const shouldShowButton = buttonLabel !== null && user !== undefined;
 
     return (
       <>
@@ -119,15 +121,9 @@ const ActivityDetailPage = () => {
   };
 
   const RightSideContent = () => {
-    const {
-      subject,
-      material,
-      type,
-      questionCount,
-      difficulty,
-      grade,
-    } = activityData;
-    
+    const { subject, material, type, questionCount, difficulty, grade } =
+      activityData;
+
     return (
       <>
         {/* Informasi Detail */}
@@ -153,7 +149,7 @@ const ActivityDetailPage = () => {
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
       { key: "similar-activities" as const, label: "Similar" },
       { key: "duration" as const, label: "Duration" },
-      { key: "progress" as const, label: "Progres" },
+      ...(user ? [{ key: "progress" as const, label: "Progres" }] : []),
     ];
 
     const handleChangeTab = (key: TaskDetailBottomContentView) => {

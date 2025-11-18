@@ -1,7 +1,8 @@
+import { LeaderboardResponse } from "@/app/interface/leaderboards/responses/ILeaderboardResponse";
 import React from "react";
 
 interface LeaderboardSectionProps {
-  data: { id: number; name: string; point: number }[];
+  data: LeaderboardResponse[];
 }
 
 const LeaderboardSection = ({ data }: LeaderboardSectionProps) => {
@@ -20,7 +21,9 @@ const LeaderboardSection = ({ data }: LeaderboardSectionProps) => {
               </span>
               <span className="font-medium text-tx-primary">{user.name}</span>
             </div>
-            <span className="text-sm text-tx-tertiary">{user.point} XP</span>
+            <span className="text-sm text-tx-tertiary">
+              {user.point} Points
+            </span>
           </li>
         ))}
       </ul>

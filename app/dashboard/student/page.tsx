@@ -9,6 +9,7 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
 import { useTasksFromAllClasses } from "@/app/hooks/class-tasks/useTasksFromAllClasses";
+import { useStudentLeaderboard } from "@/app/hooks/leaderboards/useStudentLeaderboard";
 
 import React from "react";
 
@@ -20,14 +21,12 @@ export default function DashboardPage() {
     status: TaskAttemptStatus.NOT_STARTED,
     isClassTask: true,
   });
+  const {
+    data: studentLeaderboard = [],
+    isLoading: isStudentLeaderboardLoading,
+  } = useStudentLeaderboard();
   const { data: activityLogData = [], isLoading: isActivityLogLoading } =
     useUserActivityLogs();
-
-  const leaderboard = [
-    { id: 1, name: "Sarah L.", point: 1200 },
-    { id: 2, name: "Rizky A.", point: 1150 },
-    { id: 3, name: "Kevin T.", point: 1120 },
-  ];
 
   return (
     <>
@@ -81,7 +80,7 @@ export default function DashboardPage() {
         </div>
 
         {/* === Leaderboard === */}
-        <LeaderboardSection data={leaderboard} />
+        <LeaderboardSection data={studentLeaderboard} />
       </div>
 
       <RecentActivitiesSection

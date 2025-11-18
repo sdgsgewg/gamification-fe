@@ -10,9 +10,6 @@ export const useActivities = (values?: FilterActivityFormInputs) => {
     queryKey: ["activities", values],
     queryFn: async () => {
       const res = await activityProvider.getActivities(values);
-
-      console.log("Activities: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: ActivityOverviewResponse[]) =>

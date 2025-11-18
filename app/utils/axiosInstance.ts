@@ -1,35 +1,66 @@
-import axios from "axios";
-import { getAccessToken, logoutSilently, refreshAccessToken } from "../hooks/auth/useAuthStore";
+// axiosInstance.ts
+import axios, { AxiosRequestConfig, AxiosError } from "axios";
+import {
+  getAccessToken,
+  refreshAccessToken,
+  logoutSilently,
+} from "../hooks/auth/useAuthStore";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
-  withCredentials: true, // penting: kirim cookie refresh token
+  withCredentials: true, // send refresh cookie
 });
 
-// Inject access token (in-memory)
-api.interceptors.request.use((config) => {
-  const token = getAccessToken(); // MENGAMBIL DARI MEMORY, BUKAN localStorage
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// Request interceptor to inject Authorization header
+api.interceptors.request.use(
+  (config: AxiosRequestConfig) => {
+    try {
+      const token = getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      // ignore
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Auto refresh on 401
+// Response interceptor with single-refresh queue logic
 api.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+  (response) => response,
+  async (
+    error: AxiosError & { config?: AxiosRequestConfig & { _retry?: boolean } }
+  ) => {
     const original = error.config;
 
-    // Kalau token expired → refresh
-    if (error.response?.status === 401 && !original._retry) {
+    // if no config or not our API call, just reject
+    if (!original) return Promise.reject(error);
+
+    const status = error.response?.status;
+
+    // Only attempt refresh for 401
+    if (status === 401 && !original._retry) {
       original._retry = true;
 
       try {
-        const newToken = await refreshAccessToken(); // auto refresh via backend
+        // refreshAccessToken uses queue to avoid concurrent refresh
+        const newToken = await refreshAccessToken();
+
         if (newToken) {
+          // set header and retry
+          if (!original.headers) original.headers = {};
           original.headers.Authorization = `Bearer ${newToken}`;
-          return api(original); // ulang request
+
+          // note: return api(original) directly to retry request
+          return api(original);
+        } else {
+          // refresh failed — perform silent logout cleanup
+          logoutSilently();
         }
-      } catch {
+      } catch (refreshErr) {
+        // On refresh error, ensure logout cleanup
         logoutSilently();
       }
     }

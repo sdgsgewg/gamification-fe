@@ -9,9 +9,6 @@ export const useUserMasterHistories = () => {
     queryKey: ["user-master-histories"],
     queryFn: async () => {
       const res = await masterHistoryProvider.getUserMasterHistories();
-
-      console.log("Master history data: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: MasterHistoryOverviewResponse[]) =>

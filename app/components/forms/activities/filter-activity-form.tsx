@@ -169,7 +169,7 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
             <SearchField
               control={control}
               name="searchText"
-              placeholder="Cari aktivitas..."
+              placeholder="Search activities..."
               formId="filter-activity-form"
             />
           </div>

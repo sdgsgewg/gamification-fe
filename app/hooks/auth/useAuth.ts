@@ -1,9 +1,10 @@
+// useAuth.ts
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AxiosError } from "axios";
 import { getItem, setItem, clearStorage } from "../../utils/storage";
-import { getAxios, postAxios } from "../../utils/AxiosFunction";
+import { postAxios, getAxios } from "../../utils/AxiosFunction";
 import { RegisterRequest } from "../../schemas/auth/register";
 import { CompleteProfileFormInputs } from "../../schemas/auth/completeProfile";
 import { LoginFormInputs } from "../../schemas/auth/login";
@@ -23,6 +24,8 @@ import {
   setAccessToken as setMemToken,
   registerRefreshHandler,
   registerLogoutHandler,
+  refreshAccessToken,
+  logoutSilently,
 } from "./useAuthStore";
 
 const API_URL = "/auth";
@@ -39,37 +42,30 @@ export function useAuth() {
   const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
+  const hasInitRef = useRef(false);
 
-  // =====================================================
-  // Fetch user profile
-  // =====================================================
+  // fetch profile (kept simple)
   const fetchUserProfile = useCallback(async () => {
-    try {
-      const res = await getAxios("/users/me");
-
-      setUserProfile(res);
-      setItem("userProfile", JSON.stringify(res));
-      return res;
-    } catch (err) {
-      throw err;
-    }
+    const res = await getAxios("/users/me");
+    setUserProfile(res);
+    setItem("userProfile", JSON.stringify(res));
+    return res;
   }, []);
 
-  // =====================================================
-  // Refresh token handler (REGISTERED to axiosInstance)
-  // =====================================================
+  // Register refresh handler so axiosInstance can call it
   useEffect(() => {
     registerRefreshHandler(async () => {
       try {
         const res = await postAxios(`${API_URL}/refresh`);
+        // expected shape: { accessToken: '...' }
         if (res?.accessToken) {
           setMemToken(res.accessToken);
           return res.accessToken;
         }
-      } catch {
+        return null;
+      } catch (e) {
         return null;
       }
-      return null;
     });
 
     registerLogoutHandler(() => {
@@ -81,24 +77,29 @@ export function useAuth() {
     });
   }, []);
 
-  // =====================================================
-  // Init session on mount
-  // =====================================================
+  // init session — guarded so it runs once per hook instance
   const init = useCallback(async () => {
+    if (hasInitRef.current) return;
+    hasInitRef.current = true;
+
     const loggedIn = getItem("isLoggedIn");
-    const storedUser = getItem("userProfile");
     const firstTime = getItem("firstTimeUser");
 
-    if (firstTime) setIsFirstTime(JSON.parse(firstTime));
+    if (firstTime) {
+      try {
+        setIsFirstTime(JSON.parse(firstTime));
+      } catch {
+        setIsFirstTime(true);
+      }
+    }
 
-    // Not logged in? done
     if (!loggedIn) {
       setLoading(false);
       return;
     }
 
     try {
-      // Try to fetch user profile (401 will trigger auto-refresh)
+      // Fetch profile — getAxios will attempt refresh via interceptor on 401
       const profile = await fetchUserProfile();
 
       setIsLoggedIn(true);
@@ -114,18 +115,20 @@ export function useAuth() {
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, [fetchUserProfile]);
 
+  // run init once client-side
   useEffect(() => {
-    init();
+    // ensure only runs client-side
+    if (typeof window !== "undefined") {
+      init();
+    }
   }, [init]);
 
-  // =====================================================
-  // Register
-  // =====================================================
+  // Auth actions (register, login, logout, etc.)
   const register = async (
     payload: RegisterRequest
   ): Promise<ApiResponse<null>> => {
@@ -140,9 +143,6 @@ export function useAuth() {
     }
   };
 
-  // =====================================================
-  // Verify Email
-  // =====================================================
   const verifyEmail = async (token: string): Promise<ApiResponse<string>> => {
     try {
       const res: DetailResponseDto<string> = await postAxios(
@@ -155,9 +155,6 @@ export function useAuth() {
     }
   };
 
-  // =====================================================
-  // Complete Profile
-  // =====================================================
   const completeProfile = async (
     uid: string,
     values: CompleteProfileFormInputs
@@ -173,9 +170,6 @@ export function useAuth() {
     }
   };
 
-  // =====================================================
-  // Login
-  // =====================================================
   const login = async (
     values: LoginFormInputs
   ): Promise<ApiResponse<LoginDetailResponse>> => {
@@ -189,32 +183,27 @@ export function useAuth() {
 
       if (isSuccess && data) {
         const { accessToken, user, cookieMaxAge } = data;
-  
-        // save token in-memory
+
         setMemToken(accessToken);
-  
-        // store session flags
         setItem("isLoggedIn", JSON.stringify(true));
         setItem("userProfile", JSON.stringify(user));
-  
-        // update state
+
         setIsLoggedIn(true);
         setUserProfile(user);
         setIsGuest(false);
-  
-        // role cookie (optional)
+
         setCookie("role", user.role.name, cookieMaxAge);
+
+        // notify listeners
+        authEventTarget.dispatchEvent(new Event("authChanged"));
       }
-      
+
       return res;
     } catch (error) {
       return handleAxiosError<LoginDetailResponse>(error);
     }
   };
 
-  // =====================================================
-  // Forgot Password
-  // =====================================================
   const forgotPassword = async (
     values: ForgotPasswordInputs
   ): Promise<ApiResponse<null>> => {
@@ -229,9 +218,6 @@ export function useAuth() {
     }
   };
 
-  // =====================================================
-  // Reset Password
-  // =====================================================
   const resetPassword = async (
     token: string,
     password: string
@@ -239,7 +225,10 @@ export function useAuth() {
     try {
       const res: BaseResponseDto = await postAxios(
         `${API_URL}/reset-password`,
-        { token, password }
+        {
+          token,
+          password,
+        }
       );
       return res;
     } catch (error) {
@@ -247,23 +236,23 @@ export function useAuth() {
     }
   };
 
-  // =====================================================
-  // Logout
-  // =====================================================
   const logout = useCallback(async () => {
     try {
       clearStorage();
       setMemToken(null);
-
       setIsLoggedIn(false);
       setUserProfile(null);
       setIsGuest(true);
 
       authEventTarget.dispatchEvent(new Event("authChanged"));
-
       deleteCookie("role");
 
-      await postAxios(`${API_URL}/logout`);
+      // try server logout but don't block UI
+      try {
+        await postAxios(`${API_URL}/logout`);
+      } catch {
+        // swallow
+      }
 
       router.push("/");
     } catch (error) {
@@ -271,17 +260,11 @@ export function useAuth() {
     }
   }, [router]);
 
-  // =====================================================
-  // First Time User
-  // =====================================================
   const setFirstTimeUsed = () => {
     setItem("firstTimeUser", JSON.stringify(false));
     setIsFirstTime(false);
   };
 
-  // =====================================================
-  // Get Cached Profile
-  // =====================================================
   const getCachedUserProfile = useCallback((): UserDetailResponse | null => {
     if (userProfile) return userProfile;
 

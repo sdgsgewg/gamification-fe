@@ -60,7 +60,6 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
     url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
     roles: [Role.TEACHER],
   },
-  { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
   {
     menu: "Content Management",
     url: "#",

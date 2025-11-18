@@ -56,7 +56,6 @@ const TeacherTaskPage = () => {
 
   const [filters, setFilters] = useState<FilterTaskFormInputs>({
     searchText: debouncedSearch,
-    creatorId: user?.userId,
   });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 

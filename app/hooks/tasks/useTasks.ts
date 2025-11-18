@@ -10,9 +10,6 @@ export const useTasks = (values?: FilterTaskFormInputs) => {
     queryKey: ["tasks", values],
     queryFn: async () => {
       const res = await taskProvider.getTasks(values);
-
-      console.log("Fetched tasks:", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: TaskOverviewResponse[]) =>

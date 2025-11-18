@@ -153,7 +153,7 @@ const EditTaskPage = () => {
         }
       });
 
-      const result = await taskProvider.updateTask(taskData.taskId, formData);
+      const result = await taskProvider.updateTask(taskData.id, formData);
 
       const { isSuccess, message } = result;
 
@@ -265,6 +265,7 @@ const EditTaskPage = () => {
   useEffect(() => {
     if (!taskData) return;
 
+    const { duration } = taskData;
     const {
       title,
       description,
@@ -273,9 +274,8 @@ const EditTaskPage = () => {
       taskType,
       taskGradeIds,
       difficulty,
-      duration,
       image,
-    } = taskData;
+    } = taskData.taskDetail;
     const { updatedBy } = taskData.history;
 
     const defaultTaskOverview = {

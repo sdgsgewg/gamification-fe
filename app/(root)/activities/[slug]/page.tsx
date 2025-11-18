@@ -126,34 +126,8 @@ const ActivityDetailPage = () => {
       questionCount,
       difficulty,
       grade,
-      currAttempt,
-      recentAttempt,
-      duration,
     } = activityData;
-
-    // duration
-    const startTime = duration?.startTime ?? null;
-    const endTime = duration?.endTime ?? null;
-    const activityDuration = duration?.duration ?? undefined;
-
-    // progress
-    const startedAt = currAttempt
-      ? currAttempt.startedAt
-      : recentAttempt
-      ? recentAttempt.startedAt
-      : null;
-    const lastAccessedAt = currAttempt
-      ? currAttempt.lastAccessedAt
-      : recentAttempt
-      ? recentAttempt.lastAccessedAt
-      : null;
-    const completedAt = recentAttempt ? recentAttempt.completedAt : null;
-    const statusLabel = currAttempt
-      ? TaskAttemptStatusLabels[currAttempt.status as TaskAttemptStatus]
-      : recentAttempt
-      ? TaskAttemptStatusLabels[recentAttempt.status as TaskAttemptStatus]
-      : "";
-
+    
     return (
       <>
         {/* Informasi Detail */}
@@ -165,25 +139,6 @@ const ActivityDetailPage = () => {
           difficulty={difficulty}
           grade={grade}
         />
-
-        {/* Waktu Pengerjaan */}
-        {(startTime || endTime || activityDuration) && (
-          <DurationTable
-            startTime={getDateTime(startTime ?? null)}
-            endTime={getDateTime(endTime ?? null)}
-            duration={activityDuration}
-          />
-        )}
-
-        {/* Progres Pengerjaan */}
-        {(currAttempt || recentAttempt) && (
-          <ProgressTable
-            startedAt={startedAt}
-            lastAccessedAt={lastAccessedAt}
-            completedAt={completedAt}
-            status={statusLabel}
-          />
-        )}
       </>
     );
   };

@@ -1,4 +1,4 @@
-export interface ClassLeaderboardResponseDto {
+export interface LeaderboardResponse {
   id: string;
   name: string;
   image?: string;

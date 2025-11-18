@@ -1,9 +1,6 @@
 import React from "react";
-import Image from "next/image";
-import { IMAGES } from "@/app/constants/images";
 import {
   faBook,
-  faCalendar,
   faCalendarAlt,
   faCheckCircle,
   faFileAlt,

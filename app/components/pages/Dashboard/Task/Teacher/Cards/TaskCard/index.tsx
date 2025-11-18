@@ -15,16 +15,12 @@ import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverv
 
 interface TaskCardProps {
   task: TaskOverviewResponse;
-  onShare: () => void;
-  onDelete?: (taskId: string, title: string) => void;
   onEdit: (slug: string) => void;
   onView: (slug: string) => void;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
-  onShare,
-  onDelete,
   onEdit,
   onView,
 }) => {
@@ -39,23 +35,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
           {/* <small className="text-tx-muted italic">
             * You can only delete task that has not been shared
           </small> */}
-        </div>
-
-        {/* Manage Task Action Buttons */}
-        <div className="flex gap-2">
-          <Button variant="primary" className="!p-3" onClick={onShare}>
-            <FontAwesomeIcon icon={faShareNodes} size="1x" />
-          </Button>
-
-          {task.assignedClassCount === 0 && onDelete && (
-            <Button
-              variant="danger"
-              className="!p-3"
-              onClick={() => onDelete(task.taskId, task.title)}
-            >
-              <FontAwesomeIcon icon={faTrashAlt} />
-            </Button>
-          )}
         </div>
       </div>
 

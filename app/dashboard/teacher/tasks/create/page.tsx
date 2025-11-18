@@ -18,7 +18,6 @@ import {
 import { CreateTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/createTaskQuestion";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ViewState } from "@/app/types/task";
-import { ROUTES } from "@/app/constants/routes";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
@@ -26,7 +25,6 @@ import { useGrades } from "@/app/hooks/grades/useGrades";
 
 const CreateTaskPage = () => {
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
 
   const { data: subjectData = [] } = useSubjects();
   const { data: materialData = [] } = useMaterials();
@@ -134,18 +132,13 @@ const CreateTaskPage = () => {
         }
       });
 
-      // Kalau mau lihat isi FormData:
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
       const result = await taskProvider.createTask(formData);
 
       const { isSuccess, message } = result;
 
       if (isSuccess) {
         toast.success(message ?? "Task created successfully.");
-        router.push(`${baseRoute}`);
+        router.back();
       } else {
         toast.error(result.message || "Failed to create the task.");
       }

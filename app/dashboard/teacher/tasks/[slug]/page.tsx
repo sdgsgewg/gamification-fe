@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster, useToast } from "@/app/hooks/use-toast";
@@ -26,6 +26,13 @@ import { usePublishTask } from "@/app/hooks/tasks/usePublishTask";
 import { useUnpublishTask } from "@/app/hooks/tasks/useUnpublishTask";
 import { useFinalizeTask } from "@/app/hooks/tasks/useFinalizeTask";
 import { ConfirmationModalState } from "@/app/interface/modals/IConfirmationModalState";
+import { TaskStatusLabels } from "@/app/enums/TaskStatus";
+import NotFound from "@/app/components/shared/NotFound";
+import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
+import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
+import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
+import { ShareTaskFormInputs } from "@/app/schemas/class-tasks/shareTask";
+import { FormRef } from "@/app/interface/forms/IFormRef";
 
 const TeacherTaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -33,16 +40,21 @@ const TeacherTaskDetailPage = () => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
 
-  const { data: taskData, isLoading: isTaskDataLoading } = useTaskDetail(
-    params.slug,
-    "detail"
-  );
+  const {
+    data: taskData,
+    isLoading: isTaskDataLoading,
+    refetch: refetchTaskData,
+  } = useTaskDetail(params.slug, "detail");
   const { mutateAsync: deleteTask } = useDeleteTask();
   const { mutateAsync: publishTask } = usePublishTask(params.slug);
   const { mutateAsync: unpublishTask } = useUnpublishTask(params.slug);
   const { mutateAsync: finalizeTask } = useFinalizeTask(params.slug);
 
-  const [taskId, setTaskId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const formRef = useRef<FormRef>(null);
+
+  const [taskId, setTaskId] = useState<string>("");
   const [taskName, setTaskName] = useState<string | null>(null);
   const [deleteConfirmationModal, setDeleteConfirmationModal] =
     useState<ConfirmationModalState>({
@@ -64,8 +76,23 @@ const TeacherTaskDetailPage = () => {
       visible: false,
       text: "",
     });
+  const [isShareTaskModalVisible, setIsShareTaskModalVisible] = useState(false);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { data: availableClasses = [], refetch: refetchAvailableClasses } =
+    useAvailableClasses(taskId);
+
+  const handleOpenShareTaskModal = (taskId: string) => {
+    setTaskId(taskId);
+    setIsShareTaskModalVisible(true);
+    refetchAvailableClasses();
+  };
+  const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
+
+  const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
+    console.log("Share task successful with: ", values);
+    handleCloseShareTaskModal();
+    refetchTaskData();
+  };
 
   const handleEdit = (slug: string) => {
     router.push(`${baseRoute}/edit/${slug}`);
@@ -80,14 +107,14 @@ const TeacherTaskDetailPage = () => {
   const confirmDelete = () => {
     if (taskId !== null) {
       handleDelete(taskId);
-      setTaskId(null);
+      setTaskId("");
       setTaskName(null);
       setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelDelete = () => {
-    setTaskId(null);
+    setTaskId("");
     setTaskName(null);
     setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
@@ -115,14 +142,14 @@ const TeacherTaskDetailPage = () => {
   const confirmPublish = () => {
     if (taskId !== null) {
       handlePublish(taskId);
-      setTaskId(null);
+      setTaskId("");
       setTaskName(null);
       setPublishConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelPublish = () => {
-    setTaskId(null);
+    setTaskId("");
     setTaskName(null);
     setPublishConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
@@ -150,14 +177,14 @@ const TeacherTaskDetailPage = () => {
   const confirmUnpublish = () => {
     if (taskId !== null) {
       handleUnpublish(taskId);
-      setTaskId(null);
+      setTaskId("");
       setTaskName(null);
       setUnpublishConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelUnpublish = () => {
-    setTaskId(null);
+    setTaskId("");
     setTaskName(null);
     setUnpublishConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
@@ -185,14 +212,14 @@ const TeacherTaskDetailPage = () => {
   const confirmFinalize = () => {
     if (taskId !== null) {
       handleFinalize(taskId);
-      setTaskId(null);
+      setTaskId("");
       setTaskName(null);
       setFinalizeConfirmationModal((prev) => ({ ...prev, visible: false }));
     }
   };
 
   const cancelFinalize = () => {
-    setTaskId(null);
+    setTaskId("");
     setTaskName(null);
     setFinalizeConfirmationModal((prev) => ({ ...prev, visible: false }));
   };
@@ -247,7 +274,7 @@ const TeacherTaskDetailPage = () => {
           questionCount={questionCount}
           difficulty={difficulty}
           grade={taskGrade}
-          status={status}
+          status={TaskStatusLabels[status]}
         />
       </>
     );
@@ -276,7 +303,11 @@ const TeacherTaskDetailPage = () => {
 
     const SubmissionView = () => {
       if (!assignedClasses || assignedClasses.length === 0) {
-        return <p className="text-dark">No submission yet</p>;
+        return (
+          <div>
+            <NotFound text="No submission yet" />
+          </div>
+        );
       }
 
       return (
@@ -359,11 +390,15 @@ const TeacherTaskDetailPage = () => {
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}
+        task={taskData}
         onEdit={() => {
           if (taskData) handleEdit(slug);
         }}
         onDelete={() => {
           if (taskData) showDeleteModal(taskData.id, title);
+        }}
+        onShare={() => {
+          if (taskData) handleOpenShareTaskModal(taskData.id);
         }}
         onPublish={() => {
           if (taskData) showPublishModal(taskData.id, title);
@@ -383,6 +418,24 @@ const TeacherTaskDetailPage = () => {
           bottom={<BottomContent />}
         />
       )}
+
+      {/* Share Task Modal */}
+      <ShareTaskModal
+        visible={isShareTaskModalVisible}
+        title="Share Task"
+        formId="share-task-form"
+        onCancel={handleCloseShareTaskModal}
+        onResetFilters={() => {
+          if (formRef.current?.resetForm) formRef.current?.resetForm();
+        }}
+      >
+        <ShareTaskForm
+          ref={formRef}
+          taskId={taskId}
+          classData={availableClasses}
+          onFinish={handleShareTaskIntoClasses}
+        />
+      </ShareTaskModal>
 
       <ConfirmationModal
         visible={deleteConfirmationModal.visible}

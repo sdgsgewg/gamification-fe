@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTasks } from "@/app/hooks/tasks/useTasks";
 import { ROUTES } from "@/app/constants/routes";
@@ -11,8 +11,6 @@ import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
 import { useGrades } from "@/app/hooks/grades/useGrades";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
-import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FilterModal } from "@/app/components/modals/FilterModal";
 import FilterTaskForm from "@/app/components/forms/tasks/filter-task-form";
 import { Form } from "antd";
@@ -22,19 +20,15 @@ import { Toaster } from "react-hot-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import Button from "@/app/components/shared/Button";
 import { FilterOutlined } from "@ant-design/icons";
-import { useToast } from "@/app/hooks/use-toast";
 import {
   TaskCard,
+  TaskCardSkeleton,
   TaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Task/Teacher/Cards";
-import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
-import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
-import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
-import { ShareTaskFormInputs } from "@/app/schemas/class-tasks/shareTask";
-import Loading from "@/app/components/shared/Loading";
+import NotFound from "@/app/components/shared/NotFound";
+import PaginationInfo from "@/app/components/shared/PaginationInfo";
 
 const TeacherTaskPage = () => {
-  const { toast } = useToast();
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
 
@@ -46,6 +40,7 @@ const TeacherTaskPage = () => {
   const searchValue = watch("searchText");
 
   const [debouncedSearch, setDebouncedSearch] = useState(searchValue);
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchValue);
@@ -58,25 +53,6 @@ const TeacherTaskPage = () => {
     searchText: debouncedSearch,
   });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-
-  const [selectedTaskId, setSelectedTaskId] = useState<string>("");
-  const [isShareTaskModalVisible, setIsShareTaskModalVisible] = useState(false);
-
-  const { data: availableClasses = [], refetch: refetchAvailableClasses } =
-    useAvailableClasses(selectedTaskId);
-
-  const handleOpenShareTaskModal = (taskId: string) => {
-    setSelectedTaskId(taskId);
-    setIsShareTaskModalVisible(true);
-    refetchAvailableClasses();
-  };
-  const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
-
-  const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
-    console.log("Share task successful with: ", values);
-    handleCloseShareTaskModal();
-    refetchTasks();
-  };
 
   // Update filters when user is found
   useEffect(() => {
@@ -100,29 +76,27 @@ const TeacherTaskPage = () => {
     isLoading: isTaskLoading,
     refetch: refetchTasks,
   } = useTasks(filters);
-  const { mutateAsync: deleteTask } = useDeleteTask();
   const { data: subjectData = [] } = useSubjects();
   const { data: materialData = [] } = useMaterials();
   const { data: taskTypeData = [] } = useTaskTypes();
   const { data: gradeData = [] } = useGrades();
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 5,
   });
 
+  // Compute paginated data
+  const paginatedTasks = useMemo(() => {
+    const startIdx = (pagination.current - 1) * pagination.pageSize;
+    const endIdx = pagination.current * pagination.pageSize;
+    return tasks.slice(startIdx, endIdx);
+  }, [tasks, pagination]);
+
   // Automatically refetch every time filters updated
   useEffect(() => {
     refetchTasks();
   }, [filters]);
-
-  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
-  const [deleteTaskTitle, setDeleteTaskTitle] = useState<string | null>(null);
-  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState({
-    visible: false,
-    text: "",
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formRef = useRef<FormRef>(null);
 
@@ -149,43 +123,8 @@ const TeacherTaskPage = () => {
     router.push(`${baseRoute}/edit/${slug}`);
   };
 
-  const handleOpenDeleteConfirmation = (taskId: string, title: string) => {
-    setDeleteTaskId(taskId);
-    setDeleteTaskTitle(title);
-    setDeleteConfirmationModal((prev) => ({ ...prev, visible: true }));
-  };
-
-  const confirmDeleteTask = () => {
-    if (deleteTaskId !== null) {
-      handleDelete(deleteTaskId);
-      setDeleteTaskId(null);
-      setDeleteTaskTitle(null);
-      setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
-    }
-  };
-
-  const cancelDelete = () => {
-    setDeleteTaskId(null);
-    setDeleteConfirmationModal((prev) => ({ ...prev, visible: false }));
-  };
-
-  const handleDelete = async (id: string) => {
-    setIsLoading(true);
-    const res = await deleteTask(id);
-    const { isSuccess, message } = res;
-    if (isSuccess) {
-      toast.success(message ?? "Task deleted successfully");
-      refetchTasks();
-    } else {
-      toast.error(message || "Failed to delete task");
-    }
-    setIsLoading(false);
-  };
-
   return (
     <>
-      {(isLoading || isTaskLoading) && <Loading />}
-
       {/* Header */}
       <Toaster position="top-right" />
       <DashboardTitle
@@ -220,18 +159,39 @@ const TeacherTaskPage = () => {
       </div>
 
       {/* Content */}
-      <TaskCardWrapper>
-        {tasks.map((task, i) => (
-          <TaskCard
-            key={i}
-            task={task}
-            onShare={() => handleOpenShareTaskModal(task.taskId)}
-            onDelete={handleOpenDeleteConfirmation}
-            onEdit={handleNavigateToEditTaskPage}
-            onView={handleNavigateToViewTaskPage}
+
+      {isTaskLoading ? (
+        <TaskCardWrapper>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <TaskCardSkeleton key={idx} />
+          ))}
+        </TaskCardWrapper>
+      ) : tasks.length > 0 ? (
+        <>
+          <TaskCardWrapper>
+            {paginatedTasks.map((task, i) => (
+              <TaskCard
+                key={i}
+                task={task}
+                onEdit={handleNavigateToEditTaskPage}
+                onView={handleNavigateToViewTaskPage}
+              />
+            ))}
+          </TaskCardWrapper>
+
+          {/* Pagination + Display */}
+          <PaginationInfo
+            total={tasks.length}
+            pagination={pagination}
+            label="tasks"
+            onChange={(page, pageSize) =>
+              setPagination({ current: page, pageSize })
+            }
           />
-        ))}
-      </TaskCardWrapper>
+        </>
+      ) : (
+        <NotFound text="Task Not Found" />
+      )}
 
       {/* Floating Add Button */}
       <button
@@ -261,33 +221,6 @@ const TeacherTaskPage = () => {
           onFinish={handleApplyFilter}
         />
       </FilterModal>
-
-      {/* Share Task Modal */}
-      <ShareTaskModal
-        visible={isShareTaskModalVisible}
-        title="Share Task"
-        formId="share-task-form"
-        onCancel={handleCloseShareTaskModal}
-        onResetFilters={() => {
-          if (formRef.current?.resetForm) formRef.current?.resetForm();
-        }}
-      >
-        <ShareTaskForm
-          ref={formRef}
-          taskId={selectedTaskId}
-          classData={availableClasses}
-          onFinish={handleShareTaskIntoClasses}
-        />
-      </ShareTaskModal>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmationModal
-        visible={deleteConfirmationModal.visible}
-        text={`Are you sure you want to delete the task titled '${deleteTaskTitle}'?`}
-        type="delete"
-        onConfirm={confirmDeleteTask}
-        onCancel={cancelDelete}
-      />
     </>
   );
 };

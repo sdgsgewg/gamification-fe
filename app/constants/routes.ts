@@ -27,6 +27,7 @@ export const ROUTES = {
   // 🎓 Dashboard
   DASHBOARD: {
     BASE: "/dashboard",
+    LEADERBOARD: "/dashboard/leaderboard",
 
     // 👩‍🎓 Student
     STUDENT: {
@@ -37,7 +38,6 @@ export const ROUTES = {
       TASKS_VIEW: "/dashboard/student/tasks/view",
       TASKS_ATTEMPT: "/dashboard/student/tasks/attempt",
       TASKS_SUMMARY: "/dashboard/student/tasks/summary",
-      LEADERBOARD: "/dashboard/student/leaderboard",
     },
 
     // 👨‍🏫 Teacher
@@ -47,7 +47,6 @@ export const ROUTES = {
       CLASS: "/dashboard/teacher/class",
       TASKS: "/dashboard/teacher/tasks",
       SUBMISSIONS: "/dashboard/teacher/submissions",
-      LEADERBOARD: "/dashboard/teacher/leaderboard",
     },
 
     // 🧑‍💼 Admin

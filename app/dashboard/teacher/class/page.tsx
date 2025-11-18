@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
@@ -12,8 +12,10 @@ import Button from "@/app/components/shared/Button";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import SearchField from "@/app/components/fields/SearchField";
 import { useForm } from "react-hook-form";
-import { Form } from "antd";
+import { Form, Pagination } from "antd";
 import ClassCardSkeleton from "@/app/components/pages/Dashboard/Class/Cards/ClassCard/Skeleton";
+import NotFound from "@/app/components/shared/NotFound";
+import PaginationInfo from "@/app/components/shared/PaginationInfo";
 
 const TeacherClassPage = () => {
   const router = useRouter();
@@ -34,11 +36,20 @@ const TeacherClassPage = () => {
   }, [searchValue]);
 
   const { data: classes = [], isLoading } = useUserClasses(debouncedSearch);
+
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 5,
+    pageSize: 4,
   });
 
+  // Compute paginated data
+  const paginatedClasses = useMemo(() => {
+    const startIdx = (pagination.current - 1) * pagination.pageSize;
+    const endIdx = pagination.current * pagination.pageSize;
+    return classes.slice(startIdx, endIdx);
+  }, [classes, pagination]);
+
+  // Navigation handlers
   const handleNavigateToCreateClassPage = () => {
     router.push(`${baseRoute}/create`);
   };
@@ -52,7 +63,7 @@ const TeacherClassPage = () => {
       <Toaster position="top-right" />
       <DashboardTitle title="My Class" showBackButton={false} />
 
-      {/* Add and search content */}
+      {/* Add + Search */}
       <div className="flex items-center gap-4 md:gap-12 mb-12">
         <Button
           type="primary"
@@ -64,7 +75,6 @@ const TeacherClassPage = () => {
           Add
         </Button>
 
-        {/* Search Field mengambil sisa ruang */}
         <div className="flex-1">
           <Form id="filter-class-form">
             <SearchField
@@ -78,7 +88,7 @@ const TeacherClassPage = () => {
         </div>
       </div>
 
-      {/* Class Grid */}
+      {/* Content */}
       {isLoading ? (
         <ClassCardWrapper>
           {Array.from({ length: 4 }).map((_, idx) => (
@@ -86,19 +96,31 @@ const TeacherClassPage = () => {
           ))}
         </ClassCardWrapper>
       ) : classes.length > 0 ? (
-        <ClassCardWrapper>
-          {classes.map((c) => (
-            <ClassCard
-              key={c.id}
-              image={c.image}
-              name={c.name}
-              slug={c.slug}
-              onClick={handleNavigateToClassDetailPage}
-            />
-          ))}
-        </ClassCardWrapper>
+        <>
+          <ClassCardWrapper>
+            {paginatedClasses.map((c) => (
+              <ClassCard
+                key={c.id}
+                image={c.image}
+                name={c.name}
+                slug={c.slug}
+                onClick={handleNavigateToClassDetailPage}
+              />
+            ))}
+          </ClassCardWrapper>
+
+          {/* Pagination + Display */}
+          <PaginationInfo
+            total={classes.length}
+            pagination={pagination}
+            label="classes"
+            onChange={(page, pageSize) =>
+              setPagination({ current: page, pageSize })
+            }
+          />
+        </>
       ) : (
-        <p className="text-center">Class not found.</p>
+        <NotFound text="Class Not Found" />
       )}
     </>
   );

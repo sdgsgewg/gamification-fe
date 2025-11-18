@@ -1,4 +1,11 @@
 import { TaskStatus } from "@/app/enums/TaskStatus";
+import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
+
+export interface TaskType {
+  id: string;
+  name: string;
+  scope: TaskTypeScope;
+}
 
 export interface TaskDetail {
   title: string;
@@ -7,7 +14,7 @@ export interface TaskDetail {
   image?: string;
   subject: { subjectId: string; name: string };
   material?: { materialId: string; name: string };
-  taskType: { taskTypeId: string; name: string };
+  taskType: TaskType;
   taskGradeIds: string[];
   taskGrade: string;
   questionCount: number;

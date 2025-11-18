@@ -9,24 +9,26 @@ import {
   TeacherTaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import Button from "@/app/components/shared/Button";
+import NotFound from "@/app/components/shared/NotFound";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
 import { useTeacherClassTasks } from "@/app/hooks/class-tasks/useTeacherClassTasks";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import { useClassMember } from "@/app/hooks/classes/useClassMember";
 import { useClassStudentsLeaderboard } from "@/app/hooks/leaderboards/useClassStudentsLeaderboard";
-import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { ClassDetailView, MemberRole } from "@/app/types/class-detail";
 import { faArrowLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
+import LeaderboardViewComponent, {
+  LeaderboardRow,
+} from "@/app/components/shared/leaderboard/LeaderboardView";
 
 const TeacherClassDetailPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const { role: userRole } = useGetCachedUser();
 
   const { data: classDetailData } = useClassDetail(params.slug, "detail");
 
@@ -82,7 +84,7 @@ const TeacherClassDetailPage = () => {
             ))}
           </TeacherTaskCardWrapper>
         ) : (
-          <p className="text-center">Task not found.</p>
+          <NotFound text="Task Not Found" />
         )}
       </div>
     );
@@ -154,9 +156,9 @@ const TeacherClassDetailPage = () => {
           </MemberCardWrapper>
         ) : (
           <div className="mt-8">
-            <p className="text-center">{`${
-              view === "students" ? "Students" : "Teacher"
-            } not found.`}</p>
+            <NotFound
+              text={`${view === "students" ? "Student" : "Teacher"} not found.`}
+            />
           </div>
         )}
       </div>
@@ -168,147 +170,23 @@ const TeacherClassDetailPage = () => {
       classDetailData!.id
     );
 
-    if (isLoading) {
-      return <p className="text-center py-10">Loading leaderboard...</p>;
-    }
+    // ubah data ke format LeaderboardRow jika perlu
+    const leaderboardRows: LeaderboardRow[] =
+      leaderboardData?.map((u) => ({
+        id: u.key,
+        name: u.name,
+        image: u.image,
+        point: u.point,
+      })) || [];
 
-    if (!leaderboardData || leaderboardData.length === 0) {
-      return <p className="text-center py-10">No leaderboard data found.</p>;
-    }
-
-    // Ambil podium top 3
-    const podiumTop3 = leaderboardData.slice(0, 3);
-    // Ambil sisa untuk tabel (rank 4 ke bawah)
-    const leaderboardRows = leaderboardData.slice(3);
-
-    const PodiumPosition = ({
-      place,
-      name,
-      score,
-      avatar,
-    }: {
-      place: 1 | 2 | 3;
-      name: string;
-      score: number;
-      avatar?: string;
-    }) => {
-      const medalColors: Record<1 | 2 | 3, string> = {
-        1: "#F7E08F", // gold
-        2: "#D9DDE5", // silver
-        3: "#E6C392", // bronze
-      };
-
-      return (
-        <div
-          className="relative flex flex-col items-center justify-end rounded-lg border-2 border-[var(--border-secondary)] pb-6 pt-12"
-          style={{
-            background: `linear-gradient(180deg, #ffffffaa 0%, #ffffff00 60%), ${medalColors[place]}`,
-            height: "400px",
-          }}
-        >
-          {/* Top Medal */}
-          <div className="absolute -top-5 flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--border-secondary)] bg-white/60">
-            <span
-              className="h-6 w-6 rounded-full border border-[var(--border-secondary)]"
-              style={{
-                background:
-                  "radial-gradient(circle at 30% 30%, #ffffffaa 0 35%, transparent 36%), #ffd54f",
-              }}
-            />
-          </div>
-
-          {/* Avatar */}
-          <div className="absolute top-1/4 -translate-y-1/2 transform">
-            <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-[var(--border-secondary)] bg-[var(--color-card)] shadow-md">
-              {avatar ? (
-                <Image
-                  src={avatar}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="h-full w-full bg-gray-300" />
-              )}
-            </div>
-          </div>
-
-          {/* Name & Score */}
-          <div className="mt-32 text-center">
-            <div className="font-extrabold text-[var(--text-primary)]">
-              {name}
-            </div>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--border-secondary)] bg-[var(--color-primary)] px-4 py-2 font-extrabold text-white">
-              <span
-                className="inline-block h-4 w-4 rounded-full border border-[var(--border-secondary)]"
-                style={{
-                  background:
-                    "radial-gradient(circle at 30% 30%, #ffffffaa 0 35%, transparent 36%), #ffd54f",
-                }}
-              />
-              {score}
-            </div>
-          </div>
-        </div>
-      );
-    };
+    const defaultImage = IMAGES.DEFAULT_PROFILE;
 
     return (
-      <div className="grid gap-6 pt-4 lg:grid-cols-[360px_1fr]">
-        {/* Podium */}
-        <div className="grid grid-cols-3 gap-6 items-end justify-center">
-          {([1, 2, 3] as const).map((place) => {
-            const user = podiumTop3[place - 1];
-            if (!user) return <div key={place} />;
-            return (
-              <PodiumPosition
-                key={user.key}
-                place={place}
-                name={user.name}
-                score={user.point}
-                avatar={user.image}
-              />
-            );
-          })}
-        </div>
-
-        {/* Table */}
-        <div className="overflow-hidden rounded-lg border-2 border-[var(--border-secondary)]">
-          <div className="grid grid-cols-[120px_1fr_140px] bg-[var(--color-primary)] px-3 py-2 font-bold text-white">
-            <div>Rank</div>
-            <div>Nama</div>
-            <div>Poin</div>
-          </div>
-          <div>
-            {leaderboardRows.map((r) => (
-              <div
-                key={r.key}
-                className={`grid grid-cols-[120px_1fr_140px] items-center px-3 py-2 ${
-                  r.rank % 2 === 0
-                    ? "bg-[var(--color-tertiary)]"
-                    : "bg-[var(--background)]"
-                } border-b-2 border-[var(--border-secondary)]`}
-              >
-                <div>{r.rank}</div>
-                <div className="flex items-center gap-2">
-                  <span className="h-6 w-6 overflow-hidden rounded-full border border-[var(--border-secondary)] bg-[var(--color-card)]">
-                    {r.image ? (
-                      <Image
-                        src={r.image}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gray-300" />
-                    )}
-                  </span>
-                  {r.name}
-                </div>
-                <div>{r.point}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <LeaderboardViewComponent
+        leaderboardData={leaderboardRows}
+        isLoading={isLoading}
+        defaultImage={defaultImage}
+      />
     );
   };
 

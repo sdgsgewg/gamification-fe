@@ -21,7 +21,6 @@ import { parseDate } from "@/app/utils/date";
 import Loading from "@/app/components/shared/Loading";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ViewState } from "@/app/types/task";
-import { ROUTES } from "@/app/constants/routes";
 import { useTaskDetail } from "@/app/hooks/tasks/useTaskDetail";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useMaterials } from "@/app/hooks/materials/useMaterials";
@@ -31,7 +30,6 @@ import { useGrades } from "@/app/hooks/grades/useGrades";
 const EditTaskPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.TEACHER.TASKS;
 
   const { data: taskData, isLoading: isTaskDataLoading } = useTaskDetail(
     params.slug,
@@ -159,7 +157,7 @@ const EditTaskPage = () => {
 
       if (isSuccess) {
         toast.success(message ?? "Task updated successfully.");
-        router.push(`${baseRoute}`);
+        router.back();
       } else {
         toast.error(message || "Failed to update the task.");
       }
@@ -283,7 +281,7 @@ const EditTaskPage = () => {
       description: description ?? "",
       subjectId: subject.subjectId,
       materialId: material?.materialId,
-      taskTypeId: taskType.taskTypeId,
+      taskTypeId: taskType.id,
       gradeIds: taskGradeIds,
       difficulty: difficulty.toUpperCase(),
       updatedBy: updatedBy ?? "",

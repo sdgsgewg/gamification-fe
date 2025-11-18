@@ -11,6 +11,7 @@ import {
   faBookOpen,
   faListCheck,
   faClockRotateLeft,
+  faFileArrowUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { Role } from "../enums/Role";
 import { ROUTES } from "./routes";
@@ -55,11 +56,6 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.STUDENT, Role.TEACHER],
   },
   { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
-  {
-    menu: "Class Leaderboard",
-    url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
-    roles: [Role.TEACHER],
-  },
   {
     menu: "Content Management",
     url: "#",
@@ -172,13 +168,8 @@ export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.STUDENT, Role.TEACHER],
   },
   { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
-  {
-    menu: "Class Leaderboard",
-    url: ROUTES.DASHBOARD.TEACHER.LEADERBOARD,
-    roles: [Role.TEACHER],
-  },
   { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
-  { menu: "Pengaturan Akun", url: "/account-settings", roles: [Role.ADMIN] },
+  // { menu: "Manage Account", url: "/account-settings", roles: [Role.ADMIN] },
   {
     menu: "Log Out",
     url: "/",
@@ -232,12 +223,12 @@ export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Submissions",
     url: resolveDashboardRoute(role, "/submissions"),
-    icon: faClipboardList,
+    icon: faFileArrowUp,
     roles: [Role.TEACHER],
   },
   {
     menu: "Leaderboard",
-    url: resolveDashboardRoute(role, "/leaderboard"),
+    url: ROUTES.DASHBOARD.LEADERBOARD,
     icon: faRankingStar,
     roles: [Role.STUDENT, Role.TEACHER],
   },

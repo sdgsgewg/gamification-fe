@@ -17,12 +17,15 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { TaskStatus } from "@/app/enums/TaskStatus";
+import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
+import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
+import { getTaskRules } from "@/app/utils/tasks/taskRules";
 
 interface DashboardTitleProps {
   title?: string;
   subtitle?: string;
   showBackButton?: boolean;
-  taskStatus?: TaskStatus;
+  task?: TaskDetailResponse;
 
   onBack?: () => void;
   onEdit?: () => void;
@@ -38,7 +41,7 @@ const DashboardTitle = ({
   title,
   subtitle,
   showBackButton,
-  taskStatus,
+  task,
   onBack,
   onEdit,
   onDelete,
@@ -54,35 +57,10 @@ const DashboardTitle = ({
     router.back();
   };
 
-  // ----- STATUS RULES -----
-  const statusRules = {
-    [TaskStatus.DRAFT]: {
-      edit: true,
-      share: true,
-      publish: true,
-      unpublish: false,
-      finalize: false,
-      delete: true,
-    },
-    [TaskStatus.PUBLISHED]: {
-      edit: true,
-      share: true,
-      publish: false,
-      unpublish: true,
-      finalize: true,
-      delete: false,
-    },
-    [TaskStatus.FINALIZED]: {
-      edit: false,
-      share: true,
-      publish: false,
-      unpublish: false,
-      finalize: false,
-      delete: false,
-    },
-  } as const;
+  const status = task?.taskDetail.status ?? TaskStatus.DRAFT;
+  const scope = task?.taskDetail.taskType.scope ?? TaskTypeScope.ACTIVITY;
 
-  const rules = statusRules[taskStatus ?? TaskStatus.DRAFT];
+  const rules = getTaskRules(status, scope);
 
   // ----- DROPDOWN BUILDER -----
   const items: ItemType[] = [];

@@ -363,7 +363,7 @@ const TaskDetailPage = () => {
       <Toaster position="top-right" />
       <DashboardTitle
         showBackButton={true}
-        taskStatus={taskData.taskDetail.status}
+        task={taskData}
         onEdit={() => {
           if (taskData) handleEdit(slug);
         }}

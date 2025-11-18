@@ -1,9 +1,9 @@
-// useAuth.ts
-"use client";
-
 import { useState, useEffect, useCallback, useRef } from "react";
-import { AxiosError } from "axios";
-import { getItem, setItem, clearStorage } from "../../utils/storage";
+import {
+  clearStorage, // clears both local + session
+  setSession,
+  getSession,
+} from "../../utils/storage";
 import { postAxios, getAxios } from "../../utils/AxiosFunction";
 import { RegisterRequest } from "../../schemas/auth/register";
 import { CompleteProfileFormInputs } from "../../schemas/auth/completeProfile";
@@ -19,7 +19,6 @@ import { LoginDetailResponse } from "../../interface/auth/responses/ILoginDetail
 import { UserDetailResponse } from "../../interface/users/responses/IUserDetailResponse";
 import { deleteCookie, getCookie, setCookie } from "../../utils/cookie";
 import { useRouter } from "next/navigation";
-
 import {
   setAccessToken as setMemToken,
   registerRefreshHandler,
@@ -29,7 +28,6 @@ import {
 } from "./useAuthStore";
 
 const API_URL = "/auth";
-
 export const authEventTarget = new EventTarget();
 
 export function useAuth() {
@@ -48,7 +46,10 @@ export function useAuth() {
   const fetchUserProfile = useCallback(async () => {
     const res = await getAxios("/users/me");
     setUserProfile(res);
-    setItem("userProfile", JSON.stringify(res));
+    // cache to sessionStorage
+    try {
+      setSession("userProfile", JSON.stringify(res));
+    } catch {}
     return res;
   }, []);
 
@@ -56,12 +57,18 @@ export function useAuth() {
   useEffect(() => {
     registerRefreshHandler(async () => {
       try {
-        const res = await postAxios(`${API_URL}/refresh`);
-        // expected shape: { accessToken: '...' }
+        const refreshToken = getCookie("refreshToken");
+        if (!refreshToken) return null;
+
+        const res = await postAxios(`${API_URL}/refresh`, {
+          refreshToken,
+        });
+
         if (res?.accessToken) {
           setMemToken(res.accessToken);
           return res.accessToken;
         }
+
         return null;
       } catch (e) {
         return null;
@@ -69,6 +76,7 @@ export function useAuth() {
     });
 
     registerLogoutHandler(() => {
+      // Completely clear storages and in-memory token
       clearStorage();
       setMemToken(null);
       setIsLoggedIn(false);
@@ -82,39 +90,44 @@ export function useAuth() {
     if (hasInitRef.current) return;
     hasInitRef.current = true;
 
-    const loggedIn = getItem("isLoggedIn");
-    const firstTime = getItem("firstTimeUser");
+    // If there's no refresh token, we consider not logged in.
+    const refreshToken = getCookie("refreshToken");
 
-    if (firstTime) {
-      try {
-        setIsFirstTime(JSON.parse(firstTime));
-      } catch {
-        setIsFirstTime(true);
-      }
-    }
-
-    if (!loggedIn) {
+    if (!refreshToken) {
+      setIsLoggedIn(false);
+      setIsGuest(true);
+      setUserProfile(null);
       setLoading(false);
       return;
     }
 
     try {
-      // Fetch profile — getAxios will attempt refresh via interceptor on 401
+      // Try to refresh access token using refresh token cookie
+      const newAccessToken = await refreshAccessToken();
+
+      if (!newAccessToken) {
+        throw new Error("Failed to refresh token");
+      }
+
+      // fetch profile using the new access token
       const profile = await fetchUserProfile();
 
+      // update state
       setIsLoggedIn(true);
       setIsGuest(false);
       setUserProfile(profile);
-    } catch (error) {
-      const axiosErr = error as AxiosError;
-      console.warn("Init: failed to restore session:", {
-        status: axiosErr?.response?.status,
-      });
+    } catch (err) {
+      console.warn("Init: refresh or profile fetch failed:", err);
 
+      // refresh failed → forced logout (silent)
       clearStorage();
+      deleteCookie("refreshToken");
+      deleteCookie("role");
+
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);
+      setIsGuest(true);
     } finally {
       setLoading(false);
     }
@@ -122,7 +135,6 @@ export function useAuth() {
 
   // run init once client-side
   useEffect(() => {
-    // ensure only runs client-side
     if (typeof window !== "undefined") {
       init();
     }
@@ -193,8 +205,10 @@ export function useAuth() {
         // role cookie (existing logic)
         setCookie("role", user.role.name, cookieMaxAge);
 
-        setItem("isLoggedIn", JSON.stringify(true));
-        setItem("userProfile", JSON.stringify(user));
+        // store profile to sessionStorage (not localStorage)
+        try {
+          setSession("userProfile", JSON.stringify(user));
+        } catch {}
 
         setIsLoggedIn(true);
         setUserProfile(user);
@@ -245,9 +259,10 @@ export function useAuth() {
   const logout = async () => {
     try {
       const refreshToken = getCookie("refreshToken");
+      // clear storages first
       clearStorage();
 
-      // Server logout dulu (token masih ada)
+      // Server logout (best effort)
       try {
         await postAxios(`${API_URL}/logout`, {
           refreshToken,
@@ -256,7 +271,7 @@ export function useAuth() {
         console.warn("Server logout failed:", err);
       }
 
-      // Baru hapus local session
+      // Clear local session
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);
@@ -273,14 +288,14 @@ export function useAuth() {
   };
 
   const setFirstTimeUsed = () => {
-    setItem("firstTimeUser", JSON.stringify(false));
+    // firstTimeUser is still ok to keep in localStorage
     setIsFirstTime(false);
   };
 
   const getCachedUserProfile = useCallback((): UserDetailResponse | null => {
     if (userProfile) return userProfile;
 
-    const cached = getItem("userProfile");
+    const cached = getSession("userProfile");
     if (!cached) return null;
 
     try {

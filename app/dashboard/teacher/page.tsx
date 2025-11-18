@@ -10,10 +10,13 @@ import {
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle"; // adjust import path if different
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
+import { useRecentSubmissions } from "@/app/hooks/activity-logs/useRecentSubmissions";
 import { useUserMasterHistories } from "@/app/hooks/master-histories/useUserMasterHistories";
 import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
-import { QuickActionCard, QuickActionCardWrapper } from "@/app/components/pages/Dashboard/Cards";
+import {
+  QuickActionCard,
+  QuickActionCardWrapper,
+} from "@/app/components/pages/Dashboard/Cards";
 
 interface DashboardCard {
   title: string;
@@ -26,10 +29,12 @@ interface DashboardCard {
 const TeacherDashboard: React.FC = () => {
   const router = useRouter();
 
+  const {
+    data: recentSubmissionData = [],
+    isLoading: isRecentSubmissionLoading,
+  } = useRecentSubmissions();
   const { data: masterHistoryData = [], isLoading: isMasterHistoryLoading } =
     useUserMasterHistories();
-  const { data: activityLogData = [], isLoading: isActivityLogLoading } =
-    useUserActivityLogs();
 
   const quickActionCards: DashboardCard[] = [
     {
@@ -51,7 +56,7 @@ const TeacherDashboard: React.FC = () => {
       description: "Monitor student performance and rankings.",
       icon: <FaTrophy className="w-8 h-8 text-success" />,
       buttonLabel: "View Leaderboard",
-      onClick: () => router.push(ROUTES.DASHBOARD.TEACHER.LEADERBOARD),
+      onClick: () => router.push(ROUTES.DASHBOARD.LEADERBOARD),
     },
     {
       title: "Create New Task",
@@ -86,8 +91,8 @@ const TeacherDashboard: React.FC = () => {
         <RecentActivitiesSection
           title="Recent Submissions"
           noDataText="No submission yet"
-          data={activityLogData}
-          isLoading={isActivityLogLoading}
+          data={recentSubmissionData}
+          isLoading={isRecentSubmissionLoading}
         />
 
         {/* Recent Activities */}

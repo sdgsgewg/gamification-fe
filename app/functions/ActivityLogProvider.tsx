@@ -15,4 +15,15 @@ export const activityLogProvider = {
       return handleAxiosError<ActivityLogOverviewResponse[]>(error);
     }
   },
+
+  async getRecentSubmissions(): Promise<
+    ApiResponse<ActivityLogOverviewResponse[]>
+  > {
+    try {
+      const data = await getAxios(`${API_URL}/submissions`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ActivityLogOverviewResponse[]>(error);
+    }
+  },
 };

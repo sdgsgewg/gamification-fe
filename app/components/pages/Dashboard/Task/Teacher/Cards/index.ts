@@ -4,4 +4,5 @@ export { default as SubmissonCardWrapper } from "./SubmissionCard/Wrapper";
 
 // Task Card
 export { default as TaskCard } from "./TaskCard";
+export { default as TaskCardSkeleton } from "./TaskCard/Skeleton";
 export { default as TaskCardWrapper } from "./TaskCard/Wrapper";

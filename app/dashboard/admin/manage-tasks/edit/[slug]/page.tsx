@@ -283,7 +283,7 @@ const EditTaskPage = () => {
       description: description ?? "",
       subjectId: subject.subjectId,
       materialId: material?.materialId,
-      taskTypeId: taskType.taskTypeId,
+      taskTypeId: taskType.id,
       gradeIds: taskGradeIds,
       difficulty: difficulty.toUpperCase(),
       updatedBy: updatedBy ?? "",

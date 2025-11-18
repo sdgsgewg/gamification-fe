@@ -14,6 +14,7 @@ import { ROUTES } from "@/app/constants/routes";
 import { useTeacherClassTasks } from "@/app/hooks/class-tasks/useTeacherClassTasks";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import { useClassMember } from "@/app/hooks/classes/useClassMember";
+import { useClassStudentsLeaderboard } from "@/app/hooks/leaderboards/useClassStudentsLeaderboard";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { ClassDetailView, MemberRole } from "@/app/types/class-detail";
 import { faArrowLeft, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
@@ -163,22 +164,22 @@ const TeacherClassDetailPage = () => {
   };
 
   const LeaderboardView = () => {
-    const podiumTop3 = [
-      { name: "Susi Pudjianti", score: 12500, avatar: "/avatars/a1.png" },
-      { name: "Angel Wicaksono", score: 12000, avatar: "/avatars/a2.png" },
-      { name: "Siti Nurhalizah", score: 11500, avatar: "/avatars/a3.png" },
-    ];
-
-    const leaderboardRows = useMemo(
-      () =>
-        Array.from({ length: 15 }).map((_, i) => ({
-          rank: i + 4,
-          name: i % 2 ? "Kevin Wijaya" : "Caca Permata Sari",
-          points: i % 2 ? 10500 : 11000,
-          avatar: i % 2 ? "/avatars/a5.png" : "/avatars/a4.png",
-        })),
-      []
+    const { data: leaderboardData, isLoading } = useClassStudentsLeaderboard(
+      classDetailData!.id
     );
+
+    if (isLoading) {
+      return <p className="text-center py-10">Loading leaderboard...</p>;
+    }
+
+    if (!leaderboardData || leaderboardData.length === 0) {
+      return <p className="text-center py-10">No leaderboard data found.</p>;
+    }
+
+    // Ambil podium top 3
+    const podiumTop3 = leaderboardData.slice(0, 3);
+    // Ambil sisa untuk tabel (rank 4 ke bawah)
+    const leaderboardRows = leaderboardData.slice(3);
 
     const PodiumPosition = ({
       place,
@@ -189,7 +190,7 @@ const TeacherClassDetailPage = () => {
       place: 1 | 2 | 3;
       name: string;
       score: number;
-      avatar: string;
+      avatar?: string;
     }) => {
       const medalColors: Record<1 | 2 | 3, string> = {
         1: "#F7E08F", // gold
@@ -202,7 +203,7 @@ const TeacherClassDetailPage = () => {
           className="relative flex flex-col items-center justify-end rounded-lg border-2 border-[var(--border-secondary)] pb-6 pt-12"
           style={{
             background: `linear-gradient(180deg, #ffffffaa 0%, #ffffff00 60%), ${medalColors[place]}`,
-            height: "400px", // fixed height for nice balance
+            height: "400px",
           }}
         >
           {/* Top Medal */}
@@ -219,12 +220,15 @@ const TeacherClassDetailPage = () => {
           {/* Avatar */}
           <div className="absolute top-1/4 -translate-y-1/2 transform">
             <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-[var(--border-secondary)] bg-[var(--color-card)] shadow-md">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={avatar}
-                alt={name}
-                className="h-full w-full object-cover"
-              />
+              {avatar ? (
+                <Image
+                  src={avatar}
+                  alt={name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-gray-300" />
+              )}
             </div>
           </div>
 
@@ -254,13 +258,14 @@ const TeacherClassDetailPage = () => {
         <div className="grid grid-cols-3 gap-6 items-end justify-center">
           {([1, 2, 3] as const).map((place) => {
             const user = podiumTop3[place - 1];
+            if (!user) return <div key={place} />;
             return (
               <PodiumPosition
-                key={user.name}
+                key={user.key}
                 place={place}
                 name={user.name}
-                score={user.score}
-                avatar={user.avatar}
+                score={user.point}
+                avatar={user.image}
               />
             );
           })}
@@ -274,11 +279,11 @@ const TeacherClassDetailPage = () => {
             <div>Poin</div>
           </div>
           <div>
-            {leaderboardRows.map((r, i) => (
+            {leaderboardRows.map((r) => (
               <div
-                key={r.rank}
+                key={r.key}
                 className={`grid grid-cols-[120px_1fr_140px] items-center px-3 py-2 ${
-                  i % 2 === 0
+                  r.rank % 2 === 0
                     ? "bg-[var(--color-tertiary)]"
                     : "bg-[var(--background)]"
                 } border-b-2 border-[var(--border-secondary)]`}
@@ -286,16 +291,19 @@ const TeacherClassDetailPage = () => {
                 <div>{r.rank}</div>
                 <div className="flex items-center gap-2">
                   <span className="h-6 w-6 overflow-hidden rounded-full border border-[var(--border-secondary)] bg-[var(--color-card)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={r.avatar}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
+                    {r.image ? (
+                      <Image
+                        src={r.image}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-300" />
+                    )}
                   </span>
                   {r.name}
                 </div>
-                <div>{r.points}</div>
+                <div>{r.point}</div>
               </div>
             ))}
           </div>

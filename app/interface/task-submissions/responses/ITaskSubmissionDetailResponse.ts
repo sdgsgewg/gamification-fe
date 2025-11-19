@@ -34,6 +34,8 @@ export interface AnswerLog {
   image: string | null;
   optionId: string | null;
   isCorrect: boolean | null;
+  pointAwarded: number | null;
+  teacherNotes: string | null;
 }
 
 export interface QuestionOption {

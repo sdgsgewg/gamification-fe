@@ -119,12 +119,11 @@ export const classTaskProvider = {
   },
 
   async getClassTaskSummaryFromAttempt(
-    classSlug: string,
-    taskSlug: string
+    attemptId: string
   ): Promise<ApiResponse<ClassTaskSummaryResponseDto>> {
     try {
       const data = await getAxios(
-        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}/summary`
+        `${API_URL}/attempts/${attemptId}/summary`
       );
       return { isSuccess: true, data };
     } catch (error) {

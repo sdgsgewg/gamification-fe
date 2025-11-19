@@ -6,7 +6,7 @@ import {
 import { getAxios, postAxios, putAxios } from "../utils/AxiosFunction";
 import { CreateTaskAttemptFormInputs } from "../schemas/task-attempts/createTaskAttempt";
 import { UpdateTaskAttemptFormInputs } from "../schemas/task-attempts/updateTaskAttempt";
-import { UpsertTaskAttemptResponseDto } from "../interface/task-attempts/responses/IUpsertTaskAttemptResponse";
+import { UpsertTaskAttemptResponse } from "../interface/task-attempts/responses/IUpsertTaskAttemptResponse";
 import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
 import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
@@ -52,51 +52,59 @@ export const taskAttemptProvider = {
 
   async createActivityAttempt(
     payload: CreateTaskAttemptFormInputs
-  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+  ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
-      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await postAxios(`${API_URL}/activity`, payload);
+      const res: DetailResponseDto<UpsertTaskAttemptResponse> = await postAxios(
+        `${API_URL}/activity`,
+        payload
+      );
       return res;
     } catch (error) {
-      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+      return handleAxiosError<UpsertTaskAttemptResponse>(error);
     }
   },
 
   async createClassTaskAttempt(
     payload: CreateTaskAttemptFormInputs
-  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+  ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
-      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await postAxios(`${API_URL}/class`, payload);
+      const res: DetailResponseDto<UpsertTaskAttemptResponse> = await postAxios(
+        `${API_URL}/class`,
+        payload
+      );
       return res;
     } catch (error) {
-      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+      return handleAxiosError<UpsertTaskAttemptResponse>(error);
     }
   },
 
   async updateActivityAttempt(
     id: string,
     payload: UpdateTaskAttemptFormInputs
-  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+  ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
-      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await putAxios(`${API_URL}/activity/${id}`, payload);
+      const res: DetailResponseDto<UpsertTaskAttemptResponse> = await putAxios(
+        `${API_URL}/activity/${id}`,
+        payload
+      );
       return res;
     } catch (error) {
-      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+      return handleAxiosError<UpsertTaskAttemptResponse>(error);
     }
   },
 
   async updateClassTaskAttempt(
     id: string,
     payload: UpdateTaskAttemptFormInputs
-  ): Promise<ApiResponse<UpsertTaskAttemptResponseDto>> {
+  ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
-      const res: DetailResponseDto<UpsertTaskAttemptResponseDto> =
-        await putAxios(`${API_URL}/class/${id}`, payload);
+      const res: DetailResponseDto<UpsertTaskAttemptResponse> = await putAxios(
+        `${API_URL}/class/${id}`,
+        payload
+      );
       return res;
     } catch (error) {
-      return handleAxiosError<UpsertTaskAttemptResponseDto>(error);
+      return handleAxiosError<UpsertTaskAttemptResponse>(error);
     }
   },
 };

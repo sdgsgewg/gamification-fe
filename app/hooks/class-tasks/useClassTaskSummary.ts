@@ -5,13 +5,12 @@ import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
 import { ClassTaskSummaryResponseDto } from "@/app/interface/class-tasks/responses/IClassTaskWithSummaryResponse";
 import { getImageSrc } from "@/app/utils/image";
 
-export const useClassTaskSummary = (classSlug: string, taskSlug: string) => {
+export const useClassTaskSummary = (attemptId: string) => {
   return useQuery({
-    queryKey: ["activitySummary", classSlug, taskSlug],
+    queryKey: ["class-task-summary", attemptId],
     queryFn: async () => {
       const res = await classTaskProvider.getClassTaskSummaryFromAttempt(
-        classSlug,
-        taskSlug
+        attemptId
       );
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat ringkasan pengerjaan tugas");

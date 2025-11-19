@@ -17,8 +17,6 @@ export const ROUTES = {
     BADGES: "/badges",
     ACTIVITY: "/activities",
     ACTIVITYSECTION: "/activities/sections",
-    ACTIVITYATTEMPT: "/activities/attempt",
-    ACTIVITYSUMMARY: "/activities/summary",
     LEADERBOARD: "/leaderboard",
     HISTORY: "/history",
     PROFILE: "/users",
@@ -37,7 +35,6 @@ export const ROUTES = {
       TASKS: "/dashboard/student/tasks",
       TASKS_VIEW: "/dashboard/student/tasks/view",
       TASKS_ATTEMPT: "/dashboard/student/tasks/attempt",
-      TASKS_SUMMARY: "/dashboard/student/tasks/summary",
     },
 
     // 👨‍🏫 Teacher

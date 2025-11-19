@@ -46,6 +46,7 @@ const StudentAttemptTaskPageContent = () => {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
+  const [attemptId, setAttemptId] = useState<string>("");
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [lastAccessedAt, setLastAccessedAt] = useState<Date | null>(null);
 
@@ -60,7 +61,7 @@ const StudentAttemptTaskPageContent = () => {
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Are you sure you want to submit this assignment? Please check it again.",
+    text: "Are you sure you want to submit this task? Please check it again.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -184,6 +185,10 @@ const StudentAttemptTaskPageContent = () => {
         payload
       );
 
+      const { isSuccess, data } = result;
+
+      if (isSuccess && data) setAttemptId(data.id);
+
       setMessageModal({
         visible: true,
         isSuccess: result?.isSuccess ?? false,
@@ -224,7 +229,7 @@ const StudentAttemptTaskPageContent = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Please answer all questions to complete the assignment.",
+        text: "Please answer all questions to complete the task.",
         type: "submit",
       });
       return;
@@ -247,6 +252,7 @@ const StudentAttemptTaskPageContent = () => {
           (a) => a.optionId || a.answerText
         ).length,
         status: TaskAttemptStatus.SUBMITTED,
+        startedAt,
         lastAccessedAt,
         answerLogs: answerLogs
           .filter((a) => a.optionId || a.answerText)
@@ -256,19 +262,21 @@ const StudentAttemptTaskPageContent = () => {
           })),
       };
 
-      console.log("Payload (Update): ", JSON.stringify(payload, null, 2));
-
       result = await taskAttemptProvider.updateClassTaskAttempt(
         classTaskData.lastAttemptId!,
         payload
       );
 
+      const { isSuccess, data } = result;
+
+      if (isSuccess && data) setAttemptId(data.id);
+
       setMessageModal({
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "The assignment has been successfully submitted."
-          : "Assignment Not Submitted.",
+          ? "The task has been successfully submitted."
+          : "Task not submitted.",
         type: "submit",
       });
     } catch (err) {
@@ -284,10 +292,7 @@ const StudentAttemptTaskPageContent = () => {
     if (!messageModal.isSuccess) return;
 
     if (messageModal.type === "submit") {
-      const query = new URLSearchParams();
-      query.append("class", classSlug);
-      query.append("task", taskSlug);
-      const url = `${ROUTES.DASHBOARD.STUDENT.TASKS_SUMMARY}?${query}`;
+      const url = `${ROUTES.DASHBOARD.STUDENT.TASKS}/attempts/${attemptId}/summary`;
       router.push(url);
     } else if (messageModal.type === "back") {
       router.back();
@@ -366,5 +371,5 @@ export default function StudentAttemptTaskPage() {
     <Suspense fallback={<Loading />}>
       <StudentAttemptTaskPageContent />
     </Suspense>
-  )
+  );
 }

@@ -18,7 +18,10 @@ export const useActivityDetail = (slug: string) => {
 
       const mapped: ActivityDetailResponse = {
         ...act,
-        image: act.image ? getImageSrc(act.image) : "",
+        taskDetail: {
+          ...act.taskDetail,
+          image: act.taskDetail.image ? getImageSrc(act.taskDetail.image) : "",
+        },
       };
       return mapped;
     },

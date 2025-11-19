@@ -65,7 +65,7 @@ export const LevelUpModal = ({
         </h1>
 
         <p className="text-lg font-medium mb-1">
-          Selamat! Kamu telah mencapai{" "}
+          Congratulations! You have reached{" "}
           <span className="text-yellow-300 font-semibold">Lv. {newLevel}</span>{" "}
           🎉
         </p>
@@ -76,7 +76,7 @@ export const LevelUpModal = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          XP kamu meningkat sebesar{" "}
+          Your XP has increased by{" "}
           <span className="font-bold">+{xpGained}</span> ✨
         </motion.p>
 

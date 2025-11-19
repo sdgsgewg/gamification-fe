@@ -5,11 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import {
-  FeedbackRow,
-  NumberRow,
-} from "@/app/components/shared/table/detail-page/TableRowData";
-import {
-  DetailInformationTable,
   DurationTable,
   ProgressTable,
   TaskDetailInformationTable,
@@ -29,7 +24,7 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
-import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
+import { AttemptCard, AttemptCardWrapper } from "@/app/components/shared/cards";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 
 export const dynamic = "force-dynamic";
@@ -54,37 +49,6 @@ const StudentTaskDetailPageContent = () => {
   const { data: classTaskData, isLoading: isclassTaskDataLoading } =
     useClassTaskDetail(classSlug, taskSlug);
 
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-
-  // Prefill answers ketika attemptDetailData berhasil dimuat
-  useEffect(() => {
-    if (!classTaskData) return;
-
-    // Hanya jalankan prefill kalau ada attempt sebelumnya
-
-    const prefilledAnswers: Record<string, any> = {};
-
-    classTaskData.questions?.forEach((q) => {
-      if (q.userAnswer) {
-        prefilledAnswers[q.questionId] = {
-          optionId: q.userAnswer.optionId,
-          answerText: q.userAnswer.text,
-        };
-      } else if (q.options) {
-        // Backup: cek dari option yang memiliki isSelected = true
-        const selectedOption = q.options.find((opt) => opt.isSelected);
-        if (selectedOption) {
-          prefilledAnswers[q.questionId] = {
-            optionId: selectedOption.optionId,
-            answerText: null,
-          };
-        }
-      }
-    });
-
-    setAnswers(prefilledAnswers);
-  }, [classTaskData]);
-
   const handleNavigateToTaskAttemptPage = () => {
     const query = new URLSearchParams();
     query.append("class", classSlug);
@@ -98,8 +62,7 @@ const StudentTaskDetailPageContent = () => {
   }
 
   const LeftSideContent = () => {
-    const { teacherName, className, currAttempt, recentAttempt } =
-      classTaskData;
+    const { currAttempt, recentAttempts } = classTaskData;
     const { title, image, description, questionCount, type } =
       classTaskData.taskDetail;
 
@@ -107,15 +70,15 @@ const StudentTaskDetailPageContent = () => {
     let buttonLabel: string | null = null;
 
     if (currAttempt) {
-      buttonLabel = "Lanjutkan";
-    } else if (recentAttempt) {
+      buttonLabel = "Continue";
+    } else if (recentAttempts && recentAttempts.length > 0) {
       if (type.isRepeatable) {
-        buttonLabel = "Kerja Ulang";
+        buttonLabel = "Re-Attempt";
       } else {
         buttonLabel = null; // Tidak render tombol
       }
     } else {
-      buttonLabel = "Mulai";
+      buttonLabel = "Start";
     }
 
     const shouldShowButton = buttonLabel !== null;
@@ -124,7 +87,6 @@ const StudentTaskDetailPageContent = () => {
       <>
         <DetailPageLeftSideContent
           name={title}
-          additionalText={`Graded by ${teacherName} from class '${className}'`}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -177,53 +139,27 @@ const StudentTaskDetailPageContent = () => {
   };
 
   const BottomContent = () => {
-    const [view, setView] =
-      useState<TaskDetailBottomContentView>("submission-summary");
+    const [view, setView] = useState<TaskDetailBottomContentView>("duration");
 
-    const { summary, duration, currAttempt, recentAttempt, questions } =
-      classTaskData;
-    const isCompleted =
-      recentAttempt?.status === TaskAttemptStatus.COMPLETED ? true : false;
+    const { duration, currAttempt, recentAttempts } = classTaskData;
+
+    const showCurrAttempt =
+      currAttempt !== null && recentAttempts?.length === 0;
+    const hasRecentAttempts = recentAttempts && recentAttempts.length > 0;
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
-      ...(isCompleted
-        ? [{ key: "submission-summary" as const, label: "Sumamry" }]
-        : []),
       { key: "duration" as const, label: "Duration" },
-      { key: "progress" as const, label: "Progres" },
-      ...(isCompleted
-        ? [{ key: "questions" as const, label: "Questions" }]
+      ...(showCurrAttempt
+        ? [{ key: "progress" as const, label: "Progress" }]
+        : []),
+      ...(hasRecentAttempts
+        ? [{ key: "attempts" as const, label: "Attempts" }]
         : []),
     ];
 
-    // Jika view aktif tidak tersedia lagi (misal user di stats tapi belum completed), fallback ke "progress"
-    useEffect(() => {
-      if (!isCompleted && (view === "stats" || view === "questions")) {
-        setView("progress");
-      }
-    }, [isCompleted, view]);
-
     const handleChangeTab = (key: TaskDetailBottomContentView) => {
       setView(key);
-    };
-
-    const SummaryView = () => {
-      if (!summary) return;
-
-      const { score, feedback, pointGained, totalPoints, xpGained } = summary;
-
-      return (
-        <DetailInformationTable>
-          <NumberRow
-            label="Point Gained"
-            value={pointGained ? `${pointGained}/${totalPoints}` : "-"}
-          />
-          <NumberRow label="Score" value={score} />
-          <NumberRow label="XP Gained" value={xpGained} />
-          <FeedbackRow value={feedback} />
-        </DetailInformationTable>
-      );
     };
 
     const DurationView = () => {
@@ -241,52 +177,45 @@ const StudentTaskDetailPageContent = () => {
     };
 
     const ProgressView = () => {
-      const startedAt = currAttempt
-        ? currAttempt.startedAt
-        : recentAttempt
-        ? recentAttempt.startedAt
-        : null;
-      const lastAccessedAt = currAttempt
-        ? currAttempt.lastAccessedAt
-        : recentAttempt
-        ? recentAttempt.lastAccessedAt
-        : null;
-      const completedAt = recentAttempt ? recentAttempt.completedAt : null;
+      const startedAt = currAttempt ? currAttempt.startedAt : null;
+      const lastAccessedAt = currAttempt ? currAttempt.lastAccessedAt : null;
       const statusLabel = currAttempt
         ? TaskAttemptStatusLabels[currAttempt.status as TaskAttemptStatus]
-        : recentAttempt
-        ? TaskAttemptStatusLabels[recentAttempt.status as TaskAttemptStatus]
         : "";
 
       return (
         <ProgressTable
           startedAt={startedAt}
           lastAccessedAt={lastAccessedAt}
-          completedAt={completedAt}
           status={statusLabel}
         />
       );
     };
 
-    const QuestionView = () => {
-      if (!questions) return;
+    const AttemptsView = () => {
+      if (!hasRecentAttempts) return null;
+
+      const handleNavigateToReviewPage = (attemptId: string) => {
+        router.push(
+          `${ROUTES.DASHBOARD.STUDENT.TASKS}/attempts/${attemptId}/summary`
+        );
+      };
 
       return (
-        <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
-
-          <div className="flex flex-col gap-8">
-            {questions.map((q, idx) => (
-              <TaskSummaryQuestionCard
-                key={idx}
-                index={idx}
-                question={q}
-                selectedOptionId={answers[q.questionId]?.optionId}
-                answerText={answers[q.questionId]?.answerText}
-              />
-            ))}
-          </div>
-        </>
+        <AttemptCardWrapper>
+          {recentAttempts.map((attempt, index) => (
+            <AttemptCard
+              key={index}
+              index={index}
+              id={attempt.id}
+              startedAt={attempt.startedAt}
+              completedAt={attempt.completedAt}
+              duration={attempt.duration}
+              status={attempt.status}
+              onClick={handleNavigateToReviewPage}
+            />
+          ))}
+        </AttemptCardWrapper>
       );
     };
 
@@ -296,14 +225,12 @@ const StudentTaskDetailPageContent = () => {
         view={view}
         onChangeTab={handleChangeTab}
       >
-        {view === "stats" ? (
-          <SummaryView />
-        ) : view === "duration" ? (
+        {view === "duration" ? (
           <DurationView />
         ) : view === "progress" ? (
           <ProgressView />
         ) : (
-          <QuestionView />
+          <AttemptsView />
         )}
       </TaskDetailPageBottomContentWrapper>
     );
@@ -313,7 +240,7 @@ const StudentTaskDetailPageContent = () => {
     <>
       {isclassTaskDataLoading && <Loading />}
 
-      <DashboardTitle title="Detail Tugas" showBackButton={true} />
+      <DashboardTitle title="Task Detail" showBackButton={true} />
 
       <DetailPageWrapper
         left={<LeftSideContent />}

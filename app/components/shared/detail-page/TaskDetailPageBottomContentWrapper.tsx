@@ -41,7 +41,8 @@ const TaskDetailPageBottomContentWrapper = ({
         </div>
       </div>
 
-      <div className="w-full md:max-w-[70%] lg:max-w-[80%] ">{children}</div>
+      {/* <div className="w-full md:max-w-[70%] lg:max-w-[80%] ">{children}</div> */}
+      <div className="w-full">{children}</div>
     </>
   );
 };

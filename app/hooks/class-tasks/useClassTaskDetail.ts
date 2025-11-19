@@ -15,6 +15,8 @@ export const useClassTaskDetail = (classSlug: string, taskSlug: string) => {
         taskSlug
       );
 
+      console.log("Response: ", JSON.stringify(res, null, 2));
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 
@@ -22,7 +24,10 @@ export const useClassTaskDetail = (classSlug: string, taskSlug: string) => {
 
       const mapped: ClassTaskDetailResponseDto = {
         ...ct,
-        image: ct.image ? getImageSrc(ct.image) : "",
+        taskDetail: {
+          ...ct.taskDetail,
+          image: ct.taskDetail.image ? getImageSrc(ct.taskDetail.image) : "",
+        },
       };
       return mapped;
     },

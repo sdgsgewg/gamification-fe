@@ -30,6 +30,7 @@ import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContent
 import NotFound from "@/app/components/shared/NotFound";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { Role } from "@/app/enums/Role";
+import { AttemptCard, AttemptCardWrapper } from "@/app/components/shared/cards";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -42,15 +43,15 @@ const ActivityDetailPage = () => {
     data: similarActivities = [],
     isLoading: isSimilarActivitiesLoading,
   } = useActivities({
-    subjectId: activityData?.subject.id,
-    materialId: activityData?.material?.id,
+    subjectId: activityData?.taskDetail.subject.id,
+    materialId: activityData?.taskDetail.material?.id,
   });
   const filteredSimilarActivities = similarActivities.filter(
     (activity) => activity.slug !== params.slug
   );
 
   const handleNavigateToActivityAttemptPage = () => {
-    router.push(`${ROUTES.ROOT.ACTIVITYATTEMPT}/${params.slug}`);
+    router.push(`${ROUTES.ROOT.ACTIVITY}/${params.slug}/attempt`);
   };
 
   if (!activityData) {
@@ -58,24 +59,18 @@ const ActivityDetailPage = () => {
   }
 
   const LeftSideContent = () => {
-    const {
-      title,
-      image,
-      description,
-      questionCount,
-      type,
-      currAttempt,
-      recentAttempt,
-    } = activityData;
+    const { currAttempt, recentAttempts } = activityData;
+    const { title, image, description, questionCount, type, createdBy } =
+      activityData.taskDetail;
 
     // === Tentukan teks & visibilitas tombol ===
     let buttonLabel: string | null = null;
 
     if (currAttempt) {
-      buttonLabel = "Lanjutkan";
-    } else if (recentAttempt) {
+      buttonLabel = "Continue";
+    } else if (recentAttempts && recentAttempts.length > 0) {
       if (type.isRepeatable) {
-        buttonLabel = "Repeat";
+        buttonLabel = "Re-Attempt";
       } else {
         buttonLabel = null; // Tidak render tombol
       }
@@ -90,6 +85,7 @@ const ActivityDetailPage = () => {
       <>
         <DetailPageLeftSideContent
           name={title}
+          additionalText={`Created by ${createdBy}`}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -124,7 +120,7 @@ const ActivityDetailPage = () => {
 
   const RightSideContent = () => {
     const { subject, material, type, questionCount, difficulty, grade } =
-      activityData;
+      activityData.taskDetail;
 
     return (
       <>
@@ -145,13 +141,23 @@ const ActivityDetailPage = () => {
     const [view, setView] =
       useState<TaskDetailBottomContentView>("similar-activities");
 
-    const { currAttempt, recentAttempt, duration } = activityData;
+    const { duration, currAttempt, recentAttempts } = activityData;
+
+    const hasDuration = duration && duration.startTime && duration.endTime;
+    const showCurrAttempt =
+      user && currAttempt !== null && recentAttempts?.length === 0;
+    const hasRecentAttempts = recentAttempts && recentAttempts.length > 0;
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
       { key: "similar-activities" as const, label: "Similar" },
-      { key: "duration" as const, label: "Duration" },
-      ...(user ? [{ key: "progress" as const, label: "Progres" }] : []),
+      ...(hasDuration ? [{ key: "duration" as const, label: "Duration" }] : []),
+      ...(showCurrAttempt
+        ? [{ key: "progress" as const, label: "Progres" }]
+        : []),
+      ...(hasRecentAttempts
+        ? [{ key: "attempts" as const, label: "Attempts" }]
+        : []),
     ];
 
     const handleChangeTab = (key: TaskDetailBottomContentView) => {
@@ -164,7 +170,7 @@ const ActivityDetailPage = () => {
           {filteredSimilarActivities && filteredSimilarActivities.length > 0 ? (
             <div className="grid grid-cols-1 xxs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 sm:gap-y-8 lg:gap-y-12 gap-x-0 xxs:gap-x-4 sm:gap-x-6 md:gap-x-12">
               {filteredSimilarActivities
-                .filter((sa) => sa.slug !== activityData.slug) // exclude current activity
+                .filter((sa) => sa.slug !== activityData.taskDetail.slug) // exclude current activity
                 .map((sa) => (
                   <ActivityCard
                     key={sa.id}
@@ -200,30 +206,43 @@ const ActivityDetailPage = () => {
     };
 
     const ProgressView = () => {
-      const startedAt = currAttempt
-        ? currAttempt.startedAt
-        : recentAttempt
-        ? recentAttempt.startedAt
-        : null;
-      const lastAccessedAt = currAttempt
-        ? currAttempt.lastAccessedAt
-        : recentAttempt
-        ? recentAttempt.lastAccessedAt
-        : null;
-      const completedAt = recentAttempt ? recentAttempt.completedAt : null;
+      const startedAt = currAttempt ? currAttempt.startedAt : null;
+      const lastAccessedAt = currAttempt ? currAttempt.lastAccessedAt : null;
       const statusLabel = currAttempt
         ? TaskAttemptStatusLabels[currAttempt.status as TaskAttemptStatus]
-        : recentAttempt
-        ? TaskAttemptStatusLabels[recentAttempt.status as TaskAttemptStatus]
         : "";
 
       return (
         <ProgressTable
           startedAt={startedAt}
           lastAccessedAt={lastAccessedAt}
-          completedAt={completedAt}
           status={statusLabel}
         />
+      );
+    };
+
+    const AttemptsView = () => {
+      if (!hasRecentAttempts) return null;
+
+      const handleNavigateToReviewPage = (attemptId: string) => {
+        router.push(`${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`);
+      };
+
+      return (
+        <AttemptCardWrapper>
+          {recentAttempts.map((attempt, index) => (
+            <AttemptCard
+              key={index}
+              index={index}
+              id={attempt.id}
+              startedAt={attempt.startedAt}
+              completedAt={attempt.completedAt}
+              duration={attempt.duration}
+              status={attempt.status}
+              onClick={handleNavigateToReviewPage}
+            />
+          ))}
+        </AttemptCardWrapper>
       );
     };
 
@@ -239,6 +258,8 @@ const ActivityDetailPage = () => {
           <DurationView />
         ) : view === "progress" ? (
           <ProgressView />
+        ) : view === "attempts" ? (
+          <AttemptsView />
         ) : (
           <></>
         )}

@@ -1,35 +1,35 @@
-export interface AnswerLog {
-  answerLogId: string | null;
-  text: string | null;
-  image: string | null;
-  optionId: string | null;
-  isCorrect: boolean | null;
+import { QuestionResponse } from "../../task-questions/responses/IQuestionResponse";
+
+export interface ClassTaskStats {
+  pointGained: number;
+  totalPoints: number;
+  score: number;
+  xpGained: number;
 }
 
-export interface QuestionOption {
-  optionId: string;
-  text: string;
-  isCorrect: boolean;
-  isSelected: boolean;
+export interface ClassTaskAttemptProgress {
+  startedAt: string;
+  submittedAt: string;
+  duration: string;
+  status: string;
 }
 
-export interface Question {
-  questionId: string;
-  text: string;
-  point: number;
-  type: string;
-  timeLimit?: number;
-  image?: string;
-  options?: QuestionOption[];
-  userAnswer?: AnswerLog;
+export interface ClassTaskGradingProgress {
+  startGradedAt: string;
+  lastGradedAt: string;
+  finishGradedAt: string;
+  duration: string;
+  status: string;
 }
 
 export interface ClassTaskSummaryResponseDto {
   title: string;
   image: string;
   description: string;
-  point: number;
-  xpGained: number;
-  completedAt: string;
-  questions: Question[];
+  teacherName: string;
+  className: string;
+  stats: ClassTaskStats;
+  attemptProgress: ClassTaskAttemptProgress;
+  gradingProgress: ClassTaskGradingProgress;
+  questions: QuestionResponse[];
 }

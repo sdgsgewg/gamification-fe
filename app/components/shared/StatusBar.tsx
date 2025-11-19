@@ -8,8 +8,6 @@ interface StatusBarProps {
   height: string;
 }
 
-// Activity Card: h-3
-
 const StatusBar = ({
   current,
   total,
@@ -20,7 +18,7 @@ const StatusBar = ({
   return (
     <div className="flex flex-col">
       {/* Status Text */}
-      <p className={`${labelClassName}`}>{`${current} dari ${total} Soal`}</p>
+      <p className={`${labelClassName}`}>{`${current} out of ${total} questions`}</p>
       {/* Status Bar */}
       <div
         className={`w-full ${bgClassName} rounded-2xl shadow-xs ${height} overflow-hidden`}

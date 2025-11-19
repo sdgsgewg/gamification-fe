@@ -5,12 +5,14 @@ import { activityProvider } from "@/app/functions/ActivityProvider";
 import { ActivitySummaryResponse } from "@/app/interface/activities/responses/IActivitySummaryResponse";
 import { getImageSrc } from "@/app/utils/image";
 
-export const useActivitySummary = (slug: string) => {
+export const useActivitySummary = (attemptId: string) => {
   return useQuery({
-    queryKey: ["activitySummary", slug],
-    enabled: !!slug,
+    queryKey: ["activity-summary", attemptId],
+    enabled: !!attemptId,
     queryFn: async () => {
-      const res = await activityProvider.getActivitySummaryFromAttempt(slug);
+      const res = await activityProvider.getActivitySummaryFromAttempt(
+        attemptId
+      );
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat ringkasan pengerjaan aktivitas");
 

@@ -1,35 +1,24 @@
-interface AnswerLog {
-  answerLogId: string | null;
-  text: string | null;
-  image: string | null;
-  optionId: string | null;
-  isCorrect: boolean | null;
+import { QuestionResponse } from "../../task-questions/responses/IQuestionResponse";
+
+export interface ActivityStats {
+  pointGained: number;
+  totalPoints: number;
+  score: number;
+  xpGained: number;
 }
 
-interface QuestionOption {
-  optionId: string;
-  text: string;
-  isCorrect: boolean;
-  isSelected: boolean;
-}
-
-export interface Question {
-  questionId: string;
-  text: string;
-  point: number;
-  type: string;
-  timeLimit?: number;
-  image?: string;
-  options?: QuestionOption[];
-  userAnswer?: AnswerLog;
+export interface ActivityProgress {
+  startedAt: string;
+  completedAt: string;
+  duration: string;
+  status: string;
 }
 
 export interface ActivitySummaryResponse {
   title: string;
   image: string;
   description: string;
-  point: number;
-  xpGained: number;
-  completedAt: string;
-  questions: Question[];
+  stats: ActivityStats;
+  progress: ActivityProgress;
+  questions: QuestionResponse[];
 }

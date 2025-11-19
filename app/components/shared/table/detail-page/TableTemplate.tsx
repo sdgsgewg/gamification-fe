@@ -130,9 +130,10 @@ export const HistoryTable = ({
 interface ProgressTableProps {
   title?: string;
   startedAt: string | null;
-  lastAccessedAt: string | null;
+  lastAccessedAt?: string | null;
   submittedAt?: string | null;
   completedAt?: string | null;
+  duration?: string | null;
   status: string;
 }
 
@@ -142,6 +143,7 @@ export const ProgressTable = ({
   lastAccessedAt,
   submittedAt,
   completedAt,
+  duration,
   status,
 }: ProgressTableProps) => {
   return (
@@ -155,7 +157,9 @@ export const ProgressTable = ({
 
       {/* Isi */}
       <DateRow label="Started At" value={startedAt ?? "-"} />
-      <DateRow label="Last Accessed At" value={lastAccessedAt ?? "-"} />
+      {lastAccessedAt && (
+        <DateRow label="Last Accessed At" value={lastAccessedAt ?? "-"} />
+      )}
       {submittedAt && <DateRow label="Submitted At" value={submittedAt} />}
       {completedAt && (
         <DateRow
@@ -163,6 +167,7 @@ export const ProgressTable = ({
           value={completedAt}
         />
       )}
+      {duration && <TimeRow label="Duration" value={duration ?? "-"} />}
       <StatusRow value={status ?? TaskAttemptStatus.ON_PROGRESS} />
     </TableWrapper>
   );

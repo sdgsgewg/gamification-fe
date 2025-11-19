@@ -35,6 +35,7 @@ const AttemptActivityPage = () => {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
+  const [attemptId, setAttemptId] = useState<string>("");
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [lastAccessedAt, setLastAccessedAt] = useState<Date | null>(null);
 
@@ -49,7 +50,7 @@ const AttemptActivityPage = () => {
 
   const [submitConfirmationModal, setSubmitConfirmationModal] = useState({
     visible: false,
-    text: "Are you sure you want to collect this activity? Please check again.",
+    text: "Are you sure you want to submit this activity? Please check again.",
   });
 
   const [messageModal, setMessageModal] = useState({
@@ -175,6 +176,10 @@ const AttemptActivityPage = () => {
         };
 
         result = await taskAttemptProvider.createActivityAttempt(payload);
+
+        const { isSuccess, data } = result;
+
+        if (isSuccess && data) setAttemptId(data.id);
       } else {
         // Update progres yang sudah ada
         const payload: UpdateTaskAttemptFormInputs = {
@@ -195,12 +200,18 @@ const AttemptActivityPage = () => {
           activityData.lastAttemptId!,
           payload
         );
+
+        const { isSuccess, data } = result;
+
+        if (isSuccess && data) setAttemptId(data.id);
       }
+
+      const { isSuccess } = result;
 
       setMessageModal({
         visible: true,
-        isSuccess: result?.isSuccess ?? false,
-        text: result?.isSuccess
+        isSuccess: isSuccess ?? false,
+        text: isSuccess
           ? "Progress successfully saved."
           : "Failed to save progress.",
         type: "back",
@@ -237,7 +248,7 @@ const AttemptActivityPage = () => {
       setMessageModal({
         visible: true,
         isSuccess: false,
-        text: "Please answer all questions to collect activities.",
+        text: "Please answer all questions to submit activities.",
         type: "submit",
       });
       return;
@@ -270,6 +281,10 @@ const AttemptActivityPage = () => {
         };
 
         result = await taskAttemptProvider.createActivityAttempt(payload);
+
+        const { isSuccess, data } = result;
+
+        if (isSuccess && data) setAttemptId(data.id);
       } else {
         const payload: UpdateTaskAttemptFormInputs = {
           answeredQuestionCount: answerLogs.filter(
@@ -289,9 +304,13 @@ const AttemptActivityPage = () => {
           activityData.lastAttemptId!,
           payload
         );
+
+        const { isSuccess, data } = result;
+
+        if (isSuccess && data) setAttemptId(data.id);
       }
 
-      const data = result.data;
+      const { data } = result;
 
       if (data) {
         const { leveledUp, levelChangeSummary } = data;
@@ -314,8 +333,8 @@ const AttemptActivityPage = () => {
         visible: true,
         isSuccess: result?.isSuccess ?? false,
         text: result?.isSuccess
-          ? "Activities have been successfully collected."
-          : "Activity Failed to be Collected.",
+          ? "Activities have been successfully submitted."
+          : "Activity failed to be submitted.",
         type: "submit",
       });
     } catch (err) {
@@ -331,7 +350,7 @@ const AttemptActivityPage = () => {
     if (!messageModal.isSuccess) return;
 
     if (messageModal.type === "submit") {
-      router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
+      router.push(`${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`);
     } else if (messageModal.type === "back") {
       router.back();
     }
@@ -339,7 +358,7 @@ const AttemptActivityPage = () => {
 
   const handleLevelUpModalConfirmation = () => {
     setLevelUpModal((prev) => ({ ...prev, visible: false }));
-    router.push(`${ROUTES.ROOT.ACTIVITYSUMMARY}/${params.slug}`);
+    router.push(`${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`);
   };
 
   const currentQuestion = activityData.questions[selectedQuestionIndex];

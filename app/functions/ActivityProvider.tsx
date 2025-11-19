@@ -51,7 +51,7 @@ export const activityProvider = {
     slug: string
   ): Promise<ApiResponse<ActivityWithQuestionsResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/attempt/${slug}`);
+      const data = await getAxios(`${API_URL}/${slug}/attempt`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ActivityWithQuestionsResponse>(error);
@@ -59,13 +59,10 @@ export const activityProvider = {
   },
 
   async getActivitySummaryFromAttempt(
-    slug: string
+    attemptId: string
   ): Promise<ApiResponse<ActivitySummaryResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/summary/${slug}`);
-
-      console.log("Summary Data: ", JSON.stringify(data, null, 2));
-
+      const data = await getAxios(`${API_URL}/attempts/${attemptId}/summary`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ActivitySummaryResponse>(error);

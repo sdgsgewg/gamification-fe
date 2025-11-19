@@ -139,6 +139,7 @@ const UserDropdownMenu = ({
       onOpenChange={setOpen}
       getPopupContainer={(trigger) => trigger.parentElement!}
       menu={{
+        className: "min-w-[8rem] max-w-[10rem]",
         items: [
           ...userMenus.map((item) => ({
             key: item.menu,
@@ -166,7 +167,7 @@ const UserDropdownMenu = ({
             key: "theme",
             label: (
               <div className="flex items-center justify-between px-1 py-1">
-                <span className="text-sm text-tx-secondary">Tema</span>
+                <span className="text-sm text-tx-secondary">Theme</span>
                 <ThemeSwitcher />
               </div>
             ),

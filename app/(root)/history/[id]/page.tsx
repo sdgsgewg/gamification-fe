@@ -68,7 +68,7 @@ const HistoryDetailPage = () => {
   }, [attemptDetailData]);
 
   const handleNavigateToActivityAttemptPage = () => {
-    router.push(`${ROUTES.ROOT.ACTIVITYATTEMPT}/${attemptDetailData?.slug}`);
+    router.push(`${ROUTES.ROOT}/${attemptDetailData?.slug}/attempt`);
   };
 
   if (!attemptDetailData) return <Loading />;
@@ -80,6 +80,7 @@ const HistoryDetailPage = () => {
       description,
       questionCount,
       type,
+      createdBy,
       attempt,
       progress,
     } = attemptDetailData;
@@ -90,15 +91,16 @@ const HistoryDetailPage = () => {
 
     const buttonText =
       status === TaskAttemptStatus.ON_PROGRESS
-        ? "Lanjutkan"
+        ? "Continue"
         : type.isRepeatable
-        ? "Kerja Ulang"
-        : "Mulai";
+        ? "Re-Attempt"
+        : "Start";
 
     return (
       <>
         <DetailPageLeftSideContent
           name={title}
+          additionalText={`Created by ${createdBy}`}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -148,12 +150,14 @@ const HistoryDetailPage = () => {
     const [view, setView] = useState<TaskDetailBottomContentView>("stats");
 
     const { duration, progress } = attemptDetailData;
+
+    const hasDuration = duration && duration.startTime && duration.endTime;
     const isCompleted = !!progress?.completedAt; // true kalau sudah selesai
 
     // Buat daftar tab dinamis
     const tabs: { key: TaskDetailBottomContentView; label: string }[] = [
       ...(isCompleted ? [{ key: "stats" as const, label: "Statistics" }] : []),
-      { key: "duration" as const, label: "Duration" },
+      ...(hasDuration ? [{ key: "duration" as const, label: "Duration" }] : []),
       { key: "progress" as const, label: "Progress" },
       ...(isCompleted
         ? [{ key: "questions" as const, label: "Questions" }]
@@ -221,7 +225,7 @@ const HistoryDetailPage = () => {
     const QuestionView = () => {
       return (
         <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
+          <h2 className="text-dark font-semibold text-2xl mb-4">Questions</h2>
 
           <div className="flex flex-col gap-8">
             {attemptDetailData.questions.map((q, idx) => (

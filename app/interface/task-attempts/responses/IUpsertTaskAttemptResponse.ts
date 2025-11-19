@@ -1,4 +1,5 @@
-export interface UpsertTaskAttemptResponseDto {
+export interface UpsertTaskAttemptResponse {
+  id: string;
   leveledUp: boolean;
   levelChangeSummary?: {
     previousLevel: number;

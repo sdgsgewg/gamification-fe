@@ -28,7 +28,7 @@ import {
   FeedbackRow,
   NumberRow,
 } from "@/app/components/shared/table/detail-page/TableRowData";
-import { ReviewTaskSummaryQuestionCard } from "@/app/components/pages/Dashboard/Submission/Cards";
+import { TaskSummaryQuestionCard } from "@/app/components/shared/cards";
 
 const SubmissionDetailPage = () => {
   const params = useParams<{ id: string }>();
@@ -216,7 +216,7 @@ const SubmissionDetailPage = () => {
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (
-              <ReviewTaskSummaryQuestionCard
+              <TaskSummaryQuestionCard
                 key={idx}
                 index={idx}
                 question={q}

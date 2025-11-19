@@ -9,12 +9,12 @@ import {
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { QuestionType, QuestionTypeLabels } from "@/app/enums/QuestionType";
-import { Question } from "@/app/interface/activities/responses/IActivityWithQuestionsResponse";
+import { QuestionResponse } from "@/app/interface/task-questions/responses/IQuestionResponse";
 import { getImageSrc } from "@/app/utils/image";
 
 interface TaskSummaryQuestionCardProps {
   index: number;
-  question: Question;
+  question: QuestionResponse;
   selectedOptionId?: string | null;
   answerText?: string;
 }
@@ -27,6 +27,11 @@ const TaskSummaryQuestionCard = ({
 }: TaskSummaryQuestionCardProps) => {
   const imageSrc = question.image ? getImageSrc(question.image) : undefined;
 
+  // DATA DARI USER ANSWER (LOG)
+  const answerLog = question.userAnswer;
+  const pointAwarded = answerLog?.pointAwarded ?? null;
+  const teacherNotes = answerLog?.teacherNotes ?? "";
+
   // Tentukan apakah jawaban user benar
   const selectedOption = question.options?.find(
     (opt) => opt.optionId === selectedOptionId
@@ -35,7 +40,8 @@ const TaskSummaryQuestionCard = ({
   const correctAnswerText =
     question.options?.map((opt) => opt.text).join(",") ?? ""; // fallback kalau tidak ada
   const isCorrectAnswer =
-    question.type === "fill_blank" || question.type === "essay"
+    question.type === QuestionType.FILL_BLANK ||
+    question.type === QuestionType.ESSAY
       ? answerText?.trim().toLowerCase() ===
         correctAnswerText?.trim().toLowerCase()
       : selectedOption?.isCorrect ?? false;
@@ -111,9 +117,7 @@ const TaskSummaryQuestionCard = ({
           <Image src={imageSrc} alt={`Soal ${index + 1}`} width={240} />
         </div>
       )}
-
       <p className="text-dark text-base mb-4">{question.text}</p>
-
       {/* === PILIHAN GANDA === */}
       {question.type === "multiple_choice" && question.options && (
         <div className="flex flex-col gap-3 mt-3">
@@ -183,9 +187,8 @@ const TaskSummaryQuestionCard = ({
           })}
         </div>
       )}
-
       {/* === TRUE OR FALSE === */}
-      {question.type === "true_false" && question.options && (
+      {question.type === QuestionType.TRUE_FALSE && question.options && (
         <div className="flex flex-col gap-3 mt-3">
           {question.options.map((opt) => {
             const isSelected = selectedOptionId === opt.optionId;
@@ -245,9 +248,9 @@ const TaskSummaryQuestionCard = ({
           })}
         </div>
       )}
-
       {/* === ISIAN / ESSAY === */}
-      {(question.type === "fill_blank" || question.type === "essay") && (
+      {(question.type === QuestionType.FILL_BLANK ||
+        question.type === QuestionType.ESSAY) && (
         <div className="flex flex-col gap-3 mt-3">
           <Input.TextArea
             rows={3}
@@ -261,9 +264,7 @@ const TaskSummaryQuestionCard = ({
           />
           {!isCorrectAnswer && correctAnswerText && (
             <>
-              <label className="text-dark font-medium">
-                Jawaban yang Tepat:
-              </label>
+              <label className="text-dark font-medium">Correct Answer:</label>
               <div className="border border-green-400 bg-correct-answer p-2 rounded-md text-dark">
                 {correctAnswerText}
               </div>
@@ -271,6 +272,24 @@ const TaskSummaryQuestionCard = ({
           )}
         </div>
       )}
+      {/* === POINT AWARDED & CATATAN GURU === */}
+      <div className="mt-4 flex flex-col gap-2">
+        {pointAwarded !== null && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium text-dark">Points awarded:</span>
+            <span className="font-semibold text-dark">{`${pointAwarded} / ${question.point}`}</span>
+          </div>
+        )}
+
+        {teacherNotes && (
+          <div className="mt-1">
+            <div className="text-sm font-medium text-dark mb-1">Notes:</div>
+            <div className="border border-light-accent bg-surface p-2 rounded-md text-sm text-dark whitespace-pre-line">
+              {teacherNotes}
+            </div>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

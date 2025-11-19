@@ -1,32 +1,7 @@
-import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
+import { CurrentAttemptResponse } from "../../task-attempts/responses/ICurrentAttemptResponse";
+import { RecentAttemptRespons } from "../../task-attempts/responses/IRecentAttemptResponse";
 
-interface ActivityType {
-  name: string;
-  isRepeatable: boolean;
-}
-
-interface CurrentAttempt {
-  answeredCount: number;
-  startedAt: string;
-  lastAccessedAt: string;
-  status: TaskAttemptStatus;
-}
-
-interface RecentAttempt {
-  startedAt: string;
-  lastAccessedAt: string;
-  completedAt: string;
-  status: TaskAttemptStatus;
-}
-
-interface ActivityDuration {
-  startTime?: Date;
-  endTime?: Date;
-  duration?: string;
-}
-
-export interface ActivityDetailResponse {
-  id: string;
+export interface TaskDetail {
   title: string;
   slug: string;
   description?: string;
@@ -38,7 +13,24 @@ export interface ActivityDetailResponse {
   difficulty: string;
   createdBy: string;
   type: ActivityType;
-  currAttempt?: CurrentAttempt;
-  recentAttempt?: RecentAttempt;
+}
+
+export interface ActivityType {
+  id: string;
+  name: string;
+  isRepeatable: boolean;
+}
+
+interface ActivityDuration {
+  startTime?: Date;
+  endTime?: Date;
+  duration?: string;
+}
+
+export interface ActivityDetailResponse {
+  id: string;
+  taskDetail: TaskDetail;
   duration?: ActivityDuration;
+  currAttempt?: CurrentAttemptResponse;
+  recentAttempts?: RecentAttemptRespons[];
 }

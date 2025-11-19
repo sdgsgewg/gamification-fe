@@ -292,7 +292,10 @@ export function useAuth() {
     setIsFirstTime(false);
   };
 
-  const getCachedUserProfile = useCallback((): UserDetailResponse | null => {
+  const getCachedUserProfile = useCallback(():
+    | UserDetailResponse
+    | null
+    | undefined => {
     if (userProfile) return userProfile;
 
     const cached = getSession("userProfile");

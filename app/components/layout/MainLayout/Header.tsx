@@ -230,17 +230,11 @@ const UserDropdownMenu = ({ name, username, role }: UserDropdownMenuProps) => {
 };
 
 const Header = () => {
-  const { user, role } = useGetCachedUser();
+  const { user, role, loading } = useGetCachedUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
-  const handleNavigateToHomePage = () => {
-    router.push("/");
-  };
-
-  useEffect(() => {
-    console.log("User: ", JSON.stringify(user, null, 2));
-  }, [user]);
+  const handleNavigateToHomePage = () => router.push("/");
 
   return (
     <header className="bg-surface px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
@@ -255,7 +249,10 @@ const Header = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={role} />
-          {user && role !== Role.GUEST ? (
+
+          {loading ? (
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
+          ) : user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
@@ -282,7 +279,9 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={role} isMobile />
-          {user && role !== Role.GUEST ? (
+          {loading ? (
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
+          ) : user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Role } from "@/app/enums/Role";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 import { authEventTarget, useAuth } from "./auth/useAuth";
+import { getLocal, setLocal } from "../utils/storage";
 
 interface UseGetCachedUserResult {
   user: UserDetailResponse | undefined;
@@ -12,12 +13,9 @@ interface UseGetCachedUserResult {
   loading: boolean;
 }
 
-/**
- * Hook untuk mendapatkan user & role dari useAuth
- * dan otomatis update saat login/logout karena useAuth reactive.
- */
 export const useGetCachedUser = (): UseGetCachedUserResult => {
-  const { getCachedUserProfile, isLoggedIn, loading } = useAuth();
+  const { getCachedUserProfile, isLoggedIn, loading, fetchUserProfile } =
+    useAuth();
 
   const [user, setUser] = useState<UserDetailResponse>();
   const [role, setRole] = useState<Role>(Role.GUEST);
@@ -35,41 +33,58 @@ export const useGetCachedUser = (): UseGetCachedUserResult => {
     }
   };
 
-  useEffect(() => {
-    let isMounted = true;
+  const updateUser = useCallback(async () => {
+    let cachedUser = getCachedUserProfile();
 
-    const updateUser = () => {
-      const cachedUser = getCachedUserProfile();
-
-      if (!isMounted) return;
-
-      if (cachedUser) {
-        setUser(cachedUser);
-
-        // Bisa string atau object
-        const roleValue =
-          typeof cachedUser.role === "string"
-            ? cachedUser.role
-            : cachedUser.role?.name;
-
-        setRole(parseRole(roleValue));
-      } else {
-        setUser(undefined);
-        setRole(Role.GUEST);
+    if (!cachedUser && isLoggedIn) {
+      // fallback: try localStorage
+      const localUser = getLocal("userProfile");
+      if (localUser) {
+        try {
+          cachedUser = JSON.parse(localUser);
+        } catch {
+          cachedUser = undefined;
+        }
       }
-    };
 
-    updateUser(); // fetch awal
+      // kalau masih tidak ada, fetch dari API
+      if (!cachedUser) {
+        try {
+          const profile = await fetchUserProfile();
+          cachedUser = profile;
+          // simpan ke localStorage supaya next reload cepat
+          if (profile) setLocal("userProfile", JSON.stringify(profile));
+        } catch {
+          cachedUser = undefined;
+        }
+      }
+    }
 
-    const handleAuthChange = () => updateUser(); // update otomatis saat login/logout
+    if (cachedUser) {
+      setUser(cachedUser);
 
+      const roleValue =
+        typeof cachedUser.role === "string"
+          ? cachedUser.role
+          : cachedUser.role?.name;
+
+      setRole(parseRole(roleValue));
+    } else {
+      setUser(undefined);
+      setRole(Role.GUEST);
+    }
+  }, [fetchUserProfile, getCachedUserProfile, isLoggedIn]);
+
+  useEffect(() => {
+    updateUser();
+
+    const handleAuthChange = () => updateUser();
     authEventTarget.addEventListener("authChanged", handleAuthChange);
 
     return () => {
-      isMounted = false;
       authEventTarget.removeEventListener("authChanged", handleAuthChange);
     };
-  }, []);
+  }, [updateUser]);
 
   return { user, role, isLoggedIn, loading };
 };

@@ -217,9 +217,18 @@ const Header = () => {
 
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={role} />
-          {loading ? (
+          {/* {loading ? (
             <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
           ) : user && role !== Role.GUEST ? (
+            <UserDropdownMenu
+              name={user.name}
+              username={user.username}
+              role={role}
+            />
+          ) : (
+            <AuthActionButtons />
+          )} */}
+          {user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
@@ -244,9 +253,7 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={role} isMobile />
-          {loading ? (
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-          ) : user && role !== Role.GUEST ? (
+          {user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}

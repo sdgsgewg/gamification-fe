@@ -1,5 +1,5 @@
 // useAuthStore.ts
-// Manages access token (memory + sessionStorage), refresh queue and global handlers.
+// Manages access token (memory + sessionStorage + localStorage), refresh queue and global handlers.
 
 let accessTokenMemory: string | null = null;
 let refreshHandler: (() => Promise<string | null>) | null = null;
@@ -10,50 +10,79 @@ let refreshQueue: Array<(token: string | null) => void> = [];
 
 const ACCESS_TOKEN_KEY = "app_access_token";
 
+// -----------------------------------------------------------
+// Set Access Token (memory + sessionStorage + localStorage)
+// -----------------------------------------------------------
 export function setAccessToken(token: string | null) {
   accessTokenMemory = token ?? null;
 
   try {
-    if (token) {
-      sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
-    } else {
-      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    if (typeof window !== "undefined") {
+      if (token) {
+        sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
+        localStorage.setItem(ACCESS_TOKEN_KEY, token); // persistent copy
+      } else {
+        sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+      }
     }
   } catch (e) {
-    // sessionStorage could throw in some environments (very rare)
-    // swallow, memory token still set
+    console.warn("setAccessToken storage error", e);
   }
 }
 
+// -----------------------------------------------------------
+// Get Access Token (memory → sessionStorage → localStorage)
+// -----------------------------------------------------------
 export function getAccessToken(): string | null {
   if (accessTokenMemory) return accessTokenMemory;
 
+  if (typeof window === "undefined") return null;
+
   try {
-    const stored = sessionStorage.getItem(ACCESS_TOKEN_KEY);
-    if (stored) {
-      accessTokenMemory = stored;
-      return stored;
+    const session = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+    if (session) {
+      accessTokenMemory = session;
+      return session;
+    }
+
+    const local = localStorage.getItem(ACCESS_TOKEN_KEY);
+    if (local) {
+      accessTokenMemory = local;
+
+      // restore to sessionStorage for tab isolation behavior
+      try {
+        sessionStorage.setItem(ACCESS_TOKEN_KEY, local);
+      } catch {}
+
+      return local;
     }
   } catch (e) {
-    // ignore
+    console.warn("getAccessToken error", e);
   }
 
   return null;
 }
 
+// -----------------------------------------------------------
+// Clear Access Token From All Storages
+// -----------------------------------------------------------
 export function clearAccessToken() {
   accessTokenMemory = null;
+
   try {
-    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
   } catch {}
 }
 
-// register a function that actually performs refresh
+// Handlers registration
 export function registerRefreshHandler(fn: () => Promise<string | null>) {
   refreshHandler = fn;
 }
 
-// register logout handler to perform app-level cleanup
 export function registerLogoutHandler(fn: () => void) {
   logoutHandler = fn;
 }
@@ -61,34 +90,30 @@ export function registerLogoutHandler(fn: () => void) {
 export function logoutSilently() {
   try {
     clearAccessToken();
-    if (logoutHandler) logoutHandler();
+    logoutHandler?.();
   } catch {}
 }
 
-/**
- * Ensures only a single refresh in-flight.
- * If a refresh is already in progress, returns a Promise that resolves once refresh finishes.
- */
+// -----------------------------------------------------------
+// Refresh Queue (anti-double-refresh logic)
+// -----------------------------------------------------------
 export async function refreshAccessToken(): Promise<string | null> {
-  if (!refreshHandler) {
-    return null;
-  }
+  if (!refreshHandler) return null;
 
   if (isRefreshing) {
-    // return a promise that resolves once refresh completes
-    return new Promise((resolve) => {
-      refreshQueue.push(resolve);
-    });
+    return new Promise((resolve) => refreshQueue.push(resolve));
   }
 
   isRefreshing = true;
 
   try {
     const newToken = await refreshHandler();
-    // update memory/session with new token if exists
-    if (newToken) setAccessToken(newToken);
 
-    // flush queue
+    if (newToken) {
+      setAccessToken(newToken);
+    }
+
+    // Resolve queued requests
     refreshQueue.forEach((res) => {
       try {
         res(newToken);
@@ -98,13 +123,14 @@ export async function refreshAccessToken(): Promise<string | null> {
 
     return newToken ?? null;
   } catch (err) {
-    // flush queue with null
+    // Flush queue with null on error
     refreshQueue.forEach((res) => {
       try {
         res(null);
       } catch {}
     });
     refreshQueue = [];
+
     return null;
   } finally {
     isRefreshing = false;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -238,6 +238,10 @@ const Header = () => {
     router.push("/");
   };
 
+  useEffect(() => {
+    console.log("User: ", JSON.stringify(user, null, 2));
+  }, [user]);
+
   return (
     <header className="bg-surface px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50">
       <div className="flex items-center justify-between">
@@ -251,14 +255,14 @@ const Header = () => {
         {/* Desktop menu */}
         <div className="hidden lg:flex flex-1 items-center justify-between ms-8">
           <MainMenuItemWrapper role={role} />
-          {!user || role === Role.GUEST ? (
-            <AuthActionButtons />
-          ) : (
+          {user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
               role={role}
             />
+          ) : (
+            <AuthActionButtons />
           )}
         </div>
 
@@ -278,14 +282,14 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden mt-4 flex flex-col gap-6">
           <MainMenuItemWrapper role={role} isMobile />
-          {!user || role === Role.GUEST ? (
-            <AuthActionButtons />
-          ) : (
+          {user && role !== Role.GUEST ? (
             <UserDropdownMenu
               name={user.name}
               username={user.username}
               role={role}
             />
+          ) : (
+            <AuthActionButtons />
           )}
         </div>
       )}

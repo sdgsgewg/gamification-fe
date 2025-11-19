@@ -2,89 +2,68 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Role } from "@/app/enums/Role";
-import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 import { authEventTarget, useAuth } from "./auth/useAuth";
-import { getLocal, setLocal } from "../utils/storage";
+import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
 
-interface UseGetCachedUserResult {
-  user: UserDetailResponse | undefined;
-  role: Role;
-  isLoggedIn: boolean;
-  loading: boolean;
-}
+// Normalize role safely based on enum values
+const normalizeRole = (raw: string): Role => {
+  const match = Object.values(Role).find(
+    (val) => val.toLowerCase() === raw.toLowerCase()
+  );
+  return match || Role.GUEST;
+};
 
-export const useGetCachedUser = (): UseGetCachedUserResult => {
-  const { getCachedUserProfile, isLoggedIn, loading, fetchUserProfile } =
-    useAuth();
+export const useGetCachedUser = () => {
+  const {
+    getCachedUserProfile,
+    isLoggedIn,
+    loading: authLoading,
+    fetchUserProfile,
+  } = useAuth();
 
   const [user, setUser] = useState<UserDetailResponse>();
   const [role, setRole] = useState<Role>(Role.GUEST);
-
-  const parseRole = (value: string): Role => {
-    switch (value.toLowerCase()) {
-      case "admin":
-        return Role.ADMIN;
-      case "teacher":
-        return Role.TEACHER;
-      case "student":
-        return Role.STUDENT;
-      default:
-        return Role.GUEST;
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   const updateUser = useCallback(async () => {
-    let cachedUser = getCachedUserProfile();
+    setLoading(true);
 
-    if (!cachedUser && isLoggedIn) {
-      // fallback: try localStorage
-      const localUser = getLocal("userProfile");
-      if (localUser) {
-        try {
-          cachedUser = JSON.parse(localUser);
-        } catch {
-          cachedUser = undefined;
-        }
-      }
+    let cached = getCachedUserProfile();
 
-      // kalau masih tidak ada, fetch dari API
-      if (!cachedUser) {
-        try {
-          const profile = await fetchUserProfile();
-          cachedUser = profile;
-          // simpan ke localStorage supaya next reload cepat
-          if (profile) setLocal("userProfile", JSON.stringify(profile));
-        } catch {
-          cachedUser = undefined;
-        }
-      }
+    // If logged in but no cached data yet → fetch profile once
+    if (!cached && isLoggedIn) {
+      cached = await fetchUserProfile(); // useAuth will auto cache it
     }
 
-    if (cachedUser) {
-      setUser(cachedUser);
+    if (cached) {
+      setUser(cached);
 
-      const roleValue =
-        typeof cachedUser.role === "string"
-          ? cachedUser.role
-          : cachedUser.role?.name;
+      const raw =
+        typeof cached.role === "string"
+          ? cached.role
+          : cached.role?.name || "Guest";
 
-      setRole(parseRole(roleValue));
+      setRole(normalizeRole(raw));
     } else {
       setUser(undefined);
       setRole(Role.GUEST);
     }
-  }, [fetchUserProfile, getCachedUserProfile, isLoggedIn]);
 
+    setLoading(false);
+  }, [getCachedUserProfile, fetchUserProfile, isLoggedIn]);
+
+  // Sync with auth changes
   useEffect(() => {
     updateUser();
-
-    const handleAuthChange = () => updateUser();
-    authEventTarget.addEventListener("authChanged", handleAuthChange);
-
-    return () => {
-      authEventTarget.removeEventListener("authChanged", handleAuthChange);
-    };
+    const listener = () => updateUser();
+    authEventTarget.addEventListener("authChanged", listener);
+    return () => authEventTarget.removeEventListener("authChanged", listener);
   }, [updateUser]);
 
-  return { user, role, isLoggedIn, loading };
+  return {
+    user,
+    role,
+    isLoggedIn,
+    loading: loading || authLoading,
+  };
 };

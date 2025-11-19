@@ -73,6 +73,22 @@ export const clearStorage = () => {
   clearLocal();
 };
 
+export const getCachedAuth = (key: string): string | null => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const s = sessionStorage.getItem(key);
+    if (s) return s;
+  } catch {}
+
+  try {
+    const l = localStorage.getItem(key);
+    if (l) return l;
+  } catch {}
+
+  return null;
+};
+
 /*
   Backwards-compatible aliases (existing code used getItem/setItem/clearStorage).
   getItem / setItem map to localStorage helpers (for flags like firstTimeUser).

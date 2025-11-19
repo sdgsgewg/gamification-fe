@@ -2,7 +2,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   clearStorage, // clears both local + session
   setSession,
+  setLocal,
   getSession,
+  getLocal,
+  getCachedAuth,
 } from "../../utils/storage";
 import { postAxios, getAxios } from "../../utils/AxiosFunction";
 import { RegisterRequest } from "../../schemas/auth/register";
@@ -46,10 +49,11 @@ export function useAuth() {
   const fetchUserProfile = useCallback(async () => {
     const res = await getAxios("/users/me");
     setUserProfile(res);
-    // cache to sessionStorage
-    try {
-      setSession("userProfile", JSON.stringify(res));
-    } catch {}
+
+    const json = JSON.stringify(res);
+    setSession("userProfile", json);
+    setLocal("userProfile", json);
+
     return res;
   }, []);
 
@@ -90,13 +94,20 @@ export function useAuth() {
     if (hasInitRef.current) return;
     hasInitRef.current = true;
 
+    // 1. Restore cached profile instantly (no flash GUEST)
+    const cached = getCachedAuth("userProfile");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setUserProfile(parsed);
+        setIsGuest(false);
+        setIsLoggedIn(true);
+      } catch {}
+    }
+
     // If there's no refresh token, we consider not logged in.
     const refreshToken = getCookie("refreshToken");
-
     if (!refreshToken) {
-      setIsLoggedIn(false);
-      setIsGuest(true);
-      setUserProfile(null);
       setLoading(false);
       return;
     }
@@ -104,7 +115,6 @@ export function useAuth() {
     try {
       // Try to refresh access token using refresh token cookie
       const newAccessToken = await refreshAccessToken();
-
       if (!newAccessToken) {
         throw new Error("Failed to refresh token");
       }
@@ -117,13 +127,10 @@ export function useAuth() {
       setIsGuest(false);
       setUserProfile(profile);
     } catch (err) {
-      console.warn("Init: refresh or profile fetch failed:", err);
-
       // refresh failed → forced logout (silent)
       clearStorage();
       deleteCookie("refreshToken");
       deleteCookie("role");
-
       setMemToken(null);
       setIsLoggedIn(false);
       setUserProfile(null);
@@ -205,9 +212,10 @@ export function useAuth() {
         // role cookie (existing logic)
         setCookie("role", user.role.name, cookieMaxAge);
 
-        // store profile to sessionStorage (not localStorage)
+        // store profile to sessionStorage and localStorage
         try {
           setSession("userProfile", JSON.stringify(user));
+          setLocal("userProfile", JSON.stringify(user));
         } catch {}
 
         setIsLoggedIn(true);
@@ -298,7 +306,7 @@ export function useAuth() {
     | undefined => {
     if (userProfile) return userProfile;
 
-    const cached = getSession("userProfile");
+    const cached = getCachedAuth("userProfile");
     if (!cached) return null;
 
     try {

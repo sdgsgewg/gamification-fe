@@ -85,8 +85,6 @@ const ShareTaskForm = forwardRef<FormRef, ShareTaskFormProps>(
         endTime,
       };
 
-      console.log("Payload share task: ", JSON.stringify(payload, null, 2));
-
       const result = await classTaskProvider.shareTaskIntoClasses(payload);
       const { isSuccess, message } = result;
 

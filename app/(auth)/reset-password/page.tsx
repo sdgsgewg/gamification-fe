@@ -3,7 +3,6 @@
 export const dynamic = "force-dynamic";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { ResetPasswordFormInputs } from "@/app/schemas/auth/resetPassword";
 import ResetPasswordForm from "@/app/components/forms/auth/reset-password-form";
 import { ROUTES } from "@/app/constants/routes";
 import { Suspense } from "react";
@@ -14,8 +13,7 @@ const ResetPasswordPageContent = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const handleResetPasswordRequest = (values: ResetPasswordFormInputs) => {
-    console.log("Reset password request for:", values);
+  const handleResetPasswordRequest = () => {
     router.push(ROUTES.AUTH.LOGIN);
   };
 

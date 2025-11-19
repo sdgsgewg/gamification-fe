@@ -16,8 +16,6 @@ export const useTaskSubmissionDetail = (id: string) => {
 
       const ts = res.data;
 
-      console.log("Submission detail data: ", JSON.stringify(res, null, 2));
-
       const mapped: TaskSubmissionDetailResponse = {
         ...ts,
         taskDetail: {

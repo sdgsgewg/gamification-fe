@@ -155,8 +155,6 @@ const ReviewSubmissionPage = () => {
         answers: reviewLogs,
       };
 
-      console.log("Payload: ", JSON.stringify(payload, null, 2));
-
       const result = await taskSubmissionProvider.updateTaskSubmission(
         params.id,
         payload

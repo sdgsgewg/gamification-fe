@@ -37,7 +37,6 @@ const CreateClassPage = () => {
   };
 
   const handleCreateClassSuccess = (values: CreateClassFormInputs) => {
-    console.log("Create class successful with:", values);
     router.push(`${baseRoute}`);
   };
 

@@ -45,7 +45,6 @@ const EditSubjectPage = () => {
   };
 
   const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {
-    console.log("Edit subject successful with:", values);
     router.push(`${baseRoute}`);
   };
 

@@ -17,8 +17,6 @@ export const useClassTaskWithQuestions = (
         taskSlug
       );
 
-      console.log("Class task with questions: ", JSON.stringify(res, null, 2));
-
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 

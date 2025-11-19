@@ -9,9 +9,6 @@ export const useNotJoinedClasses = (searchText?: string) => {
     queryKey: ["not-joined-classes", searchText],
     queryFn: async () => {
       const res = await classProvider.getNotJoinedClasses({ searchText });
-
-      console.log("Not joined classes: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: ClassOverviewResponse[]) =>

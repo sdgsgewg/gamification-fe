@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   sidebarAdminMenuItems,
   getSidebarMainMenuItems,
@@ -15,6 +15,7 @@ import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { useAuth } from "@/app/hooks/auth/useAuth";
 import { Role } from "@/app/enums/Role";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
 interface MainMenuItemProps {
   menu: string;
@@ -136,9 +137,8 @@ interface SidebarProps {
 
 const Sidebar = ({ onClose }: SidebarProps) => {
   const router = useRouter();
-  const { logout, getCachedUserProfile } = useAuth();
-
-  const [userRole, setUserRole] = useState<Role>(Role.ADMIN);
+  const { logout } = useAuth();
+  const { role } = useGetCachedUser();
 
   const handleNavigateToHomePage = () => {
     router.push("/");
@@ -151,11 +151,6 @@ const Sidebar = ({ onClose }: SidebarProps) => {
 
     asyncLogout();
   };
-
-  useEffect(() => {
-    const user = getCachedUserProfile();
-    if (user) setUserRole(user.role.name);
-  }, [getCachedUserProfile]);
 
   return (
     <aside className="bg-tertiary min-h-screen border-r-2 border-br-primary text-dark z-50">
@@ -174,9 +169,9 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         </button>
       </div>
       <nav className="flex flex-col gap-4">
-        <MainMenuItemWrapper role={userRole} onClose={onClose} />
-        {userRole === Role.ADMIN && (
-          <AdminMenuItemWrapper role={userRole} onClose={onClose} />
+        <MainMenuItemWrapper role={role} onClose={onClose} />
+        {role === Role.ADMIN && (
+          <AdminMenuItemWrapper role={role} onClose={onClose} />
         )}
         <PersonalizationMenuItemWrapper />
         <ul className="pt-4 border-t-2 border-br-primary">
@@ -184,7 +179,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
             menu="Logout"
             icon={faRightFromBracket}
             url="/"
-            role={userRole}
+            role={role}
             onClick={handleLogout}
             onCloseSidebar={onClose}
           />

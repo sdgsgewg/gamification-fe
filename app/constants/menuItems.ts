@@ -105,12 +105,6 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
       icon: faUser,
       roles: [Role.STUDENT],
     },
-    {
-      menu: "Log Out",
-      url: "/",
-      icon: faRightFromBracket,
-      roles: [Role.STUDENT],
-    },
   ],
   Teacher: [
     {
@@ -120,26 +114,14 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
       icon: faUser,
       roles: [Role.TEACHER],
     },
-    {
-      menu: "Log Out",
-      url: "/",
-      icon: faRightFromBracket,
-      roles: [Role.TEACHER],
-    },
   ],
   Admin: [
-    {
-      menu: "Account Settings",
-      url: "/account-settings",
-      icon: faGear,
-      roles: [Role.ADMIN],
-    },
-    {
-      menu: "Log Out",
-      url: "/",
-      icon: faRightFromBracket,
-      roles: [Role.ADMIN],
-    },
+    // {
+    //   menu: "Account Settings",
+    //   url: "/account-settings",
+    //   icon: faGear,
+    //   roles: [Role.ADMIN],
+    // },
   ],
 };
 

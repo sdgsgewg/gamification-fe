@@ -12,8 +12,6 @@ export const useAvailableClasses = (taskId: string, searchText?: string) => {
         searchText,
       });
 
-      console.log("Available classes: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: AvailableClassesResponse[]) =>

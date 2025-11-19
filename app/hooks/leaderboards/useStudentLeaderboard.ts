@@ -10,12 +10,6 @@ export const useStudentLeaderboard = () => {
     queryKey: ["student-leaderboard"],
     queryFn: async () => {
       const res = await leaderboardProvider.getStudentLeaderboard();
-
-      console.log(
-        "Student Leaderboard Response:",
-        JSON.stringify(res, null, 2)
-      );
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: LeaderboardResponse[]) =>

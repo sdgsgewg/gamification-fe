@@ -63,8 +63,7 @@ const CompleteProfilePageContent = () => {
     if (!uid) setView("error");
   }, [uid]);
 
-  const handleCompleteProfileSuccess = (values: CompleteProfileFormInputs) => {
-    console.log("Complete profile successful with:", values);
+  const handleCompleteProfileSuccess = () => {
     setView("success");
   };
 

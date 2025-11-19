@@ -3,8 +3,6 @@ import {
   clearStorage, // clears both local + session
   setSession,
   setLocal,
-  getSession,
-  getLocal,
   getCachedAuth,
 } from "../../utils/storage";
 import { postAxios, getAxios } from "../../utils/AxiosFunction";
@@ -27,7 +25,6 @@ import {
   registerRefreshHandler,
   registerLogoutHandler,
   refreshAccessToken,
-  logoutSilently,
 } from "./useAuthStore";
 
 const API_URL = "/auth";
@@ -288,8 +285,9 @@ export function useAuth() {
       deleteCookie("refreshToken");
       deleteCookie("role");
 
-      authEventTarget.dispatchEvent(new Event("authChanged"));
-      router.push("/");
+      // PAKSA FULL RELOAD
+      window.location.replace("/");
+      window.location.reload();
     } catch (error) {
       return handleAxiosError<null>(error);
     }

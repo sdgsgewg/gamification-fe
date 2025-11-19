@@ -2,7 +2,6 @@
 
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreateSubjectFormInputs } from "@/app/schemas/subjects/createSubject";
 import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateSubjectForm from "@/app/components/forms/subjects/create-subject-form";
@@ -36,8 +35,7 @@ const CreateSubjectPage = () => {
     router.back();
   };
 
-  const handleCreateSubjectSuccess = (values: CreateSubjectFormInputs) => {
-    console.log("Create subject successful with:", values);
+  const handleCreateSubjectSuccess = () => {
     router.push(`${baseRoute}`);
   };
 

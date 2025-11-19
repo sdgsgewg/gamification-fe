@@ -46,7 +46,6 @@ const EditTaskTypePage = () => {
   };
 
   const handleEdittaskTypeSuccess = (values: EditTaskTypeFormInputs) => {
-    console.log("Edit task type successful with:", values);
     router.push(`${baseRoute}`);
   };
 

@@ -37,7 +37,6 @@ const CreateTaskTypePage = () => {
   };
 
   const handleCreateTaskTypeSuccess = (values: CreateTaskTypeFormInputs) => {
-    console.log("Create task type successful with: ", values);
     router.push(`${baseRoute}`);
   };
 

@@ -5,7 +5,6 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
-import { EditMaterialFormInputs } from "@/app/schemas/materials/editMaterial";
 import EditMaterialForm from "@/app/components/forms/materials/edit-material-form";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
@@ -49,8 +48,7 @@ const EditMaterialPage = () => {
     router.back();
   };
 
-  const handleEditMaterialSuccess = (values: EditMaterialFormInputs) => {
-    console.log("Material edit successful with:", values);
+  const handleEditMaterialSuccess = () => {
     router.push(`${baseRoute}`);
   };
 

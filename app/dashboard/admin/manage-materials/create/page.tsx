@@ -5,9 +5,7 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
 import CreateMaterialForm from "@/app/components/forms/materials/create-material-form";
-import { CreateMaterialFormInputs } from "@/app/schemas/materials/createMaterial";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-
 import { ROUTES } from "@/app/constants/routes";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useGrades } from "@/app/hooks/grades/useGrades";
@@ -42,8 +40,7 @@ const CreateMaterialPage = () => {
     router.back();
   };
 
-  const handleCreateMaterialSuccess = (values: CreateMaterialFormInputs) => {
-    console.log("Create material successful with:", values);
+  const handleCreateMaterialSuccess = () => {
     router.push(ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS);
   };
 

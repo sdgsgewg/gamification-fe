@@ -42,7 +42,6 @@ const EditSubjectPage = () => {
   };
 
   const handleEditClassSuccess = (values: EditClassFormInputs) => {
-    console.log("Edit class successful with:", values);
     router.push(`${baseRoute}`);
   };
 

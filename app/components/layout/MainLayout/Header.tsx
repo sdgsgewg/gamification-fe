@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,6 +8,7 @@ import {
   faChevronDown,
   faBars,
   faXmark,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -93,13 +94,13 @@ const AuthActionButtons = () => {
     <div className="flex flex-row items-center gap-4">
       <button
         onClick={() => router.push(ROUTES.AUTH.LOGIN)}
-        className="bg-tertiary text-tx-primary-accent font-bold rounded-2xl px-6 py-2 hover:bg-tertiary-hover transition"
+        className="bg-tertiary text-tx-primary-accent font-bold rounded-2xl px-6 py-2 hover:bg-tertiary-hover transition cursor-pointer"
       >
         Login
       </button>
       <button
         onClick={() => router.push(ROUTES.AUTH.REGISTER)}
-        className="bg-primary text-white font-bold rounded-2xl px-6 py-2 hover:bg-primary-hover transition"
+        className="bg-primary text-white font-bold rounded-2xl px-6 py-2 hover:bg-primary-hover transition cursor-pointer"
       >
         Register
       </button>
@@ -123,13 +124,22 @@ const UserDropdownMenu = ({
   const [open, setOpen] = useState(false);
   const { data: userStats } = useUserStats();
 
-  const handleLogout = async () => await logout();
-  const handleMenuClick = async (e: React.MouseEvent, item: MenuItem) => {
+  const handleNavigate = (e: React.MouseEvent, item: MenuItem) => {
     e.preventDefault();
-    if (item.menu.toLowerCase() === "log out") return handleLogout();
-    if (item.dynamicPath && username)
-      return router.push(item.dynamicPath(username));
+
+    if (item.dynamicPath && username) {
+      router.push(item.dynamicPath(username));
+      return;
+    }
+
     if (item.url) router.push(item.url);
+  };
+
+  const handleLogoutClick = () => {
+    const asyncLogout = async () => {
+      await logout();
+    };
+    asyncLogout();
   };
 
   return (
@@ -141,12 +151,13 @@ const UserDropdownMenu = ({
       menu={{
         className: "min-w-[8rem] max-w-[10rem]",
         items: [
+          // Normal menu items
           ...userMenus.map((item) => ({
             key: item.menu,
             label: (
               <a
-                href={item.url || "#"}
-                onClick={(e) => handleMenuClick(e, item)}
+                href={item.url ?? "#"}
+                onClick={(e) => handleNavigate(e, item)}
                 className="flex items-center gap-2 px-1 py-2 hover:bg-light-emphasis"
               >
                 {item.icon && (
@@ -159,10 +170,13 @@ const UserDropdownMenu = ({
               </a>
             ),
           })),
+
           {
-            key: "divider",
+            key: "divider1",
             label: <div className="h-[1px] bg-light-emphasis my-1" />,
           },
+
+          // Theme
           {
             key: "theme",
             label: (
@@ -170,6 +184,28 @@ const UserDropdownMenu = ({
                 <span className="text-sm text-tx-secondary">Theme</span>
                 <ThemeSwitcher />
               </div>
+            ),
+          },
+
+          {
+            key: "divider2",
+            label: <div className="h-[1px] bg-light-emphasis my-1" />,
+          },
+
+          // Logout
+          {
+            key: "logout",
+            label: (
+              <button
+                onClick={handleLogoutClick}
+                className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-tx-secondary hover:bg-light-emphasis cursor-pointer"
+              >
+                <FontAwesomeIcon
+                  icon={faRightFromBracket}
+                  className="w-4 h-4 text-tx-tertiary"
+                />
+                Log out
+              </button>
             ),
           },
         ],
@@ -181,6 +217,7 @@ const UserDropdownMenu = ({
         <Image src="/img/profile.png" alt="Profile" width={32} height={32} />
         <div className="flex flex-col gap-1">
           <p className="text-base font-medium">Hello, {name}</p>
+
           {role === Role.STUDENT && (
             <div className="flex items-center gap-1">
               <span className="bg-tertiary text-[0.625rem] rounded-lg px-3">
@@ -192,6 +229,7 @@ const UserDropdownMenu = ({
             </div>
           )}
         </div>
+
         <FontAwesomeIcon
           icon={open ? faChevronUp : faChevronDown}
           className="text-xs transition-transform duration-200"

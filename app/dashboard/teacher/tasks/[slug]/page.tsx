@@ -89,7 +89,6 @@ const TeacherTaskDetailPage = () => {
   const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
 
   const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
-    console.log("Share task successful with: ", values);
     handleCloseShareTaskModal();
     refetchTaskData();
   };

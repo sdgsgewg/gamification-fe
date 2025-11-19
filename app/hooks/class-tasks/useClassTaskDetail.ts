@@ -15,8 +15,6 @@ export const useClassTaskDetail = (classSlug: string, taskSlug: string) => {
         taskSlug
       );
 
-      console.log("Response: ", JSON.stringify(res, null, 2));
-
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail tugas");
 

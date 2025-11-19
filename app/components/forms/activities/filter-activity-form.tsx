@@ -146,7 +146,7 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
               <SelectField
                 control={control}
                 name="taskTypeId"
-                placeholder="Tipe Aktivitas"
+                placeholder="Activity"
                 options={taskTypeOptions}
                 loading={taskTypeOptions.length === 0}
                 disabled={taskTypeOptions.length === 0}
@@ -156,7 +156,7 @@ const FilterActivityForm = forwardRef<FormRef, FilterActivityFormProps>(
               <SelectField
                 control={control}
                 name="gradeIds"
-                placeholder="Kelas"
+                placeholder="Class"
                 options={gradeOptions}
                 loading={gradeOptions.length === 0}
                 disabled={gradeOptions.length === 0}

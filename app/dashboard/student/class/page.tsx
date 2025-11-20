@@ -20,7 +20,7 @@ import {
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 
 const StudentClassPage = () => {
   const router = useRouter();

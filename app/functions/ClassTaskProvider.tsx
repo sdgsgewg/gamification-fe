@@ -15,6 +15,7 @@ import { FilterClassRequest } from "../interface/classes/requests/IFilterClassRe
 import { ShareTaskFormInputs } from "../schemas/class-tasks/shareTask";
 import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
 import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
+import { TaskAttemptOverviewResponse } from "../interface/task-attempts/responses/ITaskAttemptOverviewResponse";
 
 const API_URL = "/class-tasks";
 
@@ -41,6 +42,33 @@ export const classTaskProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<GroupedTaskAttemptResponseDto[]>(error);
+    }
+  },
+
+  async getTasksFromAllClassesList(
+    params?: FilterTaskAttemptRequest
+  ): Promise<ApiResponse<TaskAttemptOverviewResponse[]>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.status) query.append("status", params.status);
+      if (params?.isClassTask)
+        query.append("isClassTask", params?.isClassTask ? "true" : "false");
+      if (params?.dateFrom)
+        query.append("dateFrom", params.dateFrom.toDateString());
+      if (params?.dateTo) query.append("dateTo", params.dateTo.toDateString());
+      if (params?.orderBy) query.append("orderBy", params.orderBy);
+      if (params?.orderState) query.append("orderState", params.orderState);
+
+      const url = query.toString()
+        ? `${API_URL}/list?${query}`
+        : `${API_URL}/list`;
+      const data = await getAxios(url);
+
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<TaskAttemptOverviewResponse[]>(error);
     }
   },
 
@@ -122,9 +150,7 @@ export const classTaskProvider = {
     attemptId: string
   ): Promise<ApiResponse<ClassTaskSummaryResponseDto>> {
     try {
-      const data = await getAxios(
-        `${API_URL}/attempts/${attemptId}/summary`
-      );
+      const data = await getAxios(`${API_URL}/attempts/${attemptId}/summary`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<ClassTaskSummaryResponseDto>(error);

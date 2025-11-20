@@ -9,7 +9,7 @@ import {
   TeacherTaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import Button from "@/app/components/shared/Button";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
 import { useTeacherClassTasks } from "@/app/hooks/class-tasks/useTeacherClassTasks";

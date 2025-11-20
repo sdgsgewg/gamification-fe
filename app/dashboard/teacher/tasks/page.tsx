@@ -25,7 +25,7 @@ import {
   TaskCardSkeleton,
   TaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Task/Teacher/Cards";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import PaginationInfo from "@/app/components/shared/PaginationInfo";
 
 const TeacherTaskPage = () => {

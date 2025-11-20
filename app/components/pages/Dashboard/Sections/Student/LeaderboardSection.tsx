@@ -1,32 +1,41 @@
 import { LeaderboardResponse } from "@/app/interface/leaderboards/responses/ILeaderboardResponse";
 import React from "react";
+import {
+  LeaderboardCard,
+  LeaderboardCardSkeleton,
+  LeaderboardCardWrapper,
+} from "../../Cards";
+import EmptyText from "@/app/components/shared/not-found/EmptyText";
 
 interface LeaderboardSectionProps {
   data: LeaderboardResponse[];
+  isLoading: boolean;
 }
 
-const LeaderboardSection = ({ data }: LeaderboardSectionProps) => {
+const LeaderboardSection = ({ data, isLoading }: LeaderboardSectionProps) => {
   return (
-    <div className="bg-card p-5 rounded-2xl shadow-md border border-outline">
-      <h2 className="text-lg font-semibold text-primary mb-3">Top Students</h2>
-      <ul className="space-y-3">
-        {data.map((user, index) => (
-          <li
-            key={user.id}
-            className="flex justify-between items-center bg-tertiary p-3 rounded-xl border border-br-tertiary"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-bold text-primary">
-                #{index + 1}
-              </span>
-              <span className="font-medium text-tx-primary">{user.name}</span>
-            </div>
-            <span className="text-sm text-tx-tertiary">
-              {user.point} Points
-            </span>
-          </li>
-        ))}
-      </ul>
+    <div className="w-full bg-card p-5 rounded-2xl shadow-md border border-outline">
+      <h2 className="text-lg font-semibold text-primary mb-2">Top Students</h2>
+      <p className="text-sm text-tx-tertiary leading-relaxed mb-4">
+        This leaderboard shows the accumulated points from students’ activities
+        across classes.
+      </p>
+
+      {isLoading ? (
+        <LeaderboardCardWrapper>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <LeaderboardCardSkeleton key={idx} />
+          ))}
+        </LeaderboardCardWrapper>
+      ) : data && data.length > 0 ? (
+        <LeaderboardCardWrapper>
+          {data.map((user, index) => (
+            <LeaderboardCard key={index} index={index} user={user} />
+          ))}
+        </LeaderboardCardWrapper>
+      ) : (
+        <EmptyText text={`No leaderboard yet`} />
+      )}
     </div>
   );
 };

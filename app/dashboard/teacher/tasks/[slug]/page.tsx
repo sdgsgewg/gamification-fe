@@ -27,7 +27,7 @@ import { useUnpublishTask } from "@/app/hooks/tasks/useUnpublishTask";
 import { useFinalizeTask } from "@/app/hooks/tasks/useFinalizeTask";
 import { ConfirmationModalState } from "@/app/interface/modals/IConfirmationModalState";
 import { TaskStatusLabels } from "@/app/enums/TaskStatus";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
 import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
 import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";

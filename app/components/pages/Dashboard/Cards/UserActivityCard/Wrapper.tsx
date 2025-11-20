@@ -21,7 +21,7 @@ const UserActivityCardWrapper = ({
         {title}
       </h2>
 
-      <div className="py-2 overflow-y-auto max-h-[24rem]">{children}</div>
+      <div className="py-2 overflow-y-auto max-h-[16rem]">{children}</div>
     </div>
   );
 };

@@ -17,7 +17,7 @@ import {
   TaskSubmissionCardSkeleton,
   TaskSubmissionCardWrapper,
 } from "@/app/components/pages/Dashboard/Submission/Cards";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import Loading from "@/app/components/shared/Loading";
 
 export const dynamic = "force-dynamic";

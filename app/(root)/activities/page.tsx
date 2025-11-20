@@ -22,7 +22,7 @@ import {
   ActivitySectionType,
   ActivitySectionLabels,
 } from "@/app/enums/ActivitySectionType";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import { Role } from "@/app/enums/Role";
 
 export const dynamic = "force-dynamic";

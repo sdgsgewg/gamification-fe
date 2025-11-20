@@ -8,6 +8,7 @@ import {
 } from "@/app/components/pages/Dashboard/Cards";
 import { ActivityLogOverviewResponse } from "@/app/interface/activity-logs/responses/IActivityLogOverviewResponse";
 import { MasterHistoryOverviewResponse } from "@/app/interface/master-histories/responses/IMasterHistoryOverviewResponse";
+import EmptyText from "@/app/components/shared/not-found/EmptyText";
 
 interface RecentActivitiesSectionProps {
   title?: string;
@@ -29,7 +30,7 @@ export default function RecentActivitiesSection({
           <UserActivityCardSkeleton key={i} />
         ))
       ) : data.length === 0 ? (
-        <p className="text-tx-tertiary text-sm">{noDataText}</p>
+        <EmptyText text={noDataText} />
       ) : (
         data.map((data) => (
           <UserActivityCard

@@ -8,9 +8,7 @@ import { ROUTES } from "@/app/constants/routes";
 const LoginPage = () => {
   const router = useRouter();
 
-  const handleLoginSuccess = () => {
-    router.push(ROUTES.DASHBOARD.BASE);
-  };
+  const handleLoginSuccess = () => {};
 
   const handleNavigateToForgotPassword = () => {
     router.push(ROUTES.AUTH.FORGOT_PASSWORD);

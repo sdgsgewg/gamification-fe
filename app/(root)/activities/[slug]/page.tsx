@@ -27,7 +27,7 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { Role } from "@/app/enums/Role";
 import { AttemptCard, AttemptCardWrapper } from "@/app/components/shared/cards";

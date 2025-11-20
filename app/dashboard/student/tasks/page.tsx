@@ -11,7 +11,7 @@ import {
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import {
   TaskHistoryCard,
   TaskHistoryCardSkeleton,

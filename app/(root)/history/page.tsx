@@ -14,7 +14,7 @@ import {
   HistoryCardSkeleton,
   HistoryCardWrapper,
 } from "@/app/components/pages/History/Cards";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
 

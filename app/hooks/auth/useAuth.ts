@@ -26,6 +26,7 @@ import {
   registerLogoutHandler,
   refreshAccessToken,
 } from "./useAuthStore";
+import { ROUTES } from "@/app/constants/routes";
 
 const API_URL = "/auth";
 export const authEventTarget = new EventTarget();
@@ -221,6 +222,10 @@ export function useAuth() {
 
         // notify listeners
         authEventTarget.dispatchEvent(new Event("authChanged"));
+
+        const modifiedRole = user.role.name.toLowerCase();
+
+        router.push(`${ROUTES.DASHBOARD.BASE}/${modifiedRole}`);
       }
 
       return res;

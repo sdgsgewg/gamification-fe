@@ -14,7 +14,7 @@ import SearchField from "@/app/components/fields/SearchField";
 import { useForm } from "react-hook-form";
 import { Form, Pagination } from "antd";
 import ClassCardSkeleton from "@/app/components/pages/Dashboard/Class/Cards/ClassCard/Skeleton";
-import NotFound from "@/app/components/shared/NotFound";
+import NotFound from "@/app/components/shared/not-found/NotFound";
 import PaginationInfo from "@/app/components/shared/PaginationInfo";
 
 const TeacherClassPage = () => {

@@ -6,19 +6,19 @@ import Button from "../shared/Button";
 import { SearchOutlined } from "@ant-design/icons";
 
 interface SearchFieldProps {
+  formId: string;
   control: any;
   name: string;
   placeholder?: string;
-  formId: string;
   className?: string;
   inputClassName?: string;
 }
 
 const SearchField = ({
+  formId,
   control,
   name,
   placeholder,
-  formId,
   className,
   inputClassName,
 }: SearchFieldProps) => {

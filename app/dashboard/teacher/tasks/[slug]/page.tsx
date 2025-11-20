@@ -7,11 +7,9 @@ import { Toaster, useToast } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import DetailPageWrapper from "@/app/components/shared/detail-page/DetailPageWrapper";
 import {
-  DurationTable,
   HistoryTable,
   TaskDetailInformationTable,
 } from "@/app/components/shared/table/detail-page/TableTemplate";
-import { getDateTime } from "@/app/utils/date";
 import QuestionCard from "@/app/components/pages/Dashboard/Task/QuestionCard";
 import DetailPageLeftSideContent from "@/app/components/shared/detail-page/DetailPageLeftSideContent";
 import { ROUTES } from "@/app/constants/routes";
@@ -31,7 +29,6 @@ import NotFound from "@/app/components/shared/not-found/NotFound";
 import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
 import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
 import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
-import { ShareTaskFormInputs } from "@/app/schemas/class-tasks/shareTask";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 
 const TeacherTaskDetailPage = () => {
@@ -88,7 +85,7 @@ const TeacherTaskDetailPage = () => {
   };
   const handleCloseShareTaskModal = () => setIsShareTaskModalVisible(false);
 
-  const handleShareTaskIntoClasses = (values: ShareTaskFormInputs) => {
+  const handleShareTaskIntoClasses = () => {
     handleCloseShareTaskModal();
     refetchTaskData();
   };
@@ -283,7 +280,7 @@ const TeacherTaskDetailPage = () => {
     const [view, setView] =
       useState<TaskDetailBottomContentView>("submissions");
 
-    const { assignedClasses, duration, history, questions } = taskData;
+    const { assignedClasses, history, questions } = taskData;
     const isShared = assignedClasses ?? false;
 
     // Buat daftar tab dinamis
@@ -291,7 +288,6 @@ const TeacherTaskDetailPage = () => {
       ...(isShared
         ? [{ key: "submissions" as const, label: "Submissions" }]
         : []),
-      { key: "duration" as const, label: "Duration" },
       { key: "history" as const, label: "History" },
       { key: "questions" as const, label: "Questions" },
     ];
@@ -315,20 +311,6 @@ const TeacherTaskDetailPage = () => {
             <SubmissionCard key={cls.id} cls={cls} />
           ))}
         </SubmissionCardWrapper>
-      );
-    };
-
-    const DurationView = () => {
-      if (!duration) return;
-
-      const { startTime, endTime, duration: taskDuration } = duration;
-
-      return (
-        <DurationTable
-          startTime={getDateTime(startTime ?? null)}
-          endTime={getDateTime(endTime ?? null)}
-          duration={taskDuration}
-        />
       );
     };
 
@@ -369,8 +351,6 @@ const TeacherTaskDetailPage = () => {
       >
         {view === "submissions" ? (
           <SubmissionView />
-        ) : view === "duration" ? (
-          <DurationView />
         ) : view === "history" ? (
           <HistoryView />
         ) : (

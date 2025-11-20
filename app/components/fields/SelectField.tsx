@@ -52,7 +52,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
       validateStatus={error ? "error" : ""}
       help={error?.message ?? helpText}
       style={{ marginBottom: error ? "1rem" : "0rem" }}
-      required={required}
+      // required={required}
     >
       <Controller
         name={name}

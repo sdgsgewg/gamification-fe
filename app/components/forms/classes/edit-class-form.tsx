@@ -6,7 +6,7 @@ import { useToast } from "@/app/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../shared/Button";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { useAuth } from "@/app/hooks/auth/useAuth";
 import TextField from "../../fields/TextField";
 import TextAreaField from "../../fields/TextAreaField";
@@ -23,14 +23,17 @@ import {
   editClassSchema,
 } from "@/app/schemas/classes/editClass";
 import { classProvider } from "@/app/functions/ClassProvider";
+import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
+import SelectField from "../../fields/SelectField";
 
 interface EditClassFormProps {
-  classData?: EditClassFormInputs;
+  classData: EditClassFormInputs;
+  gradeData: GradeOverviewResponse[];
   onFinish: (values: EditClassFormInputs) => void;
 }
 
 const EditClassForm = forwardRef<FormRef, EditClassFormProps>(
-  ({ classData, onFinish }, ref) => {
+  ({ classData, gradeData, onFinish }, ref) => {
     const { toast } = useToast();
 
     const {
@@ -48,6 +51,15 @@ const EditClassForm = forwardRef<FormRef, EditClassFormProps>(
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const gradeOptions = useMemo(
+      () =>
+        gradeData.map((grade) => ({
+          value: grade.gradeId,
+          label: grade.name,
+        })),
+      [gradeData]
+    );
 
     useInitializeForm<EditClassFormInputs>(reset, classData, (d) => ({
       ...d,
@@ -144,6 +156,18 @@ const EditClassForm = forwardRef<FormRef, EditClassFormProps>(
                   label="Deskripsi"
                   placeholder="Enter the class description"
                   errors={errors}
+                />
+
+                <SelectField
+                  control={control}
+                  name="gradeIds"
+                  label="Grade Levels"
+                  placeholder="Select grade levels"
+                  options={gradeOptions}
+                  errors={errors}
+                  loading={gradeOptions.length === 0}
+                  disabled={gradeOptions.length === 0}
+                  mode="multiple"
                 />
               </>
             }

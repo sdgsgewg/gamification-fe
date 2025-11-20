@@ -46,6 +46,9 @@ export const ConfirmationModal = ({
       case "delete":
         defaultText = "Are you sure you want to delete this item?";
         break;
+      case "leave":
+        defaultText = "Are you sure you want to leave?";
+        break;
       default:
         defaultText = "";
         break;
@@ -55,12 +58,12 @@ export const ConfirmationModal = ({
   };
 
   const getConfirmButtonVariant = () => {
-    if (type === "delete") return "danger";
+    if (type === "delete" || type === "leave") return "danger";
     return "outline";
   };
 
   const getCancelButtonVariant = () => {
-    if (type === "delete") return "outline";
+    if (type === "delete" || type === "leave") return "outline";
     return "primary";
   };
 

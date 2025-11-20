@@ -7,15 +7,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SelectField from "../../fields/SelectField";
 import { ClassOverviewResponse } from "@/app/interface/classes/responses/IClassOverviewResponse";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { joinClassDefaultValues, JoinClassFormInputs, joinClassSchema } from "@/app/schemas/classes/joinClass";
+import {
+  joinClassDefaultValues,
+  JoinClassFormInputs,
+  joinClassSchema,
+} from "@/app/schemas/classes/joinClass";
 
 interface JoinClassFormProps {
   classData: ClassOverviewResponse[];
+  isLoading: boolean;
   onFinish: (values: JoinClassFormInputs) => void;
 }
 
 const JoinClassForm = forwardRef<FormRef, JoinClassFormProps>(
-  ({ classData, onFinish }, ref) => {
+  ({ classData, isLoading, onFinish }, ref) => {
     const {
       control,
       handleSubmit,
@@ -49,13 +54,19 @@ const JoinClassForm = forwardRef<FormRef, JoinClassFormProps>(
       >
         <SelectField
           control={control}
-          name="classIds"
+          name="classId"
           label="Class"
           placeholder="Choose class"
           options={classOptions}
-          loading={classOptions.length === 0}
+          errors={errors}
+          loading={isLoading}
           disabled={classOptions.length === 0}
-          mode="multiple"
+          helpText={
+            classOptions.length === 0
+              ? "There are no available classes at this moment."
+              : undefined
+          }
+          required
         />
       </Form>
     );

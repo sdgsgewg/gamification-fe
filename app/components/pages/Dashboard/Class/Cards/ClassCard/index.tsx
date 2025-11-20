@@ -1,17 +1,18 @@
 "use client";
 
 import { IMAGES } from "@/app/constants/images";
+import { ClassOverviewResponse } from "@/app/interface/classes/responses/IClassOverviewResponse";
 import Image from "next/image";
 import React from "react";
 
 interface ClassCardProps {
-  image?: string;
-  name: string;
-  slug: string;
+  data: ClassOverviewResponse;
   onClick: (slug: string) => void;
 }
 
-const ClassCard = ({ image, name, slug, onClick }: ClassCardProps) => {
+const ClassCard = ({ data, onClick }: ClassCardProps) => {
+  const { name, slug, image } = data;
+
   return (
     <div
       className="bg-background flex flex-col items-center justify-center gap-4 p-6 rounded-lg shadow-xs border border-br-primary hover:bg-background-hover transition duration-300 ease-in-out cursor-pointer"

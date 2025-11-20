@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import {
   MemberCard,
   MemberCardSkeleton,
@@ -9,24 +10,33 @@ import {
   StudentTaskCardWrapper,
 } from "@/app/components/pages/Dashboard/Class/Cards";
 import Button from "@/app/components/shared/Button";
+import Loading from "@/app/components/shared/Loading";
 import { IMAGES } from "@/app/constants/images";
 import { ROUTES } from "@/app/constants/routes";
+import { classStudentProvider } from "@/app/functions/ClassStudentProvider";
 import { useStudentClassTasks } from "@/app/hooks/class-tasks/useStudentClassTasks";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import { useClassMember } from "@/app/hooks/classes/useClassMember";
 import { useClassStudentsLeaderboard } from "@/app/hooks/leaderboards/useClassStudentsLeaderboard";
+import { useToast } from "@/app/hooks/use-toast";
 import { ClassDetailView, MemberRole } from "@/app/types/class-detail";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 const StudentClassDetailPage = () => {
+  const { toast } = useToast();
   const params = useParams<{ slug: string }>();
   const router = useRouter();
+  const baseRoute = ROUTES.DASHBOARD.STUDENT.CLASS;
 
   const { data: classDetailData } = useClassDetail(params.slug, "detail");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [view, setView] = useState<ClassDetailView>("tasks");
   // Buat daftar tab dinamis
@@ -36,8 +46,47 @@ const StudentClassDetailPage = () => {
     { key: "leaderboard" as const, label: "Leaderboard" },
   ];
 
+  const [leaveConfirmationModal, setLeaveConfirmationModal] = useState({
+    visible: false,
+    text: "",
+  });
+
   const handleBack = () => {
     router.back();
+  };
+
+  const showLeaveModal = () => {
+    setLeaveConfirmationModal((prev) => ({ ...prev, visible: true }));
+  };
+
+  const confirmLeaveClass = () => {
+    handleLeaveClass();
+    setLeaveConfirmationModal((prev) => ({ ...prev, visible: false }));
+  };
+
+  const cancelLeave = () => {
+    setLeaveConfirmationModal((prev) => ({ ...prev, visible: false }));
+  };
+
+  const handleLeaveClass = async () => {
+    if (!classDetailData) return;
+
+    setIsLoading(true);
+
+    const { id } = classDetailData;
+
+    const res = await classStudentProvider.leaveClass(id);
+
+    const { isSuccess, message } = res;
+
+    if (isSuccess) {
+      toast.success(message ?? "You have left class");
+      router.push(`${baseRoute}`);
+    } else {
+      toast.error(message ?? "Failed left class");
+    }
+
+    setIsLoading(false);
   };
 
   const TaskView = () => {
@@ -305,66 +354,84 @@ const StudentClassDetailPage = () => {
   const { name, description, image } = classDetailData;
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-        <div>
-          <Button
-            type="primary"
-            size="middle"
-            variant="primary"
-            onClick={handleBack}
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
-            <span className="text-base font-semibold">Kembali</span>
-          </Button>
-        </div>
-        <div className="w-full sm:max-w-[60%] lg:max-w-[40%] flex items-center gap-4 sm:ms-auto">
-          <div className="flex flex-col text-end gap-2">
-            <h3 className="text-dark text-2xl md:text-3xl font-bold">{name}</h3>
-            <p className="text-sm font-medium">{description}</p>
-          </div>
-          {/* Class Image */}
-          <div className="max-w-32">
-            <Image
-              src={image ?? IMAGES.DEFAULT_CLASS}
-              alt={name}
-              width={100}
-              height={100}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      </div>
+    <>
+      {isLoading && <Loading />}
 
-      {/* Navigation tab antar view */}
-      <div className="w-full flex items-center mt-4 mb-8 border-y border-y-br-primary">
-        <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
-          {tabs.map((tab) => (
+      <div>
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+          <div className="flex flex-row sm:flex-col gap-4">
             <Button
-              key={tab.key}
+              type="primary"
               size="middle"
-              onClick={() => setView(tab.key)}
-              className={`relative flex items-center gap-2 !px-10 !py-5 !border-none text-sm transition-all duration-150 !bg-background hover:!bg-background-hover !text-dark`}
+              variant="primary"
+              onClick={handleBack}
             >
-              <span className="text-base font-semibold">{tab.label}</span>
-              {view === tab.key && (
-                <span className="absolute -bottom-0 left-0 w-full h-[2px] bg-primary" />
-              )}
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
+              <span className="text-base font-semibold">Back</span>
             </Button>
-          ))}
+            <Button size="middle" variant="danger" onClick={showLeaveModal}>
+              <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" />
+              <span className="text-base font-semibold">Leave</span>
+            </Button>
+          </div>
+          <div className="w-full sm:max-w-[60%] lg:max-w-[40%] flex items-center gap-4 sm:ms-auto">
+            <div className="flex flex-col text-end gap-2">
+              <h3 className="text-dark text-2xl md:text-3xl font-bold">
+                {name}
+              </h3>
+              <p className="text-sm font-medium">{description}</p>
+            </div>
+            {/* Class Image */}
+            <div className="max-w-32">
+              <Image
+                src={image ?? IMAGES.DEFAULT_CLASS}
+                alt={name}
+                width={100}
+                height={100}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
         </div>
+
+        {/* Navigation tab antar view */}
+        <div className="w-full flex items-center mt-4 mb-8 border-y border-y-br-primary">
+          <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.key}
+                size="middle"
+                onClick={() => setView(tab.key)}
+                className={`relative flex items-center gap-2 !px-10 !py-5 !border-none text-sm transition-all duration-150 !bg-background hover:!bg-background-hover !text-dark`}
+              >
+                <span className="text-base font-semibold">{tab.label}</span>
+                {view === tab.key && (
+                  <span className="absolute -bottom-0 left-0 w-full h-[2px] bg-primary" />
+                )}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Render View */}
+        {view === "tasks" ? (
+          <TaskView />
+        ) : view === "members" ? (
+          <MemberView />
+        ) : (
+          <LeaderboardView />
+        )}
       </div>
 
-      {/* Render View */}
-      {view === "tasks" ? (
-        <TaskView />
-      ) : view === "members" ? (
-        <MemberView />
-      ) : (
-        <LeaderboardView />
-      )}
-    </div>
+      <ConfirmationModal
+        visible={leaveConfirmationModal.visible}
+        text={`Are you sure you want to leave class '${classDetailData.name}'?`}
+        type="leave"
+        onConfirm={confirmLeaveClass}
+        onCancel={cancelLeave}
+      />
+    </>
   );
 };
 

@@ -21,11 +21,12 @@ const PaginationInfo = ({
   label = "items",
   sizeOptions = ["5", "10", "20", "50"],
 }: Props) => {
-  const start = total === 0 ? 0 : (pagination.current - 1) * pagination.pageSize + 1;
+  const start =
+    total === 0 ? 0 : (pagination.current - 1) * pagination.pageSize + 1;
   const end = Math.min(pagination.current * pagination.pageSize, total);
 
   return (
-    <div className="flex flex-col items-end gap-2 mt-12">
+    <div className="flex-1 flex flex-col items-start justify-end gap-2">
       <Pagination
         current={pagination.current}
         pageSize={pagination.pageSize}

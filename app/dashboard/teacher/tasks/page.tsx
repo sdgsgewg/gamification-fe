@@ -27,6 +27,7 @@ import {
 } from "@/app/components/pages/Dashboard/Task/Teacher/Cards";
 import NotFound from "@/app/components/shared/not-found/NotFound";
 import PaginationInfo from "@/app/components/shared/PaginationInfo";
+import FloatingButton from "@/app/components/shared/FloatingButton";
 
 const TeacherTaskPage = () => {
   const router = useRouter();
@@ -52,7 +53,8 @@ const TeacherTaskPage = () => {
   const [filters, setFilters] = useState<FilterTaskFormInputs>({
     searchText: debouncedSearch,
   });
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [isFilterModalVisible, setIsFilterModalVisible] =
+    useState<boolean>(false);
 
   // Update filters when user is found
   useEffect(() => {
@@ -111,6 +113,7 @@ const TeacherTaskPage = () => {
     setIsFilterModalVisible(false);
   };
 
+  // Navigation handlers
   const handleNavigateToCreateTaskPage = () => {
     router.push(`${baseRoute}/create`);
   };
@@ -125,7 +128,6 @@ const TeacherTaskPage = () => {
 
   return (
     <>
-      {/* Header */}
       <Toaster position="top-right" />
       <DashboardTitle
         title="Task Management"
@@ -178,29 +180,28 @@ const TeacherTaskPage = () => {
               />
             ))}
           </TaskCardWrapper>
-
-          {/* Pagination + Display */}
-          <PaginationInfo
-            total={tasks.length}
-            pagination={pagination}
-            label="tasks"
-            onChange={(page, pageSize) =>
-              setPagination({ current: page, pageSize })
-            }
-          />
         </>
       ) : (
         <NotFound text="Task Not Found" />
       )}
 
+      {/* Pagination + Display */}
+      {tasks.length > 0 && (
+        <PaginationInfo
+          total={tasks.length}
+          pagination={pagination}
+          label="tasks"
+          onChange={(page, pageSize) =>
+            setPagination({ current: page, pageSize })
+          }
+        />
+      )}
+
       {/* Floating Add Button */}
-      <button
-        className="fixed bottom-8 right-8 bg-primary hover:bg-primary-hover text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl text-2xl transition duration-300 ease-in-out cursor-pointer"
+      <FloatingButton
         title="Create New Task"
         onClick={handleNavigateToCreateTaskPage}
-      >
-        +
-      </button>
+      />
 
       {/* Filter Modal */}
       <FilterModal

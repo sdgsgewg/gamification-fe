@@ -7,23 +7,24 @@ import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
-import { ROUTES } from "@/app/constants/routes";
 import { useClassDetail } from "@/app/hooks/classes/useClassDetail";
 import EditClassForm from "@/app/components/forms/classes/edit-class-form";
 import { EditClassFormInputs } from "@/app/schemas/classes/editClass";
+import { useGrades } from "@/app/hooks/grades/useGrades";
 
 const EditSubjectPage = () => {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const baseRoute = ROUTES.DASHBOARD.TEACHER.CLASS;
 
   const { data: classData, isLoading } = useClassDetail(params.slug, "edit");
+  const { data: gradeData = [] } = useGrades();
+
   const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
     text: "",
   });
 
-  const formRef = useRef<FormRef>(null);
+  const formRef = useRef<FormRef<EditClassFormInputs>>(null);
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
@@ -41,8 +42,8 @@ const EditSubjectPage = () => {
     router.back();
   };
 
-  const handleEditClassSuccess = (values: EditClassFormInputs) => {
-    router.push(`${baseRoute}`);
+  const handleEditClassSuccess = () => {
+    router.back();
   };
 
   return (
@@ -55,6 +56,7 @@ const EditSubjectPage = () => {
         <EditClassForm
           ref={formRef}
           classData={classData}
+          gradeData={gradeData}
           onFinish={handleEditClassSuccess}
         />
       )}

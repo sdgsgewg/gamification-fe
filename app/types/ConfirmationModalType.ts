@@ -4,4 +4,5 @@ export type ConfirmationModalType =
   | "unpublish"
   | "finalize"
   | "submit"
-  | "delete";
+  | "delete"
+  | "leave";

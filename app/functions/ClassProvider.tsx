@@ -14,6 +14,7 @@ import {
   deleteAxios,
 } from "../utils/AxiosFunction";
 import { FilterClassMemberRequest } from "../interface/classes/requests/IFilterClassMemberRequest";
+import { FilterClassFormInputs } from "../schemas/classes/filterClass";
 
 const API_URL = "/classes";
 
@@ -28,12 +29,15 @@ export const classProvider = {
   },
 
   async getUserClasses(
-    params?: FilterClassRequest
+    params?: FilterClassFormInputs
   ): Promise<ApiResponse<ClassOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
 
       if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.gradeIds && params.gradeIds.length > 0) {
+        params.gradeIds.forEach((id) => query.append("gradeIds", id));
+      }
       if (params?.orderBy) query.append("orderBy", params.orderBy);
       if (params?.orderState) query.append("orderState", params.orderState);
 

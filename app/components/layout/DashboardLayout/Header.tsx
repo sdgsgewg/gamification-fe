@@ -37,7 +37,7 @@ interface HeaderProps {
 
 const Header = ({ onToggle }: HeaderProps) => {
   return (
-    <header className="sticky top-0 z-10 h-16 flex items-center gap-4 bg-primary text-light px-6 py-4">
+    <header className="z-10 h-16 flex items-center gap-4 bg-primary text-light px-6 py-4">
       <div className="lg:hidden">
         <button className="cursor-pointer" onClick={onToggle}>
           <FontAwesomeIcon icon={faBars} className="text-white text-xl" />

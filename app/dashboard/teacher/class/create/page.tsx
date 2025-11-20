@@ -7,18 +7,22 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ROUTES } from "@/app/constants/routes";
-import { CreateClassFormInputs } from "@/app/schemas/classes/createClass";
 import CreateClassForm from "@/app/components/forms/classes/create-class-form";
+import { useGrades } from "@/app/hooks/grades/useGrades";
+import { CreateClassFormInputs } from "@/app/schemas/classes/createClass";
 
 const CreateClassPage = () => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.TEACHER.CLASS;
+
+  const { data: gradeData = [] } = useGrades();
+
   const [backConfirmationModal, setBackConfirmationModal] = useState({
     visible: false,
     text: "",
   });
 
-  const formRef = useRef<FormRef>(null);
+  const formRef = useRef<FormRef<CreateClassFormInputs>>(null);
 
   const handleBack = () => {
     const isDirty = formRef.current?.isDirty;
@@ -36,7 +40,7 @@ const CreateClassPage = () => {
     router.back();
   };
 
-  const handleCreateClassSuccess = (values: CreateClassFormInputs) => {
+  const handleCreateClassSuccess = () => {
     router.push(`${baseRoute}`);
   };
 
@@ -44,7 +48,11 @@ const CreateClassPage = () => {
     <>
       <Toaster position="top-right" />
       <DashboardTitle title="Create New Class" onBack={handleBack} />
-      <CreateClassForm ref={formRef} onFinish={handleCreateClassSuccess} />
+      <CreateClassForm
+        ref={formRef}
+        gradeData={gradeData}
+        onFinish={handleCreateClassSuccess}
+      />
 
       <ConfirmationModal
         visible={backConfirmationModal.visible}

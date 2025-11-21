@@ -1,7 +1,9 @@
 import { FilterUserRequest } from "../interface/users/requests/IFilterUserRequest";
 import { UserDetailResponse } from "../interface/users/responses/IUserDetailResponse";
+import { UserLastLoginResponse } from "../interface/users/responses/IUserLastLoginResponse";
 import { UserOverviewResponse } from "../interface/users/responses/IUserOverviewResponse";
 import { UserRecentActivityResponse } from "../interface/users/responses/IUserRecentActivityResponse";
+import { UserRoleCountResponse } from "../interface/users/responses/IUserRoleCountResponse";
 import { UserStatsResponse } from "../interface/users/responses/IUserStatsResponse";
 import { getAxios, putAxios } from "../utils/AxiosFunction";
 import {
@@ -34,6 +36,15 @@ export const userProvider = {
     }
   },
 
+  async getUserRoleCounts(): Promise<ApiResponse<UserRoleCountResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/statistics`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserRoleCountResponse>(error);
+    }
+  },
+
   async getUserById(id: string): Promise<ApiResponse<UserDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
@@ -54,9 +65,18 @@ export const userProvider = {
     }
   },
 
+  async getUserLastLogin(): Promise<ApiResponse<UserLastLoginResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/me/last-login`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<UserLastLoginResponse>(error);
+    }
+  },
+
   async getUserStats(): Promise<ApiResponse<UserStatsResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/stats`);
+      const data = await getAxios(`${API_URL}/me/stats`);
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserStatsResponse>(error);

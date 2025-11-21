@@ -3,6 +3,7 @@ import React from "react";
 interface StatusBarProps {
   current: number;
   total: number;
+  showLabel?: boolean;
   labelClassName?: string;
   bgClassName?: string;
   height: string;
@@ -11,14 +12,19 @@ interface StatusBarProps {
 const StatusBar = ({
   current,
   total,
+  showLabel = true,
   labelClassName = "text-[0.625rem] font-medium",
-  bgClassName = "bg-background",
+  bgClassName = "bg-tertiary",
   height,
 }: StatusBarProps) => {
   return (
     <div className="flex flex-col">
       {/* Status Text */}
-      <p className={`${labelClassName}`}>{`${current} out of ${total} questions`}</p>
+      {showLabel && (
+        <p
+          className={`${labelClassName}`}
+        >{`${current} out of ${total} questions`}</p>
+      )}
       {/* Status Bar */}
       <div
         className={`w-full ${bgClassName} rounded-2xl shadow-xs ${height} overflow-hidden`}

@@ -3,7 +3,6 @@
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { Role } from "@/app/enums/Role";
-import { useAuth } from "@/app/hooks/auth/useAuth";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
@@ -13,108 +12,127 @@ import {
   SideBySideContentSection,
   SideBySideContentSectionProps,
 } from "../Section";
-import { TextVariant } from "@/app/types/ui/TextVariant";
-import { getTextClassName } from "@/app/utils/ui/getTextClassName";
 import { ROUTES } from "@/app/constants/routes";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useUserStats } from "@/app/hooks/users/useUserStats";
+import { useTasks } from "@/app/hooks/tasks/useTasks";
+import { TaskStatus } from "@/app/enums/TaskStatus";
+import { useTeacherTotalStudents } from "@/app/hooks/class-students/useTeacherTotalStudents";
+import { useUserRoleCounts } from "@/app/hooks/users/useUserRoleCounts";
+import { useMostPopularTask } from "@/app/hooks/task-attempts/useMosPopularTask";
+import StatusBar from "@/app/components/shared/StatusBar";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
 const StatsSection = () => {
   const router = useRouter();
-  const { getCachedUserProfile } = useAuth();
+  const { user, role } = useGetCachedUser();
 
   const [userName, setUserName] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [userRole, setUserRole] = useState<Role>(Role.STUDENT);
 
   useEffect(() => {
-    const user = getCachedUserProfile();
-    if (user) {
+    if (user && role) {
       setUserName(user.name);
-      setUserRole(user.role.name);
+      setUsername(user.username);
+      setUserRole(role);
     }
-  }, [getCachedUserProfile]);
+  }, [user, role]);
 
   const DataRow = ({
     icon,
     text,
-    textVariant = "text-xl-semibold",
+    textClassName = "text-xl font-semibold",
   }: {
     icon?: { src: string; alt: string };
     text: string;
-    textVariant?: TextVariant;
+    textClassName?: string;
   }) => {
     return (
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         {icon && <Image src={icon.src} alt={icon.alt} width={28} height={28} />}
-        <p className={getTextClassName(textVariant)}>{text}</p>
+        <p className={textClassName}>{text}</p>
       </div>
     );
   };
 
   const LeftSideContent = () => {
-    const StudentData = () => {
+    const StudentView = () => {
       const { data: userStats } = useUserStats();
 
       if (!userStats) return;
 
-      const { level, currXp, nextLvlMinXp, xpProgress } = userStats;
+      const { level, currXp, nextLvlMinXp } = userStats;
 
       return (
         <>
-          <DataRow text={`Level ${level}`} textVariant="text-4xl-bold" />
+          <DataRow
+            text={`Level ${level}`}
+            textClassName="text-2xl sm:text-3xl font-bold"
+          />
           <DataRow
             text={`XP: ${currXp} / ${nextLvlMinXp}`}
-            textVariant="text-xl-semibold"
+            textClassName="text-lg sm:text-xl font-semibold"
           />
-          <div className="w-full bg-background rounded-2xl h-8 overflow-hidden mt-2">
-            <div
-              className="bg-primary h-8 rounded-2xl transition-all duration-500"
-              style={{ width: `${xpProgress}%` }}
-            ></div>
+          <div className="mt-2">
+            <StatusBar
+              current={currXp}
+              total={nextLvlMinXp}
+              showLabel={false}
+              height="h-6 sm:h-8"
+            />
           </div>
         </>
       );
     };
 
-    const TeacherData = () => {
+    const TeacherView = () => {
+      const { data: activeTasks } = useTasks({ status: TaskStatus.PUBLISHED });
+      const { data: totalStudents } = useTeacherTotalStudents();
+
       return (
         <>
-          <DataRow text={userName} textVariant="text-4xl-bold" />
+          <DataRow
+            text={userName}
+            textClassName="text-3xl sm:text-4xl font-bold"
+          />
           <div className="flex flex-col gap-4">
             <DataRow
               icon={{ src: IMAGES.PEOPLE, alt: "active students" }}
-              text={`Active Students: 142`}
-              textVariant="text-xl-semibold"
+              text={`Active Students: ${totalStudents?.length}`}
+              textClassName="text-xl font-semibold"
             />
             <DataRow
               icon={{ src: IMAGES.TASK, alt: "active tasks" }}
-              text={`Active Tasks: 6 ongoing tasks`}
-              textVariant="text-xl-semibold"
+              text={`Active Tasks: ${activeTasks} ongoing tasks`}
+              textClassName="text-xl font-semibold"
             />
           </div>
         </>
       );
     };
 
-    const AdminData = () => {
+    const AdminView = () => {
       const { data: subjects = [] } = useSubjects();
+      const { data: userRoleCounts } = useUserRoleCounts();
+      const { data: mostPopularTask } = useMostPopularTask();
 
       return (
         <>
           <DataRow
             icon={{ src: IMAGES.PEOPLE, alt: "total registered users" }}
-            text={`Total Registered Users: 3,120`}
-            textVariant="text-xl-semibold"
+            text={`Total Registered Users: ${userRoleCounts?.totalUsers}`}
+            textClassName="text-xl font-semibold"
           />
           <DataRow
             icon={{ src: IMAGES.SUBJECT, alt: "total subjects" }}
             text={`Total Subjects: ${subjects.length}`}
-            textVariant="text-xl-semibold"
+            textClassName="text-xl font-semibold"
           />
           <DataRow
             icon={{ src: IMAGES.TASK, alt: "most popular task" }}
-            text={`Most Popular Task: Math Tryout 2025`}
-            textVariant="text-xl-semibold"
+            text={`Most Popular Task: ${mostPopularTask?.title} (${mostPopularTask?.attemptCount} attempts)`}
+            textClassName="text-xl font-semibold"
           />
         </>
       );
@@ -134,11 +152,11 @@ const StatsSection = () => {
 
         <div className="flex-1 flex flex-col gap-4 justify-between">
           {userRole === Role.STUDENT ? (
-            <StudentData />
+            <StudentView />
           ) : userRole === Role.TEACHER ? (
-            <TeacherData />
+            <TeacherView />
           ) : (
-            <AdminData />
+            <AdminView />
           )}
         </div>
       </div>
@@ -148,7 +166,7 @@ const StatsSection = () => {
   const RightSideContent = () => {
     const handleClickCTA = () => {
       if (userRole === Role.STUDENT) {
-        router.push("/profile");
+        router.push(`${ROUTES.ROOT.PROFILE}/${username}`);
       } else if (userRole === Role.TEACHER) {
         router.push(ROUTES.DASHBOARD.TEACHER.CLASS);
       } else {
@@ -161,7 +179,7 @@ const StatsSection = () => {
         <DataRow
           icon={{ src: IMAGES.BADGE, alt: "top student badge" }}
           text={`Quiz Master`}
-          textVariant="text-xl-semibold"
+          textClassName="text-xl font-semibold"
         />
       );
     };
@@ -173,11 +191,11 @@ const StatsSection = () => {
             <DataRow
               icon={{ src: IMAGES.LEADERBOARD, alt: "top student" }}
               text={`Top Student of the Week`}
-              textVariant="text-[1.8rem]-semibold"
+              textClassName="text-[1.8rem] font-bold"
             />
             <DataRow
               text={`Zahra L. - 3,200 pts`}
-              textVariant="text-base-semibold"
+              textClassName="text-base font-semibold"
             />
           </div>
         </>

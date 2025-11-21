@@ -6,6 +6,7 @@ export const filterTaskSchema = z.object({
   materialId: z.string().optional(),
   taskTypeId: z.string().optional(),
   gradeIds: z.array(z.string()).optional(),
+  status: z.string().optional(),
   orderBy: z.string().optional(),
   orderState: z.string().optional(),
 });
@@ -18,6 +19,7 @@ export const filterTaskDefaultValues: FilterTaskFormInputs = {
   materialId: "",
   taskTypeId: "",
   gradeIds: [],
+  status: "",
   orderBy: "createdAt",
   orderState: "DESC",
 };

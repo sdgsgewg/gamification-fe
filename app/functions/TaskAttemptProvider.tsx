@@ -10,6 +10,7 @@ import { UpsertTaskAttemptResponse } from "../interface/task-attempts/responses/
 import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
 import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
+import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IMostPopularTaskResponse";
 
 const API_URL = "/task-attempts";
 
@@ -36,6 +37,15 @@ export const taskAttemptProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<GroupedTaskAttemptResponseDto[]>(error);
+    }
+  },
+
+  async getMostPopularTask(): Promise<ApiResponse<MostPopularTaskResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/popular`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<MostPopularTaskResponse>(error);
     }
   },
 

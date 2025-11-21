@@ -10,6 +10,7 @@ import { useUserClasses } from "@/app/hooks/classes/useUserClasses";
 import { useMaterials } from "@/app/hooks/materials/useMaterials";
 import { useSubjects } from "@/app/hooks/subjects/useSubjects";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { useUserLastLogin } from "@/app/hooks/users/useUserLastLogin";
 import { useUserRecentActivities } from "@/app/hooks/users/useUserRecentActivities";
 import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
 import { getDate } from "@/app/utils/date";
@@ -78,6 +79,7 @@ const ProfilePage = () => {
     data: recentActivityData = [],
     isLoading: isRecentActivityDataLoading,
   } = useUserRecentActivities();
+  const { data: lastLoginData } = useUserLastLogin();
 
   // Admin Stats Data
   const { data: subjectData } = useSubjects();
@@ -258,7 +260,7 @@ const ProfilePage = () => {
                   </Pill>
                 </div>
 
-                {/* <div className="flex items-start justify-between rounded-lg bg-surface p-3">
+                <div className="flex items-start justify-between rounded-lg bg-surface p-3">
                   <div>
                     <p className="font-medium text-tx-primary">Session</p>
                     <p className="text-tx-tertiary">
@@ -266,13 +268,11 @@ const ProfilePage = () => {
                     </p>
                   </div>
                   <span className="text-xs text-tx-muted">
-                    {(cachedUser as any)?.lastLoginAt
-                      ? new Date(
-                          (cachedUser as any).lastLoginAt
-                        ).toLocaleString()
+                    {lastLoginData?.lastLoginAt
+                      ? lastLoginData?.lastLoginAt
                       : "Time not available"}
                   </span>
-                </div> */}
+                </div>
 
                 <div className="rounded-lg border border-br-sring-br-secondary">
                   <div className="border-b border-br-sring-br-secondary bg-tertiary px-3 py-2 text-xs font-semibold text-tx-primary">
@@ -290,9 +290,9 @@ const ProfilePage = () => {
                   </ul>
                 </div>
 
-                {/* <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="rounded-lg bg-card px-3 py-1.5 text-sm font-medium text-tx-secondary ring-1 ring-light-accent transition hover:bg-light-emphasis"
                   >
                     Reload Profile
@@ -300,7 +300,7 @@ const ProfilePage = () => {
                   <span className="text-xs text-tx-muted">
                     Data updated from auth cache / local override.
                   </span>
-                </div> */}
+                </div>
               </div>
             </div>
           </div>

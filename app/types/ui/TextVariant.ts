@@ -5,4 +5,5 @@ export type TextVariant =
   | "text-[1.8rem]-semibold"
   | "text-2xl-semibold"
   | "text-xl-semibold"
+  | "text-lg-semibold"
   | "text-base-semibold";

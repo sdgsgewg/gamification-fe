@@ -4,11 +4,11 @@ import React from "react";
 import {
   UserActivityCard,
   UserActivityCardSkeleton,
-  UserActivityCardWrapper,
 } from "@/app/components/pages/Dashboard/Cards";
 import { ActivityLogOverviewResponse } from "@/app/interface/activity-logs/responses/IActivityLogOverviewResponse";
 import { MasterHistoryOverviewResponse } from "@/app/interface/master-histories/responses/IMasterHistoryOverviewResponse";
 import EmptyText from "@/app/components/shared/not-found/EmptyText";
+import DashboardSectionWrapper from "./Wrapper";
 
 interface RecentActivitiesSectionProps {
   title?: string;
@@ -24,22 +24,24 @@ export default function RecentActivitiesSection({
   isLoading,
 }: RecentActivitiesSectionProps) {
   return (
-    <UserActivityCardWrapper title={title}>
-      {isLoading ? (
-        Array.from({ length: 4 }).map((_, i) => (
-          <UserActivityCardSkeleton key={i} />
-        ))
-      ) : data.length === 0 ? (
-        <EmptyText text={noDataText} />
-      ) : (
-        data.map((data) => (
-          <UserActivityCard
-            key={data.id}
-            description={data.description}
-            createdAt={data.createdAt}
-          />
-        ))
-      )}
-    </UserActivityCardWrapper>
+    <DashboardSectionWrapper title={title}>
+      <div className="py-2 overflow-y-auto max-h-[16rem]">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <UserActivityCardSkeleton key={i} />
+          ))
+        ) : data.length === 0 ? (
+          <EmptyText text={noDataText} />
+        ) : (
+          data.map((data) => (
+            <UserActivityCard
+              key={data.id}
+              description={data.description}
+              createdAt={data.createdAt}
+            />
+          ))
+        )}
+      </div>
+    </DashboardSectionWrapper>
   );
 }

@@ -8,7 +8,7 @@ import { CreateTaskAttemptFormInputs } from "../schemas/task-attempts/createTask
 import { UpdateTaskAttemptFormInputs } from "../schemas/task-attempts/updateTaskAttempt";
 import { UpsertTaskAttemptResponse } from "../interface/task-attempts/responses/IUpsertTaskAttemptResponse";
 import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
-import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
+import { GroupedTaskAttemptResponse } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
 import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IMostPopularTaskResponse";
 
@@ -17,7 +17,7 @@ const API_URL = "/task-attempts";
 export const taskAttemptProvider = {
   async getTaskAttemptsByUser(
     params?: FilterTaskAttemptRequest
-  ): Promise<ApiResponse<GroupedTaskAttemptResponseDto[]>> {
+  ): Promise<ApiResponse<GroupedTaskAttemptResponse[]>> {
     try {
       const query = new URLSearchParams();
 
@@ -36,16 +36,16 @@ export const taskAttemptProvider = {
 
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<GroupedTaskAttemptResponseDto[]>(error);
+      return handleAxiosError<GroupedTaskAttemptResponse[]>(error);
     }
   },
 
-  async getMostPopularTask(): Promise<ApiResponse<MostPopularTaskResponse>> {
+  async getMostPopularTask(): Promise<ApiResponse<MostPopularTaskResponse[]>> {
     try {
       const data = await getAxios(`${API_URL}/popular`);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<MostPopularTaskResponse>(error);
+      return handleAxiosError<MostPopularTaskResponse[]>(error);
     }
   },
 

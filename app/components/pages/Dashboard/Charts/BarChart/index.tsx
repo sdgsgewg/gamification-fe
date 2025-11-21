@@ -1,7 +1,8 @@
 import React from "react";
+import { BarChartItem } from "../../Sections/BarChartSection";
 
 interface BarChartProps {
-  data: { label: string; value: number }[];
+  data: BarChartItem[];
 }
 
 const BarChart = ({ data }: BarChartProps) => {
@@ -37,8 +38,8 @@ const BarChart = ({ data }: BarChartProps) => {
                 style={{ height: `${h}%` }}
                 aria-label={`${d.label} ${d.value}`}
               />
-              <div className="mt-3 text-xs text-tx-secondary select-none">
-                {d.label}
+              <div className="mt-3 text-xs text-tx-secondary line-clamp-1 select-none">
+                <p title={d.label}>{d.label}</p>
               </div>
             </div>
           );

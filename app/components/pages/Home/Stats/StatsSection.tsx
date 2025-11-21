@@ -19,7 +19,7 @@ import { useTasks } from "@/app/hooks/tasks/useTasks";
 import { TaskStatus } from "@/app/enums/TaskStatus";
 import { useTeacherTotalStudents } from "@/app/hooks/class-students/useTeacherTotalStudents";
 import { useUserRoleCounts } from "@/app/hooks/users/useUserRoleCounts";
-import { useMostPopularTask } from "@/app/hooks/task-attempts/useMosPopularTask";
+import { useMostPopularTask } from "@/app/hooks/task-attempts/useMostPopularTask";
 import StatusBar from "@/app/components/shared/StatusBar";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
@@ -115,7 +115,7 @@ const StatsSection = () => {
     const AdminView = () => {
       const { data: subjects = [] } = useSubjects();
       const { data: userRoleCounts } = useUserRoleCounts();
-      const { data: mostPopularTask } = useMostPopularTask();
+      const { data: mostPopularTasks = [] } = useMostPopularTask();
 
       return (
         <>
@@ -129,11 +129,13 @@ const StatsSection = () => {
             text={`Total Subjects: ${subjects.length}`}
             textClassName="text-xl font-semibold"
           />
-          <DataRow
-            icon={{ src: IMAGES.TASK, alt: "most popular task" }}
-            text={`Most Popular Task: ${mostPopularTask?.title} (${mostPopularTask?.attemptCount} attempts)`}
-            textClassName="text-xl font-semibold"
-          />
+          {mostPopularTasks && mostPopularTasks.length > 0 && (
+            <DataRow
+              icon={{ src: IMAGES.TASK, alt: "most popular task" }}
+              text={`Most Popular Task: ${mostPopularTasks[0].title} (${mostPopularTasks[0].attemptCount} attempts)`}
+              textClassName="text-xl font-semibold"
+            />
+          )}
         </>
       );
     };

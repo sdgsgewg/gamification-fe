@@ -1,18 +1,19 @@
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faUser,
-  faRightFromBracket,
-  faGear,
-  faChalkboard,
-  faRankingStar,
-  faClipboardList,
-  faHome,
-  faBook,
-  faBookOpen,
-  faListCheck,
-  faClockRotateLeft,
-  faFileArrowUp,
-} from "@fortawesome/free-solid-svg-icons";
+  LucideIcon,
+  User,
+  LogOut,
+  Settings,
+  Presentation,
+  Trophy,
+  ClipboardList,
+  Home,
+  Book,
+  Layers,
+  History,
+  FileUp,
+  Shapes,
+} from "lucide-react";
+
 import { Role } from "../enums/Role";
 import { ROUTES } from "./routes";
 import { IMAGES } from "./images";
@@ -22,18 +23,20 @@ export interface MenuItem {
   menu: string;
   url: string;
   dynamicPath?: (text: string) => string;
-  icon?: IconDefinition;
+  icon?: LucideIcon;
   roles: Role[];
   isShownOnFooter?: boolean;
   dropdownMenuItems?: {
     menu: string;
     url: string;
-    icon?: string;
+    icon?: string | LucideIcon;
     roles: Role[];
   }[];
 }
 
-// HEADER (Main Layout)
+/* -----------------------------------------
+   HEADER (Main Layout)
+----------------------------------------- */
 export const getMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Activity",
@@ -55,7 +58,11 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
     url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
-  { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
+  {
+    menu: "Task",
+    url: ROUTES.DASHBOARD.TEACHER.TASKS,
+    roles: [Role.TEACHER],
+  },
   {
     menu: "Content Management",
     url: "#",
@@ -89,20 +96,23 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
   },
 ];
 
+/* -----------------------------------------
+   USER DROPDOWN (Profile Menu)
+----------------------------------------- */
 export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
   Guest: [],
   Student: [
     {
       menu: "History",
       url: ROUTES.ROOT.HISTORY,
-      icon: faClockRotateLeft,
+      icon: History,
       roles: [Role.STUDENT],
     },
     {
       menu: "Profile",
       url: "",
       dynamicPath: (username: string) => `/users/${username}`,
-      icon: faUser,
+      icon: User,
       roles: [Role.STUDENT],
     },
   ],
@@ -111,21 +121,16 @@ export const userDropdownMenuItems: Record<Role, MenuItem[]> = {
       menu: "Profile",
       url: "",
       dynamicPath: (username: string) => `/users/${username}`,
-      icon: faUser,
+      icon: User,
       roles: [Role.TEACHER],
     },
   ],
-  Admin: [
-    // {
-    //   menu: "Account Settings",
-    //   url: "/account-settings",
-    //   icon: faGear,
-    //   roles: [Role.ADMIN],
-    // },
-  ],
+  Admin: [],
 };
 
-// FOOTER (Main Layout)
+/* -----------------------------------------
+   FOOTER (Main Layout)
+----------------------------------------- */
 export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Activity",
@@ -138,23 +143,28 @@ export const getFooterMainMenuItems = (role: Role): MenuItem[] => [
     roles: [Role.GUEST, Role.STUDENT],
   },
   { menu: "Log In/Register", url: ROUTES.AUTH.LOGIN, roles: [Role.GUEST] },
+
   {
     menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
     roles: [Role.STUDENT, Role.TEACHER],
   },
+
   {
     menu: "Profile",
     url: "",
     dynamicPath: (username: string) => `/users/${username}`,
+    icon: User,
     roles: [Role.STUDENT, Role.TEACHER],
   },
+
   { menu: "Task", url: ROUTES.DASHBOARD.TEACHER.TASKS, roles: [Role.TEACHER] },
   { menu: "Dashboard", url: ROUTES.DASHBOARD.ADMIN.HOME, roles: [Role.ADMIN] },
-  // { menu: "Manage Account", url: "/account-settings", roles: [Role.ADMIN] },
+
   {
     menu: "Log Out",
     url: "/",
+    icon: LogOut,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
 ];
@@ -182,57 +192,62 @@ export const footerHelpMenuItems: MenuItem[] = [
   },
 ];
 
-// SIDEBAR (Dashboard Layout)
+/* -----------------------------------------
+   SIDEBAR (Dashboard Layout)
+----------------------------------------- */
 export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Dashboard",
     url: resolveDashboardRoute(role),
-    icon: faHome,
+    icon: Home,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
     menu: "My Class",
     url: resolveDashboardRoute(role, "/class"),
-    icon: faChalkboard,
+    icon: Presentation,
     roles: [Role.STUDENT, Role.TEACHER],
   },
   {
     menu: "Task",
     url: resolveDashboardRoute(role, "/tasks"),
-    icon: faClipboardList,
+    icon: ClipboardList,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   {
     menu: "Submissions",
     url: resolveDashboardRoute(role, "/submissions"),
-    icon: faFileArrowUp,
+    icon: FileUp,
     roles: [Role.TEACHER],
   },
   {
     menu: "Leaderboard",
     url: ROUTES.DASHBOARD.LEADERBOARD,
-    icon: faRankingStar,
+    icon: Trophy,
     roles: [Role.STUDENT, Role.TEACHER],
   },
 ];
 
+/* -----------------------------------------
+   SIDEBAR ADMIN
+----------------------------------------- */
 export const sidebarAdminMenuItems: MenuItem[] = [
   {
     menu: "Subject",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_SUBJECTS,
-    icon: faBook,
+    icon: Book,
     roles: [Role.ADMIN],
   },
   {
     menu: "Material",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_MATERIALS,
-    icon: faBookOpen,
+    icon: Layers,
     roles: [Role.ADMIN],
   },
   {
     menu: "Task Type",
     url: ROUTES.DASHBOARD.ADMIN.MANAGE_TASK_TYPES,
-    icon: faListCheck,
+    icon: Shapes,
     roles: [Role.ADMIN],
   },
 ];

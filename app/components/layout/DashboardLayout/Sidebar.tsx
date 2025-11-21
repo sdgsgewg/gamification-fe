@@ -6,20 +6,17 @@ import {
   getSidebarMainMenuItems,
 } from "@/app/constants/menuItems";
 import { usePathname, useRouter } from "next/navigation";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { useAuth } from "@/app/hooks/auth/useAuth";
 import { Role } from "@/app/enums/Role";
 import ThemeSwitcher from "../../shared/ThemeSwitcher";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 
+import { X, LogOut, CircleHelp } from "lucide-react";
+
 interface MainMenuItemProps {
   menu: string;
-  icon: IconDefinition;
+  icon?: React.ComponentType<{ className?: string }>;
   url: string;
   role: string;
   onClick?: () => void;
@@ -28,7 +25,7 @@ interface MainMenuItemProps {
 
 const MainMenuItem = ({
   menu,
-  icon,
+  icon: Icon,
   url,
   role,
   onClick,
@@ -43,21 +40,20 @@ const MainMenuItem = ({
       : pathname === url || pathname.startsWith(url + "/");
 
   const handleClick = () => {
-    if (onClick) onClick();
-    if (onCloseSidebar) onCloseSidebar();
+    onClick?.();
+    onCloseSidebar?.();
   };
 
   const baseClasses =
     "flex items-center gap-2 px-4 py-3 w-full text-left text-dark cursor-pointer transition duration-300 ease-in-out";
   const activeClasses = "!bg-secondary font-semibold";
   const hoverClasses = "hover:bg-tertiary-hover hover:font-medium";
-
   const classes = `${baseClasses} ${isActive ? activeClasses : hoverClasses}`;
 
   return (
     <li>
       <Link href={url} onClick={handleClick} className={classes}>
-        <FontAwesomeIcon icon={icon} className="text-base" />
+        {Icon && <Icon className="w-5 h-5 stroke-[1.8]" />}
         <span className="text-sm">{menu}</span>
       </Link>
     </li>
@@ -75,12 +71,12 @@ const MainMenuItemWrapper = ({ role, onClose }: MainMenuItemWrapperProps) => {
   );
 
   return (
-    <ul className={`flex flex-col gap-2`}>
+    <ul className="flex flex-col gap-2">
       {filteredItems.map((item) => (
         <MainMenuItem
           key={item.url}
           menu={item.menu}
-          icon={item.icon ?? faQuestionCircle}
+          icon={item.icon ?? CircleHelp}
           url={item.url}
           role={role}
           onCloseSidebar={onClose}
@@ -103,12 +99,12 @@ const AdminMenuItemWrapper = ({ role, onClose }: AdminMenuItemWrapperProps) => {
   return (
     <div>
       <p className="text-xs font-semibold px-4 mb-1">Administrator</p>
-      <ul className={`flex flex-col gap-2`}>
+      <ul className="flex flex-col gap-2">
         {filteredItems.map((item) => (
           <MainMenuItem
             key={item.url}
             menu={item.menu}
-            icon={item.icon ?? faQuestionCircle}
+            icon={item.icon ?? CircleHelp}
             url={item.url}
             role={role}
             onCloseSidebar={onClose}
@@ -161,23 +157,28 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         >
           Gamification
         </h1>
+
         <button
           onClick={onClose}
-          className="block lg:hidden text-tx-primary  cursor-pointer"
+          className="block lg:hidden text-tx-primary cursor-pointer"
         >
-          <FontAwesomeIcon icon={faXmark} className="text-xl" />
+          <X className="w-6 h-6" />
         </button>
       </div>
+
       <nav className="flex flex-col gap-4">
         <MainMenuItemWrapper role={role} onClose={onClose} />
+
         {role === Role.ADMIN && (
           <AdminMenuItemWrapper role={role} onClose={onClose} />
         )}
+
         <PersonalizationMenuItemWrapper />
+
         <ul className="pt-4 border-t-2 border-br-primary">
           <MainMenuItem
             menu="Logout"
-            icon={faRightFromBracket}
+            icon={LogOut}
             url="/"
             role={role}
             onClick={handleLogout}

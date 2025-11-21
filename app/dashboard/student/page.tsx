@@ -1,14 +1,15 @@
 "use client";
 
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
+import { LeaderboardSection } from "@/app/components/pages/Dashboard/Sections/LeaderboardSection";
 import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
-import LeaderboardSection from "@/app/components/pages/Dashboard/Sections/Student/LeaderboardSection";
 import PendingTaskSection from "@/app/components/pages/Dashboard/Sections/Student/PendingTaskSection";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
 import { useTasksFromAllClassesList } from "@/app/hooks/class-tasks/useTasksFromAllClassesList";
 import { useStudentLeaderboard } from "@/app/hooks/leaderboards/useStudentLeaderboard";
 import React from "react";
+import { DashboardData } from "@/app/interface/DashboardData";
 
 export default function DashboardPage() {
   const { data: pendingTasks = [], isLoading: isPendingTasksLoading } =
@@ -16,12 +17,24 @@ export default function DashboardPage() {
       status: TaskAttemptStatus.NOT_STARTED,
       isClassTask: true,
     });
+
+  // Leaderboard
   const {
     data: studentLeaderboard = [],
     isLoading: isStudentLeaderboardLoading,
   } = useStudentLeaderboard();
+  const modifiedLeaderboardData = studentLeaderboard.map((student) => ({
+    label: student.name,
+    value: student.point,
+  }));
+
   const { data: activityLogData = [], isLoading: isActivityLogLoading } =
     useUserActivityLogs();
+
+  const isLoading =
+    isPendingTasksLoading ||
+    isStudentLeaderboardLoading ||
+    isActivityLogLoading;
 
   return (
     <>
@@ -37,8 +50,10 @@ export default function DashboardPage() {
 
         {/* === Leaderboard === */}
         <LeaderboardSection
-          data={studentLeaderboard}
-          isLoading={isStudentLeaderboardLoading}
+          title="Leaderboard"
+          data={modifiedLeaderboardData}
+          valueType="points"
+          isLoading={isLoading}
         />
       </div>
 

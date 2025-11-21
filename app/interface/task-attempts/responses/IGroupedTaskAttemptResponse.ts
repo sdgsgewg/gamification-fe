@@ -1,6 +1,6 @@
 import { TaskAttemptOverviewResponse } from "./ITaskAttemptOverviewResponse";
 
-export interface GroupedTaskAttemptResponseDto {
+export interface GroupedTaskAttemptResponse {
   dateLabel: string;
   dayLabel: string;
   attempts: TaskAttemptOverviewResponse[];

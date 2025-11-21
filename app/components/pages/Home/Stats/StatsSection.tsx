@@ -52,14 +52,13 @@ const StatsSection = () => {
   };
 
   const LeftSideContent = () => {
-    const { data: subjects = [] } = useSubjects();
-    const { data: userStats } = useUserStats();
-
-    if (!userStats) return;
-
-    const { level, currXp, nextLvlMinXp, xpProgress } = userStats;
-
     const StudentData = () => {
+      const { data: userStats } = useUserStats();
+
+      if (!userStats) return;
+
+      const { level, currXp, nextLvlMinXp, xpProgress } = userStats;
+
       return (
         <>
           <DataRow text={`Level ${level}`} textVariant="text-4xl-bold" />
@@ -98,6 +97,8 @@ const StatsSection = () => {
     };
 
     const AdminData = () => {
+      const { data: subjects = [] } = useSubjects();
+
       return (
         <>
           <DataRow
@@ -174,7 +175,10 @@ const StatsSection = () => {
               text={`Top Student of the Week`}
               textVariant="text-[1.8rem]-semibold"
             />
-            <DataRow text={`Zahra L. - 3,200 pts`} textVariant="text-base-semibold" />
+            <DataRow
+              text={`Zahra L. - 3,200 pts`}
+              textVariant="text-base-semibold"
+            />
           </div>
         </>
       );

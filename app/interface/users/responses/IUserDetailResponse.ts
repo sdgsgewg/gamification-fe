@@ -5,11 +5,11 @@ export interface UserDetailResponse {
   name: string;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   gender: string;
   phone: string;
-  dob: string;
-  image: string;
+  dob: Date;
+  image?: string;
   role: { roleId: string; name: Role };
   grade: { gradeId: string; name: string };
   level: number;

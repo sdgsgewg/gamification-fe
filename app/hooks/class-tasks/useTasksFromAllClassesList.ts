@@ -1,8 +1,8 @@
 "use client";
 
 import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
+import { ClassTaskOverviewResponse } from "@/app/interface/class-tasks/responses/IClassTaskOverviewResponse";
 import { FilterTaskAttemptRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptRequest";
-import { TaskAttemptOverviewResponse } from "@/app/interface/task-attempts/responses/ITaskAttemptOverviewResponse";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTasksFromAllClassesList = (
@@ -14,7 +14,7 @@ export const useTasksFromAllClassesList = (
       const res = await classTaskProvider.getTasksFromAllClassesList(values);
       return res.isSuccess && res.data ? res.data : [];
     },
-    select: (data: TaskAttemptOverviewResponse[]) =>
+    select: (data: ClassTaskOverviewResponse[]) =>
       data.map((ta, idx) => ({
         key: idx,
         ...ta,

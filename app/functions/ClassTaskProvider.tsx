@@ -15,7 +15,7 @@ import { FilterClassRequest } from "../interface/classes/requests/IFilterClassRe
 import { ShareTaskFormInputs } from "../schemas/class-tasks/shareTask";
 import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptRequest";
 import { GroupedTaskAttemptResponseDto } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
-import { TaskAttemptOverviewResponse } from "../interface/task-attempts/responses/ITaskAttemptOverviewResponse";
+import { ClassTaskOverviewResponse } from "../interface/class-tasks/responses/IClassTaskOverviewResponse";
 
 const API_URL = "/class-tasks";
 
@@ -47,7 +47,7 @@ export const classTaskProvider = {
 
   async getTasksFromAllClassesList(
     params?: FilterTaskAttemptRequest
-  ): Promise<ApiResponse<TaskAttemptOverviewResponse[]>> {
+  ): Promise<ApiResponse<ClassTaskOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
 
@@ -68,7 +68,7 @@ export const classTaskProvider = {
 
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<TaskAttemptOverviewResponse[]>(error);
+      return handleAxiosError<ClassTaskOverviewResponse[]>(error);
     }
   },
 

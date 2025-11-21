@@ -3,8 +3,12 @@ import { UserDetailResponse } from "../interface/users/responses/IUserDetailResp
 import { UserOverviewResponse } from "../interface/users/responses/IUserOverviewResponse";
 import { UserRecentActivityResponse } from "../interface/users/responses/IUserRecentActivityResponse";
 import { UserStatsResponse } from "../interface/users/responses/IUserStatsResponse";
-import { getAxios } from "../utils/AxiosFunction";
-import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
+import { getAxios, putAxios } from "../utils/AxiosFunction";
+import {
+  ApiResponse,
+  BaseResponseDto,
+  handleAxiosError,
+} from "../utils/axiosHelper";
 
 const API_URL = "/users";
 
@@ -67,6 +71,15 @@ export const userProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<UserRecentActivityResponse[]>(error);
+    }
+  },
+
+  async updateProfile(formData: FormData): Promise<ApiResponse<null>> {
+    try {
+      const res: BaseResponseDto = await putAxios(`${API_URL}`, formData);
+      return res;
+    } catch (error) {
+      return handleAxiosError<null>(error);
     }
   },
 };

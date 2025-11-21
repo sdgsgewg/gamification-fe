@@ -1,4 +1,3 @@
-import { TaskAttemptOverviewResponse } from "@/app/interface/task-attempts/responses/ITaskAttemptOverviewResponse";
 import React from "react";
 import {
   PendingTaskCard,
@@ -6,9 +5,10 @@ import {
   PendingTaskCardWrapper,
 } from "../../Cards";
 import EmptyText from "@/app/components/shared/not-found/EmptyText";
+import { ClassTaskOverviewResponse } from "@/app/interface/class-tasks/responses/IClassTaskOverviewResponse";
 
 interface PendingTaskSectionProps {
-  data: TaskAttemptOverviewResponse[];
+  data: ClassTaskOverviewResponse[];
   isLoading: boolean;
 }
 

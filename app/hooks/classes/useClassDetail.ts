@@ -13,7 +13,7 @@ type ModeReturnType<M extends ManageItemMode> = M extends "detail"
 
 export const useClassDetail = <M extends ManageItemMode>(
   slug: string,
-  mode: M,
+  mode: M
 ) => {
   return useQuery<ModeReturnType<M>>({
     queryKey: ["class-detail", slug, mode],
@@ -31,6 +31,7 @@ export const useClassDetail = <M extends ManageItemMode>(
           classId: c.id,
           name: c.name,
           description: c.description ?? "",
+          gradeIds: c.gradeIds,
           updatedBy: "",
           image: c.image ? getImageSrc(c.image) : "",
           imageFile: null,
@@ -44,9 +45,11 @@ export const useClassDetail = <M extends ManageItemMode>(
         name: c.name,
         slug: c.slug,
         description: c.description ?? "",
+        gradeIds: c.gradeIds,
+        grade: c.grade,
         image: c.image ? getImageSrc(c.image) : "",
       };
-      
+
       return mapped as ModeReturnType<M>;
     },
   });

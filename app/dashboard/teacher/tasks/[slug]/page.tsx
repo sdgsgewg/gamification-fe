@@ -317,9 +317,16 @@ const TeacherTaskDetailPage = () => {
     const HistoryView = () => {
       if (!history) return;
 
-      const { createdBy, updatedBy } = history;
+      const { createdBy, updatedBy, publishedAt, finalizedAt } = history;
 
-      return <HistoryTable createdBy={createdBy} updatedBy={updatedBy} />;
+      return (
+        <HistoryTable
+          createdBy={createdBy}
+          updatedBy={updatedBy}
+          publishedAt={publishedAt}
+          finalizedAt={finalizedAt}
+        />
+      );
     };
 
     const QuestionView = () => {

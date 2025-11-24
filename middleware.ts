@@ -85,25 +85,25 @@ export function middleware(req: NextRequest) {
   console.log("Role middleware: ", role);
   console.log("Current URL =>", url);
 
-  // Jika route termasuk auth routes -> langsung allow tanpa cek role
-  if (PUBLIC_AUTH_ROUTES.includes(url)) {
-    return NextResponse.next();
-  }
+  // // Jika route termasuk auth routes -> langsung allow tanpa cek role
+  // if (PUBLIC_AUTH_ROUTES.includes(url)) {
+  //   return NextResponse.next();
+  // }
 
-  // Batasi url khusus admin
-  if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  // // Batasi url khusus admin
+  // if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {
+  //   return NextResponse.redirect(new URL("/", req.url));
+  // }
 
-  // Manage akses url by role user
-  const allowedPaths = roleAccess[role] || [];
-  const isAllowed = allowedPaths.some(
-    (path) => url === path || url.startsWith(`${path}/`)
-  );
+  // // Manage akses url by role user
+  // const allowedPaths = roleAccess[role] || [];
+  // const isAllowed = allowedPaths.some(
+  //   (path) => url === path || url.startsWith(`${path}/`)
+  // );
 
-  if (!isAllowed) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  // if (!isAllowed) {
+  //   return NextResponse.redirect(new URL("/", req.url));
+  // }
 
   return NextResponse.next();
 }

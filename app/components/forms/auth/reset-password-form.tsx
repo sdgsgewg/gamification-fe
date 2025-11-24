@@ -12,7 +12,6 @@ import {
   ResetPasswordFormInputs,
   resetPasswordSchema,
 } from "@/app/schemas/auth/resetPassword";
-import { useState } from "react";
 import Loading from "../../shared/Loading";
 import FormTitle from "../../pages/Auth/FormTitle";
 import PasswordField from "../../fields/PasswordField";
@@ -28,7 +27,7 @@ export default function ResetPasswordForm({
   onFinish,
 }: ResetPasswordFormProps) {
   const { toast } = useToast();
-  const { resetPassword } = useAuth();
+  const { resetPassword, loading } = useAuth();
 
   const {
     control,
@@ -39,11 +38,7 @@ export default function ResetPasswordForm({
     defaultValues: resetPasswordDefaultValues,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const onSubmit = async (data: ResetPasswordFormInputs) => {
-    setIsLoading(true);
-
     const result = await resetPassword(token, data.password);
 
     const { isSuccess, message } = result;
@@ -56,13 +51,11 @@ export default function ResetPasswordForm({
         message ?? "Gagal melakukan reset password. Silahkan coba lagi."
       );
     }
-
-    setIsLoading(false);
   };
 
   return (
     <>
-      {isLoading && <Loading />}
+      {loading && <Loading />}
 
       <Form
         name="resetPassword"

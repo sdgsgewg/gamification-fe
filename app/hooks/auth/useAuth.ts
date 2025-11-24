@@ -149,14 +149,26 @@ export function useAuth() {
   const register = async (
     payload: RegisterRequest
   ): Promise<ApiResponse<null>> => {
+    setLoading(true);
+
     try {
       const res: BaseResponseDto = await postAxios(
         `${API_URL}/register`,
         payload
       );
+
+      const { isSuccess } = res;
+
+      if (isSuccess) {
+        sessionStorage.setItem("userEmail", payload.email);
+        router.push(ROUTES.AUTH.EMAIL_VERIFICATION);
+      }
+
       return res;
     } catch (error) {
       return handleAxiosError<null>(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -237,6 +249,8 @@ export function useAuth() {
   const forgotPassword = async (
     values: ForgotPasswordInputs
   ): Promise<ApiResponse<null>> => {
+    setLoading(true);
+
     try {
       const res: BaseResponseDto = await postAxios(
         `${API_URL}/forgot-password`,
@@ -245,6 +259,8 @@ export function useAuth() {
       return res;
     } catch (error) {
       return handleAxiosError<null>(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -252,6 +268,7 @@ export function useAuth() {
     token: string,
     password: string
   ): Promise<ApiResponse<null>> => {
+    setLoading(true);
     try {
       const res: BaseResponseDto = await postAxios(
         `${API_URL}/reset-password`,
@@ -263,6 +280,8 @@ export function useAuth() {
       return res;
     } catch (error) {
       return handleAxiosError<null>(error);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -11,7 +11,6 @@ import {
   forgotPasswordSchema,
 } from "@/app/schemas/auth/forgotPassword";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import FormTitle from "../../pages/Auth/FormTitle";
 import Loading from "../../shared/Loading";
 import FormLayout from "@/app/(auth)/form-layout";
@@ -28,7 +27,7 @@ export default function ForgotPasswordForm({
 }: ForgotPasswordFormProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const { forgotPassword } = useAuth();
+  const { forgotPassword, loading } = useAuth();
 
   const {
     control,
@@ -39,11 +38,7 @@ export default function ForgotPasswordForm({
     defaultValues: forgotPasswordDefaultValues,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const onSubmit = async (data: ForgotPasswordInputs) => {
-    setIsLoading(true);
-
     const result = await forgotPassword(data);
 
     const { isSuccess, message } = result;
@@ -56,8 +51,6 @@ export default function ForgotPasswordForm({
     } else {
       toast.error(message ?? "Failed to send reset link. Please try again.");
     }
-
-    setIsLoading(false);
   };
 
   const handleNavigateToLogin = () => {
@@ -66,7 +59,7 @@ export default function ForgotPasswordForm({
 
   return (
     <>
-      {isLoading && <Loading />}
+      {loading && <Loading />}
 
       <Form
         name="forgotPassword"

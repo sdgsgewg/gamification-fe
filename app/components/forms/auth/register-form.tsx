@@ -37,7 +37,7 @@ export default function RegisterForm({
   onFinish,
 }: RegisterFormProps) {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const { toast } = useToast();
 
   const {
@@ -49,11 +49,7 @@ export default function RegisterForm({
     defaultValues: registerDefaultValues,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const onSubmit = async (data: RegisterFormInputs) => {
-    setIsLoading(true);
-
     // Send only the fields required by the backend
     const payload: RegisterRequest = {
       email: data.email,
@@ -70,8 +66,6 @@ export default function RegisterForm({
     } else {
       toast.error(message ?? "Registration failed.");
     }
-
-    setIsLoading(false);
   };
 
   const handleOAuthRegister = () => {
@@ -84,7 +78,7 @@ export default function RegisterForm({
 
   return (
     <>
-      {isLoading && <Loading />}
+      {loading && <Loading />}
 
       <Form
         name="register"

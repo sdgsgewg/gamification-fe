@@ -16,12 +16,15 @@ const UserGreetSection = () => {
         <div className="h-8 w-32 ms-auto bg-gray-200 rounded animate-pulse" />
       ) : user ? (
         <div className="flex items-center gap-3 ms-auto">
-          <Image
-            src={user.image ?? IMAGES.DEFAULT_PROFILE}
-            alt={"Profile"}
-            width={32}
-            height={32}
-          />
+          <div className="w-10 h-10 overflow-hidden rounded-full">
+            <Image
+              src={user.image ?? IMAGES.DEFAULT_PROFILE}
+              alt={user.name}
+              width={10}
+              height={10}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <p className="text-white text-base font-medium">Hello, {user.name}</p>
         </div>
       ) : (

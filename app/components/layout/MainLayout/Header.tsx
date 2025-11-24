@@ -24,6 +24,8 @@ import {
 import { useUserStats } from "@/app/hooks/users/useUserStats";
 import { useAuth } from "@/app/hooks/auth/useAuth";
 import { LucideIcon } from "lucide-react";
+import { UserDetailResponse } from "@/app/interface/users/responses/IUserDetailResponse";
+import { IMAGES } from "@/app/constants/images";
 
 const MainMenuItem = ({
   url,
@@ -134,18 +136,13 @@ const AuthActionButtons = () => {
   );
 };
 
-const UserDropdownMenu = ({
-  name,
-  username,
-  role,
-}: {
-  name: string;
-  username: string;
-  role: Role;
-}) => {
+const UserDropdownMenu = ({ user }: { user: UserDetailResponse }) => {
   const { logout } = useAuth();
   const router = useRouter();
-  const userMenus = userDropdownMenuItems[role] || [];
+
+  const { name, username, image } = user;
+  const { name: roleName } = user.role;
+  const userMenus = userDropdownMenuItems[roleName] || [];
   const [open, setOpen] = useState(false);
   const { data: userStats } = useUserStats();
 
@@ -236,11 +233,19 @@ const UserDropdownMenu = ({
       className="cursor-pointer"
     >
       <div className="flex items-center gap-3 text-dark cursor-pointer select-none">
-        <Image src="/img/profile.png" alt="Profile" width={32} height={32} />
+        <div className="w-10 h-10 overflow-hidden rounded-full">
+          <Image
+            src={user.image ?? IMAGES.DEFAULT_PROFILE}
+            alt={user.name}
+            width={10}
+            height={10}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="flex flex-col gap-1">
           <p className="text-base font-medium">Hello, {name}</p>
 
-          {role === Role.STUDENT && (
+          {roleName === Role.STUDENT && (
             <div className="flex items-center gap-1">
               <span className="bg-tertiary text-[0.625rem] rounded-lg px-3">
                 {userStats?.level ?? 0}
@@ -281,11 +286,7 @@ const Header = () => {
           {loading ? (
             <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
           ) : user && role !== Role.GUEST ? (
-            <UserDropdownMenu
-              name={user.name}
-              username={user.username}
-              role={role}
-            />
+            <UserDropdownMenu user={user} />
           ) : (
             <AuthActionButtons />
           )}
@@ -308,11 +309,7 @@ const Header = () => {
           {loading ? (
             <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
           ) : user && role !== Role.GUEST ? (
-            <UserDropdownMenu
-              name={user.name}
-              username={user.username}
-              role={role}
-            />
+            <UserDropdownMenu user={user} />
           ) : (
             <AuthActionButtons />
           )}

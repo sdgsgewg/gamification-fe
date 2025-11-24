@@ -59,18 +59,18 @@ const EmailVerificationPageContent = () => {
   const PromptView = () => {
     return (
       <ShowInformationSection
-        imageUrl={IMAGES.EMAIL_VERIFCATION_SUCCESS}
+        imageUrl={IMAGES.EMAIL_VERIFICATION_SUCCESS}
         imageAlt="Email Verification"
-        title="Verifikasi Alamat Email Anda"
+        title="Verify Your Email Address"
         subtitle1={
           <p>
-            Kamu telah memasukkan <strong>{email}</strong> sebagai alamat email
-            untuk akun Anda.
+            You have entered <strong>{email}</strong> as the email address for
+            your account.
           </p>
         }
-        subtitle2="Mohon lakukan verifikasi email dengan menekan tombol di bawah ini."
+        subtitle2="Please verify your email by clicking the button below."
         onButtonClick={handleGoToGmail}
-        buttonText="Verifikasi Email"
+        buttonText="Verify Email"
       />
     );
   };
@@ -78,7 +78,7 @@ const EmailVerificationPageContent = () => {
   const VerifyingView = () => {
     return (
       <div>
-        <p className="text-center">Memverifikasi email...</p>
+        <p className="text-center">Verifying email...</p>
       </div>
     );
   };
@@ -86,12 +86,12 @@ const EmailVerificationPageContent = () => {
   const SuccessView = () => {
     return (
       <ShowInformationSection
-        imageUrl={IMAGES.EMAIL_VERIFCATION_SUCCESS}
+        imageUrl={IMAGES.EMAIL_VERIFICATION_SUCCESS}
         imageAlt="Email Verification Success"
-        title="Verifikasi Berhasil"
-        subtitle1="Email Anda berhasil diverifikasi."
+        title="Verification Successful"
+        subtitle1="Your email has been successfully verified."
         onButtonClick={handleContinue}
-        buttonText="Lanjut Isi Profil"
+        buttonText="Continue to Profile Setup"
       />
     );
   };
@@ -99,12 +99,12 @@ const EmailVerificationPageContent = () => {
   const ErrorView = () => {
     return (
       <ShowInformationSection
-        imageUrl={IMAGES.EMAIL_VERIFCATION_ERROR}
+        imageUrl={IMAGES.EMAIL_VERIFICATION_ERROR}
         imageAlt="Email Verification Error"
-        title="Verifikasi Gagal"
-        subtitle1="Link verifikasi tidak valid atau telah kedaluwarsa."
+        title="Verification Failed"
+        subtitle1="The verification link is invalid or has expired."
         onButtonClick={handleBack}
-        buttonText="Kembali"
+        buttonText="Back"
       />
     );
   };
@@ -129,5 +129,5 @@ export default function EmailVerificationPage() {
     <Suspense fallback={<Loading />}>
       <EmailVerificationPageContent />
     </Suspense>
-  )
+  );
 }

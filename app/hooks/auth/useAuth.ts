@@ -146,27 +146,46 @@ export function useAuth() {
   }, [init]);
 
   // Auth actions (register, login, logout, etc.)
+  // const register = async (
+  //   payload: RegisterRequest
+  // ): Promise<ApiResponse<null>> => {
+  //   setLoading(true);
+
+  //   try {
+  //     const res: BaseResponseDto = await postAxios(
+  //       `${API_URL}/register`,
+  //       payload
+  //     );
+
+  //     return res;
+  //   } catch (error) {
+  //     return handleAxiosError<null>(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const register = async (
     payload: RegisterRequest
-  ): Promise<ApiResponse<null>> => {
+  ): Promise<ApiResponse<UserDetailResponse>> => {
     setLoading(true);
 
     try {
-      const res: BaseResponseDto = await postAxios(
+      const res: DetailResponseDto<UserDetailResponse> = await postAxios(
         `${API_URL}/register`,
         payload
       );
 
-      const { isSuccess } = res;
+      const { isSuccess, data } = res;
 
-      if (isSuccess) {
+      if (isSuccess && data) {
         sessionStorage.setItem("userEmail", payload.email);
-        router.push(ROUTES.AUTH.EMAIL_VERIFICATION);
+        router.push(`${ROUTES.AUTH.COMPLETE_PROFILE}?uid=${data.userId}`);
       }
 
       return res;
     } catch (error) {
-      return handleAxiosError<null>(error);
+      return handleAxiosError<UserDetailResponse>(error);
     } finally {
       setLoading(false);
     }

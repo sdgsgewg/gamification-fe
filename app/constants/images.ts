@@ -2,9 +2,9 @@ export const IMAGES = {
   // Auth
   AUTH_BG:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/auth/auth-bg.jpg",
-  EMAIL_VERIFCATION_SUCCESS:
+  EMAIL_VERIFICATION_SUCCESS:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/auth/email-verification-success.png",
-  EMAIL_VERIFCATION_ERROR:
+  EMAIL_VERIFICATION_ERROR:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/auth/email-verification-error.png",
   SUCCESS_SOLID_ICON:
     "https://acctihmbqsiftxmlcygv.supabase.co/storage/v1/object/public/auth/success-solid-icon.png",

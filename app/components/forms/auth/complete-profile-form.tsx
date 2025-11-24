@@ -97,9 +97,8 @@ export default function CompleteProfileForm({
           top={
             <>
               <FormTitle
-                title="Informasi Pribadi"
-                subtitle="Mohon isi data di bawah ini agar kami dapat lebih memahami
-                  preferensimu."
+                title="Personal Information"
+                subtitle="Please fill in the data below so we can better understand your preferences."
               />
 
               {/* Name Field */}

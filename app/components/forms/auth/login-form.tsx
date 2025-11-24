@@ -119,13 +119,13 @@ export default function LoginForm({
                     </Checkbox>
                   )}
                 />
-                <Button
+                {/* <Button
                   type="link"
                   onClick={onForgotPasswordClick}
                   className="!text-tx-primary-accent"
                 >
                   Forgot Password?
-                </Button>
+                </Button> */}
               </div>
 
               <Form.Item className="!m-0">

@@ -58,6 +58,7 @@ export default function RegisterForm({
     };
 
     const result = await register(payload);
+
     const { isSuccess, message } = result;
 
     if (isSuccess) {

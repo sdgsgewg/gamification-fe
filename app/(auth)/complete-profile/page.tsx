@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CompleteProfileFormInputs } from "@/app/schemas/auth/completeProfile";
 import CompleteProfileForm from "@/app/components/forms/auth/complete-profile-form";
 import ShowInformationSection from "@/app/components/pages/Auth/ShowInformationSection";
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
@@ -86,11 +85,11 @@ const CompleteProfilePageContent = () => {
   const SuccessView = () => (
     <ShowInformationSection
       imageUrl={IMAGES.SUCCESS_SOLID_ICON}
-      imageAlt="Sukses"
-      title="Pendaftaran Berhasil"
-      subtitle1="Akun Anda telah berhasil dibuat."
+      imageAlt="Success"
+      title="Registration Successful"
+      subtitle1="Your account has been successfully created."
       onButtonClick={handleNavigateToLogin}
-      buttonText="Login Sekarang"
+      buttonText="Login Now"
     />
   );
 
@@ -98,11 +97,11 @@ const CompleteProfilePageContent = () => {
     <ShowInformationSection
       imageUrl={IMAGES.ERROR_REGULAR_ICON}
       imageAlt="Error"
-      title="Terjadi Kesalahan"
-      subtitle1="User ID tidak ditemukan."
-      subtitle2="Silakan verifikasi ulang email Anda melalui tautan yang dikirim ke email Anda"
+      title="An Error Occurred"
+      subtitle1="User ID not found."
+      subtitle2="Please verify your email again using the link sent to your email."
       onButtonClick={handleGoToGmail}
-      buttonText="Verifikasi Email"
+      buttonText="Verify Email"
     />
   );
 

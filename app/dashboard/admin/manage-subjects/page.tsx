@@ -118,7 +118,7 @@ const ManageSubjectPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Subjects List" showBackButton={false} />
+      <DashboardTitle title="Manage Subjects" showBackButton={false} />
 
       <Table
         columns={columns}

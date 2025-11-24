@@ -22,6 +22,7 @@ import { TaskTypeScope, TaskTypeScopeLabels } from "@/app/enums/TaskTypeScope";
 import { BooleanField, BooleanFieldLabels } from "@/app/enums/BooleanField";
 import { useInjectUser } from "@/app/hooks/form/useInjectUser";
 import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { formText } from "@/app/utils/formText";
 
 interface CreateTaskTypeFormProps {
   onFinish: (values: CreateTaskTypeFormInputs) => void;
@@ -98,8 +99,7 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Name"
-                  placeholder="Enter task type name"
+                  {...formText("task type", "name")}
                   errors={errors}
                   required
                 />
@@ -107,8 +107,7 @@ const CreateTaskTypeForm = forwardRef<FormRef, CreateTaskTypeFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Description"
-                  placeholder="Enter task type description"
+                  {...formText("task type", "name")}
                   errors={errors}
                 />
 

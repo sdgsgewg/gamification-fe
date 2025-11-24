@@ -23,6 +23,7 @@ import { FormRef } from "@/app/interface/forms/IFormRef";
 import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
 import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
 import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { formText } from "@/app/utils/formText";
 
 interface EditSubjectFormProps {
   subjectData?: EditSubjectFormInputs;
@@ -132,8 +133,7 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Nama"
-                  placeholder="Masukkan nama mata pelajaran"
+                  {...formText("subject", "name")}
                   errors={errors}
                   required
                 />
@@ -141,8 +141,7 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Deskripsi"
-                  placeholder="Masukkan deskripsi mata pelajaran"
+                  {...formText("subject", "description")}
                   errors={errors}
                 />
               </>
@@ -151,7 +150,7 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Gambar"
+                {...formText("subject", "imageFile")}
                 fileList={fileList}
                 setFileList={setFileList}
                 onChange={handleImageChange}

@@ -15,7 +15,7 @@ const Label = ({ label, required, optional = false, readonly }: LabelProps) => {
         (required ? (
           <span className="text-red-500">*</span>
         ) : optional ? (
-          <span className="text-gray-500">{"(opsional)"}</span>
+          <span className="text-gray-500">{"(optional)"}</span>
         ) : null)}
     </span>
   );

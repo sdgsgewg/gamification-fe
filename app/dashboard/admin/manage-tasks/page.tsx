@@ -220,7 +220,7 @@ const TaskPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Task List" showBackButton={false} />
+      <DashboardTitle title="Manage Tasks" showBackButton={false} />
 
       <Table
         columns={columns}

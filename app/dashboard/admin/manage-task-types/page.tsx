@@ -185,7 +185,7 @@ const TaskTypePage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Task Types List" showBackButton={false} />
+      <DashboardTitle title="Manage Task Types" showBackButton={false} />
 
       <Table
         columns={columns}

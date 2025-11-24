@@ -57,7 +57,7 @@ const EditMaterialPage = () => {
       {isLoading && <Loading />}
 
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Learning Material" onBack={handleBack} />
+      <DashboardTitle title="Edit Material" onBack={handleBack} />
       {materialData && (
         <EditMaterialForm
           ref={formRef}

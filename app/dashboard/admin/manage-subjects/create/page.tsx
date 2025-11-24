@@ -42,7 +42,7 @@ const CreateSubjectPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Buat Mata Pelajaran Baru" onBack={handleBack} />
+      <DashboardTitle title="Create New Subject" onBack={handleBack} />
       <CreateSubjectForm ref={formRef} onFinish={handleCreateSubjectSuccess} />
 
       <ConfirmationModal

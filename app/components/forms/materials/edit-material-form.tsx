@@ -26,6 +26,7 @@ import { FormRef } from "@/app/interface/forms/IFormRef";
 import { useInitializeForm } from "@/app/hooks/form/useInitializeForm";
 import { useInitializeFileList } from "@/app/hooks/file/useInitializeFileList";
 import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { formText } from "@/app/utils/formText";
 
 interface EditMaterialFormProps {
   materialData?: EditMaterialFormInputs;
@@ -119,11 +120,11 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Study material successfully updated!");
+        toast.success(message ?? "Material successfully updated!");
         onFinish(data);
         setFileList([]);
       } else {
-        toast.error(message ?? "Failed to update study material.");
+        toast.error(message ?? "Failed to update material.");
       }
 
       setIsLoading(false);
@@ -151,8 +152,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Name"
-                  placeholder="Enter the name of the study material"
+                  {...formText("material", "name")}
                   errors={errors}
                   required
                 />
@@ -160,8 +160,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <SelectField
                   control={control}
                   name="subjectId"
-                  label="Subject"
-                  placeholder="Select a subject"
+                  {...formText("material", "subjectId")}
                   options={subjectOptions}
                   errors={errors}
                   loading={subjectOptions.length === 0}
@@ -172,16 +171,14 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Description"
-                  placeholder="Enter the study material description"
+                  {...formText("material", "description")}
                   errors={errors}
                 />
 
                 <SelectField
                   control={control}
                   name="gradeIds"
-                  label="Grade Levels"
-                  placeholder="Select grade levels"
+                  {...formText("material", "gradeIds")}
                   options={gradeOptions}
                   errors={errors}
                   loading={gradeOptions.length === 0}
@@ -194,7 +191,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Image"
+                {...formText("material", "imageFile")}
                 fileList={fileList}
                 setFileList={setFileList}
                 onChange={handleImageChange}

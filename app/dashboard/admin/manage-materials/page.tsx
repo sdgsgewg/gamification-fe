@@ -160,7 +160,7 @@ const MaterialPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Materials List" showBackButton={false} />
+      <DashboardTitle title="Manage Materials" showBackButton={false} />
 
       <Table
         columns={columns}

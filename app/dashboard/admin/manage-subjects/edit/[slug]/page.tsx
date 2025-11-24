@@ -6,7 +6,6 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { useRouter, useParams } from "next/navigation";
 import { Toaster } from "@/app/hooks/use-toast";
 import Loading from "@/app/components/shared/Loading";
-import { EditSubjectFormInputs } from "@/app/schemas/subjects/editSubject";
 import { ConfirmationModal } from "@/app/components/modals/ConfirmationModal";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { ROUTES } from "@/app/constants/routes";
@@ -44,7 +43,7 @@ const EditSubjectPage = () => {
     router.back();
   };
 
-  const handleEditSubjectSuccess = (values: EditSubjectFormInputs) => {
+  const handleEditSubjectSuccess = () => {
     router.push(`${baseRoute}`);
   };
 
@@ -53,7 +52,7 @@ const EditSubjectPage = () => {
       {isLoading && <Loading />}
 
       <Toaster position="top-right" />
-      <DashboardTitle title="Edit Mata Pelajaran" onBack={handleBack} />
+      <DashboardTitle title="Edit Subject" onBack={handleBack} />
       {subjectData && (
         <EditSubjectForm
           ref={formRef}

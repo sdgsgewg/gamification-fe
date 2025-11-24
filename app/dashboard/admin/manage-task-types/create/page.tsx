@@ -2,7 +2,6 @@
 
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreateTaskTypeFormInputs } from "@/app/schemas/task-types/createTaskType";
 import { Toaster } from "@/app/hooks/use-toast";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import CreateTaskTypeForm from "@/app/components/forms/task-types/create-task-type-form";
@@ -36,14 +35,14 @@ const CreateTaskTypePage = () => {
     router.back();
   };
 
-  const handleCreateTaskTypeSuccess = (values: CreateTaskTypeFormInputs) => {
+  const handleCreateTaskTypeSuccess = () => {
     router.push(`${baseRoute}`);
   };
 
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Buat Tipe Tugas Baru" onBack={handleBack} />
+      <DashboardTitle title="Create New Task Type" onBack={handleBack} />
       <CreateTaskTypeForm onFinish={handleCreateTaskTypeSuccess} />
 
       <ConfirmationModal

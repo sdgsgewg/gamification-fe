@@ -47,7 +47,7 @@ const CreateMaterialPage = () => {
   return (
     <>
       <Toaster position="top-right" />
-      <DashboardTitle title="Buat Materi Pelajaran Baru" onBack={handleBack} />
+      <DashboardTitle title="Create New Material" onBack={handleBack} />
       <CreateMaterialForm
         ref={formRef}
         subjectData={subjectData}

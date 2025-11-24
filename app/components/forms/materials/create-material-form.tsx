@@ -24,6 +24,7 @@ import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOv
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { useInjectUser } from "@/app/hooks/form/useInjectUser";
 import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
+import { formText } from "@/app/utils/formText";
 
 interface CreateMaterialFormProps {
   subjectData: SubjectOverviewResponse[];
@@ -80,11 +81,11 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
       const { isSuccess, message } = result;
 
       if (isSuccess) {
-        toast.success(message ?? "Learning material created successfully!");
+        toast.success(message ?? "Material created successfully!");
         onFinish(data);
         setFileList([]);
       } else {
-        toast.error(message ?? "Failed to create learning material.");
+        toast.error(message ?? "Failed to create material.");
       }
 
       setIsLoading(false);
@@ -112,8 +113,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Name"
-                  placeholder="Enter learning material name"
+                  {...formText("material", "name")}
                   errors={errors}
                   required
                 />
@@ -121,8 +121,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <SelectField
                   control={control}
                   name="subjectId"
-                  label="Subject"
-                  placeholder="Select subject"
+                  {...formText("material", "subjectId")}
                   options={subjectOptions}
                   errors={errors}
                   loading={subjectOptions.length === 0}
@@ -133,16 +132,14 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Description"
-                  placeholder="Enter description of the learning material"
+                  {...formText("material", "description")}
                   errors={errors}
                 />
 
                 <SelectField
                   control={control}
                   name="gradeIds"
-                  label="Grade Level"
-                  placeholder="Select grade level(s)"
+                  {...formText("material", "gradeIds")}
                   options={gradeOptions}
                   errors={errors}
                   loading={gradeOptions.length === 0}
@@ -155,7 +152,7 @@ const CreateMaterialForm = forwardRef<FormRef, CreateMaterialFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Image"
+                {...formText("material", "imageFile")}
                 fileList={fileList}
                 setFileList={setFileList}
                 errors={errors}

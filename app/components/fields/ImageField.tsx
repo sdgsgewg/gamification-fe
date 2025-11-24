@@ -148,7 +148,7 @@ const ImageField = ({
                       }}
                       className="flex items-center gap-2 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg shadow cursor-pointer"
                     >
-                      <DeleteOutlined /> Hapus
+                      <DeleteOutlined /> Delete
                     </button>
                   </div>
                 )}
@@ -157,7 +157,7 @@ const ImageField = ({
               <div className="flex flex-col items-center justify-center w-60 aspect-square border-2 border-dashed rounded-lg text-dark hover:border-blue-500 hover:text-blue-500 transition cursor-pointer">
                 <PlusOutlined className="text-2xl mb-2" />
                 <span className="text-sm">
-                  {readonly ? "Tidak ada gambar" : "Upload"}
+                  {readonly ? "No Image" : "Upload"}
                 </span>
               </div>
             )}

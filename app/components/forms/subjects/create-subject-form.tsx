@@ -21,6 +21,7 @@ import {
 } from "@/app/schemas/subjects/createSubject";
 import { useInjectUser } from "@/app/hooks/form/useInjectUser";
 import { subjectProvider } from "@/app/functions/SubjectProvider";
+import { formText } from "@/app/utils/formText";
 
 interface CreateSubjectFormProps {
   onFinish: (values: CreateSubjectFormInputs) => void;
@@ -96,8 +97,7 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
                 <TextField
                   control={control}
                   name="name"
-                  label="Name"
-                  placeholder="Enter subject name"
+                  {...formText("subject", "name")}
                   errors={errors}
                   required
                 />
@@ -105,8 +105,7 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
                 <TextAreaField
                   control={control}
                   name="description"
-                  label="Description"
-                  placeholder="Enter subject description"
+                  {...formText("subject", "description")}
                   errors={errors}
                 />
               </>
@@ -115,7 +114,7 @@ const CreateSubjectForm = forwardRef<FormRef, CreateSubjectFormProps>(
               <ImageField
                 control={control}
                 name="imageFile"
-                label="Upload Image"
+                {...formText("subject", "imageFile")}
                 fileList={fileList}
                 setFileList={setFileList}
                 errors={errors}

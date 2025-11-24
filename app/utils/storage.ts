@@ -31,7 +31,15 @@ export const removeLocal = (key: string) => {
 export const clearLocal = () => {
   if (typeof window === "undefined") return;
   try {
+    // simpan value 'theme'
+    const theme = localStorage.getItem("theme");
+
     localStorage.clear();
+
+    // restore theme
+    if (theme !== null) {
+      localStorage.setItem("theme", theme);
+    }
   } catch {}
 };
 

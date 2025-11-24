@@ -290,9 +290,12 @@ export function useAuth() {
       deleteCookie("refreshToken");
       deleteCookie("role");
 
+      // notify listeners
+      authEventTarget.dispatchEvent(new Event("authChanged"));
+
       // PAKSA FULL RELOAD
       window.location.replace("/");
-      window.location.reload();
+      // window.location.reload();
 
       // router.push("/");
       // router.refresh();

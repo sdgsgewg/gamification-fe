@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Dropdown } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,10 +23,22 @@ import {
 } from "@/app/constants/menuItems";
 import { useUserStats } from "@/app/hooks/users/useUserStats";
 import { useAuth } from "@/app/hooks/auth/useAuth";
+import { LucideIcon } from "lucide-react";
 
-const MainMenuItem = ({ url, menu }: { url: string; menu: string }) => (
+const MainMenuItem = ({
+  url,
+  menu,
+  Icon,
+}: {
+  url: string;
+  menu: string;
+  Icon?: LucideIcon;
+}) => (
   <li className="text-dark">
-    <a href={url}>{menu}</a>
+    <a href={url} className="flex items-center gap-2">
+      {Icon && <Icon size={16} className="text-dark" />}
+      {menu}
+    </a>
   </li>
 );
 
@@ -59,12 +71,20 @@ const MainMenuItemWrapper = ({
                       href={sub.url}
                       className="flex items-center gap-2 px-1 py-2 text-sm hover:bg-light-emphasis"
                     >
-                      <Image
-                        src={sub.icon ?? "/img/default.png"}
-                        alt={sub.menu}
-                        width={16}
-                        height={16}
-                      />
+                      {sub.icon && (
+                        <>
+                          {typeof sub.icon === "string" ? (
+                            <Image
+                              src={sub.icon}
+                              alt={sub.menu}
+                              width={16}
+                              height={16}
+                            />
+                          ) : (
+                            <sub.icon size={16} className="text-dark" />
+                          )}
+                        </>
+                      )}
                       <span className="text-dark">{sub.menu}</span>
                     </a>
                   ),
@@ -81,7 +101,12 @@ const MainMenuItemWrapper = ({
             </Dropdown>
           </li>
         ) : (
-          <MainMenuItem key={item.url} menu={item.menu} url={item.url} />
+          <MainMenuItem
+            key={item.url}
+            menu={item.menu}
+            url={item.url}
+            Icon={item.icon}
+          />
         )
       )}
     </ul>
@@ -161,10 +186,7 @@ const UserDropdownMenu = ({
                 className="flex items-center gap-2 px-1 py-2 hover:bg-light-emphasis"
               >
                 {item.icon && (
-                  <FontAwesomeIcon
-                    icon={item.icon}
-                    className="w-4 h-4 text-tx-tertiary"
-                  />
+                  <item.icon size={16} className="text-tx-tertiary" />
                 )}
                 <span className="text-sm text-tx-secondary">{item.menu}</span>
               </a>

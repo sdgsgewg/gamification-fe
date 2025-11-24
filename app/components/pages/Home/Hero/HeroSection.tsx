@@ -3,33 +3,22 @@
 import { IMAGES } from "@/app/constants/images";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   SideBySideContentSection,
   SideBySideContentSectionProps,
 } from "../Section";
 import { Role } from "@/app/enums/Role";
-
 import Button from "@/app/components/shared/Button";
 import { ROUTES } from "@/app/constants/routes";
-import { useAuth } from "@/app/hooks/auth/useAuth";
+import { useGetCachedUser } from "../../../../hooks/useGetCachedUser";
 
 const HeroSection = () => {
   const router = useRouter();
-  const { getCachedUserProfile } = useAuth();
-  const [userRole, setUserRole] = useState<Role>(Role.GUEST);
-
-  useEffect(() => {
-    const user = getCachedUserProfile();
-    if (user) {
-      setUserRole(user.role.name);
-    } else {
-      setUserRole(Role.GUEST);
-    }
-  }, [getCachedUserProfile]);
+  const { role } = useGetCachedUser();
 
   const handleClickStartNow = () => {
-    if (userRole === Role.GUEST) {
+    if (role === Role.GUEST) {
       router.push(ROUTES.AUTH.LOGIN);
     } else {
       router.push(ROUTES.ROOT.ACTIVITY);

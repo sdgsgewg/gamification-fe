@@ -67,6 +67,15 @@ function buildRoleAccess(): Record<Role, string[]> {
   return access;
 }
 
+const PUBLIC_AUTH_ROUTES = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/email-verification",
+  "/complete-profile",
+];
+
 const roleAccess = buildRoleAccess();
 
 export function middleware(req: NextRequest) {
@@ -75,6 +84,11 @@ export function middleware(req: NextRequest) {
 
   console.log("Role middleware: ", role);
   console.log("Current URL =>", url);
+
+  // Jika route termasuk auth routes -> langsung allow tanpa cek role
+  if (PUBLIC_AUTH_ROUTES.includes(url)) {
+    return NextResponse.next();
+  }
 
   // Batasi url khusus admin
   if (url.startsWith("/dashboard/admin") && role !== Role.ADMIN) {

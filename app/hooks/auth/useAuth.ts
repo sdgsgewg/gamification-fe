@@ -293,6 +293,9 @@ export function useAuth() {
       // PAKSA FULL RELOAD
       window.location.replace("/");
       window.location.reload();
+
+      // router.push("/");
+      // router.refresh();
     } catch (error) {
       return handleAxiosError<null>(error);
     }

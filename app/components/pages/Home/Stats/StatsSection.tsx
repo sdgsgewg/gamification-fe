@@ -178,18 +178,19 @@ const StatsSection = () => {
 
     const StudentData = () => {
       return (
-        <DataRow
-          icon={{ src: IMAGES.BADGE, alt: "top student badge" }}
-          text={`Quiz Master`}
-          textClassName="text-xl font-semibold"
-        />
+        // <DataRow
+        //   icon={{ src: IMAGES.BADGE, alt: "top student badge" }}
+        //   text={`Quiz Master`}
+        //   textClassName="text-xl font-semibold"
+        // />
+        <></>
       );
     };
 
     const TeacherData = () => {
       return (
         <>
-          <div className="flex flex-col gap-4">
+          {/* <div className="flex flex-col gap-4">
             <DataRow
               icon={{ src: IMAGES.LEADERBOARD, alt: "top student" }}
               text={`Top Student of the Week`}
@@ -199,7 +200,7 @@ const StatsSection = () => {
               text={`Zahra L. - 3,200 pts`}
               textClassName="text-base font-semibold"
             />
-          </div>
+          </div> */}
         </>
       );
     };

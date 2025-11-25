@@ -9,19 +9,27 @@ interface LeaderboardItem {
 
 interface LeaderboardProps {
   title: string;
+  subtitle?: string;
   data: LeaderboardItem[];
   valueType: string;
   isLoading?: boolean;
 }
 
-const rankColors = {
+const rankColors: Record<number, string> = {
   1: "from-yellow-400 to-yellow-600 text-yellow-900",
   2: "from-gray-300 to-gray-400 text-gray-800",
   3: "from-amber-600 to-amber-800 text-amber-50",
 };
 
+const rankEmojis: Record<number, string> = {
+  1: "🥇",
+  2: "🥈",
+  3: "🥉",
+};
+
 export const LeaderboardSection = ({
   title,
+  subtitle,
   data,
   valueType,
   isLoading,
@@ -52,9 +60,13 @@ export const LeaderboardSection = ({
   const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
-    <DashboardSectionWrapper title={title} icon={ListOrdered}>
+    <DashboardSectionWrapper
+      title={title}
+      subtitle={subtitle}
+      icon={ListOrdered}
+    >
       <div className="space-y-3">
-        {data.map((item, index) => {
+        {data.slice(0, 5).map((item, index) => {
           const rank = index + 1;
           const isTop3 = rank <= 3;
 
@@ -77,13 +89,7 @@ export const LeaderboardSection = ({
                   }
                 `}
               >
-                {rank === 1
-                  ? "🥇"
-                  : rank === 2
-                  ? "🥈"
-                  : rank === 3
-                  ? "🥉"
-                  : rank}
+                {rankEmojis[rank] || rank}
               </div>
 
               {/* Task name */}

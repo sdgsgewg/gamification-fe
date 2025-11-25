@@ -1,4 +1,4 @@
-import { LeaderboardResponse } from "@/app/interface/leaderboards/responses/ILeaderboardResponse";
+import { LeaderboardResponse } from "@/app/interface/leaderboards/responses/IClassLeaderboardResponse";
 import React from "react";
 
 interface LeaderboardCardProps {

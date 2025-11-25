@@ -1,9 +1,9 @@
-export interface ClassStudentsLeaderboardResponse {
+export interface StudentLeaderboardResponse {
   id: string;
+  rank: number;
   name: string;
   username: string;
   image?: string;
-  rank: number;
   level: number;
   xp: number;
   point: number;

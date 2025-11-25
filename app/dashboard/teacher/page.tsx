@@ -90,6 +90,7 @@ const TeacherDashboard: React.FC = () => {
         {/* Recent Submissions */}
         <RecentActivitiesSection
           title="Recent Submissions"
+          subtitle="These are the tasks that have been submitted by students."
           noDataText="No submission yet"
           data={recentSubmissionData}
           isLoading={isRecentSubmissionLoading}

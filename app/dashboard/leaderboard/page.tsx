@@ -7,9 +7,13 @@ import { IMAGES } from "@/app/constants/images";
 import LeaderboardFilters from "@/app/components/shared/leaderboard/LeaderboardFilters";
 import LeaderboardViewComponent from "@/app/components/shared/leaderboard/LeaderboardView";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
+import { LeaderboardScope } from "@/app/types/LeaderboardScope";
+import { LeaderboardScopeEnum } from "@/app/enums/LeaderboardSopeEnum";
 
 const LeaderboardPage = () => {
-  const [filter, setFilter] = useState<"class" | "student">("class");
+  const [filter, setFilter] = useState<LeaderboardScope>(
+    LeaderboardScopeEnum.CLASS.toLowerCase() as LeaderboardScope
+  );
 
   const { data: classLeaderboard = [], isLoading: isClassLoading } =
     useClassLeaderboard();
@@ -28,7 +32,7 @@ const LeaderboardPage = () => {
     <>
       <DashboardTitle title="Leaderboard" />
 
-      <LeaderboardFilters filter={filter} setFilter={setFilter} />
+      <LeaderboardFilters module="dashboard" filter={filter} setFilter={setFilter} />
 
       <LeaderboardViewComponent
         leaderboardData={leaderboard}

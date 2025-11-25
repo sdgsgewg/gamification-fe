@@ -1,48 +1,51 @@
-import { GlobalLeaderboardResponse } from "../interface/leaderboards/responses/IGlobalLeaderboardResponse";
-import { LeaderboardResponse } from "../interface/leaderboards/responses/ILeaderboardResponse";
+import { FilterStudentLeaderboardRequest } from "../interface/leaderboards/requests/IFilterStudentLeaderboardRequest";
+import { ClassLeaderboardResponse } from "../interface/leaderboards/responses/IClassLeaderboardResponse";
+import { StudentLeaderboardResponse } from "../interface/leaderboards/responses/IStudentLeaderboardResponse";
 import { getAxios } from "../utils/AxiosFunction";
 import { ApiResponse, handleAxiosError } from "../utils/axiosHelper";
 
 const API_URL = "/leaderboards";
 
 export const leaderboardProvider = {
-  async getGlobalLeaderboard(): Promise<
-    ApiResponse<GlobalLeaderboardResponse[]>
-  > {
+  async getStudentLeaderboard(
+    params?: FilterStudentLeaderboardRequest
+  ): Promise<ApiResponse<StudentLeaderboardResponse[]>> {
     try {
-      const data = await getAxios(`${API_URL}/global`);
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<GlobalLeaderboardResponse[]>(error);
-    }
-  },
+      const query = new URLSearchParams();
 
-  async getClassLeaderboard(): Promise<ApiResponse<LeaderboardResponse[]>> {
-    try {
-      const data = await getAxios(`${API_URL}/classes`);
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<LeaderboardResponse[]>(error);
-    }
-  },
+      if (params?.scope) query.append("scope", params.scope);
+      if (params?.orderBy) query.append("orderBy", params.orderBy);
+      if (params?.orderState) query.append("orderState", params.orderState);
 
-  async getStudentLeaderboard(): Promise<ApiResponse<LeaderboardResponse[]>> {
-    try {
-      const data = await getAxios(`${API_URL}/students`);
+      const url = query.toString()
+        ? `${API_URL}/students?${query}`
+        : `${API_URL}/students`;
+      const data = await getAxios(url);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<LeaderboardResponse[]>(error);
+      return handleAxiosError<StudentLeaderboardResponse[]>(error);
     }
   },
 
   async getClassStudentsLeaderboard(
     classId: string
-  ): Promise<ApiResponse<GlobalLeaderboardResponse[]>> {
+  ): Promise<ApiResponse<StudentLeaderboardResponse[]>> {
     try {
       const data = await getAxios(`${API_URL}/classes/${classId}/students`);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<GlobalLeaderboardResponse[]>(error);
+      return handleAxiosError<StudentLeaderboardResponse[]>(error);
+    }
+  },
+
+  async getClassLeaderboard(): Promise<
+    ApiResponse<ClassLeaderboardResponse[]>
+  > {
+    try {
+      const data = await getAxios(`${API_URL}/classes`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ClassLeaderboardResponse[]>(error);
     }
   },
 };

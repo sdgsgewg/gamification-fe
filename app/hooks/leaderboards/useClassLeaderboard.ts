@@ -1,7 +1,7 @@
 "use client";
 
 import { leaderboardProvider } from "@/app/functions/LeaderboardProvider";
-import { LeaderboardResponse } from "@/app/interface/leaderboards/responses/ILeaderboardResponse";
+import { ClassLeaderboardResponse } from "@/app/interface/leaderboards/responses/IClassLeaderboardResponse";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -12,7 +12,7 @@ export const useClassLeaderboard = () => {
       const res = await leaderboardProvider.getClassLeaderboard();
       return res.isSuccess && res.data ? res.data : [];
     },
-    select: (data: LeaderboardResponse[]) =>
+    select: (data: ClassLeaderboardResponse[]) =>
       data.map((cl, idx) => ({
         key: cl.id ?? idx,
         ...cl,

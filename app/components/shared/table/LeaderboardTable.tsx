@@ -3,18 +3,18 @@
 import React from "react";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { LeaderboardData } from "@/app/interface/LeaderboardData";
 import { IMAGES } from "@/app/constants/images";
 import Image from "next/image";
+import { StudentLeaderboardResponse } from "@/app/interface/leaderboards/responses/IStudentLeaderboardResponse";
 
 interface LeaderboardPreviewTableProps {
-  data: LeaderboardData[];
+  data: StudentLeaderboardResponse[];
 }
 
 export const LeaderboardPreviewTable = ({
   data,
 }: LeaderboardPreviewTableProps) => {
-  const columns: ColumnsType<LeaderboardData> = [
+  const columns: ColumnsType<StudentLeaderboardResponse> = [
     {
       title: "Rank",
       dataIndex: "rank",
@@ -56,12 +56,12 @@ export const LeaderboardPreviewTable = ({
     },
     {
       title: "Points",
-      dataIndex: "points",
-      key: "points",
+      dataIndex: "point",
+      key: "point",
       align: "left",
       width: "30%",
       render: (text) => (
-        <span className="font-medium">{text.toLocaleString()}</span>
+        <span className="font-medium">{text}</span>
       ),
     },
   ];

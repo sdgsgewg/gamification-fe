@@ -9,13 +9,14 @@ export interface BarChartItem {
 
 interface BarChartSectionProps {
   title: string;
+  subtitle?: string;
   data: BarChartItem[];
   isLoading?: boolean;
 }
 
-const BarChartSection = ({ title, data, isLoading }: BarChartSectionProps) => {
+const BarChartSection = ({ title, subtitle, data, isLoading }: BarChartSectionProps) => {
   return (
-    <DashboardSectionWrapper title={title}>
+    <DashboardSectionWrapper title={title} subtitle={subtitle}>
       {isLoading ? (
         <BarChartSkeleton />
       ) : data.length === 0 ? (

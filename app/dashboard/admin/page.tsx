@@ -164,6 +164,7 @@ const AdminDashboardPage = () => {
       {/* Most Popular Task Leaderboard */}
       <LeaderboardSection
         title="Most Popular Tasks"
+        subtitle="These are the tasks that have been attempted the most."
         data={modifiedMostPopularTaskData}
         valueType="attempts"
         isLoading={isLoading}
@@ -172,6 +173,7 @@ const AdminDashboardPage = () => {
       {/* Class Chart */}
       <BarChartSection
         title="Number of Students per Class"
+        subtitle="This chart shows the amount of students in each class."
         data={classes}
         isLoading={isLoading}
       />

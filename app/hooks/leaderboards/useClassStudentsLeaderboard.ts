@@ -1,7 +1,7 @@
 "use client";
 
 import { leaderboardProvider } from "@/app/functions/LeaderboardProvider";
-import { ClassStudentsLeaderboardResponse } from "@/app/interface/leaderboards/responses/IClassStudentsLeaderboardResponse";
+import { StudentLeaderboardResponse } from "@/app/interface/leaderboards/responses/IStudentLeaderboardResponse";
 import { useQuery } from "@tanstack/react-query";
 
 export const useClassStudentsLeaderboard = (classId: string) => {
@@ -13,7 +13,7 @@ export const useClassStudentsLeaderboard = (classId: string) => {
       );
       return res.isSuccess && res.data ? res.data : [];
     },
-    select: (data: ClassStudentsLeaderboardResponse[]) =>
+    select: (data: StudentLeaderboardResponse[]) =>
       data.map((csl, idx) => ({
         key: csl.id ?? idx,
         ...csl,

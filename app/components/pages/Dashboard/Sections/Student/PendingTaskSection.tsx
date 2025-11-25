@@ -6,6 +6,7 @@ import {
 } from "../../Cards";
 import EmptyText from "@/app/components/shared/not-found/EmptyText";
 import { ClassTaskOverviewResponse } from "@/app/interface/class-tasks/responses/IClassTaskOverviewResponse";
+import DashboardSectionWrapper from "../Wrapper";
 
 interface PendingTaskSectionProps {
   data: ClassTaskOverviewResponse[];
@@ -14,9 +15,10 @@ interface PendingTaskSectionProps {
 
 const PendingTaskSection = ({ data, isLoading }: PendingTaskSectionProps) => {
   return (
-    <div className="col-span-2 bg-card p-5 rounded-2xl shadow-md border border-outline">
-      <h2 className="text-lg font-semibold text-primary mb-3">Pending Tasks</h2>
-
+    <DashboardSectionWrapper
+      title="Pending Tasks"
+      subtitle="These are the tasks you haven’t started yet."
+    >
       {isLoading ? (
         <PendingTaskCardWrapper>
           {Array.from({ length: 4 }).map((_, idx) => (
@@ -32,7 +34,7 @@ const PendingTaskSection = ({ data, isLoading }: PendingTaskSectionProps) => {
       ) : (
         <EmptyText text={`No pending task`} />
       )}
-    </div>
+    </DashboardSectionWrapper>
   );
 };
 

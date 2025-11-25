@@ -12,6 +12,7 @@ import DashboardSectionWrapper from "./Wrapper";
 
 interface RecentActivitiesSectionProps {
   title?: string;
+  subtitle?: string;
   noDataText?: string;
   data: MasterHistoryOverviewResponse[] | ActivityLogOverviewResponse[];
   isLoading: boolean;
@@ -19,12 +20,13 @@ interface RecentActivitiesSectionProps {
 
 export default function RecentActivitiesSection({
   title = "Recent Activities",
+  subtitle = "Your latest activities and updates.",
   noDataText = "No activty yet",
   data,
   isLoading,
 }: RecentActivitiesSectionProps) {
   return (
-    <DashboardSectionWrapper title={title}>
+    <DashboardSectionWrapper title={title} subtitle={subtitle}>
       <div className="py-2 overflow-y-auto max-h-[16rem]">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (

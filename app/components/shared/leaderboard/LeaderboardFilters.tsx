@@ -1,34 +1,45 @@
 "use client";
 
+import { LeaderboardScope } from "@/app/types/LeaderboardScope";
+
 type Props = {
-  filter: "class" | "student";
-  setFilter: (f: "class" | "student") => void;
+  module: "root" | "dashboard";
+  filter: LeaderboardScope;
+  setFilter: (f: LeaderboardScope) => void;
 };
 
-export default function LeaderboardFilters({ filter, setFilter }: Props) {
-  return (
-    <div className="mb-6 flex gap-4">
-      <button
-        onClick={() => setFilter("class")}
-        className={`px-4 py-2 font-bold rounded-lg ${
-          filter === "class"
-            ? "bg-primary text-white"
-            : "bg-card text-tx-primary border border-br-secondary"
-        } cursor-pointer`}
-      >
-        Class
-      </button>
+export default function LeaderboardFilters({
+  module,
+  filter,
+  setFilter,
+}: Props) {
+  const scopes =
+    module === "root"
+      ? [
+          { value: "global", label: "Global" },
+          { value: "activity", label: "Activity" },
+          { value: "class", label: "Class" },
+        ]
+      : [
+          { value: "class", label: "Class" },
+          { value: "student", label: "Student" },
+        ];
 
-      <button
-        onClick={() => setFilter("student")}
-        className={`px-4 py-2 font-bold rounded-lg ${
-          filter === "student"
-            ? "bg-primary text-white"
-            : "bg-card text-tx-primary border border-br-secondary"
-        } cursor-pointer`}
-      >
-        Student
-      </button>
+  return (
+    <div className="flex gap-4 mb-6 ">
+      {scopes.map((scope) => (
+        <button
+          key={scope.value}
+          onClick={() => setFilter(scope.value as LeaderboardScope)}
+          className={`px-4 py-2 font-bold rounded-lg ${
+            filter === scope.value
+              ? "bg-primary text-white"
+              : "bg-card text-tx-primary border border-br-secondary"
+          } cursor-pointer`}
+        >
+          {scope.label}
+        </button>
+      ))}
     </div>
   );
 }

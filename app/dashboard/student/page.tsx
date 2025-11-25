@@ -4,12 +4,14 @@ import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { LeaderboardSection } from "@/app/components/pages/Dashboard/Sections/LeaderboardSection";
 import RecentActivitiesSection from "@/app/components/pages/Dashboard/Sections/RecentActivitiesSection";
 import PendingTaskSection from "@/app/components/pages/Dashboard/Sections/Student/PendingTaskSection";
+import { LeaderboardScopeEnum } from "@/app/enums/LeaderboardSopeEnum";
+import { LeaderboardScope } from "@/app/types/LeaderboardScope";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 import { useUserActivityLogs } from "@/app/hooks/activity-logs/useUserActivityLogs";
 import { useTasksFromAllClassesList } from "@/app/hooks/class-tasks/useTasksFromAllClassesList";
 import { useStudentLeaderboard } from "@/app/hooks/leaderboards/useStudentLeaderboard";
+import { scopeDescription } from "@/app/utils/leaderboard/scopeDescription";
 import React from "react";
-import { DashboardData } from "@/app/interface/DashboardData";
 
 export default function DashboardPage() {
   const { data: pendingTasks = [], isLoading: isPendingTasksLoading } =
@@ -22,7 +24,9 @@ export default function DashboardPage() {
   const {
     data: studentLeaderboard = [],
     isLoading: isStudentLeaderboardLoading,
-  } = useStudentLeaderboard();
+  } = useStudentLeaderboard({
+    scope: LeaderboardScopeEnum.CLASS,
+  });
   const modifiedLeaderboardData = studentLeaderboard.map((student) => ({
     label: student.name,
     value: student.point,
@@ -51,6 +55,11 @@ export default function DashboardPage() {
         {/* === Leaderboard === */}
         <LeaderboardSection
           title="Leaderboard"
+          subtitle={
+            scopeDescription[
+              LeaderboardScopeEnum.CLASS.toLowerCase() as LeaderboardScope
+            ]
+          }
           data={modifiedLeaderboardData}
           valueType="points"
           isLoading={isLoading}

@@ -1,6 +1,7 @@
+"use client";
+
 import Button from "@/app/components/shared/Button";
 import { LeaderboardPreviewTable } from "@/app/components/shared/table/LeaderboardTable";
-import { LeaderboardData } from "@/app/interface/LeaderboardData";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/navigation";
@@ -9,17 +10,15 @@ import {
   SideBySideContentSectionProps,
 } from "../Section";
 import { ROUTES } from "@/app/constants/routes";
-
-const leaderboardData: LeaderboardData[] = [
-  { rank: 1, name: "Dinda P.", points: 36700 },
-  { rank: 2, name: "Arif W.", points: 34200 },
-  { rank: 3, name: "Zahra I.", points: 33150 },
-  { rank: 4, name: "Rafi A.", points: 32700 },
-  { rank: 5, name: "Chika M.", points: 31800 },
-];
+import { useStudentLeaderboard } from "@/app/hooks/leaderboards/useStudentLeaderboard";
+import { LeaderboardScopeEnum } from "@/app/enums/LeaderboardSopeEnum";
 
 const LeaderboardSection = () => {
   const router = useRouter();
+
+  const { data: leaderboardData = [] } = useStudentLeaderboard({
+    scope: LeaderboardScopeEnum.GLOBAL,
+  });
 
   const navigateToLeaderboardPage = () => {
     router.push(ROUTES.ROOT.LEADERBOARD);
@@ -53,7 +52,7 @@ const LeaderboardSection = () => {
   const LeaderboardPreview = () => {
     return (
       <div className="w-full lg:w-1/2">
-        <LeaderboardPreviewTable data={leaderboardData} />
+        <LeaderboardPreviewTable data={leaderboardData.slice(0, 5)} />
       </div>
     );
   };

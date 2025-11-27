@@ -14,8 +14,6 @@ export const leaderboardProvider = {
       const query = new URLSearchParams();
 
       if (params?.scope) query.append("scope", params.scope);
-      if (params?.orderBy) query.append("orderBy", params.orderBy);
-      if (params?.orderState) query.append("orderState", params.orderState);
 
       const url = query.toString()
         ? `${API_URL}/students?${query}`

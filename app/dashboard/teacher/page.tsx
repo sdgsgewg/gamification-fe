@@ -70,7 +70,7 @@ const TeacherDashboard: React.FC = () => {
   return (
     <>
       {/* Page Title */}
-      <DashboardTitle title="Teacher Dashboard" showBackButton={false} />
+      <DashboardTitle title="Dashboard" showBackButton={false} />
 
       {/* === Main Grid Section === */}
       <QuickActionCardWrapper>

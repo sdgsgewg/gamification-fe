@@ -45,7 +45,7 @@ export default function DashboardPage() {
       <DashboardTitle title="Dashboard" showBackButton={false} />
 
       {/* === Main Grid === */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
         {/* === Pending Tasks === */}
         <PendingTaskSection
           data={pendingTasks}

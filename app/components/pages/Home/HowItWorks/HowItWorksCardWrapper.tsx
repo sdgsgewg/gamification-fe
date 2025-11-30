@@ -18,7 +18,8 @@ const howItWorksContent: HowItWorksContentData[] = [
   },
   {
     title: "03",
-    description: "Earn Points & Badges from each task",
+    // description: "Earn Points & Badges from each task",
+    description: "Earn Points & XP from each task",
   },
   {
     title: "04",

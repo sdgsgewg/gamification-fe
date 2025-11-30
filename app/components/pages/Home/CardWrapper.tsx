@@ -8,7 +8,8 @@ export default function CardWrapper({
 }) {
   const { sectionName } = useSectionContext();
 
-  const threeGridSections = ["features"];
+  const twoGridSections = ["features"];
+  // const threeGridSections = ["features"];
   const fourGridSections = ["howItWorks", "subject", "badge"];
 
   return (
@@ -16,7 +17,8 @@ export default function CardWrapper({
       className={`grid grid-cols-1 sm:grid-cols-2 ${
         fourGridSections.includes(sectionName)
           ? "lg:grid-cols-4"
-          : "lg:grid-cols-3"
+          // : "lg:grid-cols-3"
+          : "lg:grid-cols-2"
       } gap-y-8 ${
         sectionName === "howItWorks"
           ? "lg:gap-y-0 lg:gap-x-8 xl:gap-x-12"

@@ -6,7 +6,7 @@ import StatsSection from "../components/pages/Home/Stats/StatsSection";
 import LeaderboardSection from "../components/pages/Home/Leaderboard/LeaderboardSection";
 import SubjectSection from "../components/pages/Home/Subject/SubjectSection";
 import CTASection from "../components/pages/Home/CTA/CTASection";
-import BadgeSection from "../components/pages/Home/Badge/BadgeSection";
+// import BadgeSection from "../components/pages/Home/Badge/BadgeSection";
 
 // ===============================
 // Role-based Home Section Mapping
@@ -19,7 +19,7 @@ export const roleSectionsMap = {
     { name: "features", element: <FeatureSection /> },
     { name: "leaderboard", element: <LeaderboardSection /> },
     { name: "subject", element: <SubjectSection /> },
-    { name: "badge", element: <BadgeSection /> },
+    // { name: "badge", element: <BadgeSection /> },
     { name: "cta", element: <CTASection /> },
   ],
   [Role.STUDENT]: [
@@ -29,7 +29,7 @@ export const roleSectionsMap = {
     { name: "stats", element: <StatsSection /> },
     { name: "leaderboard", element: <LeaderboardSection /> },
     { name: "subject", element: <SubjectSection /> },
-    { name: "badge", element: <BadgeSection /> },
+    // { name: "badge", element: <BadgeSection /> },
     { name: "cta", element: <CTASection /> },
   ],
   [Role.TEACHER]: [

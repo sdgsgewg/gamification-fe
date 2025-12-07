@@ -21,8 +21,8 @@ import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/I
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import Loading from "../../../shared/Loading";
 import SelectField from "../../../fields/SelectField";
-import DateField from "../../../fields/DateField";
-import TimeField from "../../../fields/TimeField";
+// import DateField from "../../../fields/DateField";
+// import TimeField from "../../../fields/TimeField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { combineDateTime } from "@/app/utils/date";
@@ -36,14 +36,10 @@ import {
 } from "@/app/hooks/file/useInitializeFileList";
 import { EditTaskQuestionFormInputs } from "@/app/schemas/tasks/task-questions/editTaskQuestion";
 import { isEqual } from "lodash";
-import {
-  TaskDifficulty,
-  TaskDifficultyLabels,
-} from "@/app/enums/TaskDifficulty";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
-import { Role } from "@/app/enums/Role";
-import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
 import { useAuth } from "@/app/hooks/auth/useAuth";
+import { TaskTypeOptionItem } from "./OptionItem";
+import { useUpsertTaskOverviewForm } from "@/app/hooks/form/useUpsertTaskOverviewForm";
 
 interface EditTaskOverviewFormProps {
   taskOverviewDefaultValue: EditTaskOverviewFormInputs;
@@ -98,34 +94,42 @@ const EditTaskOverviewForm = forwardRef<
     const [filteredMaterials, setFilteredMaterials] = useState<
       MaterialOverviewResponse[]
     >([]);
-    const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
+    // const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
+
+    const data = useUpsertTaskOverviewForm({
+      role,
+      subjectData,
+      materialData,
+      taskTypeData,
+      gradeData,
+      selectedSubjectId,
+    });
+
+    const {
+      subjectOptions,
+      // materialOptions,
+      taskTypeOptions,
+      gradeOptions,
+      difficultyOptions,
+      // selectedTaskTypeHasDeadline,
+    } = data;
 
     // Use useMemo for derived values
-    const selectedTaskTypeHasDeadline = useMemo(() => {
-      if (!selectedTaskTypeId) return undefined;
-      const taskType = taskTypeData.find(
-        (tt) => tt.taskTypeId === selectedTaskTypeId
-      );
+    // const selectedTaskTypeHasDeadline = useMemo(() => {
+    //   if (!selectedTaskTypeId) return undefined;
+    //   const taskType = taskTypeData.find(
+    //     (tt) => tt.taskTypeId === selectedTaskTypeId
+    //   );
 
-      if (taskType) {
-        resetField("startDate");
-        resetField("startTime");
-        resetField("endDate");
-        resetField("endTime");
-      }
+    //   if (taskType) {
+    //     resetField("startDate");
+    //     resetField("startTime");
+    //     resetField("endDate");
+    //     resetField("endTime");
+    //   }
 
-      return taskType?.hasDeadline;
-    }, [selectedTaskTypeId, taskTypeData]);
-
-    // Prepare options for select fields
-    const subjectOptions = useMemo(
-      () =>
-        subjectData.map((subject) => ({
-          value: subject.subjectId,
-          label: subject.name,
-        })),
-      [subjectData]
-    );
+    //   return taskType?.hasDeadline;
+    // }, [selectedTaskTypeId, taskTypeData]);
 
     const materialOptions = useMemo(
       () =>
@@ -135,34 +139,6 @@ const EditTaskOverviewForm = forwardRef<
         })),
       [filteredMaterials]
     );
-
-    const taskTypeOptions = useMemo(() => {
-      const validTaskType =
-        role === Role.ADMIN
-          ? taskTypeData.filter(
-              (data) => data.scope.toUpperCase() !== TaskTypeScope.CLASS
-            )
-          : taskTypeData;
-
-      return validTaskType.map((taskType) => ({
-        value: taskType.taskTypeId,
-        label: taskType.name,
-      }));
-    }, [role, taskTypeData]);
-
-    const gradeOptions = useMemo(
-      () =>
-        gradeData.map((grade) => ({
-          value: grade.gradeId,
-          label: grade.name,
-        })),
-      [gradeData]
-    );
-
-    const difficultyOptions = Object.values(TaskDifficulty).map((value) => ({
-      value,
-      label: TaskDifficultyLabels[value],
-    }));
 
     useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
       ...d,
@@ -308,7 +284,16 @@ const EditTaskOverviewForm = forwardRef<
                   name="taskTypeId"
                   label="Task Type"
                   placeholder="Select task type"
-                  options={taskTypeOptions}
+                  options={taskTypeOptions.map((opt) => ({
+                    value: opt.value,
+                    searchLabel: opt.label,
+                    label: (
+                      <TaskTypeOptionItem
+                        label={opt.label}
+                        description={opt.description}
+                      />
+                    ),
+                  }))}
                   errors={errors}
                   loading={taskTypeOptions.length === 0}
                   disabled={taskTypeOptions.length === 0}
@@ -331,7 +316,7 @@ const EditTaskOverviewForm = forwardRef<
                   control={control}
                   name="difficulty"
                   label="Difficulty"
-                  placeholder="Choose difficulty"
+                  placeholder="Select difficulty"
                   options={difficultyOptions}
                   errors={errors}
                   loading={difficultyOptions.length === 0}
@@ -339,7 +324,7 @@ const EditTaskOverviewForm = forwardRef<
                   required
                 />
 
-                {selectedTaskTypeHasDeadline && (
+                {/* {selectedTaskTypeHasDeadline && (
                   <>
                     <div className="w-full flex flex-col gap-2 mb-0">
                       <p className="text-base font-medium">Start Time</p>
@@ -389,7 +374,7 @@ const EditTaskOverviewForm = forwardRef<
                       </div>
                     </div>
                   </>
-                )}
+                )} */}
               </>
             }
             right={

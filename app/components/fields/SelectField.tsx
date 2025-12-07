@@ -7,8 +7,8 @@ import get from "lodash.get";
 import Label from "./Label";
 
 interface Option {
-  value: string | number | boolean;
-  label: string;
+  value: string | number;
+  label: string | React.ReactNode;
 }
 
 interface SelectFieldProps {
@@ -80,7 +80,17 @@ const SelectField: React.FC<SelectFieldProps> = ({
               field.onChange(value);
               onChange?.(value);
             }}
-          />
+          >
+            {options.map((opt) => (
+              <Select.Option
+                key={opt.value}
+                value={opt.value}
+                label={opt.label}
+              >
+                {opt.label}
+              </Select.Option>
+            ))}
+          </Select>
         )}
       />
     </Form.Item>

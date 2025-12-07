@@ -21,8 +21,8 @@ import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/I
 import { GradeOverviewResponse } from "@/app/interface/grades/responses/IGradeOverviewResponse";
 import Loading from "../../../shared/Loading";
 import SelectField from "../../../fields/SelectField";
-import DateField from "../../../fields/DateField";
-import TimeField from "../../../fields/TimeField";
+// import DateField from "../../../fields/DateField";
+// import TimeField from "../../../fields/TimeField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { combineDateTime } from "@/app/utils/date";
@@ -31,13 +31,9 @@ import { useNavigationGuard } from "@/app/hooks/useNavigationGuard";
 import { useInjectUser } from "@/app/hooks/form/useInjectUser";
 import { useInitializeMaterialBasedOnSelectedSubject } from "@/app/hooks/form/useInitializeMaterialBasedOnSelectedSubject";
 import { useInitializeFileListBetweenView } from "@/app/hooks/file/useInitializeFileList";
-import {
-  TaskDifficulty,
-  TaskDifficultyLabels,
-} from "@/app/enums/TaskDifficulty";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
-import { Role } from "@/app/enums/Role";
-import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
+import { useUpsertTaskOverviewForm } from "@/app/hooks/form/useUpsertTaskOverviewForm";
+import { TaskTypeOptionItem } from "./OptionItem";
 
 interface CreateTaskOverviewFormProps {
   taskOverview: CreateTaskOverviewFormInputs;
@@ -83,34 +79,42 @@ const CreateTaskOverviewForm = forwardRef<
     const [filteredMaterials, setFilteredMaterials] = useState<
       MaterialOverviewResponse[]
     >([]);
-    const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
+    // const selectedTaskTypeId = useWatch({ control, name: "taskTypeId" });
+
+    const data = useUpsertTaskOverviewForm({
+      role,
+      subjectData,
+      materialData,
+      taskTypeData,
+      gradeData,
+      selectedSubjectId,
+    });
+
+    const {
+      subjectOptions,
+      // materialOptions,
+      taskTypeOptions,
+      gradeOptions,
+      difficultyOptions,
+      // selectedTaskTypeHasDeadline,
+    } = data;
 
     // Use useMemo for derived values
-    const selectedTaskTypeHasDeadline = useMemo(() => {
-      if (!selectedTaskTypeId) return undefined;
-      const taskType = taskTypeData.find(
-        (tt) => tt.taskTypeId === selectedTaskTypeId
-      );
+    // const selectedTaskTypeHasDeadline = useMemo(() => {
+    //   if (!selectedTaskTypeId) return undefined;
+    //   const taskType = taskTypeData.find(
+    //     (tt) => tt.taskTypeId === selectedTaskTypeId
+    //   );
 
-      if (taskType) {
-        resetField("startDate");
-        resetField("startTime");
-        resetField("endDate");
-        resetField("endTime");
-      }
+    //   if (taskType) {
+    //     resetField("startDate");
+    //     resetField("startTime");
+    //     resetField("endDate");
+    //     resetField("endTime");
+    //   }
 
-      return taskType?.hasDeadline;
-    }, [selectedTaskTypeId, taskTypeData, resetField]);
-
-    // Prepare options for select fields
-    const subjectOptions = useMemo(
-      () =>
-        subjectData.map((subject) => ({
-          value: subject.subjectId,
-          label: subject.name,
-        })),
-      [subjectData]
-    );
+    //   return taskType?.hasDeadline;
+    // }, [selectedTaskTypeId, taskTypeData, resetField]);
 
     const materialOptions = useMemo(
       () =>
@@ -120,34 +124,6 @@ const CreateTaskOverviewForm = forwardRef<
         })),
       [filteredMaterials]
     );
-
-    const taskTypeOptions = useMemo(() => {
-      const validTaskType =
-        role === Role.ADMIN
-          ? taskTypeData.filter(
-              (data) => data.scope.toUpperCase() !== TaskTypeScope.CLASS
-            )
-          : taskTypeData;
-
-      return validTaskType.map((taskType) => ({
-        value: taskType.taskTypeId,
-        label: taskType.name,
-      }));
-    }, [role, taskTypeData]);
-
-    const gradeOptions = useMemo(
-      () =>
-        gradeData.map((grade) => ({
-          value: grade.gradeId,
-          label: grade.name,
-        })),
-      [gradeData]
-    );
-
-    const difficultyOptions = Object.values(TaskDifficulty).map((value) => ({
-      value,
-      label: TaskDifficultyLabels[value],
-    }));
 
     useInjectUser(setValue, ["creatorId", "createdBy"]);
     const excludedFields = ["creatorId", "createdBy"];
@@ -256,7 +232,16 @@ const CreateTaskOverviewForm = forwardRef<
                   name="taskTypeId"
                   label="Task Type"
                   placeholder="Select task type"
-                  options={taskTypeOptions}
+                  options={taskTypeOptions.map((opt) => ({
+                    value: opt.value,
+                    searchLabel: opt.label,
+                    label: (
+                      <TaskTypeOptionItem
+                        label={opt.label}
+                        description={opt.description}
+                      />
+                    ),
+                  }))}
                   errors={errors}
                   loading={taskTypeOptions.length === 0}
                   disabled={taskTypeOptions.length === 0}
@@ -278,8 +263,8 @@ const CreateTaskOverviewForm = forwardRef<
                 <SelectField
                   control={control}
                   name="difficulty"
-                  label="Tingkat Kesulitan"
-                  placeholder="Pilih tingkat kesulitan"
+                  label="Difficulty"
+                  placeholder="Select difficulty"
                   options={difficultyOptions}
                   errors={errors}
                   loading={difficultyOptions.length === 0}
@@ -287,7 +272,7 @@ const CreateTaskOverviewForm = forwardRef<
                   required
                 />
 
-                {selectedTaskTypeHasDeadline && (
+                {/* {selectedTaskTypeHasDeadline && (
                   <>
                     <div className="w-full flex flex-col gap-2 mb-0">
                       <p className="text-base font-medium">Start Time</p>
@@ -337,7 +322,7 @@ const CreateTaskOverviewForm = forwardRef<
                       </div>
                     </div>
                   </>
-                )}
+                )} */}
               </>
             }
             right={

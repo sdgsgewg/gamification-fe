@@ -35,6 +35,9 @@ import {
   TaskDifficulty,
   TaskDifficultyLabels,
 } from "@/app/enums/TaskDifficulty";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { Role } from "@/app/enums/Role";
+import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
 
 interface CreateTaskOverviewFormProps {
   taskOverview: CreateTaskOverviewFormInputs;
@@ -72,6 +75,7 @@ const CreateTaskOverviewForm = forwardRef<
     });
 
     const watchedValues = useWatch({ control });
+    const { role } = useGetCachedUser();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -117,14 +121,19 @@ const CreateTaskOverviewForm = forwardRef<
       [filteredMaterials]
     );
 
-    const taskTypeOptions = useMemo(
-      () =>
-        taskTypeData.map((taskType) => ({
-          value: taskType.taskTypeId,
-          label: taskType.name,
-        })),
-      [taskTypeData]
-    );
+    const taskTypeOptions = useMemo(() => {
+      const validTaskType =
+        role === Role.ADMIN
+          ? taskTypeData.filter(
+              (data) => data.scope.toUpperCase() !== TaskTypeScope.CLASS
+            )
+          : taskTypeData;
+
+      return validTaskType.map((taskType) => ({
+        value: taskType.taskTypeId,
+        label: taskType.name,
+      }));
+    }, [role, taskTypeData]);
 
     const gradeOptions = useMemo(
       () =>

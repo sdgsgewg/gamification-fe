@@ -11,7 +11,6 @@ import {
 } from "@/app/schemas/tasks/task-overview/editTaskOverview";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/Button";
-import { useAuth } from "@/app/hooks/auth/useAuth";
 import TextField from "../../../fields/TextField";
 import TextAreaField from "../../../fields/TextAreaField";
 import ImageField from "../../../fields/ImageField";
@@ -41,6 +40,10 @@ import {
   TaskDifficulty,
   TaskDifficultyLabels,
 } from "@/app/enums/TaskDifficulty";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { Role } from "@/app/enums/Role";
+import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
+import { useAuth } from "@/app/hooks/auth/useAuth";
 
 interface EditTaskOverviewFormProps {
   taskOverviewDefaultValue: EditTaskOverviewFormInputs;
@@ -86,6 +89,7 @@ const EditTaskOverviewForm = forwardRef<
 
     const watchedValues = useWatch({ control });
     const { getCachedUserProfile } = useAuth();
+    const { role } = useGetCachedUser();
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -132,14 +136,19 @@ const EditTaskOverviewForm = forwardRef<
       [filteredMaterials]
     );
 
-    const taskTypeOptions = useMemo(
-      () =>
-        taskTypeData.map((taskType) => ({
-          value: taskType.taskTypeId,
-          label: taskType.name,
-        })),
-      [taskTypeData]
-    );
+    const taskTypeOptions = useMemo(() => {
+      const validTaskType =
+        role === Role.ADMIN
+          ? taskTypeData.filter(
+              (data) => data.scope.toUpperCase() !== TaskTypeScope.CLASS
+            )
+          : taskTypeData;
+
+      return validTaskType.map((taskType) => ({
+        value: taskType.taskTypeId,
+        label: taskType.name,
+      }));
+    }, [role, taskTypeData]);
 
     const gradeOptions = useMemo(
       () =>
@@ -157,7 +166,7 @@ const EditTaskOverviewForm = forwardRef<
 
     useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
       ...d,
-      updatedBy: getCachedUserProfile()?.name,
+      updatedBy: getCachedUserProfile?.name,
     }));
     useInitializeFileList(taskOverview, setFileList);
 
@@ -166,7 +175,7 @@ const EditTaskOverviewForm = forwardRef<
       const currentValues = JSON.stringify(watchedValues);
       const originalValues = JSON.stringify({
         ...taskOverviewDefaultValue,
-        updatedBy: getCachedUserProfile()?.name,
+        updatedBy: getCachedUserProfile?.name,
       });
 
       const isTaskOverviewDirty = currentValues !== originalValues;
@@ -321,8 +330,8 @@ const EditTaskOverviewForm = forwardRef<
                 <SelectField
                   control={control}
                   name="difficulty"
-                  label="Tingkat Kesulitan"
-                  placeholder="Pilih tingkat kesulitan"
+                  label="Difficulty"
+                  placeholder="Choose difficulty"
                   options={difficultyOptions}
                   errors={errors}
                   loading={difficultyOptions.length === 0}

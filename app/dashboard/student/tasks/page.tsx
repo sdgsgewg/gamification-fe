@@ -43,6 +43,10 @@ const StudentTaskPage = () => {
       label: TaskAttemptStatusLabels[TaskAttemptStatus.ON_PROGRESS],
     },
     {
+      key: TaskAttemptStatus.PAST_DUE,
+      label: TaskAttemptStatusLabels[TaskAttemptStatus.PAST_DUE],
+    },
+    {
       key: TaskAttemptStatus.SUBMITTED,
       label: TaskAttemptStatusLabels[TaskAttemptStatus.SUBMITTED],
     },

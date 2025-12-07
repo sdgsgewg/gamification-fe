@@ -63,7 +63,7 @@ const StudentTaskDetailPageContent = () => {
 
   const LeftSideContent = () => {
     const { currAttempt, recentAttempts } = classTaskData;
-    const { title, image, description, questionCount, type } =
+    const { title, subtitle, image, description, questionCount, type } =
       classTaskData.taskDetail;
 
     // === Tentukan teks & visibilitas tombol ===
@@ -87,6 +87,7 @@ const StudentTaskDetailPageContent = () => {
       <>
         <DetailPageLeftSideContent
           name={title}
+          additionalText={subtitle}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />

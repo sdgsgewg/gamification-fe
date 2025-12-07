@@ -3,6 +3,7 @@ import { RecentAttemptRespons } from "../../task-attempts/responses/IRecentAttem
 
 export interface TaskDetail {
   title: string;
+  subtitle: string;
   slug: string;
   description?: string;
   image?: string;

@@ -78,6 +78,8 @@ export const SideBySideContentSection: React.FC<
   const customClassName =
     sectionName === "hero"
       ? "flex-col-reverse gap-4 items-center"
+      : sectionName === "cta"
+      ? "flex-col gap-8 items-center"
       : sectionName === "leaderboard"
       ? "flex-col gap-12 items-center"
       : sectionName === "stats"

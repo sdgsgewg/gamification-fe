@@ -66,7 +66,7 @@ const CTASection = () => {
 
   const CTAStaticImage = () => {
     return (
-      <div className="w-[90%] sm:w-[30%] lg:w-[20%]">
+      <div className="w-[60%] sm:w-[30%] lg:w-[20%]">
         <Image
           src={IMAGES.CTA}
           alt="CTA Static Image"

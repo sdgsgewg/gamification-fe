@@ -73,7 +73,7 @@ const StudentTaskPage = () => {
       <DashboardTitle title="Task List" showBackButton={false} />
 
       {/* Status Tab Filter */}
-      <div className="w-full flex items-center mb-6 border-b border-b-primary">
+      <div className="w-full flex items-center border-b border-b-primary">
         <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
           {tabs.map((tab) => (
             <Button
@@ -126,7 +126,7 @@ const StudentTaskPage = () => {
                     attempt={attempt}
                     onClick={() =>
                       handleNavigateToTaskDetailPage(
-                        attempt.classSlug,
+                        attempt.class.slug,
                         attempt.taskSlug
                       )
                     }

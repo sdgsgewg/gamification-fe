@@ -2,7 +2,7 @@
 
 import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
 import { FilterTaskAttemptRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptRequest";
-import { GroupedTaskAttemptResponseDto } from "@/app/interface/task-attempts/responses/IGroupedTaskAttemptResponse";
+import { GroupedTaskAttemptResponse } from "@/app/interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTasksFromAllClasses = (values?: FilterTaskAttemptRequest) => {
@@ -13,7 +13,7 @@ export const useTasksFromAllClasses = (values?: FilterTaskAttemptRequest) => {
 
       return res.isSuccess && res.data ? res.data : [];
     },
-    select: (data: GroupedTaskAttemptResponseDto[]) =>
+    select: (data: GroupedTaskAttemptResponse[]) =>
       data.map((gta, idx) => ({
         key: idx,
         ...gta,

@@ -10,7 +10,7 @@ import {
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
 import { IMAGES } from "@/app/constants/images";
-import { FaClock } from "react-icons/fa";
+import { FaBookOpen, FaClock } from "react-icons/fa";
 import {
   getDeadlineText,
   getProgressText,
@@ -24,7 +24,7 @@ interface TaskHistoryCardProps {
 }
 
 const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
-  const { title, image, status, classSlug, taskSlug } = attempt;
+  const { title, image, status, class: classData, taskSlug } = attempt;
 
   const modifiedStatus = status as TaskAttemptStatus;
 
@@ -34,10 +34,14 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
     return TaskAttemptStatusLabels[modifiedStatus];
   };
 
+  const getClassText = () => {
+    return `From: ${classData.name}`;
+  };
+
   return (
     <div
       className={`h-24 sm:h-28 xl:h-32 bg-card flex gap-6 rounded-lg shadow-sm p-4 lg:p-6 cursor-pointer`}
-      onClick={() => onClick(classSlug, taskSlug)}
+      onClick={() => onClick(classData.slug, taskSlug)}
     >
       <div className="w-[15%] md:w-[12%] xl:w-[8%]">
         <Image
@@ -56,14 +60,18 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
               {getProgressText(attempt)}
             </p>
           </div>
-          {getDeadlineText(attempt) !== "" && (
-            <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5">
+            {getDeadlineText(attempt) !== "" && (
               <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
                 <FaClock className="w-3 h-3" />
                 <span>{getDeadlineText(attempt)}</span>
               </p>
-            </div>
-          )}
+            )}
+            <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
+              <FaBookOpen className="w-3 h-3" />
+              <span>{getClassText()}</span>
+            </p>
+          </div>
         </div>
         <div className="flex items-start justify-start">
           <Tag color={getStatusTagColor(modifiedStatus)} className="!m-0">

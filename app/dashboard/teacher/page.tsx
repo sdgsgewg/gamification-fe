@@ -17,6 +17,8 @@ import {
   QuickActionCard,
   QuickActionCardWrapper,
 } from "@/app/components/pages/Dashboard/Cards";
+import { useMostPopularTask } from "@/app/hooks/task-attempts/useMostPopularTask";
+import { LeaderboardSection } from "@/app/components/pages/Dashboard/Sections/LeaderboardSection";
 
 interface DashboardCard {
   title: string;
@@ -28,6 +30,16 @@ interface DashboardCard {
 
 const TeacherDashboard: React.FC = () => {
   const router = useRouter();
+
+  // Most Popular Task Data
+  const {
+    data: mostPopularTaskData = [],
+    isLoading: isMostPopularTaskLoading,
+  } = useMostPopularTask();
+  const modifiedMostPopularTaskData = mostPopularTaskData.map((task) => ({
+    label: task.title,
+    value: task.attemptCount,
+  }));
 
   const {
     data: recentSubmissionData = [],
@@ -86,7 +98,16 @@ const TeacherDashboard: React.FC = () => {
         ))}
       </QuickActionCardWrapper>
 
-      <div className="flex flex-col lg:flex-row gap-8 mt-8">
+      {/* Most Popular Task Leaderboard */}
+      <LeaderboardSection
+        title="Most Popular Tasks"
+        subtitle="These are the tasks that consistently accessed by students."
+        data={modifiedMostPopularTaskData}
+        valueType="attempts"
+        isLoading={isMostPopularTaskLoading}
+      />
+
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Recent Submissions */}
         <RecentActivitiesSection
           title="Recent Submissions"

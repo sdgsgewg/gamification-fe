@@ -12,6 +12,7 @@ export const useClassTaskSummary = (attemptId: string) => {
       const res = await classTaskProvider.getClassTaskSummaryFromAttempt(
         attemptId
       );
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat ringkasan pengerjaan tugas");
 

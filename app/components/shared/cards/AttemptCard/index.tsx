@@ -48,9 +48,11 @@ const AttemptCard: React.FC<AttemptCardProps> = ({
         </div>
       </div>
 
-      <Button variant="primary" size="middle" onClick={() => onClick(id)}>
-        Review
-      </Button>
+      {status !== TaskAttemptStatus.PAST_DUE && (
+        <Button variant="primary" size="middle" onClick={() => onClick(id)}>
+          Review
+        </Button>
+      )}
     </div>
   );
 };

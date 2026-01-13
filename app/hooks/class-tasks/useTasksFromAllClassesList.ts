@@ -13,8 +13,6 @@ export const useTasksFromAllClassesList = (
     queryFn: async () => {
       const res = await classTaskProvider.getTasksFromAllClassesList(values);
 
-      console.log("Res: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: ClassTaskOverviewResponse[]) =>

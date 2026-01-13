@@ -10,8 +10,6 @@ export const useUserRecentActivities = () => {
     queryFn: async () => {
       const res = await userProvider.getUserRecentActivities();
 
-      console.log("Response recent activities: ", JSON.stringify(res, null, 2));
-
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: UserRecentActivityResponse[]) =>

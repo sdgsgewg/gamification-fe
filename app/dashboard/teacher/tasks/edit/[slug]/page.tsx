@@ -157,7 +157,14 @@ const EditTaskPage = () => {
 
       if (isSuccess) {
         toast.success(message ?? "Task updated successfully.");
-        router.back();
+
+        if (taskOverview.title !== taskData.taskDetail.title) {
+          router.replace(
+            `/dashboard/teacher/tasks/${result.data?.taskDetail.slug}`
+          );
+        } else {
+          router.back();
+        }
       } else {
         toast.error(message || "Failed to update the task.");
       }

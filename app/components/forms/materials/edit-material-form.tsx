@@ -51,6 +51,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
     });
 
     const { getCachedUserProfile } = useAuth();
+    const user = getCachedUserProfile();
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +69,7 @@ const EditMaterialForm = forwardRef<FormRef, EditMaterialFormProps>(
 
     useInitializeForm<EditMaterialFormInputs>(reset, materialData, (d) => ({
       ...d,
-      updatedBy: getCachedUserProfile()?.name,
+      updatedBy: user?.name,
     }));
     useInitializeFileList(materialData, setFileList);
     const isDirty = Object.keys(dirtyFields).some(

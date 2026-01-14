@@ -86,12 +86,12 @@ export const getMainMenuItems = (role: Role): MenuItem[] => [
         icon: IMAGES.TASK,
         roles: [Role.ADMIN],
       },
-      {
-        menu: "Mini Game",
-        url: ROUTES.DASHBOARD.ADMIN.MANAGE_MINI_GAMES,
-        icon: IMAGES.MINI_GAME,
-        roles: [Role.ADMIN],
-      },
+      // {
+      //   menu: "Mini Game",
+      //   url: ROUTES.DASHBOARD.ADMIN.MANAGE_MINI_GAMES,
+      //   icon: IMAGES.MINI_GAME,
+      //   roles: [Role.ADMIN],
+      // },
     ],
   },
 ];

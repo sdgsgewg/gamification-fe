@@ -159,7 +159,12 @@ const EditTaskPage = () => {
 
       if (isSuccess) {
         toast.success(message ?? "Task updated successfully.");
-        router.push(`${baseRoute}`);
+
+        if (taskOverview.title !== taskData.taskDetail.title) {
+          router.replace(`${baseRoute}`);
+        } else {
+          router.back();
+        }
       } else {
         toast.error(message ?? "Failed to update the task.");
       }
@@ -271,8 +276,8 @@ const EditTaskPage = () => {
       description,
       subject,
       material,
-      taskType,
-      taskGradeIds,
+      type,
+      gradeIds,
       difficulty,
       image,
     } = taskData.taskDetail;
@@ -281,10 +286,10 @@ const EditTaskPage = () => {
     const defaultTaskOverview = {
       title: title,
       description: description ?? "",
-      subjectId: subject.subjectId,
-      materialId: material?.materialId,
-      taskTypeId: taskType.id,
-      gradeIds: taskGradeIds,
+      subjectId: subject.id,
+      materialId: material?.id,
+      taskTypeId: type.id,
+      gradeIds: gradeIds,
       difficulty: difficulty.toUpperCase(),
       updatedBy: updatedBy ?? "",
       startDate: parseDate(duration?.startTime),

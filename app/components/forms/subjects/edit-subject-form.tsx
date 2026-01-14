@@ -46,13 +46,14 @@ const EditSubjectForm = forwardRef<FormRef, EditSubjectFormProps>(
     });
 
     const { getCachedUserProfile } = useAuth();
+    const user = getCachedUserProfile();
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useInitializeForm<EditSubjectFormInputs>(reset, subjectData, (d) => ({
       ...d,
-      updatedBy: getCachedUserProfile()?.name,
+      updatedBy: user?.name,
     }));
     useInitializeFileList(subjectData, setFileList);
     const isDirty = Object.keys(dirtyFields).some(

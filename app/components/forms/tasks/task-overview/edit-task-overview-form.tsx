@@ -85,6 +85,7 @@ const EditTaskOverviewForm = forwardRef<
 
     const watchedValues = useWatch({ control });
     const { getCachedUserProfile } = useAuth();
+    const user = getCachedUserProfile();
     const { role } = useGetCachedUser();
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -142,7 +143,7 @@ const EditTaskOverviewForm = forwardRef<
 
     useInitializeForm<EditTaskOverviewFormInputs>(reset, taskOverview, (d) => ({
       ...d,
-      updatedBy: getCachedUserProfile?.name,
+      updatedBy: user?.name,
     }));
     useInitializeFileList(taskOverview, setFileList);
 
@@ -151,7 +152,7 @@ const EditTaskOverviewForm = forwardRef<
       const currentValues = JSON.stringify(watchedValues);
       const originalValues = JSON.stringify({
         ...taskOverviewDefaultValue,
-        updatedBy: getCachedUserProfile?.name,
+        updatedBy: user?.name,
       });
 
       const isTaskOverviewDirty = currentValues !== originalValues;
@@ -166,7 +167,7 @@ const EditTaskOverviewForm = forwardRef<
       taskOverviewDefaultValue,
       taskQuestionsDefaultValue,
       taskQuestions,
-      getCachedUserProfile,
+      user,
     ]);
 
     useNavigationGuard(isDirty);

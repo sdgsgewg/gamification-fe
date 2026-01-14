@@ -31,6 +31,7 @@ import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
 import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
 import { FormRef } from "@/app/interface/forms/IFormRef";
 import { IMAGES } from "@/app/constants/images";
+import { useTaskTypes } from "@/app/hooks/task-types/useTaskTypes";
 
 const TeacherTaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -76,6 +77,7 @@ const TeacherTaskDetailPage = () => {
     });
   const [isShareTaskModalVisible, setIsShareTaskModalVisible] = useState(false);
 
+  const { data: taskTypes = [] } = useTaskTypes();
   const { data: availableClasses = [], refetch: refetchAvailableClasses } =
     useAvailableClasses(taskId);
 
@@ -348,7 +350,9 @@ const TeacherTaskDetailPage = () => {
 
       return (
         <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Question List</h2>
+          <h2 className="text-dark font-semibold text-2xl mb-4">
+            Question List
+          </h2>
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (
@@ -431,7 +435,8 @@ const TeacherTaskDetailPage = () => {
       >
         <ShareTaskForm
           ref={formRef}
-          taskId={taskId}
+          task={taskData}
+          taskTypeData={taskTypes}
           classData={availableClasses}
           onFinish={handleShareTaskIntoClasses}
         />

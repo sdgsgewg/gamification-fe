@@ -24,15 +24,18 @@ import TimeField from "../../fields/TimeField";
 import DateField from "../../fields/DateField";
 import { combineDateTime } from "@/app/utils/date";
 import Loading from "../../shared/Loading";
+import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
+import { TaskTypeOverviewResponse } from "@/app/interface/task-types/responses/ITaskTypeOverviewResponse";
 
 interface ShareTaskFormProps {
-  taskId: string;
+  task: TaskDetailResponse;
+  taskTypeData: TaskTypeOverviewResponse[];
   classData: AvailableClassesResponse[];
   onFinish: (values: ShareTaskFormInputs) => void;
 }
 
 const ShareTaskForm = forwardRef<FormRef, ShareTaskFormProps>(
-  ({ taskId, classData, onFinish }, ref) => {
+  ({ task, taskTypeData, classData, onFinish }, ref) => {
     const { toast } = useToast();
 
     const {
@@ -41,12 +44,33 @@ const ShareTaskForm = forwardRef<FormRef, ShareTaskFormProps>(
       formState: { errors },
       reset,
       setValue,
+      resetField,
     } = useForm<ShareTaskFormInputs>({
       resolver: zodResolver(shareTaskSchema),
       defaultValues: shareTaskDefaultValues,
     });
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const taskId = task.id;
+    const selectedTaskTypeId = task.taskDetail.type.id;
+
+    // Use useMemo for derived values
+    const selectedTaskTypeHasDeadline = useMemo(() => {
+      if (!selectedTaskTypeId) return undefined;
+      const taskType = taskTypeData.find(
+        (tt) => tt.taskTypeId === selectedTaskTypeId
+      );
+
+      if (taskType) {
+        resetField("startDate");
+        resetField("startTime");
+        resetField("endDate");
+        resetField("endTime");
+      }
+
+      return taskType?.hasDeadline;
+    }, [selectedTaskTypeId, taskTypeData, resetField]);
 
     const classOptions = useMemo(
       () =>
@@ -128,53 +152,57 @@ const ShareTaskForm = forwardRef<FormRef, ShareTaskFormProps>(
             mode="multiple"
           />
 
-          <div className="w-full flex flex-col gap-2 mb-0">
-            <p className="text-base font-medium">Start Time</p>
-            <div className="w-full flex flex-row items-center gap-8">
-              <div className="flex-1">
-                <DateField
-                  control={control}
-                  name="startDate"
-                  label="Date"
-                  placeholder="Enter date"
-                  errors={errors}
-                />
+          {selectedTaskTypeHasDeadline && (
+            <>
+              <div className="w-full flex flex-col gap-2 mb-0">
+                <p className="text-base font-medium">Start Time</p>
+                <div className="w-full flex flex-row items-center gap-8">
+                  <div className="flex-1">
+                    <DateField
+                      control={control}
+                      name="startDate"
+                      label="Date"
+                      placeholder="Enter date"
+                      errors={errors}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <TimeField
+                      control={control}
+                      name="startTime"
+                      label="Time"
+                      placeholder="Enter time"
+                      errors={errors}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <TimeField
-                  control={control}
-                  name="startTime"
-                  label="Time"
-                  placeholder="Enter time"
-                  errors={errors}
-                />
-              </div>
-            </div>
-          </div>
 
-          <div className="w-full flex flex-col gap-2 mb-0">
-            <p className="text-base font-medium">End Time</p>
-            <div className="w-full flex flex-row items-center gap-8">
-              <div className="flex-1">
-                <DateField
-                  control={control}
-                  name="endDate"
-                  label="Date"
-                  placeholder="Enter date"
-                  errors={errors}
-                />
+              <div className="w-full flex flex-col gap-2 mb-0">
+                <p className="text-base font-medium">End Time</p>
+                <div className="w-full flex flex-row items-center gap-8">
+                  <div className="flex-1">
+                    <DateField
+                      control={control}
+                      name="endDate"
+                      label="Date"
+                      placeholder="Enter date"
+                      errors={errors}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <TimeField
+                      control={control}
+                      name="endTime"
+                      label="Time"
+                      placeholder="Enter time"
+                      errors={errors}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <TimeField
-                  control={control}
-                  name="endTime"
-                  label="Time"
-                  placeholder="Enter time"
-                  errors={errors}
-                />
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </Form>
       </>
     );

@@ -44,6 +44,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
     });
 
     const { getCachedUserProfile } = useAuth();
+    const user = getCachedUserProfile();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -61,7 +62,7 @@ const EditTaskTypeForm = forwardRef<FormRef, EditTaskTypeFormProps>(
     // Initialize form with data and inject updatedBy
     useInitializeForm<EditTaskTypeFormInputs>(reset, taskTypeData, (d) => ({
       ...d,
-      updatedBy: getCachedUserProfile()?.name,
+      updatedBy: user?.name,
     }));
 
     const isDirty = Object.keys(dirtyFields).some(

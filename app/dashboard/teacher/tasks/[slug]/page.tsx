@@ -298,6 +298,15 @@ const TeacherTaskDetailPage = () => {
     };
 
     const SubmissionView = () => {
+      const handleNavigateToSubmissionPage = (taskSlug: string) => {
+        const query = new URLSearchParams({
+          class: params.slug,
+          task: taskSlug,
+        });
+
+        router.push(`${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?${query}`);
+      };
+
       if (!assignedClasses || assignedClasses.length === 0) {
         return (
           <div>
@@ -309,7 +318,11 @@ const TeacherTaskDetailPage = () => {
       return (
         <SubmissionCardWrapper>
           {assignedClasses.map((cls) => (
-            <SubmissionCard key={cls.id} cls={cls} />
+            <SubmissionCard
+              key={cls.id}
+              cls={cls}
+              onClick={handleNavigateToSubmissionPage}
+            />
           ))}
         </SubmissionCardWrapper>
       );
@@ -335,7 +348,7 @@ const TeacherTaskDetailPage = () => {
 
       return (
         <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
+          <h2 className="text-dark font-semibold text-2xl mb-4">Question List</h2>
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (

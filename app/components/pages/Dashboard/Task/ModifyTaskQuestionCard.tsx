@@ -217,6 +217,40 @@ export default function ModifyTaskQuestionCard({
     }
   }, [defaultQuestionType, defaultQuestionOptions, questionType]);
 
+  // Set default options for true/false question when type is changed to true/false
+  useEffect(() => {
+    if (questionType !== QuestionType.TRUE_FALSE) return;
+
+    const optionsPath = `questions.${index}.options`;
+
+    setValue(optionsPath, [
+      {
+        text: "True",
+        isCorrect:
+          control._formValues?.questions?.[index]?.correctAnswer === "true",
+      },
+      {
+        text: "False",
+        isCorrect:
+          control._formValues?.questions?.[index]?.correctAnswer === "false",
+      },
+    ]);
+  }, [questionType]);
+
+  // Set default options for fill in the blank question when type is changed to fill in the blank
+  useEffect(() => {
+    if (questionType !== QuestionType.FILL_BLANK) return;
+
+    const optionsPath = `questions.${index}.options`;
+
+    setValue(optionsPath, [
+      {
+        text: "Option 1",
+        isCorrect: true,
+      },
+    ]);
+  }, [questionType]);
+
   return (
     <div className="relative bg-outline border border-br-primary shadow-sm rounded-lg">
       <div className="bg-tertiary border-b border-br-primary flex justify-between items-center rounded-t-lg py-3 px-6">

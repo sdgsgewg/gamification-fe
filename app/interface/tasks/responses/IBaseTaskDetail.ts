@@ -2,11 +2,11 @@ export interface BaseTaskDetail {
   title: string;
   slug: string;
   description?: string | null;
-  image?: string | null;
-  subject?: {
+  image?: string;
+  subject: {
     id: string;
     name: string;
-  } | null;
+  };
   material?: {
     id: string;
     name: string;

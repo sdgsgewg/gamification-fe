@@ -112,7 +112,8 @@ const CreateTaskPage = () => {
           options:
             q.options?.map((opt, idx) => ({
               text: opt.text,
-              isCorrect: q.correctAnswer === idx.toString(),
+              // isCorrect: q.correctAnswer === idx.toString(),
+              isCorrect: opt.isCorrect,
             })) || [],
         })),
       };

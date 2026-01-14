@@ -148,7 +148,7 @@ export default function PrepPLLPage() {
         <div className="mt-6 border-b border-indigo-200" />
 
         {/* Question list */}
-        <h3 className="mt-6 text-xl font-bold">Daftar Soal</h3>
+        <h3 className="mt-6 text-xl font-bold">Question List</h3>
         <div className="mt-4 space-y-6">
           {QUESTIONS.map((q) => (
             <div
@@ -156,8 +156,8 @@ export default function PrepPLLPage() {
               className="rounded-2xl bg-white border border-indigo-200 p-4"
             >
               <div className="flex items-start justify-between">
-                <div className="font-semibold">Soal {q.id}</div>
-                <div className="text-sm opacity-80">{q.point} Poin</div>
+                <div className="font-semibold">Question {q.id}</div>
+                <div className="text-sm opacity-80">{q.point} Point</div>
               </div>
 
               <div className="mt-3 flex items-center gap-4">

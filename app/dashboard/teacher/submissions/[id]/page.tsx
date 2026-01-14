@@ -212,7 +212,7 @@ const SubmissionDetailPage = () => {
 
       return (
         <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Daftar Soal</h2>
+          <h2 className="text-dark font-semibold text-2xl mb-4">Question List</h2>
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (

@@ -34,7 +34,7 @@ const ModifyTaskNavigationBarWrapper = ({
           />
         </div>
       ) : (
-        <div className="w-full flex flex-row justify-between mb-8">
+        <div className="w-full flex flex-row justify-between">
           <NavigationBar
             label="Do you still want to modify the data about your task?"
             navigationType="back"

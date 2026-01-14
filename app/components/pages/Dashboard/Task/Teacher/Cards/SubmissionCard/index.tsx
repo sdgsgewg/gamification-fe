@@ -10,9 +10,10 @@ import Button from "@/app/components/shared/Button";
 
 interface SubmissionCardProps {
   cls: AssignedClassInfo;
+  onClick: (taskSlug: string) => void;
 }
 
-const SubmissionCard = ({ cls }: SubmissionCardProps) => {
+const SubmissionCard = ({ cls, onClick }: SubmissionCardProps) => {
   const submittedPercentage = Math.round(
     (cls.submissionCount / cls.totalStudents) * 100
   );
@@ -75,7 +76,7 @@ const SubmissionCard = ({ cls }: SubmissionCardProps) => {
       </div>
 
       {/* Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end" onClick={() => onClick(cls.slug)}>
         <Button variant="primary" size="middle">
           View Submission
         </Button>

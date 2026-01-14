@@ -28,12 +28,14 @@ const TeacherTaskCard = ({ task, onClick }: TeacherTaskCardProps) => {
   return (
     <div className="p-4 bg-background rounded-xl shadow-sm border border-br-primary hover:shadow-md transition">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-dark">{task.title}</h3>
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <h3 className="flex-1 text-lg font-semibold text-dark">{task.title}</h3>
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClass}`}
+          className={`w-[22%] px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClass}`}
         >
-          {isCompleted ? TaskAttemptStatusLabels["COMPLETED"] : TaskAttemptStatusLabels["ON_PROGRESS"]}
+          {isCompleted
+            ? TaskAttemptStatusLabels["COMPLETED"]
+            : TaskAttemptStatusLabels["ON_PROGRESS"]}
         </span>
       </div>
 

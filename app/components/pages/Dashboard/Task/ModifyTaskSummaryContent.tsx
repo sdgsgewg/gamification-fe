@@ -108,7 +108,7 @@ const ModifyTaskSummaryContent = ({
               width={24}
               height={24}
             />
-            <p className="text-base font-medium">Deskripsi</p>
+            <p className="text-base font-medium">Description</p>
           </div>
           <p className="text-sm text-justify">{payload.description}</p>
         </div>
@@ -146,7 +146,9 @@ const ModifyTaskSummaryContent = ({
   const BottomContent = () => {
     return (
       <>
-        <h2 className="text-black font-semibold text-2xl mb-4">Daftar Soal</h2>
+        <h2 className="text-black font-semibold text-2xl mb-4">
+          Question List
+        </h2>
 
         <div className="flex flex-col gap-8">
           {payload.questions.map((q, idx) => (
@@ -169,15 +171,20 @@ const ModifyTaskSummaryContent = ({
         />
       )}
 
-      <Button
-        type="primary"
-        size="large"
-        variant="primary"
-        className="!px-8"
-        onClick={onSubmit}
-      >
-        Submit
-      </Button>
+      <div className="mt-8">
+        <p className={`text-sm text-black mb-2`}>
+          {`Once you are sure that all the information and questions are correct, click the button below to finalize the task creation.`}
+        </p>
+        <Button
+          type="primary"
+          size="large"
+          variant="primary"
+          className="!px-8"
+          onClick={onSubmit}
+        >
+          Submit
+        </Button>
+      </div>
     </>
   );
 };

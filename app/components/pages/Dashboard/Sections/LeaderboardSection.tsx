@@ -49,14 +49,6 @@ export const LeaderboardSection = ({
     );
   }
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="p-6 rounded-2xl bg-card border border-outline shadow-sm text-center text-muted-foreground">
-        No data available.
-      </div>
-    );
-  }
-
   const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
@@ -66,7 +58,11 @@ export const LeaderboardSection = ({
       icon={ListOrdered}
     >
       <div className="space-y-3">
-        {data.slice(0, 5).map((item, index) => {
+        {(!data || data.length === 0) ? 
+          <div className="p-6 text-center text-muted-foreground">
+            No data available.
+          </div>
+        : data.slice(0, 5).map((item, index) => {
           const rank = index + 1;
           const isTop3 = rank <= 3;
 

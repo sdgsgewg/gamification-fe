@@ -4,7 +4,7 @@ import React from "react";
 import { Card, Tag, Image } from "antd";
 import { TaskQuestionResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
 import { QuestionType, QuestionTypeLabels } from "@/app/enums/QuestionType";
-import { CheckCircleTwoTone, ClockCircleOutlined } from "@ant-design/icons";
+import { CheckCircleTwoTone } from "@ant-design/icons";
 import { CreateTaskQuestionRequest } from "@/app/interface/tasks/requests/ICreateTaskRequest";
 import { UpdateTaskQuestionRequest } from "@/app/interface/tasks/requests/IUpdateTaskRequest";
 import { getImageSrc } from "@/app/utils/image";

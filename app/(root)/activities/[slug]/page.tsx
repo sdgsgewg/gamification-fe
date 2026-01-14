@@ -43,7 +43,7 @@ const ActivityDetailPage = () => {
     data: similarActivities = [],
     isLoading: isSimilarActivitiesLoading,
   } = useActivities({
-    subjectId: activityData?.taskDetail.subject.id,
+    subjectId: activityData?.taskDetail.subject?.id,
     materialId: activityData?.taskDetail.material?.id,
   });
   const filteredSimilarActivities = similarActivities.filter(
@@ -86,8 +86,8 @@ const ActivityDetailPage = () => {
         <DetailPageLeftSideContent
           name={title}
           additionalText={`Created by ${createdBy}`}
-          image={image !== "" ? image : IMAGES.ACTIVITY}
-          description={description}
+          image={image && image !== "" ? image : IMAGES.ACTIVITY}
+          description={description ?? ""}
         />
 
         {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
@@ -126,12 +126,12 @@ const ActivityDetailPage = () => {
       <>
         {/* Informasi Detail */}
         <TaskDetailInformationTable
-          subject={subject.name}
+          subject={subject ? subject.name : ""}
           material={material?.name}
           type={type.name}
           questionCount={questionCount}
           difficulty={difficulty}
-          grade={grade}
+          grade={grade ? grade : ""}
         />
       </>
     );

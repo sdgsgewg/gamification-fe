@@ -1,25 +1,14 @@
 import { CurrentAttemptResponse } from "../../task-attempts/responses/ICurrentAttemptResponse";
 import { RecentAttemptRespons } from "../../task-attempts/responses/IRecentAttemptResponse";
+import { BaseTaskType } from "../../task-types/responses/IBaseTaskType";
+import { BaseTaskDetail } from "../../tasks/responses/IBaseTaskDetail";
+import { TaskDuration } from "../../tasks/responses/ITaskDuration";
 
-export interface TaskDetail {
-  title: string;
+export interface ClassTaskDetail extends BaseTaskDetail {
   subtitle: string;
-  slug: string;
-  description?: string;
-  image?: string;
-  subject: { id: string; name: string };
-  material?: { id: string; name: string };
-  grade: string;
-  questionCount: number;
-  difficulty: string;
-  createdBy: string;
-  type: TaskType;
-}
-
-export interface TaskType {
-  id: string;
-  name: string;
-  isRepeatable: boolean;
+  type: BaseTaskType & {
+    isRepeatable: boolean;
+  };
 }
 
 export interface SubmissionSummary {
@@ -30,15 +19,9 @@ export interface SubmissionSummary {
   feedback: string;
 }
 
-export interface TaskDuration {
-  startTime?: Date;
-  endTime?: Date;
-  duration?: string;
-}
-
 export interface ClassTaskDetailResponseDto {
   id: string;
-  taskDetail: TaskDetail;
+  taskDetail: ClassTaskDetail;
   duration?: TaskDuration;
   currAttempt?: CurrentAttemptResponse;
   recentAttempts?: RecentAttemptRespons[];

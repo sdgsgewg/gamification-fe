@@ -25,6 +25,7 @@ import { ConfirmationModalState } from "@/app/interface/modals/IConfirmationModa
 import { useUnpublishTask } from "@/app/hooks/tasks/useUnpublishTask";
 import { useFinalizeTask } from "@/app/hooks/tasks/useFinalizeTask";
 import { TaskStatusLabels } from "@/app/enums/TaskStatus";
+import { IMAGES } from "@/app/constants/images";
 
 const TaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -220,8 +221,8 @@ const TaskDetailPage = () => {
     return (
       <DetailPageLeftSideContent
         name={title}
-        image={image}
-        description={description}
+        image={image ?? IMAGES.TASK}
+        description={description ?? ""}
       />
     );
   };
@@ -230,10 +231,10 @@ const TaskDetailPage = () => {
     const {
       subject,
       material,
-      taskType,
+      type,
       questionCount,
       difficulty,
-      taskGrade,
+      grade,
       status,
     } = taskData.taskDetail;
 
@@ -241,12 +242,12 @@ const TaskDetailPage = () => {
       <>
         {/* Informasi Detail */}
         <TaskDetailInformationTable
-          subject={subject.name}
+          subject={subject ? subject.name : ""}
           material={material?.name}
-          type={taskType.name}
+          type={type.name}
           questionCount={questionCount}
           difficulty={difficulty}
-          grade={taskGrade}
+          grade={grade ? grade : ""}
           status={TaskStatusLabels[status]}
         />
       </>

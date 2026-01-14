@@ -30,6 +30,7 @@ import { ShareTaskModal } from "@/app/components/modals/ShareTaskModal";
 import ShareTaskForm from "@/app/components/forms/class-tasks/share-task-form";
 import { useAvailableClasses } from "@/app/hooks/class-tasks/useAvailableClasses";
 import { FormRef } from "@/app/interface/forms/IFormRef";
+import { IMAGES } from "@/app/constants/images";
 
 const TeacherTaskDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -243,8 +244,8 @@ const TeacherTaskDetailPage = () => {
     return (
       <DetailPageLeftSideContent
         name={title}
-        image={image}
-        description={description}
+        image={image && image !== "" ? image : IMAGES.TASK}
+        description={description ?? ""}
       />
     );
   };
@@ -253,10 +254,10 @@ const TeacherTaskDetailPage = () => {
     const {
       subject,
       material,
-      taskType,
+      type,
       questionCount,
       difficulty,
-      taskGrade,
+      grade,
       status,
     } = taskData.taskDetail;
 
@@ -264,12 +265,12 @@ const TeacherTaskDetailPage = () => {
       <>
         {/* Informasi Detail */}
         <TaskDetailInformationTable
-          subject={subject.name}
+          subject={subject ? subject.name : ""}
           material={material?.name}
-          type={taskType.name}
+          type={type.name}
           questionCount={questionCount}
           difficulty={difficulty}
-          grade={taskGrade}
+          grade={grade ? grade : ""}
           status={TaskStatusLabels[status]}
         />
       </>

@@ -58,7 +58,7 @@ const DashboardTitle = ({
   };
 
   const status = task?.taskDetail.status ?? TaskStatus.DRAFT;
-  const scope = task?.taskDetail.taskType.scope ?? TaskTypeScope.ACTIVITY;
+  const scope = task?.taskDetail.type.scope ?? TaskTypeScope.ACTIVITY;
 
   const rules = getTaskRules(status, scope);
 

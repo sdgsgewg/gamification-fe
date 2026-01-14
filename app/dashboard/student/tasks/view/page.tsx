@@ -88,8 +88,8 @@ const StudentTaskDetailPageContent = () => {
         <DetailPageLeftSideContent
           name={title}
           additionalText={subtitle}
-          image={image !== "" ? image : IMAGES.ACTIVITY}
-          description={description}
+          image={image && image !== "" ? image : IMAGES.ACTIVITY}
+          description={description ?? ""}
         />
 
         {/* Status Pengerjaan (untuk section "Lanjut Mengerjakan") */}
@@ -128,12 +128,12 @@ const StudentTaskDetailPageContent = () => {
       <>
         {/* Informasi Detail */}
         <TaskDetailInformationTable
-          subject={subject.name}
+          subject={subject ? subject.name : ""}
           material={material?.name}
           type={type.name}
           questionCount={questionCount}
           difficulty={difficulty}
-          grade={grade}
+          grade={grade ? grade : ""}
         />
       </>
     );

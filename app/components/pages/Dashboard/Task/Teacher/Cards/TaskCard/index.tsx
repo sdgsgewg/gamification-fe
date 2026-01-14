@@ -3,12 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faPenToSquare,
-  faShareNodes,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/app/components/shared/Button";
 import { IMAGES } from "@/app/constants/images";
 import { TaskOverviewResponse } from "@/app/interface/tasks/responses/ITaskOverviewResponse";
@@ -19,11 +14,7 @@ interface TaskCardProps {
   onView: (slug: string) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({
-  task,
-  onEdit,
-  onView,
-}) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onView }) => {
   return (
     <div className="rounded-2xl border border-br-secondary bg-card shadow-sm hover:shadow-md transition-all">
       {/* Header */}

@@ -1,156 +1,63 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import Button from "@/app/components/shared/Button";
-import {
-  TaskSubmissionStatus,
-  TaskSubmissionStatusLabels,
-} from "@/app/enums/TaskSubmissionStatus";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ROUTES } from "@/app/constants/routes";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
-import { FilterTaskSubmissionRequest } from "@/app/interface/task-submissions/requests/IFilterTaskSubmissionRequest";
-import { useTaskSubmissionsInClass } from "@/app/hooks/task-submissions/useTaskSubmissionsInClass";
-import { useTaskSubmissions } from "@/app/hooks/task-submissions/useTaskSubmissions";
-import {
-  TaskSubmissionCard,
-  TaskSubmissionCardSkeleton,
-  TaskSubmissionCardWrapper,
-} from "@/app/components/pages/Dashboard/Submission/Cards";
-import NotFound from "@/app/components/shared/not-found/NotFound";
 import Loading from "@/app/components/shared/Loading";
+import NotFound from "@/app/components/shared/not-found/NotFound";
+
+import { useTaskSubmissions } from "@/app/hooks/task-submissions/useTaskSubmissions";
+import { useTaskSubmissionsInClass } from "@/app/hooks/task-submissions/useTaskSubmissionsInClass";
+import OverviewTaskList from "@/app/components/pages/Dashboard/Submission/sections/OverviewTaskList";
+import ClassTaskAnalyticsView from "@/app/components/pages/Dashboard/Submission/sections/ClassTaskAnalyticsView";
 
 export const dynamic = "force-dynamic";
 
 const SubmissionsPageContent = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [classSlug, setClassSlug] = useState<string>("");
-  const [taskSlug, setTaskSlug] = useState<string>("");
+  const [classSlug, setClassSlug] = useState("");
+  const [taskSlug, setTaskSlug] = useState("");
 
   useEffect(() => {
-    if (searchParams) {
-      const cSlug = searchParams.get("class") ?? "";
-      const tSlug = searchParams.get("task") ?? "";
-
-      setClassSlug(cSlug);
-      setTaskSlug(tSlug);
-    }
+    setClassSlug(searchParams.get("class") ?? "");
+    setTaskSlug(searchParams.get("task") ?? "");
   }, [searchParams]);
 
-  const [filters, setFilters] = useState<FilterTaskSubmissionRequest>({
-    searchText: "",
-    status: null,
-  });
+  const isDetailView = Boolean(classSlug && taskSlug);
+
+  const { data: overviewData = [], isLoading: isOverviewLoading } =
+    useTaskSubmissions();
+
   const {
-    data: groupedSubmissions = [],
-    isLoading: isGroupedSubmissionsLoading,
-  } = useTaskSubmissions(filters);
-  const {
-    data: groupedSubmissionsInClass = [],
-    isLoading: isGroupedSubmissionsInClassLoading,
-  } = useTaskSubmissionsInClass(classSlug, taskSlug, filters);
-
-  const tabs: { key: TaskSubmissionStatus | null; label: string }[] = [
-    {
-      key: null,
-      label: "All",
-    },
-    {
-      key: TaskSubmissionStatus.NOT_STARTED,
-      label: TaskSubmissionStatusLabels[TaskSubmissionStatus.NOT_STARTED],
-    },
-    {
-      key: TaskSubmissionStatus.ON_PROGRESS,
-      label: TaskSubmissionStatusLabels[TaskSubmissionStatus.ON_PROGRESS],
-    },
-    {
-      key: TaskSubmissionStatus.COMPLETED,
-      label: TaskSubmissionStatusLabels[TaskSubmissionStatus.COMPLETED],
-    },
-  ];
-
-  const handleNavigateToSubmissionDetailPage = (submissionId: string) => {
-    router.push(`${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}/${submissionId}`);
-  };
-
-  const groupedSubmissionData =
-    classSlug === "" && taskSlug === ""
-      ? groupedSubmissions
-      : groupedSubmissionsInClass;
-
-  const isLoading =
-    isGroupedSubmissionsLoading || isGroupedSubmissionsInClassLoading;
+    data: detailData,
+    isLoading: isDetailLoading,
+    isError,
+  } = useTaskSubmissionsInClass(classSlug, taskSlug);
 
   return (
     <>
-      <DashboardTitle title="Submission List" showBackButton={false} />
+      <DashboardTitle
+        title={isDetailView ? "Task Analytics" : "Submission Overview"}
+        showBackButton={isDetailView}
+      />
 
-      {/* Status Tab Filter */}
-      <div className="w-full flex items-center mb-6 border-b border-b-primary">
-        <div className="flex overflow-x-auto custom-thin-scrollbar max-w-full">
-          {tabs.map((tab) => (
-            <Button
-              key={tab.key}
-              size="middle"
-              onClick={() =>
-                setFilters((prev) => ({
-                  ...prev,
-                  status: tab.key,
-                }))
-              }
-              className={`relative flex items-center gap-2 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
-                ${
-                  filters.status === tab.key
-                    ? "!bg-primary !text-white"
-                    : "!bg-background hover:!bg-background-hover !text-dark"
-                }`}
-            >
-              <span>{tab.label}</span>
-              {filters.status === tab.key && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-br-primary rounded-t-sm" />
-              )}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Submission Card */}
-      <div className="flex flex-col gap-8">
-        {isLoading ? (
-          <TaskSubmissionCardWrapper>
-            {Array.from({ length: 4 }).map((_, idx) => (
-              <TaskSubmissionCardSkeleton key={idx} />
-            ))}
-          </TaskSubmissionCardWrapper>
-        ) : groupedSubmissionData && groupedSubmissionData.length > 0 ? (
-          groupedSubmissionData.map((groupedSubmission, idx) => {
-            const { dateLabel, dayLabel, submissions } = groupedSubmission;
-
-            return (
-              <div key={idx} className="flex flex-col gap-4">
-                <div className="flex gap-2">
-                  <p className="text-dark text-lg font-semibold">{dateLabel}</p>
-                  <p className="text-tx-tertiary text-lg">{dayLabel}</p>
-                </div>
-
-                <TaskSubmissionCardWrapper>
-                  {submissions.map((submission, idx) => (
-                    <TaskSubmissionCard
-                      key={idx}
-                      submission={submission}
-                      onClick={handleNavigateToSubmissionDetailPage}
-                    />
-                  ))}
-                </TaskSubmissionCardWrapper>
-              </div>
-            );
-          })
+      {isDetailView ? (
+        isDetailLoading ? (
+          <Loading />
+        ) : isError || !detailData ? (
+          <NotFound text="Task analytics not found" />
         ) : (
-          <NotFound text="Submission Not Found" />
-        )}
-      </div>
+          <ClassTaskAnalyticsView data={detailData} />
+        )
+      ) : isOverviewLoading ? (
+        <Loading />
+      ) : overviewData.length === 0 ? (
+        <NotFound text="No task submissions found" />
+      ) : (
+        <OverviewTaskList data={overviewData} />
+      )}
     </>
   );
 };

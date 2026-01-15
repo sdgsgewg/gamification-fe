@@ -80,14 +80,16 @@ function DataTable<T extends object>({
       {(searchable || extra || onRefresh) && (
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <Button
-              type="primary"
-              variant="primary"
-              icon={<PlusCircleOutlined />}
-              onClick={onAddButtonClick}
-            >
-              Add
-            </Button>
+            {onAddButtonClick && (
+              <Button
+                type="primary"
+                variant="primary"
+                icon={<PlusCircleOutlined />}
+                onClick={onAddButtonClick}
+              >
+                Add
+              </Button>
+            )}
             {onRefresh && (
               <Button
                 icon={<ReloadOutlined />}

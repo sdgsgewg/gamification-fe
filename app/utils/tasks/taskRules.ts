@@ -5,27 +5,30 @@ import { TaskTypeScope } from "@/app/enums/TaskTypeScope";
 export const scopeRules = {
   [TaskTypeScope.ACTIVITY]: {
     edit: true,
+    delete: true,
+    finalize: true,
     share: false,
     publish: true,
     unpublish: true,
-    finalize: true,
-    delete: true,
+    archive: true,
   },
   [TaskTypeScope.CLASS]: {
     edit: true,
+    delete: true,
+    finalize: true,
     share: true,
     publish: false,
     unpublish: false,
-    finalize: true,
-    delete: true,
+    archive: true,
   },
   [TaskTypeScope.GLOBAL]: {
     edit: true,
+    delete: true,
+    finalize: true,
     share: true,
     publish: true,
     unpublish: true,
-    finalize: true,
-    delete: true,
+    archive: true,
   },
 } as const;
 
@@ -33,27 +36,39 @@ export const scopeRules = {
 export const statusRules = {
   [TaskStatus.DRAFT]: {
     edit: true,
-    share: true,
-    publish: true,
-    unpublish: false,
-    finalize: false,
     delete: true,
-  },
-  [TaskStatus.PUBLISHED]: {
-    edit: true,
-    share: true,
-    publish: false,
-    unpublish: true,
     finalize: true,
-    delete: false,
-  },
-  [TaskStatus.FINALIZED]: {
-    edit: false,
     share: false,
     publish: false,
     unpublish: false,
-    finalize: false,
+    archive: false,
+  },
+  [TaskStatus.FINALIZED]: {
+    edit: false,
     delete: false,
+    finalize: false,
+    share: true,
+    publish: true,
+    unpublish: false,
+    archive: false,
+  },
+  [TaskStatus.PUBLISHED]: {
+    edit: false,
+    delete: false,
+    finalize: false,
+    share: true,
+    publish: false,
+    unpublish: true,
+    archive: true,
+  },
+  [TaskStatus.ARCHIVED]: {
+    edit: false,
+    delete: false,
+    finalize: false,
+    share: false,
+    publish: false,
+    unpublish: false,
+    archive: false,
   },
 } as const;
 
@@ -64,10 +79,11 @@ export const getTaskRules = (status: TaskStatus, scope: TaskTypeScope) => {
 
   return {
     edit: statusRule.edit && scopeRule.edit,
+    delete: statusRule.delete && scopeRule.delete,
+    finalize: statusRule.finalize && scopeRule.finalize,
     share: statusRule.share && scopeRule.share,
     publish: statusRule.publish && scopeRule.publish,
     unpublish: statusRule.unpublish && scopeRule.unpublish,
-    finalize: statusRule.finalize && scopeRule.finalize,
-    delete: statusRule.delete && scopeRule.delete,
+    archive: statusRule.archive && scopeRule.archive,
   };
 };

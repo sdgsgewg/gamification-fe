@@ -99,15 +99,17 @@ export const DurationTable = ({
 interface HistoryTableProps {
   createdBy: string;
   updatedBy?: string;
-  publishedAt?: string;
   finalizedAt?: string;
+  publishedAt?: string;
+  archivedAt?: string;
 }
 
 export const HistoryTable = ({
   createdBy,
   updatedBy,
-  publishedAt,
   finalizedAt,
+  publishedAt,
+  archivedAt,
 }: HistoryTableProps) => {
   return (
     <TableWrapper>
@@ -121,8 +123,13 @@ export const HistoryTable = ({
       {/* Isi */}
       <DateRow label="Created By" value={createdBy} />
       <DateRow label="Last Updated" value={updatedBy ?? ""} />
-      <DateRow label="Published At" value={publishedAt ?? ""} />
-      <DateRow label="Finalized At" value={finalizedAt ?? ""} />
+      {publishedAt && (
+        <DateRow label="Published At" value={publishedAt ?? ""} />
+      )}
+      {finalizedAt && (
+        <DateRow label="Finalized At" value={finalizedAt ?? ""} />
+      )}
+      {archivedAt && <DateRow label="Archived At" value={archivedAt ?? ""} />}
     </TableWrapper>
   );
 };

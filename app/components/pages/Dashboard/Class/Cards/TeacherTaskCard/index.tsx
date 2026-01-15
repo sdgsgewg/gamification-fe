@@ -26,10 +26,10 @@ const TeacherTaskCard = ({ task, onClick }: TeacherTaskCardProps) => {
     : "bg-yellow-100 text-yellow-700";
 
   return (
-    <div className="p-4 bg-background rounded-xl shadow-sm border border-br-primary hover:shadow-md transition">
+    <div className="flex flex-col p-4 bg-background rounded-xl shadow-sm border border-br-primary hover:shadow-md transition">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
-        <h3 className="flex-1 text-lg font-semibold text-dark">{task.title}</h3>
+        <h3 className="flex-1 text-lg font-semibold text-dark line-clamp-1">{task.title}</h3>
         <span
           className={`w-[22%] px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClass}`}
         >
@@ -79,7 +79,7 @@ const TeacherTaskCard = ({ task, onClick }: TeacherTaskCardProps) => {
       </div>
 
       {/* Button */}
-      <div className="flex justify-end" onClick={() => onClick(task.slug)}>
+      <div className="flex justify-end mt-auto" onClick={() => onClick(task.slug)}>
         <Button variant="primary" size="middle">
           View Submission
         </Button>

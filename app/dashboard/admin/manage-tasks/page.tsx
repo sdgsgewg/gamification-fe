@@ -144,7 +144,7 @@ const TaskPage = () => {
       dataIndex: "status",
       key: "status",
       width: 150,
-      render: (_, record) => TaskStatusLabels[record.status] || "-",
+      render: (_, record) => record.status || "-",
       onCell: () => ({
         style: { minWidth: 150 },
       }),

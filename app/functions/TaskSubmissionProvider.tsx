@@ -5,57 +5,89 @@ import {
 } from "../utils/axiosHelper";
 import { getAxios, putAxios } from "../utils/AxiosFunction";
 import { UpdateTaskSubmissionFormInputs } from "../schemas/task-submissions/updateTaskSubmission";
-import { FilterTaskSubmissionRequest } from "../interface/task-submissions/requests/IFilterTaskSubmissionRequest";
-import { GroupedTaskSubmissionResponseDto } from "../interface/task-submissions/responses/IGroupedTaskSubmissionResponse";
+// import { FilterTaskSubmissionRequest } from "../interface/task-submissions/requests/IFilterTaskSubmissionRequest";
+// import { GroupedTaskSubmissionResponseDto } from "../interface/task-submissions/responses/IGroupedTaskSubmissionResponse";
 import { TaskSubmissionDetailResponse } from "../interface/task-submissions/responses/ITaskSubmissionDetailResponse";
 import { TaskSubmissionWithAnswersResponse } from "../interface/task-submissions/responses/TaskSubmissionWithAnswersResponse";
+import { TeacherClassTaskAnalyticsDto } from "../interface/task-submissions/responses/ITeacherClassTaskAnalyticsResponse";
+import { ClassTaskAttemptAnalyticsResponseDto } from "../interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
 
 const API_URL = "/task-submissions";
 
 export const taskSubmissionProvider = {
-  async getAllTaskSubmissions(
-    params?: FilterTaskSubmissionRequest
-  ): Promise<ApiResponse<GroupedTaskSubmissionResponseDto[]>> {
+  // async getAllTaskSubmissions(
+  //   params?: FilterTaskSubmissionRequest
+  // ): Promise<ApiResponse<GroupedTaskSubmissionResponseDto[]>> {
+  //   try {
+  //     const query = new URLSearchParams();
+
+  //     if (params?.searchText) query.append("searchText", params.searchText);
+  //     if (params?.status) query.append("status", params.status);
+  //     if (params?.orderBy) query.append("orderBy", params.orderBy);
+  //     if (params?.orderState) query.append("orderState", params.orderState);
+
+  //     const baseUrl = `${API_URL}`;
+
+  //     const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+  //     const data = await getAxios(url);
+
+  //     return { isSuccess: true, data };
+  //   } catch (error) {
+  //     return handleAxiosError<GroupedTaskSubmissionResponseDto[]>(error);
+  //   }
+  // },
+
+  // async getTaskSubmissionsInClass(
+  //   classSlug: string,
+  //   taskSlug: string,
+  //   params?: FilterTaskSubmissionRequest
+  // ): Promise<ApiResponse<GroupedTaskSubmissionResponseDto[]>> {
+  //   try {
+  //     const query = new URLSearchParams();
+
+  //     if (params?.searchText) query.append("searchText", params.searchText);
+  //     if (params?.status) query.append("status", params.status);
+  //     if (params?.orderBy) query.append("orderBy", params.orderBy);
+  //     if (params?.orderState) query.append("orderState", params.orderState);
+
+  //     const baseUrl = `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`;
+
+  //     const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+  //     const data = await getAxios(url);
+
+  //     return { isSuccess: true, data };
+  //   } catch (error) {
+  //     return handleAxiosError<GroupedTaskSubmissionResponseDto[]>(error);
+  //   }
+  // },
+
+  async getAllTaskSubmissions(): Promise<
+    ApiResponse<TeacherClassTaskAnalyticsDto[]>
+  > {
     try {
-      const query = new URLSearchParams();
-
-      if (params?.searchText) query.append("searchText", params.searchText);
-      if (params?.status) query.append("status", params.status);
-      if (params?.orderBy) query.append("orderBy", params.orderBy);
-      if (params?.orderState) query.append("orderState", params.orderState);
-
       const baseUrl = `${API_URL}`;
-
-      const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+      const url = baseUrl;
       const data = await getAxios(url);
 
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<GroupedTaskSubmissionResponseDto[]>(error);
+      return handleAxiosError<TeacherClassTaskAnalyticsDto[]>(error);
     }
   },
 
   async getTaskSubmissionsInClass(
     classSlug: string,
-    taskSlug: string,
-    params?: FilterTaskSubmissionRequest
-  ): Promise<ApiResponse<GroupedTaskSubmissionResponseDto[]>> {
+    taskSlug: string
+  ): Promise<ApiResponse<ClassTaskAttemptAnalyticsResponseDto>> {
     try {
-      const query = new URLSearchParams();
-
-      if (params?.searchText) query.append("searchText", params.searchText);
-      if (params?.status) query.append("status", params.status);
-      if (params?.orderBy) query.append("orderBy", params.orderBy);
-      if (params?.orderState) query.append("orderState", params.orderState);
-
       const baseUrl = `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`;
 
-      const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+      const url = baseUrl;
       const data = await getAxios(url);
 
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<GroupedTaskSubmissionResponseDto[]>(error);
+      return handleAxiosError<ClassTaskAttemptAnalyticsResponseDto>(error);
     }
   },
 

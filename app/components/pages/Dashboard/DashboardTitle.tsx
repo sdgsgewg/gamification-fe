@@ -15,6 +15,7 @@ import {
   faCloudArrowUp,
   faCloudArrowDown,
   faCheckCircle,
+  faArchive,
 } from "@fortawesome/free-solid-svg-icons";
 import { TaskStatus } from "@/app/enums/TaskStatus";
 import { TaskDetailResponse } from "@/app/interface/tasks/responses/ITaskDetailResponse";
@@ -31,10 +32,11 @@ interface DashboardTitleProps {
   onEdit?: () => void;
   onDelete?: () => void;
 
+  onFinalize?: () => void;
   onShare?: () => void;
   onPublish?: () => void;
   onUnpublish?: () => void;
-  onFinalize?: () => void;
+  onArchive?: () => void;
 }
 
 const DashboardTitle = ({
@@ -45,10 +47,11 @@ const DashboardTitle = ({
   onBack,
   onEdit,
   onDelete,
+  onFinalize,
   onShare,
   onPublish,
   onUnpublish,
-  onFinalize,
+  onArchive,
 }: DashboardTitleProps) => {
   const router = useRouter();
 
@@ -76,6 +79,13 @@ const DashboardTitle = ({
     onClick: onEdit!,
   });
 
+  push(rules.finalize && !!onFinalize, {
+    key: "finalize",
+    label: "Finalize",
+    icon: <FontAwesomeIcon icon={faCheckCircle} />,
+    onClick: onFinalize!,
+  });
+
   push(rules.share && !!onShare, {
     key: "share",
     label: "Share",
@@ -97,11 +107,11 @@ const DashboardTitle = ({
     onClick: onUnpublish!,
   });
 
-  push(rules.finalize && !!onFinalize, {
-    key: "finalize",
-    label: "Finalize",
-    icon: <FontAwesomeIcon icon={faCheckCircle} />,
-    onClick: onFinalize!,
+  push(rules.archive && !!onArchive, {
+    key: "archive",
+    label: "Archive",
+    icon: <FontAwesomeIcon icon={faArchive} />,
+    onClick: onArchive!,
   });
 
   // DELETE GROUP

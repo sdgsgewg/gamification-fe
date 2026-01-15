@@ -24,8 +24,9 @@ export interface AssignedClassInfo {
 
 export interface TaskHistory {
   createdBy: string;
-  publishedAt?: string;
   finalizedAt?: string;
+  publishedAt?: string;
+  archivedAt?: string;
   updatedBy?: string;
 }
 

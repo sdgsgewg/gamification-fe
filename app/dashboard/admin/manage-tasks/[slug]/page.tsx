@@ -283,7 +283,8 @@ const TaskDetailPage = () => {
     const HistoryView = () => {
       if (!history) return;
 
-      const { createdBy, updatedBy, publishedAt, finalizedAt } = history;
+      const { createdBy, updatedBy, finalizedAt, publishedAt, archivedAt } =
+        history;
 
       return (
         <HistoryTable
@@ -291,6 +292,7 @@ const TaskDetailPage = () => {
           updatedBy={updatedBy}
           publishedAt={publishedAt}
           finalizedAt={finalizedAt}
+          archivedAt={archivedAt}
         />
       );
     };
@@ -300,7 +302,9 @@ const TaskDetailPage = () => {
 
       return (
         <>
-          <h2 className="text-dark font-semibold text-2xl mb-4">Question List</h2>
+          <h2 className="text-dark font-semibold text-2xl mb-4">
+            Question List
+          </h2>
 
           <div className="flex flex-col gap-8">
             {questions.map((q, idx) => (

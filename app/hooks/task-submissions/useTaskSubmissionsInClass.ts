@@ -1,8 +1,8 @@
 "use client";
 
 import { taskSubmissionProvider } from "@/app/functions/TaskSubmissionProvider";
+import { ClassTaskAttemptAnalyticsResponse } from "@/app/interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
 // import { FilterTaskSubmissionRequest } from "@/app/interface/task-submissions/requests/IFilterTaskSubmissionRequest";
-import { ClassTaskAttemptAnalyticsResponseDto } from "@/app/interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
 // import { GroupedTaskSubmissionResponseDto } from "@/app/interface/task-submissions/responses/IGroupedTaskSubmissionResponse";
 import { useQuery } from "@tanstack/react-query";
 
@@ -32,19 +32,19 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useTaskSubmissionsInClass = (
   classSlug: string,
-  taskSlug: string
+  taskSlug: string,
 ) => {
   return useQuery({
     queryKey: ["task-submissions-in-class", classSlug, taskSlug],
     queryFn: async () => {
       const res = await taskSubmissionProvider.getTaskSubmissionsInClass(
         classSlug,
-        taskSlug
+        taskSlug,
       );
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail pengumpulan tugas di kelas");
 
-      const data: ClassTaskAttemptAnalyticsResponseDto = res.data;
+      const data: ClassTaskAttemptAnalyticsResponse = res.data;
 
       return data;
     },

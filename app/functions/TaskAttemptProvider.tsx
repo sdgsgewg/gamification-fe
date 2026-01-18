@@ -11,12 +11,16 @@ import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IF
 import { GroupedTaskAttemptResponse } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
 import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IMostPopularTaskResponse";
+import { ActivityTaskAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IActivityTaskAttemptResponse";
+import { ClassTaskAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IClassTaskAttemptResponse";
+import { ClassTaskStudentAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IClassTaskStudentAttemptResponse";
+import { ActivityTaskStudentAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IActivityTaskStudentAttemptResponse";
 
 const API_URL = "/task-attempts";
 
 export const taskAttemptProvider = {
   async getTaskAttemptsByUser(
-    params?: FilterTaskAttemptRequest
+    params?: FilterTaskAttemptRequest,
   ): Promise<ApiResponse<GroupedTaskAttemptResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -40,17 +44,8 @@ export const taskAttemptProvider = {
     }
   },
 
-  async getMostPopularTask(): Promise<ApiResponse<MostPopularTaskResponse[]>> {
-    try {
-      const data = await getAxios(`${API_URL}/popular`);
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<MostPopularTaskResponse[]>(error);
-    }
-  },
-
   async getTaskAttemptDetail(
-    id: string
+    id: string,
   ): Promise<ApiResponse<TaskAttemptDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
@@ -60,13 +55,67 @@ export const taskAttemptProvider = {
     }
   },
 
+  async getMostPopularTask(): Promise<ApiResponse<MostPopularTaskResponse[]>> {
+    try {
+      const data = await getAxios(`${API_URL}/popular`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<MostPopularTaskResponse[]>(error);
+    }
+  },
+
+  async getAllTaskAttemptsFromClass(): Promise<
+    ApiResponse<ClassTaskAttemptResponse[]>
+  > {
+    try {
+      const data = await getAxios(`${API_URL}/class`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ClassTaskAttemptResponse[]>(error);
+    }
+  },
+
+  async getAllTaskAttemptsFromActivityPage(): Promise<
+    ApiResponse<ActivityTaskAttemptResponse[]>
+  > {
+    try {
+      const data = await getAxios(`${API_URL}/activity`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ActivityTaskAttemptResponse[]>(error);
+    }
+  },
+
+  async getStudentAttemptsFromClassTask(
+    classSlug: string,
+    taskSlug: string,
+  ): Promise<ApiResponse<ClassTaskStudentAttemptResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/class/${classSlug}/${taskSlug}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ClassTaskStudentAttemptResponse>(error);
+    }
+  },
+
+  async getStudentAttemptsFromActivityTask(
+    taskSlug: string,
+  ): Promise<ApiResponse<ActivityTaskStudentAttemptResponse>> {
+    try {
+      const data = await getAxios(`${API_URL}/activity/${taskSlug}`);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<ActivityTaskStudentAttemptResponse>(error);
+    }
+  },
+
   async createActivityAttempt(
-    payload: CreateTaskAttemptFormInputs
+    payload: CreateTaskAttemptFormInputs,
   ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponse> = await postAxios(
         `${API_URL}/activity`,
-        payload
+        payload,
       );
       return res;
     } catch (error) {
@@ -75,12 +124,12 @@ export const taskAttemptProvider = {
   },
 
   async createClassTaskAttempt(
-    payload: CreateTaskAttemptFormInputs
+    payload: CreateTaskAttemptFormInputs,
   ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponse> = await postAxios(
         `${API_URL}/class`,
-        payload
+        payload,
       );
       return res;
     } catch (error) {
@@ -90,12 +139,12 @@ export const taskAttemptProvider = {
 
   async updateActivityAttempt(
     id: string,
-    payload: UpdateTaskAttemptFormInputs
+    payload: UpdateTaskAttemptFormInputs,
   ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponse> = await putAxios(
         `${API_URL}/activity/${id}`,
-        payload
+        payload,
       );
       return res;
     } catch (error) {
@@ -105,12 +154,12 @@ export const taskAttemptProvider = {
 
   async updateClassTaskAttempt(
     id: string,
-    payload: UpdateTaskAttemptFormInputs
+    payload: UpdateTaskAttemptFormInputs,
   ): Promise<ApiResponse<UpsertTaskAttemptResponse>> {
     try {
       const res: DetailResponseDto<UpsertTaskAttemptResponse> = await putAxios(
         `${API_URL}/class/${id}`,
-        payload
+        payload,
       );
       return res;
     } catch (error) {

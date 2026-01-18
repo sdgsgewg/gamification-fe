@@ -3,10 +3,30 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-import { TeacherClassTaskAnalyticsDto } from "@/app/interface/task-submissions/responses/ITeacherClassTaskAnalyticsResponse";
+
+export interface OverviewTaskItem {
+  task: {
+    title: string;
+    slug: string;
+    isRepeatable: boolean;
+  };
+
+  studentsCompleted: number;
+  avgScoreLatestAttempt: number;
+
+  /** Hanya ada di class scope */
+  totalStudents?: number;
+
+  class?: {
+    name: string;
+    slug: string;
+  };
+
+  deadline?: string;
+}
 
 type Props = {
-  data: TeacherClassTaskAnalyticsDto[];
+  data: OverviewTaskItem[];
 };
 
 const OverviewTaskList: React.FC<Props> = ({ data }) => {
@@ -14,11 +34,11 @@ const OverviewTaskList: React.FC<Props> = ({ data }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {data.map((task, idx) => {
+      {data.map((data, idx) => {
         const progress =
-          task.totalStudents === 0
-            ? 0
-            : Math.round((task.studentsCompleted / task.totalStudents) * 100);
+          data.totalStudents && data.totalStudents > 0
+            ? Math.round((data.studentsCompleted / data.totalStudents) * 100)
+            : 0;
 
         return (
           <div
@@ -26,42 +46,45 @@ const OverviewTaskList: React.FC<Props> = ({ data }) => {
             className="cursor-pointer rounded-xl border bg-surface p-4 shadow hover:shadow-md transition"
             onClick={() =>
               router.push(
-                `${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?class=${task.classSlug}&task=${task.taskSlug}`
+                data.class
+                  ? `${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?class=${data.class.slug}&task=${data.task.slug}`
+                  : `${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?task=${data.task.slug}`,
               )
             }
           >
-            {/* Title */}
-            <h3 className="text-lg font-semibold text-dark">
-              {task.taskTitle}
-            </h3>
-            <p className="text-sm text-tx-secondary">{task.className}</p>
+            <h3 className="text-lg font-semibold">{data.task.title}</h3>
 
-            {/* Progress */}
-            <div className="mt-4">
-              <div className="flex justify-between text-sm mb-1">
-                <span>Completion</span>
-                <span>{progress}%</span>
-              </div>
-              <div className="h-2 rounded bg-light-muted">
-                <div
-                  className="h-2 rounded bg-primary"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
+            {data.class && (
+              <p className="text-sm text-tx-secondary">{data.class.name}</p>
+            )}
 
-            {/* Stats */}
+            {data.totalStudents !== undefined && (
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Completion</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="h-2 rounded bg-light-muted">
+                  <div
+                    className="h-2 rounded bg-primary"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="mt-4 flex justify-between text-sm text-tx-secondary">
-              <span>
-                {task.studentsCompleted}/{task.totalStudents} completed
-              </span>
-              <span>Avg Score: {task.avgScoreLatestAttempt}</span>
+              {data.totalStudents !== undefined && (
+                <span>
+                  {data.studentsCompleted}/{data.totalStudents} completed
+                </span>
+              )}
+              <span>Avg Score: {data.avgScoreLatestAttempt}</span>
             </div>
 
-            {/* Deadline */}
-            {task.deadline && (
+            {data.deadline && (
               <p className="mt-2 text-xs text-tx-tertiary">
-                Deadline: {new Date(task.deadline).toLocaleDateString()}
+                Deadline: {new Date(data.deadline).toLocaleDateString()}
               </p>
             )}
           </div>

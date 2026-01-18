@@ -10,7 +10,7 @@ import { UpdateTaskSubmissionFormInputs } from "../schemas/task-submissions/upda
 import { TaskSubmissionDetailResponse } from "../interface/task-submissions/responses/ITaskSubmissionDetailResponse";
 import { TaskSubmissionWithAnswersResponse } from "../interface/task-submissions/responses/TaskSubmissionWithAnswersResponse";
 import { TeacherClassTaskAnalyticsDto } from "../interface/task-submissions/responses/ITeacherClassTaskAnalyticsResponse";
-import { ClassTaskAttemptAnalyticsResponseDto } from "../interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
+import { ClassTaskAttemptAnalyticsResponse } from "../interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
 
 const API_URL = "/task-submissions";
 
@@ -77,8 +77,8 @@ export const taskSubmissionProvider = {
 
   async getTaskSubmissionsInClass(
     classSlug: string,
-    taskSlug: string
-  ): Promise<ApiResponse<ClassTaskAttemptAnalyticsResponseDto>> {
+    taskSlug: string,
+  ): Promise<ApiResponse<ClassTaskAttemptAnalyticsResponse>> {
     try {
       const baseUrl = `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`;
 
@@ -87,12 +87,12 @@ export const taskSubmissionProvider = {
 
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<ClassTaskAttemptAnalyticsResponseDto>(error);
+      return handleAxiosError<ClassTaskAttemptAnalyticsResponse>(error);
     }
   },
 
   async getTaskSubmissionDetail(
-    id: string
+    id: string,
   ): Promise<ApiResponse<TaskSubmissionDetailResponse>> {
     try {
       const data = await getAxios(`${API_URL}/${id}`);
@@ -103,7 +103,7 @@ export const taskSubmissionProvider = {
   },
 
   async getTaskSubmissionWithAnswers(
-    id: string
+    id: string,
   ): Promise<ApiResponse<TaskSubmissionWithAnswersResponse>> {
     try {
       const data = await getAxios(`${API_URL}/review/${id}`);
@@ -115,7 +115,7 @@ export const taskSubmissionProvider = {
 
   async updateTaskSubmission(
     id: string,
-    payload: UpdateTaskSubmissionFormInputs
+    payload: UpdateTaskSubmissionFormInputs,
   ): Promise<ApiResponse<null>> {
     try {
       const res: BaseResponseDto = await putAxios(`${API_URL}/${id}`, payload);

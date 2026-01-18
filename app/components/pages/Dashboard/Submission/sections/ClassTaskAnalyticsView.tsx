@@ -2,11 +2,8 @@
 
 import React from "react";
 import DataTable from "@/app/components/shared/table/Table";
-import {
-  ClassTaskAttemptAnalyticsResponseDto,
-  StudentTaskAttemptAnalyticsDto,
-} from "@/app/interface/task-submissions/responses/IClassTaskAttemptAnalyticsResponse";
-import { Tag, Tooltip } from "antd";
+
+import { Tag } from "antd";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
@@ -15,9 +12,27 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
+import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/student-attempt/IStudentTaskAttemptAnalyticsResponse";
+
+export interface DetailTaskItem {
+  task: {
+    title: string;
+    slug: string;
+  };
+
+  averageScoreAllStudents: number;
+  averageAttempts: number;
+
+  students: StudentTaskAttemptAnalyticsResponse[];
+
+  /** Hanya ada di class scope */
+  class?: {
+    name: string;
+  };
+}
 
 type Props = {
-  data: ClassTaskAttemptAnalyticsResponseDto;
+  data: DetailTaskItem;
 };
 
 const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
@@ -28,7 +43,7 @@ const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
     router.push(`${baseRoute}/${submissionId}`);
   };
 
-  const columns: ColumnType<StudentTaskAttemptAnalyticsDto>[] = [
+  const columns: ColumnType<StudentTaskAttemptAnalyticsResponse>[] = [
     {
       title: "Student",
       dataIndex: "studentName",
@@ -131,8 +146,10 @@ const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
     <div className="flex flex-col gap-6">
       {/* ===== SUMMARY ===== */}
       <div className="rounded-xl border bg-surface p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">{data.taskTitle}</h2>
-        <p className="text-sm text-tx-secondary">{data.className}</p>
+        <h2 className="text-lg font-semibold">{data.task.title}</h2>
+        {data.class && (
+          <p className="text-sm text-tx-secondary">{data.class.name}</p>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
           <Stat label="Students" value={data.students.length} />

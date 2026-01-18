@@ -1,30 +1,6 @@
-import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
+import { StudentTaskAttemptAnalyticsResponse } from "../../task-attempts/responses/student-attempt/IStudentTaskAttemptAnalyticsResponse";
 
-export interface StudentAttemptDetailDto {
-  attemptNumber: number;
-  attemptId: string;
-  score: number;
-  status: TaskAttemptStatus;
-  completedAt?: Date;
-}
-
-export interface StudentTaskAttemptAnalyticsDto {
-  studentId: string;
-  studentName: string;
-
-  totalAttempts: number;
-  firstAttemptScore?: number;
-  lastAttemptScore?: number;
-  averageScore?: number;
-  improvement?: number;
-
-  latestStatus: TaskAttemptStatus;
-  latestSubmissionId: string;
-
-  attempts: StudentAttemptDetailDto[];
-}
-
-export interface ClassTaskAttemptAnalyticsResponseDto {
+export interface ClassTaskAttemptAnalyticsResponse {
   className: string;
   taskTitle: string;
   taskSlug: string;
@@ -32,5 +8,5 @@ export interface ClassTaskAttemptAnalyticsResponseDto {
   averageScoreAllStudents: number;
   averageAttempts: number;
 
-  students: StudentTaskAttemptAnalyticsDto[];
+  students: StudentTaskAttemptAnalyticsResponse[];
 }

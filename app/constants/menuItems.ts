@@ -218,8 +218,14 @@ export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
     menu: "Submissions",
     url: resolveDashboardRoute(role, "/submissions"),
     icon: FileUp,
-    roles: [Role.TEACHER],
+    roles: [Role.TEACHER, Role.ADMIN],
   },
+  // {
+  //   menu: "Attempts",
+  //   url: resolveDashboardRoute(role, "/attempts"),
+  //   icon: FileUp,
+  //   roles: [Role.TEACHER, Role.ADMIN],
+  // },
   {
     menu: "Leaderboard",
     url: ROUTES.DASHBOARD.LEADERBOARD,

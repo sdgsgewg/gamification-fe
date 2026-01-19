@@ -3,7 +3,11 @@ import { Space } from "antd";
 
 import Button, { ButtonVariant } from "../Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPenToSquare, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
+import {
+  faEye,
+  faPenToSquare,
+  faTrashAlt,
+} from "@fortawesome/free-regular-svg-icons";
 
 interface RowActionButtonProps {
   variant?: ButtonVariant;
@@ -26,12 +30,14 @@ const RowActionButton: React.FC<RowActionButtonProps> = ({
 interface RowActionsProps {
   onView?: () => void;
   onEdit?: () => void;
+  onGrade?: () => void;
   onDelete?: () => void;
 }
 
 const RowActions: React.FC<RowActionsProps> = ({
   onView,
   onEdit,
+  onGrade,
   onDelete,
 }) => {
   return (
@@ -43,6 +49,11 @@ const RowActions: React.FC<RowActionsProps> = ({
       )}
       {onEdit && (
         <RowActionButton variant="warning" onClick={onEdit}>
+          <FontAwesomeIcon icon={faPenToSquare} />
+        </RowActionButton>
+      )}
+      {onGrade && (
+        <RowActionButton variant="warning" onClick={onGrade}>
           <FontAwesomeIcon icon={faPenToSquare} />
         </RowActionButton>
       )}

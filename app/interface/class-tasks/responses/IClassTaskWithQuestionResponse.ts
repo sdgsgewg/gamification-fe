@@ -1,7 +1,9 @@
 import { QuestionResponse } from "../../task-questions/responses/IQuestionResponse";
 
-export interface ClassTaskWithQuestionsResponseDto {
+export interface ClassTaskWithQuestionsResponse {
   id: string;
+  classId: string;
+  taskId: string;
   lastAttemptId?: string;
   startTime?: Date;
   endTime?: Date;

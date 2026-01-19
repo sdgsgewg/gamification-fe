@@ -300,10 +300,10 @@ const TeacherTaskDetailPage = () => {
     };
 
     const SubmissionView = () => {
-      const handleNavigateToSubmissionPage = (taskSlug: string) => {
+      const handleNavigateToSubmissionPage = (classSlug: string) => {
         const query = new URLSearchParams({
-          class: params.slug,
-          task: taskSlug,
+          class: classSlug,
+          task: params.slug,
         });
 
         router.push(`${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?${query}`);

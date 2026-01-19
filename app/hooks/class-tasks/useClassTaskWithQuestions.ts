@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { classTaskProvider } from "@/app/functions/ClassTaskProvider";
-import { ClassTaskWithQuestionsResponseDto } from "@/app/interface/class-tasks/responses/IClassTaskWithQuestionResponse";
+import { ClassTaskWithQuestionsResponse } from "@/app/interface/class-tasks/responses/IClassTaskWithQuestionResponse";
 import { getImageSrc } from "@/app/utils/image";
 
 export const useClassTaskWithQuestions = (
@@ -22,7 +22,7 @@ export const useClassTaskWithQuestions = (
 
       const ct = res.data;
 
-      const mapped: ClassTaskWithQuestionsResponseDto = {
+      const mapped: ClassTaskWithQuestionsResponse = {
         ...ct,
         questions: ct.questions.map((q) => ({
           ...q,

@@ -1,4 +1,4 @@
-import { StudentTaskAttemptAnalyticsResponse } from "../../task-attempts/responses/student-attempt/IStudentTaskAttemptAnalyticsResponse";
+import { StudentTaskAttemptAnalyticsResponse } from "../../task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
 
 export interface ClassTaskAttemptAnalyticsResponse {
   className: string;

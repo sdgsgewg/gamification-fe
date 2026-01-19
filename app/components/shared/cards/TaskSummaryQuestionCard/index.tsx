@@ -59,7 +59,7 @@ const TaskSummaryQuestionCard = ({
       title={
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-dark font-semibold">{`Soal ${
+            <span className="text-dark font-semibold">{`Question ${
               index + 1
             }`}</span>
             <Tag color="blue">
@@ -74,20 +74,20 @@ const TaskSummaryQuestionCard = ({
               <Tag
                 color="purple"
                 icon={<ClockCircleOutlined />}
-                className="!m-0"
+                className="m-0!"
               >
                 {`${question.timeLimit} detik`}
               </Tag>
             )}
 
             {/* Point */}
-            <Tag color="blue" className="!m-0">{`Poin: ${question.point}`}</Tag>
+            <Tag color="blue" className="m-0!">{`Point: ${question.point}`}</Tag>
 
             {/* Status Benar/Salah */}
             {isAnswered && (
               <Tag
                 color={isCorrectAnswer ? "green" : "red"}
-                className="font-semibold flex items-center !m-0"
+                className="font-semibold flex items-center m-0!"
               >
                 <FontAwesomeIcon
                   icon={isCorrectAnswer ? faCheckCircle : faTimesCircle}
@@ -97,14 +97,14 @@ const TaskSummaryQuestionCard = ({
                   } text-base`}
                 />
                 <span className="ms-1">
-                  {isCorrectAnswer ? "Benar" : "Salah"}
+                  {isCorrectAnswer ? "Correct" : "Wrong"}
                 </span>
               </Tag>
             )}
           </div>
         </div>
       }
-      className={`!bg-background shadow-md rounded-lg transition-all duration-300 border-2 ${cardBorderColor}`}
+      className={`bg-background! shadow-md rounded-lg transition-all duration-300 border-2 ${cardBorderColor}`}
       headStyle={{
         backgroundColor: "var(--color-tertiary)",
         fontWeight: "bold",
@@ -114,10 +114,11 @@ const TaskSummaryQuestionCard = ({
     >
       {imageSrc && (
         <div className="my-3 flex justify-center">
-          <Image src={imageSrc} alt={`Soal ${index + 1}`} width={240} />
+          <Image src={imageSrc} alt={`Question ${index + 1}`} width={240} />
         </div>
       )}
       <p className="text-dark text-base mb-4">{question.text}</p>
+
       {/* === PILIHAN GANDA === */}
       {question.type === "multiple_choice" && question.options && (
         <div className="flex flex-col gap-3 mt-3">
@@ -187,6 +188,7 @@ const TaskSummaryQuestionCard = ({
           })}
         </div>
       )}
+
       {/* === TRUE OR FALSE === */}
       {question.type === QuestionType.TRUE_FALSE && question.options && (
         <div className="flex flex-col gap-3 mt-3">
@@ -248,6 +250,7 @@ const TaskSummaryQuestionCard = ({
           })}
         </div>
       )}
+
       {/* === ISIAN / ESSAY === */}
       {(question.type === QuestionType.FILL_BLANK ||
         question.type === QuestionType.ESSAY) && (
@@ -272,6 +275,7 @@ const TaskSummaryQuestionCard = ({
           )}
         </div>
       )}
+
       {/* === POINT AWARDED & CATATAN GURU === */}
       <div className="mt-4 flex flex-col gap-2">
         {pointAwarded !== null && (

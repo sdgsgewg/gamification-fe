@@ -9,6 +9,7 @@ export interface ClassTaskStats {
 
 export interface ClassTaskAttemptProgress {
   startedAt: string;
+  completedAt: string;
   submittedAt: string;
   duration: string;
   status: string;
@@ -30,6 +31,6 @@ export interface ClassTaskSummaryResponseDto {
   className: string;
   stats: ClassTaskStats;
   attemptProgress: ClassTaskAttemptProgress;
-  gradingProgress: ClassTaskGradingProgress;
+  gradingProgress?: ClassTaskGradingProgress | null;
   questions: QuestionResponse[];
 }

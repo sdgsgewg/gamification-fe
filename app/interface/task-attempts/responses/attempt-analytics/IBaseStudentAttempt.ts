@@ -1,4 +1,5 @@
 import { StudentTaskAttemptAnalyticsResponse } from "./IStudentTaskAttemptAnalyticsResponse";
+import { TaskAttemptAnalyticsResponse } from "./ITaskAttemptAnalyticsResponse";
 
 export abstract class BaseStudentAttempt {
   task!: {
@@ -8,6 +9,8 @@ export abstract class BaseStudentAttempt {
 
   averageScoreAllStudents!: number;
   averageAttempts!: number;
+
+  attempts!: TaskAttemptAnalyticsResponse[];
 
   students!: StudentTaskAttemptAnalyticsResponse[];
 }

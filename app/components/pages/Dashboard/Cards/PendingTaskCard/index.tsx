@@ -10,9 +10,10 @@ import { FaBookOpen, FaCalendarAlt } from "react-icons/fa";
 
 interface PendingTaskCardProps {
   task: ClassTaskOverviewResponse;
+  onClick: (classSlug: string, taskSlug: string) => void;
 }
 
-const PendingTaskCard = ({ task }: PendingTaskCardProps) => {
+const PendingTaskCard = ({ task, onClick }: PendingTaskCardProps) => {
   const getClassText = () => {
     return `From: ${task.class.name}`;
   };
@@ -20,7 +21,8 @@ const PendingTaskCard = ({ task }: PendingTaskCardProps) => {
   return (
     <div
       key={task.id}
-      className="flex justify-between items-center bg-tertiary hover:bg-tertiary-hover transition p-4 rounded-xl border border-br-tertiary"
+      className="flex justify-between items-center bg-tertiary hover:bg-tertiary-hover transition p-4 rounded-xl border border-br-tertiary cursor-pointer"
+      onClick={() => onClick(task.class.slug, task.taskSlug)}
     >
       <div className="flex flex-col justify-between gap-1">
         <div className="flex flex-col">

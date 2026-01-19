@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import DataTable from "@/app/components/shared/table/Table";
 
 import { Tag } from "antd";
@@ -12,7 +12,10 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
-import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/student-attempt/IStudentTaskAttemptAnalyticsResponse";
+import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
+import StudentAttemptAnalyticsModal from "../../../../modals/StudentAttemptAnalyticsModal";
+import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
+import { Line } from "@ant-design/plots";
 
 export interface DetailTaskItem {
   task: {
@@ -22,6 +25,8 @@ export interface DetailTaskItem {
 
   averageScoreAllStudents: number;
   averageAttempts: number;
+
+  attempts: TaskAttemptAnalyticsResponse[];
 
   students: StudentTaskAttemptAnalyticsResponse[];
 
@@ -35,11 +40,18 @@ type Props = {
   data: DetailTaskItem;
 };
 
-const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
+const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
   const router = useRouter();
   const baseRoute = ROUTES.DASHBOARD.TEACHER.SUBMISSIONS;
 
-  const handleView = (submissionId: string) => {
+  const [selectedStudent, setSelectedStudent] =
+    useState<StudentTaskAttemptAnalyticsResponse | null>(null);
+
+  const handleView = (student: StudentTaskAttemptAnalyticsResponse) => {
+    setSelectedStudent(student);
+  };
+
+  const handleGrade = (submissionId: string) => {
     router.push(`${baseRoute}/${submissionId}`);
   };
 
@@ -126,21 +138,77 @@ const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
       title: "Actions",
       key: "actions",
       align: "center",
-      width: 100,
-      onCell: () => ({
-        style: { minWidth: 100 },
-      }),
-      render: (_, record) => {
+      render: (_, record) => (
         <RowActions
-          onView={
+          onView={() => handleView(record)}
+          onGrade={
             record.latestSubmissionId
-              ? () => handleView(record.latestSubmissionId)
+              ? () => handleGrade(record.latestSubmissionId)
               : undefined
           }
-        />;
-      },
+        />
+      ),
     },
   ];
+
+  const averageAttemptChartData = data.attempts
+    .filter((a) => a.averageScore !== undefined)
+    .map((a) => ({
+      attempt: `#${a.attemptNumber}`,
+      averageScore: a.averageScore!,
+    }));
+
+  const averageAttemptChartConfig = {
+    data: averageAttemptChartData,
+    xField: "attempt",
+    yField: "averageScore",
+
+    smooth: true,
+    
+    point: {
+      size: 5,
+      shape: "circle",
+    },
+
+    lineStyle: {
+      lineWidth: 2,
+    },
+
+    xAxis: {
+      title: {
+        text: "Attempt Number",
+      },
+    },
+
+    yAxis: {
+      min: 0,
+      max: 100,
+      title: {
+        text: "Average Score",
+      },
+    },
+
+    tooltip: {
+      customContent: (title: string, items: any[]) => {
+        if (!items || items.length === 0) return null;
+
+        const item = items[0];
+
+        return `
+      <div style="padding: 8px;">
+        <div style="font-weight: 600; margin-bottom: 4px;">
+          ${title}
+        </div>
+        <div>
+          Average Score: <b>${Number(item.value).toFixed(2)}</b>
+        </div>
+      </div>
+    `;
+      },
+    },
+
+    height: 260,
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,6 +229,16 @@ const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
+      {/* ===== AVERAGE ATTEMPT CHART ===== */}
+      {averageAttemptChartData.length > 0 && (
+        <div className="rounded-xl border bg-surface p-4 shadow-sm">
+          <h3 className="text-md font-semibold mb-4">
+            Average Score per Attempt
+          </h3>
+          <Line {...averageAttemptChartConfig} />
+        </div>
+      )}
+
       {/* ===== TABLE ===== */}
       <DataTable
         title="Student Attempt Analytics"
@@ -169,6 +247,12 @@ const ClassTaskAnalyticsView: React.FC<Props> = ({ data }) => {
         rowKey="studentId"
         searchable
         searchPlaceholder="Search student"
+      />
+
+      <StudentAttemptAnalyticsModal
+        open={!!selectedStudent}
+        student={selectedStudent}
+        onClose={() => setSelectedStudent(null)}
       />
     </div>
   );
@@ -181,4 +265,4 @@ const Stat = ({ label, value }: { label: string; value: number }) => (
   </div>
 );
 
-export default ClassTaskAnalyticsView;
+export default TaskDetailAnalyticsView;

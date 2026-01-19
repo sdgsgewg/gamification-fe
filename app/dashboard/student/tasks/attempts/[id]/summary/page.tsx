@@ -65,14 +65,24 @@ const StudentTaskSummaryPageContent = () => {
   };
 
   const LeftSideContent = () => {
-    const { title, image, description, teacherName, className } =
-      classTaskSummaryData;
+    const {
+      title,
+      image,
+      description,
+      teacherName,
+      className,
+      gradingProgress,
+    } = classTaskSummaryData;
+
+    const additionalText = gradingProgress
+      ? `Graded by ${teacherName} from class '${className}'`
+      : `Graded by SYSTEM from class '${className}'`;
 
     return (
       <>
         <DetailPageLeftSideContent
           name={title}
-          additionalText={`Graded by ${teacherName} from class '${className}'`}
+          additionalText={additionalText}
           image={image !== "" ? image : IMAGES.ACTIVITY}
           description={description}
         />
@@ -118,35 +128,33 @@ const StudentTaskSummaryPageContent = () => {
     const ProgressView = () => {
       const {
         startedAt,
+        completedAt,
         submittedAt,
         duration: attemptDuration,
         status: attemptStatus,
       } = attemptProgress;
-      const {
-        startGradedAt,
-        finishGradedAt,
-        duration: gradingDuration,
-        status: gradingStatus,
-      } = gradingProgress;
 
       return (
         <div className="flex flex-col gap-6">
           {/* Attempt Progress */}
           <ProgressTable
             startedAt={startedAt}
+            completedAt={completedAt}
             submittedAt={submittedAt}
             duration={attemptDuration}
             status={attemptStatus}
           />
 
           {/* Grading Progress */}
-          <ProgressTable
-            title="Grading Progress"
-            startedAt={startGradedAt}
-            submittedAt={finishGradedAt}
-            duration={gradingDuration}
-            status={gradingStatus}
-          />
+          {gradingProgress && (
+            <ProgressTable
+              title="Grading Progress"
+              startedAt={gradingProgress.startGradedAt}
+              submittedAt={gradingProgress.finishGradedAt}
+              duration={gradingProgress.duration}
+              status={gradingProgress.status}
+            />
+          )}
         </div>
       );
     };

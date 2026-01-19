@@ -12,7 +12,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
    PROGRESS TEXT HELPER
 ---------------------------- */
 export const getProgressText = (
-  attempt: TaskAttemptOverviewResponse
+  attempt: TaskAttemptOverviewResponse,
 ): string => {
   if (attempt.completedTime) return `Graded on: ${attempt.completedTime}`;
   if (attempt.submittedTime) return `Submitted on: ${attempt.submittedTime}`;
@@ -25,7 +25,7 @@ export const getProgressText = (
    DEADLINE TEXT HELPER
 ---------------------------- */
 export const getDeadlineText = (
-  attempt: TaskAttemptOverviewResponse
+  attempt: TaskAttemptOverviewResponse,
 ): string => {
   const status = attempt.status as TaskAttemptStatus;
 

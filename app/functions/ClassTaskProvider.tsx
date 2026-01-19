@@ -7,7 +7,7 @@ import { StudentClassTaskResponse } from "../interface/class-tasks/responses/ISt
 import { getAxios, postAxios } from "../utils/AxiosFunction";
 import { FilterClassTask } from "../interface/class-tasks/requests/IFilterClassTaskRequest";
 import { ClassTaskDetailResponseDto } from "../interface/class-tasks/responses/IClassTaskDetailResponse";
-import { ClassTaskWithQuestionsResponseDto } from "../interface/class-tasks/responses/IClassTaskWithQuestionResponse";
+import { ClassTaskWithQuestionsResponse } from "../interface/class-tasks/responses/IClassTaskWithQuestionResponse";
 import { ClassTaskSummaryResponseDto } from "../interface/class-tasks/responses/IClassTaskWithSummaryResponse";
 import { TeacherClassTaskResponse } from "../interface/class-tasks/responses/ITeacherClassTaskResponse";
 import { AvailableClassesResponse } from "../interface/class-tasks/responses/IAvailableClassesResponse";
@@ -21,7 +21,7 @@ const API_URL = "/class-tasks";
 
 export const classTaskProvider = {
   async getTasksFromAllClasses(
-    params?: FilterTaskAttemptRequest
+    params?: FilterTaskAttemptRequest,
   ): Promise<ApiResponse<GroupedTaskAttemptResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -46,7 +46,7 @@ export const classTaskProvider = {
   },
 
   async getTasksFromAllClassesList(
-    params?: FilterTaskAttemptRequest
+    params?: FilterTaskAttemptRequest,
   ): Promise<ApiResponse<ClassTaskOverviewResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -74,7 +74,7 @@ export const classTaskProvider = {
 
   async getStudentClassTasks(
     classSlug: string,
-    params?: FilterClassTask
+    params?: FilterClassTask,
   ): Promise<ApiResponse<StudentClassTaskResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -97,7 +97,7 @@ export const classTaskProvider = {
 
   async getTeacherClassTasks(
     classSlug: string,
-    params?: FilterClassTask
+    params?: FilterClassTask,
   ): Promise<ApiResponse<TeacherClassTaskResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -120,11 +120,11 @@ export const classTaskProvider = {
 
   async getClassTaskDetail(
     classSlug: string,
-    taskSlug: string
+    taskSlug: string,
   ): Promise<ApiResponse<ClassTaskDetailResponseDto>> {
     try {
       const data = await getAxios(
-        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`
+        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}`,
       );
       return { isSuccess: true, data };
     } catch (error) {
@@ -134,20 +134,20 @@ export const classTaskProvider = {
 
   async getClassTaskWithQuestions(
     classSlug: string,
-    taskSlug: string
-  ): Promise<ApiResponse<ClassTaskWithQuestionsResponseDto>> {
+    taskSlug: string,
+  ): Promise<ApiResponse<ClassTaskWithQuestionsResponse>> {
     try {
       const data = await getAxios(
-        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}/attempt`
+        `${API_URL}/classes/${classSlug}/tasks/${taskSlug}/attempt`,
       );
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<ClassTaskWithQuestionsResponseDto>(error);
+      return handleAxiosError<ClassTaskWithQuestionsResponse>(error);
     }
   },
 
   async getClassTaskSummaryFromAttempt(
-    attemptId: string
+    attemptId: string,
   ): Promise<ApiResponse<ClassTaskSummaryResponseDto>> {
     try {
       const data = await getAxios(`${API_URL}/attempts/${attemptId}/summary`);
@@ -159,7 +159,7 @@ export const classTaskProvider = {
 
   async getAvailableClasses(
     taskId: string,
-    params?: FilterClassRequest
+    params?: FilterClassRequest,
   ): Promise<ApiResponse<AvailableClassesResponse[]>> {
     try {
       const query = new URLSearchParams();
@@ -177,7 +177,7 @@ export const classTaskProvider = {
   },
 
   async shareTaskIntoClasses(
-    payload: ShareTaskFormInputs
+    payload: ShareTaskFormInputs,
   ): Promise<ApiResponse<null>> {
     try {
       const res: BaseResponseDto = await postAxios(API_URL, payload);

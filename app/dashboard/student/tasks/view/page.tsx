@@ -109,7 +109,7 @@ const StudentTaskDetailPageContent = () => {
             type="primary"
             size="large"
             variant="primary"
-            className="!py-4 !px-6 !rounded-[1.5rem]"
+            className="py-4! px-6! rounded-3xl"
             onClick={handleNavigateToTaskAttemptPage}
           >
             <FontAwesomeIcon icon={faPlay} />

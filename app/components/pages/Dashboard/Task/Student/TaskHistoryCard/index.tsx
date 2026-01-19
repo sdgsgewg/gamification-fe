@@ -52,16 +52,18 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="flex-1 flex justify-between">
+      <div className="flex-1 flex justify-between gap-2">
         <div className="flex flex-col justify-between gap-1">
           <div className="flex flex-col gap-0.5">
-            <h4 className="text-lg font-bold text-start">{title}</h4>
+            <h4 className="text-lg font-bold text-start line-clamp-1">
+              {title}
+            </h4>
             <p className="text-dark text-sm font-medium">
               {getProgressText(attempt)}
             </p>
           </div>
           <div className="flex flex-col gap-0.5">
-            {getDeadlineText(attempt) !== "" && (
+            {attempt.deadline && (
               <p className="text-tx-tertiary text-xs font-medium flex items-center gap-1">
                 <FaClock className="w-3 h-3" />
                 <span>{getDeadlineText(attempt)}</span>
@@ -74,7 +76,7 @@ const TaskHistoryCard = ({ attempt, onClick }: TaskHistoryCardProps) => {
           </div>
         </div>
         <div className="flex items-start justify-start">
-          <Tag color={getStatusTagColor(modifiedStatus)} className="!m-0">
+          <Tag color={getStatusTagColor(modifiedStatus)} className="m-0!">
             <FontAwesomeIcon icon={getStatusIcon(modifiedStatus)} />
             <span className="ms-1">{getStatusText()}</span>
           </Tag>

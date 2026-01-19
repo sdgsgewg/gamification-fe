@@ -11,10 +11,10 @@ import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IF
 import { GroupedTaskAttemptResponse } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
 import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IMostPopularTaskResponse";
-import { ActivityTaskAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IActivityTaskAttemptResponse";
-import { ClassTaskAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IClassTaskAttemptResponse";
-import { ClassTaskStudentAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IClassTaskStudentAttemptResponse";
-import { ActivityTaskStudentAttemptResponse } from "../interface/task-attempts/responses/student-attempt/IActivityTaskStudentAttemptResponse";
+import { ActivityTaskAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IActivityTaskAttemptResponse";
+import { ClassTaskAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IClassTaskAttemptResponse";
+import { ClassTaskStudentAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IClassTaskStudentAttemptResponse";
+import { ActivityTaskStudentAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IActivityTaskStudentAttemptResponse";
 
 const API_URL = "/task-attempts";
 

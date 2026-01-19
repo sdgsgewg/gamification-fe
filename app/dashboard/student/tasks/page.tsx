@@ -58,7 +58,7 @@ const StudentTaskPage = () => {
 
   const handleNavigateToTaskDetailPage = (
     classSlug: string,
-    taskSlug: string
+    taskSlug: string,
   ) => {
     const query = new URLSearchParams({
       class: classSlug,
@@ -85,16 +85,16 @@ const StudentTaskPage = () => {
                   status: tab.key,
                 }))
               }
-              className={`relative flex items-center gap-2 !px-10 !py-1 !border-none !rounded-t-lg !rounded-b-none text-sm transition-all duration-150
+              className={`relative flex items-center gap-2 px-10! py-1! border-none! rounded-t-lg! rounded-b-none! text-sm transition-all duration-150
                 ${
                   filters.status === tab.key
-                    ? "!bg-primary !text-white"
-                    : "!bg-background hover:!bg-background-hover !text-dark"
+                    ? "bg-primary! text-white!"
+                    : "bg-background! hover:bg-background-hover! text-dark!"
                 }`}
             >
               <span>{tab.label}</span>
               {filters.status === tab.key && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-br-primary rounded-t-sm" />
+                <span className="absolute bottom-0 left-0 w-full h-0.75 bg-br-primary rounded-t-sm" />
               )}
             </Button>
           ))}
@@ -127,7 +127,7 @@ const StudentTaskPage = () => {
                     onClick={() =>
                       handleNavigateToTaskDetailPage(
                         attempt.class.slug,
-                        attempt.taskSlug
+                        attempt.taskSlug,
                       )
                     }
                   />

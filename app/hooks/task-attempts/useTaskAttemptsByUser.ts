@@ -10,6 +10,7 @@ export const useTaskAttemptsByUser = (values?: FilterTaskAttemptRequest) => {
     queryKey: ["task-attempts-by-user", values],
     queryFn: async () => {
       const res = await taskAttemptProvider.getTaskAttemptsByUser(values);
+
       return res.isSuccess && res.data ? res.data : [];
     },
     select: (data: GroupedTaskAttemptResponse[]) =>

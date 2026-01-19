@@ -7,6 +7,8 @@ import {
 import EmptyText from "@/app/components/shared/not-found/EmptyText";
 import { ClassTaskOverviewResponse } from "@/app/interface/class-tasks/responses/IClassTaskOverviewResponse";
 import DashboardSectionWrapper from "../Wrapper";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/app/constants/routes";
 
 interface PendingTaskSectionProps {
   data: ClassTaskOverviewResponse[];
@@ -14,6 +16,20 @@ interface PendingTaskSectionProps {
 }
 
 const PendingTaskSection = ({ data, isLoading }: PendingTaskSectionProps) => {
+  const router = useRouter();
+
+  const handleNavigateToTaskDetailPage = (
+    classSlug: string,
+    taskSlug: string,
+  ) => {
+    const query = new URLSearchParams({
+      class: classSlug,
+      task: taskSlug,
+    });
+
+    router.push(`${ROUTES.DASHBOARD.STUDENT.TASKS_VIEW}?${query.toString()}`);
+  };
+
   return (
     <DashboardSectionWrapper
       title="Pending Tasks"
@@ -28,7 +44,15 @@ const PendingTaskSection = ({ data, isLoading }: PendingTaskSectionProps) => {
       ) : data && data.length > 0 ? (
         <PendingTaskCardWrapper>
           {data.map((task) => {
-            return <PendingTaskCard key={task.id} task={task} />;
+            return (
+              <PendingTaskCard
+                key={task.id}
+                task={task}
+                onClick={() =>
+                  handleNavigateToTaskDetailPage(task.class.slug, task.taskSlug)
+                }
+              />
+            );
           })}
         </PendingTaskCardWrapper>
       ) : (

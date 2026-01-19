@@ -1,7 +1,7 @@
 "use client";
 
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
-import { ActivityTaskStudentAttemptResponse } from "@/app/interface/task-attempts/responses/student-attempt/IActivityTaskStudentAttemptResponse";
+import { ActivityTaskStudentAttemptResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IActivityTaskStudentAttemptResponse";
 import { useQuery } from "@tanstack/react-query";
 
 export const useStudentAttemptsFromActivityTask = (taskSlug: string) => {
@@ -19,5 +19,6 @@ export const useStudentAttemptsFromActivityTask = (taskSlug: string) => {
 
       return data;
     },
+    enabled: Boolean(taskSlug),
   });
 };

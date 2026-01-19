@@ -1,7 +1,7 @@
 "use client";
 
 import { taskAttemptProvider } from "@/app/functions/TaskAttemptProvider";
-import { ActivityTaskAttemptResponse } from "@/app/interface/task-attempts/responses/student-attempt/IActivityTaskAttemptResponse";
+import { ActivityTaskAttemptResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IActivityTaskAttemptResponse";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTaskAttemptsFromActivityPage = () => {

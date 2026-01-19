@@ -164,7 +164,7 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     yField: "averageScore",
 
     smooth: true,
-    
+
     point: {
       size: 5,
       shape: "circle",
@@ -189,22 +189,11 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     },
 
     tooltip: {
-      customContent: (title: string, items: any[]) => {
-        if (!items || items.length === 0) return null;
-
-        const item = items[0];
-
-        return `
-      <div style="padding: 8px;">
-        <div style="font-weight: 600; margin-bottom: 4px;">
-          ${title}
-        </div>
-        <div>
-          Average Score: <b>${Number(item.value).toFixed(2)}</b>
-        </div>
-      </div>
-    `;
-      },
+      title: "Attempt",
+      formatter: (datum: any) => ({
+        name: "Score",
+        value: datum.score,
+      }),
     },
 
     height: 260,

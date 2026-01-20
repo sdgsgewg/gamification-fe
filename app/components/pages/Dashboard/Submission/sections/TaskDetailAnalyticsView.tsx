@@ -12,9 +12,9 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
-import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
+import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import StudentAttemptAnalyticsModal from "../../../../modals/StudentAttemptAnalyticsModal";
-import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
+import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IAttemptAnalyticsResponse";
 import { Line } from "@ant-design/plots";
 
 export interface DetailTaskItem {

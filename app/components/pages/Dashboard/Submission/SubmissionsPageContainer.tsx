@@ -11,8 +11,9 @@ import OverviewTaskList, {
 import TaskDetailAnalyticsView from "@/app/components/pages/Dashboard/Submission/sections/TaskDetailAnalyticsView";
 import FilterBar from "@/app/components/shared/FilterBar";
 import { SubmissionOverviewScope } from "@/app/types/SubmissionOverviewScope";
-import { useStudentAttemptsFromClassTask } from "@/app/hooks/task-attempts/useStudentAttemptsFromClassTask";
-import { useStudentAttemptsFromActivityTask } from "@/app/hooks/task-attempts/useStudentAttemptsFromActivityTask";
+import { useTaskAttemptDetailAnalytics } from "@/app/hooks/task-attempts/useTaskAttemptDetailAnalytics";
+import { FilterTaskAttemptAnalyticsRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
+import { TaskAttemptScope } from "@/app/enums/TaskAttemptScope";
 
 export interface SubmissionPageConfig {
   scopes: { value: SubmissionOverviewScope; label: string }[];
@@ -52,10 +53,21 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
     setTaskSlug(searchParams.get("task") ?? "");
   }, [searchParams]);
 
-  const isDetailView = Boolean(classSlug && taskSlug);
+  const isDetailView = Boolean(classSlug || taskSlug);
 
-  const classDetail = useStudentAttemptsFromClassTask(classSlug, taskSlug);
-  const activityDetail = useStudentAttemptsFromActivityTask(taskSlug);
+  const [filters, setFilters] = useState<FilterTaskAttemptAnalyticsRequest>({
+    searchText: "",
+    scope: TaskAttemptScope.CLASS,
+  });
+
+  const classDetail = useTaskAttemptDetailAnalytics(taskSlug, classSlug, {
+    ...filters,
+    scope: TaskAttemptScope.CLASS,
+  });
+  const activityDetail = useTaskAttemptDetailAnalytics(taskSlug, undefined, {
+    ...filters,
+    scope: TaskAttemptScope.ACTIVITY,
+  });
 
   const overviewState = config.overview[scope];
   const detailState = scope === "class" ? classDetail : activityDetail;

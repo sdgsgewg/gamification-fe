@@ -3,7 +3,7 @@
 import React from "react";
 import { Modal, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
+import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,

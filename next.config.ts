@@ -2,9 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "acctihmbqsiftxmlcygv.supabase.co",
-    ],
+    domains: ["acctihmbqsiftxmlcygv.supabase.co"],
   },
   // Abaikan error TypeScript saat build
   typescript: {
@@ -14,6 +12,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

@@ -11,10 +11,9 @@ import { FilterTaskAttemptRequest } from "../interface/task-attempts/requests/IF
 import { GroupedTaskAttemptResponse } from "../interface/task-attempts/responses/IGroupedTaskAttemptResponse";
 import { TaskAttemptDetailResponse } from "../interface/task-attempts/responses/ITaskAttemptDetailResponse";
 import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IMostPopularTaskResponse";
-import { ActivityTaskAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IActivityTaskAttemptResponse";
-import { ClassTaskAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IClassTaskAttemptResponse";
-import { ClassTaskStudentAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IClassTaskStudentAttemptResponse";
-import { ActivityTaskStudentAttemptResponse } from "../interface/task-attempts/responses/attempt-analytics/IActivityTaskStudentAttemptResponse";
+import { FilterTaskAttemptAnalyticsRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
+import { TaskAttemptAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
+import { TaskAttemptDetailAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/ITaskAttemptDetailAnalyticsResponse";
 
 const API_URL = "/task-attempts";
 
@@ -64,48 +63,48 @@ export const taskAttemptProvider = {
     }
   },
 
-  async getAllTaskAttemptsFromClass(): Promise<
-    ApiResponse<ClassTaskAttemptResponse[]>
-  > {
+  async getAllTaskAttemptsAnalytics(
+    params?: FilterTaskAttemptAnalyticsRequest,
+  ): Promise<ApiResponse<TaskAttemptAnalyticsResponse[]>> {
     try {
-      const data = await getAxios(`${API_URL}/class`);
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.scope) query.append("scope", params.scope);
+
+      console.log("Constructed query params:", query.toString());
+
+      const url = query.toString()
+        ? `${API_URL}/analytics?${query}`
+        : `${API_URL}/analytics`;
+
+      const data = await getAxios(url);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<ClassTaskAttemptResponse[]>(error);
+      return handleAxiosError<TaskAttemptAnalyticsResponse[]>(error);
     }
   },
 
-  async getAllTaskAttemptsFromActivityPage(): Promise<
-    ApiResponse<ActivityTaskAttemptResponse[]>
-  > {
-    try {
-      const data = await getAxios(`${API_URL}/activity`);
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<ActivityTaskAttemptResponse[]>(error);
-    }
-  },
-
-  async getStudentAttemptsFromClassTask(
-    classSlug: string,
+  async getTaskAttemptDetailAnalytics(
     taskSlug: string,
-  ): Promise<ApiResponse<ClassTaskStudentAttemptResponse>> {
+    classSlug?: string,
+    params?: FilterTaskAttemptAnalyticsRequest,
+  ): Promise<ApiResponse<TaskAttemptDetailAnalyticsResponse>> {
     try {
-      const data = await getAxios(`${API_URL}/class/${classSlug}/${taskSlug}`);
-      return { isSuccess: true, data };
-    } catch (error) {
-      return handleAxiosError<ClassTaskStudentAttemptResponse>(error);
-    }
-  },
+      const query = new URLSearchParams();
 
-  async getStudentAttemptsFromActivityTask(
-    taskSlug: string,
-  ): Promise<ApiResponse<ActivityTaskStudentAttemptResponse>> {
-    try {
-      const data = await getAxios(`${API_URL}/activity/${taskSlug}`);
+      if (params?.scope) query.append("scope", params.scope);
+
+      const slugUrl = classSlug ? `${classSlug}/${taskSlug}` : `${taskSlug}`;
+
+      const url = query.toString()
+        ? `${API_URL}/analytics/${slugUrl}?${query}`
+        : `${API_URL}/analytics/${slugUrl}`;
+
+      const data = await getAxios(url);
       return { isSuccess: true, data };
     } catch (error) {
-      return handleAxiosError<ActivityTaskStudentAttemptResponse>(error);
+      return handleAxiosError<TaskAttemptDetailAnalyticsResponse>(error);
     }
   },
 

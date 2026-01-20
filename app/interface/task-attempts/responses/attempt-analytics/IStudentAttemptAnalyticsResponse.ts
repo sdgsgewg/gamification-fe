@@ -1,7 +1,7 @@
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 import { StudentAttemptDetailResponse } from "./IStudentAttemptDetailResponse";
 
-export interface StudentTaskAttemptAnalyticsResponse {
+export interface StudentAttemptAnalyticsResponse {
   studentId: string;
   studentName: string;
 

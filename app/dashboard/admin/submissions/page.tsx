@@ -1,14 +1,23 @@
 "use client";
 
 import SubmissionPage from "@/app/components/pages/Dashboard/Submission/SubmissionsPageContainer";
-import { useTaskAttemptsFromActivityPage } from "@/app/hooks/task-attempts/useTaskAttemptsFromActivityPage";
-import { useStudentAttemptsFromActivityTask } from "@/app/hooks/task-attempts/useStudentAttemptsFromActivityTask";
+import { TaskAttemptScope } from "@/app/enums/TaskAttemptScope";
+import { useTaskAttemptsAnalytics } from "@/app/hooks/task-attempts/useTaskAttemptsAnalytics";
+import { FilterTaskAttemptAnalyticsRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
+import { useState } from "react";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminSubmissionPage() {
-  const activityOverview = useTaskAttemptsFromActivityPage();
-  const activityDetail = useStudentAttemptsFromActivityTask("");
+  const [filters, setFilters] = useState<FilterTaskAttemptAnalyticsRequest>({
+    searchText: "",
+    scope: TaskAttemptScope.CLASS,
+  });
+
+  const activityOverview = useTaskAttemptsAnalytics({
+    ...filters,
+    scope: TaskAttemptScope.ACTIVITY,
+  });
 
   return (
     <SubmissionPage
@@ -21,15 +30,6 @@ export default function AdminSubmissionPage() {
             isLoading: activityOverview.isLoading,
           },
         },
-
-        detail: {
-          activity: {
-            data: activityDetail.data,
-            isLoading: activityDetail.isLoading,
-          },
-        },
-
-        resolveIsDetailView: ({ taskSlug }) => Boolean(taskSlug),
       }}
     />
   );

@@ -14,6 +14,10 @@ import { MostPopularTaskResponse } from "../interface/task-attempts/responses/IM
 import { FilterTaskAttemptAnalyticsRequest } from "../interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
 import { TaskAttemptAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
 import { TaskAttemptDetailAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/ITaskAttemptDetailAnalyticsResponse";
+import { StudentTaskAttemptAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
+import { StudentTaskAttemptDetailAnalyticsResponse } from "../interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptDetailAnalyticsResponse";
+import { StudentAttemptDetailResponse } from "../interface/task-attempts/responses/attempt-analytics/IStudentAttemptDetailResponse";
+import { FilterStudentRecentAttemptRequest } from "../interface/task-attempts/requests/IFilterStudentRecentAttemptRequest";
 
 const API_URL = "/task-attempts";
 
@@ -63,6 +67,25 @@ export const taskAttemptProvider = {
     }
   },
 
+  async getStudentRecentAttempts(
+    params?: FilterStudentRecentAttemptRequest,
+  ): Promise<ApiResponse<StudentAttemptDetailResponse[]>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.classSlug) query.append("classSlug", params.classSlug);
+      if (params?.taskSlug) query.append("taskSlug", params.taskSlug);
+
+      const baseUrl = `${API_URL}/recent-attempts`;
+      const url = query.toString() ? `${baseUrl}?${query}` : baseUrl;
+
+      const data = await getAxios(url);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<StudentAttemptDetailResponse[]>(error);
+    }
+  },
+
   async getAllTaskAttemptsAnalytics(
     params?: FilterTaskAttemptAnalyticsRequest,
   ): Promise<ApiResponse<TaskAttemptAnalyticsResponse[]>> {
@@ -105,6 +128,51 @@ export const taskAttemptProvider = {
       return { isSuccess: true, data };
     } catch (error) {
       return handleAxiosError<TaskAttemptDetailAnalyticsResponse>(error);
+    }
+  },
+
+  async getStudentTaskAttemptsAnalytics(
+    params?: FilterTaskAttemptAnalyticsRequest,
+  ): Promise<ApiResponse<StudentTaskAttemptAnalyticsResponse[]>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.searchText) query.append("searchText", params.searchText);
+      if (params?.scope) query.append("scope", params.scope);
+
+      console.log("Constructed query params:", query.toString());
+
+      const url = query.toString()
+        ? `${API_URL}/analytics/student?${query}`
+        : `${API_URL}/analytics/student`;
+
+      const data = await getAxios(url);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<StudentTaskAttemptAnalyticsResponse[]>(error);
+    }
+  },
+
+  async getStudentTaskAttemptDetailAnalytics(
+    taskSlug: string,
+    classSlug?: string,
+    params?: FilterTaskAttemptAnalyticsRequest,
+  ): Promise<ApiResponse<StudentTaskAttemptDetailAnalyticsResponse>> {
+    try {
+      const query = new URLSearchParams();
+
+      if (params?.scope) query.append("scope", params.scope);
+
+      const slugUrl = classSlug ? `${classSlug}/${taskSlug}` : `${taskSlug}`;
+
+      const url = query.toString()
+        ? `${API_URL}/analytics/student/${slugUrl}?${query}`
+        : `${API_URL}/analytics/student/${slugUrl}`;
+
+      const data = await getAxios(url);
+      return { isSuccess: true, data };
+    } catch (error) {
+      return handleAxiosError<StudentTaskAttemptDetailAnalyticsResponse>(error);
     }
   },
 

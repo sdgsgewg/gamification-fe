@@ -35,6 +35,7 @@ export const ROUTES = {
       TASKS: "/dashboard/student/tasks",
       TASKS_VIEW: "/dashboard/student/tasks/view",
       TASKS_ATTEMPT: "/dashboard/student/tasks/attempt",
+      SUBMISSIONS: "/dashboard/student/submissions",
     },
 
     // 👨‍🏫 Teacher

@@ -24,8 +24,12 @@ import {
 } from "@/app/enums/TaskAttemptStatus";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContentView";
-import { AttemptCard, AttemptCardWrapper } from "@/app/components/shared/cards";
 import TaskDetailPageBottomContentWrapper from "@/app/components/shared/detail-page/TaskDetailPageBottomContentWrapper";
+import StudentAttemptView from "@/app/components/shared/attempt/StudentAttemptView";
+import { useStudentRecentAttempts } from "@/app/hooks/task-attempts/useStudentRecentAttempts";
+import AttemptRowActions from "@/app/components/shared/table/AttemptRowActions";
+import { ColumnsType } from "antd/es/table";
+import { StudentAttemptDetailResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptDetailResponse";
 
 export const dynamic = "force-dynamic";
 
@@ -142,7 +146,12 @@ const StudentTaskDetailPageContent = () => {
   const BottomContent = () => {
     const [view, setView] = useState<TaskDetailBottomContentView>("duration");
 
-    const { duration, currAttempt, recentAttempts } = classTaskData;
+    const { duration, currAttempt } = classTaskData;
+
+    const { data: recentAttempts } = useStudentRecentAttempts({
+      classSlug,
+      taskSlug,
+    });
 
     const showCurrAttempt =
       currAttempt !== null && recentAttempts?.length === 0;
@@ -198,25 +207,29 @@ const StudentTaskDetailPageContent = () => {
 
       const handleNavigateToReviewPage = (attemptId: string) => {
         router.push(
-          `${ROUTES.DASHBOARD.STUDENT.TASKS}/attempts/${attemptId}/summary`
+          `${ROUTES.DASHBOARD.STUDENT.TASKS}/attempts/${attemptId}/summary`,
         );
       };
 
-      return (
-        <AttemptCardWrapper>
-          {recentAttempts.map((attempt, index) => (
-            <AttemptCard
-              key={index}
-              index={index}
-              id={attempt.id}
-              startedAt={attempt.startedAt}
-              completedAt={attempt.completedAt}
-              duration={attempt.duration}
-              status={attempt.status}
-              onClick={handleNavigateToReviewPage}
+      const actionColumns: ColumnsType<StudentAttemptDetailResponse> = [
+        {
+          title: "Actions",
+          key: "actions",
+          align: "center",
+          render: (_, record) => (
+            <AttemptRowActions
+              record={record}
+              onView={() => handleNavigateToReviewPage(record.attemptId)}
             />
-          ))}
-        </AttemptCardWrapper>
+          ),
+        },
+      ];
+
+      return (
+        <StudentAttemptView
+          attempts={recentAttempts}
+          actionColumns={actionColumns}
+        />
       );
     };
 

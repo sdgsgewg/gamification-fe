@@ -3,17 +3,18 @@
 import React from "react";
 import { Modal, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
+import { StudentAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
 import { Bar } from "@ant-design/plots";
+import { StatCard } from "../pages/Dashboard/Submission/Cards";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  student: StudentTaskAttemptAnalyticsResponse | null;
+  student: StudentAttemptAnalyticsResponse | null;
 };
 
 const StudentAttemptAnalyticsModal: React.FC<Props> = ({
@@ -31,8 +32,6 @@ const StudentAttemptAnalyticsModal: React.FC<Props> = ({
     score: a.score,
     isBest: a.score === bestScore,
   }));
-
-  const attempts = chartData.map((d) => d.attempt);
 
   const chartConfig = {
     data: chartData,
@@ -127,10 +126,13 @@ const StudentAttemptAnalyticsModal: React.FC<Props> = ({
     >
       {/* ===== SUMMARY ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat label="Total Attempts" value={student.totalAttempts} />
-        <Stat label="First Score" value={student.firstAttemptScore ?? "-"} />
-        <Stat label="Last Score" value={student.lastAttemptScore ?? "-"} />
-        <Stat label="Best Score" value={bestScore} />
+        <StatCard label="Total Attempts" value={student.totalAttempts} />
+        <StatCard
+          label="First Score"
+          value={student.firstAttemptScore ?? "-"}
+        />
+        <StatCard label="Last Score" value={student.lastAttemptScore ?? "-"} />
+        <StatCard label="Best Score" value={bestScore} />
       </div>
 
       {/* ===== CHART ===== */}
@@ -149,12 +151,5 @@ const StudentAttemptAnalyticsModal: React.FC<Props> = ({
     </Modal>
   );
 };
-
-const Stat = ({ label, value }: { label: string; value: any }) => (
-  <div className="rounded-lg bg-background p-3 text-center border">
-    <p className="text-sm text-tx-secondary">{label}</p>
-    <p className="text-xl font-semibold">{value}</p>
-  </div>
-);
 
 export default StudentAttemptAnalyticsModal;

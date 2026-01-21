@@ -61,7 +61,10 @@ const StudentTaskSummaryPageContent = () => {
   if (!classTaskSummaryData) return <Loading />;
 
   const handleBack = () => {
-    router.push(ROUTES.DASHBOARD.STUDENT.TASKS);
+    if (router.back.name.includes(ROUTES.DASHBOARD.STUDENT.TASKS_ATTEMPT))
+      router.push(ROUTES.DASHBOARD.STUDENT.TASKS);
+
+    router.back();
   };
 
   const LeftSideContent = () => {

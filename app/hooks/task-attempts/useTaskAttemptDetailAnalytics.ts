@@ -11,7 +11,7 @@ export const useTaskAttemptDetailAnalytics = (
   values?: FilterTaskAttemptAnalyticsRequest,
 ) => {
   return useQuery({
-    queryKey: ["student-attempts-from-class-task", classSlug, taskSlug, values],
+    queryKey: ["task-attempt-detail-analytics", classSlug, taskSlug, values],
     queryFn: async () => {
       const res = await taskAttemptProvider.getTaskAttemptDetailAnalytics(
         taskSlug,

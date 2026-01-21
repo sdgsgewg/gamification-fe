@@ -5,3 +5,6 @@ export { default as TaskSubmissionCardSkeleton } from "./TaskSubmissionCard/Skel
 
 // Review Task Question Card
 export { default as ReviewTaskQuestionCard } from "./ReviewTaskQuestionCard";
+
+// Task Submission Stat Card
+export { default as StatCard } from "./StatCard";

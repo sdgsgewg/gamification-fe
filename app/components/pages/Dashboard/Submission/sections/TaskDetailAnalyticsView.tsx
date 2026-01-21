@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import DataTable from "@/app/components/shared/table/Table";
-
 import { Tag } from "antd";
 import RowActions from "@/app/components/shared/table/RowActions";
 import { useRouter } from "next/navigation";
@@ -12,32 +11,14 @@ import {
   TaskAttemptStatus,
   TaskAttemptStatusLabels,
 } from "@/app/enums/TaskAttemptStatus";
-import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import StudentAttemptAnalyticsModal from "../../../../modals/StudentAttemptAnalyticsModal";
-import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IAttemptAnalyticsResponse";
 import { Line } from "@ant-design/plots";
-
-export interface DetailTaskItem {
-  task: {
-    title: string;
-    slug: string;
-  };
-
-  averageScoreAllStudents: number;
-  averageAttempts: number;
-
-  attempts: TaskAttemptAnalyticsResponse[];
-
-  students: StudentTaskAttemptAnalyticsResponse[];
-
-  /** Hanya ada di class scope */
-  class?: {
-    name: string;
-  };
-}
+import { TaskAttemptDetailAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptDetailAnalyticsResponse";
+import { StudentAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
+import ChartWrapper from "../ChartWrapper";
 
 type Props = {
-  data: DetailTaskItem;
+  data: TaskAttemptDetailAnalyticsResponse;
 };
 
 const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
@@ -45,9 +26,9 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
   const baseRoute = ROUTES.DASHBOARD.TEACHER.SUBMISSIONS;
 
   const [selectedStudent, setSelectedStudent] =
-    useState<StudentTaskAttemptAnalyticsResponse | null>(null);
+    useState<StudentAttemptAnalyticsResponse | null>(null);
 
-  const handleView = (student: StudentTaskAttemptAnalyticsResponse) => {
+  const handleView = (student: StudentAttemptAnalyticsResponse) => {
     setSelectedStudent(student);
   };
 
@@ -55,7 +36,7 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     router.push(`${baseRoute}/${submissionId}`);
   };
 
-  const columns: ColumnType<StudentTaskAttemptAnalyticsResponse>[] = [
+  const columns: ColumnType<StudentAttemptAnalyticsResponse>[] = [
     {
       title: "Student",
       dataIndex: "studentName",
@@ -220,12 +201,12 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
 
       {/* ===== AVERAGE ATTEMPT CHART ===== */}
       {averageAttemptChartData.length > 0 && (
-        <div className="rounded-xl border bg-surface p-4 shadow-sm">
-          <h3 className="text-md font-semibold mb-4">
-            Average Score per Attempt
-          </h3>
+        <ChartWrapper
+          title="Average Scre per Attempt"
+          description="This chart shows the average score distribution of all students per attempts"
+        >
           <Line {...averageAttemptChartConfig} />
-        </div>
+        </ChartWrapper>
       )}
 
       {/* ===== TABLE ===== */}

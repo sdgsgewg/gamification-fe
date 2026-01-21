@@ -30,7 +30,11 @@ import { TaskDetailBottomContentView } from "@/app/types/TaskDetailBottomContent
 import NotFound from "@/app/components/shared/not-found/NotFound";
 import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
 import { Role } from "@/app/enums/Role";
-import { AttemptCard, AttemptCardWrapper } from "@/app/components/shared/cards";
+import { ColumnsType } from "antd/es/table";
+import { StudentAttemptDetailResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptDetailResponse";
+import AttemptRowActions from "@/app/components/shared/table/AttemptRowActions";
+import StudentAttemptView from "@/app/components/shared/attempt/StudentAttemptView";
+import { useStudentRecentAttempts } from "@/app/hooks/task-attempts/useStudentRecentAttempts";
 
 const ActivityDetailPage = () => {
   const params = useParams<{ slug: string }>();
@@ -47,7 +51,7 @@ const ActivityDetailPage = () => {
     materialId: activityData?.taskDetail.material?.id,
   });
   const filteredSimilarActivities = similarActivities.filter(
-    (activity) => activity.slug !== params.slug
+    (activity) => activity.slug !== params.slug,
   );
 
   const handleNavigateToActivityAttemptPage = () => {
@@ -107,7 +111,7 @@ const ActivityDetailPage = () => {
             type="primary"
             size="large"
             variant="primary"
-            className="!py-4 !px-6 !rounded-[1.5rem]"
+            className="py-4! px-6! rounded-3xl"
             onClick={handleNavigateToActivityAttemptPage}
           >
             <FontAwesomeIcon icon={faPlay} />
@@ -141,7 +145,11 @@ const ActivityDetailPage = () => {
     const [view, setView] =
       useState<TaskDetailBottomContentView>("similar-activities");
 
-    const { duration, currAttempt, recentAttempts } = activityData;
+    const { data: recentAttempts } = useStudentRecentAttempts({
+      taskSlug: params.slug,
+    });
+
+    const { duration, currAttempt } = activityData;
 
     const hasDuration = duration && duration.startTime && duration.endTime;
     const showCurrAttempt =
@@ -228,21 +236,25 @@ const ActivityDetailPage = () => {
         router.push(`${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`);
       };
 
-      return (
-        <AttemptCardWrapper>
-          {recentAttempts.map((attempt, index) => (
-            <AttemptCard
-              key={index}
-              index={index}
-              id={attempt.id}
-              startedAt={attempt.startedAt}
-              completedAt={attempt.completedAt}
-              duration={attempt.duration}
-              status={attempt.status}
-              onClick={handleNavigateToReviewPage}
+      const actionColumns: ColumnsType<StudentAttemptDetailResponse> = [
+        {
+          title: "Actions",
+          key: "actions",
+          align: "center",
+          render: (_, record) => (
+            <AttemptRowActions
+              record={record}
+              onView={() => handleNavigateToReviewPage(record.attemptId)}
             />
-          ))}
-        </AttemptCardWrapper>
+          ),
+        },
+      ];
+
+      return (
+        <StudentAttemptView
+          attempts={recentAttempts}
+          actionColumns={actionColumns}
+        />
       );
     };
 

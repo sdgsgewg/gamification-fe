@@ -8,7 +8,7 @@ import { useState } from "react";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminSubmissionPage() {
+export default function AdminAnalyticsPage() {
   const [filters, setFilters] = useState<FilterTaskAttemptAnalyticsRequest>({
     searchText: "",
     scope: TaskAttemptScope.CLASS,

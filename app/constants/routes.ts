@@ -36,6 +36,7 @@ export const ROUTES = {
       TASKS_VIEW: "/dashboard/student/tasks/view",
       TASKS_ATTEMPT: "/dashboard/student/tasks/attempt",
       SUBMISSIONS: "/dashboard/student/submissions",
+      ANALYTICS: "/dashboard/student/analytics",
     },
 
     // 👨‍🏫 Teacher
@@ -45,6 +46,7 @@ export const ROUTES = {
       CLASS: "/dashboard/teacher/class",
       TASKS: "/dashboard/teacher/tasks",
       SUBMISSIONS: "/dashboard/teacher/submissions",
+      ANALYTICS: "/dashboard/teacher/analytics",
     },
 
     // 🧑‍💼 Admin
@@ -56,6 +58,7 @@ export const ROUTES = {
       MANAGE_TASKS: "/dashboard/admin/manage-tasks",
       MANAGE_TASK_TYPES: "/dashboard/admin/manage-task-types",
       MANAGE_MINI_GAMES: "/dashboard/admin/manage-mini-games",
+      ANALYTICS: "/dashboard/admin/analytics",
     },
   },
 };

@@ -1,29 +1,29 @@
 "use client";
 
-import StudentSubmissionPage from "@/app/components/pages/Dashboard/Submission/StudentSubmissionPageContainer";
+import SubmissionPage from "@/app/components/pages/Dashboard/Submission/SubmissionsPageContainer";
 import { TaskAttemptScope } from "@/app/enums/TaskAttemptScope";
-import { useStudentTaskAttemptsAnalytics } from "@/app/hooks/task-attempts/useStudentTaskAttemptAnalytics";
+import { useTaskAttemptsAnalytics } from "@/app/hooks/task-attempts/useTaskAttemptsAnalytics";
 import { FilterTaskAttemptAnalyticsRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
 import { useState } from "react";
 
-export default function StudSubmissionPage() {
+export default function TeacherAnalyticsPage() {
   const [filters, setFilters] = useState<FilterTaskAttemptAnalyticsRequest>({
     searchText: "",
     scope: TaskAttemptScope.CLASS,
   });
 
-  const classOverview = useStudentTaskAttemptsAnalytics({
+  const classOverview = useTaskAttemptsAnalytics({
     ...filters,
     scope: TaskAttemptScope.CLASS,
   });
 
-  const activityOverview = useStudentTaskAttemptsAnalytics({
+  const activityOverview = useTaskAttemptsAnalytics({
     ...filters,
     scope: TaskAttemptScope.ACTIVITY,
   });
 
   return (
-    <StudentSubmissionPage
+    <SubmissionPage
       config={{
         scopes: [
           { value: "class", label: "Class Tasks" },

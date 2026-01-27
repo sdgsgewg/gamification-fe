@@ -103,11 +103,14 @@ const StudentTaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     );
   };
 
-  const handleNavigatetoAttemptPage = (classSlug: string, taskSlug: string) => {
+  const handleNavigatetoAttemptPage = (
+    taskSlug: string,
+    classSlug?: string,
+  ) => {
     const query = new URLSearchParams();
     let url = "";
 
-    if (classSlug !== "") {
+    if (classSlug) {
       query.append("class", classSlug);
       query.append("task", taskSlug);
       url = `${ROUTES.DASHBOARD.STUDENT.TASKS_ATTEMPT}?${query}`;
@@ -128,7 +131,7 @@ const StudentTaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
           record={record}
           onView={() => handleNavigateToReviewPage(record.attemptId)}
           onAttempt={() =>
-            handleNavigatetoAttemptPage(record.classSlug, record.taskSlug)
+            handleNavigatetoAttemptPage(record.task.slug, record.class?.slug)
           }
         />
       ),

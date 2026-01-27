@@ -123,11 +123,11 @@ export const HistoryTable = ({
       {/* Isi */}
       <DateRow label="Created By" value={createdBy} />
       <DateRow label="Last Updated" value={updatedBy ?? ""} />
-      {publishedAt && (
-        <DateRow label="Published At" value={publishedAt ?? ""} />
-      )}
       {finalizedAt && (
         <DateRow label="Finalized At" value={finalizedAt ?? ""} />
+      )}
+      {publishedAt && (
+        <DateRow label="Published At" value={publishedAt ?? ""} />
       )}
       {archivedAt && <DateRow label="Archived At" value={archivedAt ?? ""} />}
     </TableWrapper>

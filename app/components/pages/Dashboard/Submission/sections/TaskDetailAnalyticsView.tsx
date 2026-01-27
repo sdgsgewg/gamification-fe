@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import DataTable from "@/app/components/shared/table/Table";
 import { Tag } from "antd";
-import RowActions from "@/app/components/shared/table/RowActions";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
 import { ColumnType } from "antd/es/table";
@@ -16,6 +15,7 @@ import { Line } from "@ant-design/plots";
 import { TaskAttemptDetailAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptDetailAnalyticsResponse";
 import { StudentAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import ChartWrapper from "../ChartWrapper";
+import SubmissionRowActions from "@/app/components/shared/table/SubmissionRowActions";
 
 type Props = {
   data: TaskAttemptDetailAnalyticsResponse;
@@ -120,7 +120,8 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
       key: "actions",
       align: "center",
       render: (_, record) => (
-        <RowActions
+        <SubmissionRowActions
+          record={record}
           onView={() => handleView(record)}
           onGrade={
             record.latestSubmissionId

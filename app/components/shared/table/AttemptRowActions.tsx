@@ -1,6 +1,5 @@
 import React from "react";
 import { Space } from "antd";
-
 import Button, { ButtonVariant } from "../Button";
 import { TaskAttemptStatus } from "@/app/enums/TaskAttemptStatus";
 import { StudentAttemptDetailResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptDetailResponse";
@@ -26,7 +25,7 @@ const AttemptRowActionButton: React.FC<AttemptRowActionButtonProps> = ({
 interface AttemptRowActionsProps {
   record: StudentAttemptDetailResponse;
   onView?: (attemptId: string) => void;
-  onAttempt?: (classSlug: string, taskSlug: string) => void;
+  onAttempt?: (taskSlug: string, classSlug?: string) => void;
   onGrade?: (attemptId: string) => void;
 }
 
@@ -76,7 +75,9 @@ const AttemptRowActions: React.FC<AttemptRowActionsProps> = ({
         ) && (
           <AttemptRowActionButton
             variant="view"
-            onClick={() => onAttempt(record.classSlug, record.taskSlug)}
+            onClick={() =>
+              onAttempt(record.class?.slug ?? "", record.task.slug)
+            }
           >
             {getText()}
           </AttemptRowActionButton>

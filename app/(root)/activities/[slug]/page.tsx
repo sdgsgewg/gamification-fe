@@ -50,6 +50,10 @@ const ActivityDetailPage = () => {
     subjectId: activityData?.taskDetail.subject?.id,
     materialId: activityData?.taskDetail.material?.id,
   });
+  const { data: recentAttempts } = useStudentRecentAttempts({
+    taskSlug: params.slug,
+  });
+
   const filteredSimilarActivities = similarActivities.filter(
     (activity) => activity.slug !== params.slug,
   );
@@ -63,7 +67,7 @@ const ActivityDetailPage = () => {
   }
 
   const LeftSideContent = () => {
-    const { currAttempt, recentAttempts } = activityData;
+    const { currAttempt } = activityData;
     const { title, image, description, questionCount, type, createdBy } =
       activityData.taskDetail;
 
@@ -144,10 +148,6 @@ const ActivityDetailPage = () => {
   const BottomContent = () => {
     const [view, setView] =
       useState<TaskDetailBottomContentView>("similar-activities");
-
-    const { data: recentAttempts } = useStudentRecentAttempts({
-      taskSlug: params.slug,
-    });
 
     const { duration, currAttempt } = activityData;
 
@@ -232,7 +232,17 @@ const ActivityDetailPage = () => {
     const AttemptsView = () => {
       if (!hasRecentAttempts) return null;
 
-      const handleNavigateToReviewPage = (attemptId: string) => {
+      const handleNavigateToReviewPage = (
+        attemptId: string,
+        classSlug?: string,
+      ) => {
+        if (classSlug) {
+          router.push(
+            `${ROUTES.DASHBOARD.STUDENT.TASKS}/attempts/${attemptId}/summary`,
+          );
+          return;
+        }
+
         router.push(`${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`);
       };
 
@@ -241,10 +251,16 @@ const ActivityDetailPage = () => {
           title: "Actions",
           key: "actions",
           align: "center",
+          width: 100,
+          onCell: () => ({
+            style: { minWidth: 100 },
+          }),
           render: (_, record) => (
             <AttemptRowActions
               record={record}
-              onView={() => handleNavigateToReviewPage(record.attemptId)}
+              onView={() =>
+                handleNavigateToReviewPage(record.attemptId, record.class?.slug)
+              }
             />
           ),
         },

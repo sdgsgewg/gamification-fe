@@ -15,7 +15,6 @@ export const useTaskAttemptsAnalytics = (
       values?.searchText ?? "",
     ],
     queryFn: async () => {
-      console.log("Fetching task attempts analytics with values:", values);
       const res = await taskAttemptProvider.getAllTaskAttemptsAnalytics(values);
       return res.isSuccess && res.data ? res.data : [];
     },

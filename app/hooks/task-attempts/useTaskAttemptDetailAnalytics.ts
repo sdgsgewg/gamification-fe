@@ -18,6 +18,7 @@ export const useTaskAttemptDetailAnalytics = (
         classSlug,
         values,
       );
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail data percobaan tugas.");
 

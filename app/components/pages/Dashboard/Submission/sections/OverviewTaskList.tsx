@@ -3,30 +3,10 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
-
-export interface OverviewTaskItem {
-  task: {
-    title: string;
-    slug: string;
-    isRepeatable: boolean;
-  };
-
-  studentsCompleted: number;
-  avgScoreLatestAttempt: number;
-
-  /** Hanya ada di class scope */
-  totalStudents?: number;
-
-  class?: {
-    name: string;
-    slug: string;
-  };
-
-  deadline?: string;
-}
+import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
 
 type Props = {
-  data: OverviewTaskItem[];
+  data: TaskAttemptAnalyticsResponse[];
 };
 
 const OverviewTaskList: React.FC<Props> = ({ data }) => {
@@ -76,10 +56,12 @@ const OverviewTaskList: React.FC<Props> = ({ data }) => {
             <div className="mt-4 flex justify-between text-sm text-tx-secondary">
               {data.totalStudents !== undefined && (
                 <span>
-                  {data.studentsCompleted}/{data.totalStudents} completed
+                  {data.studentsCompleted}/{data.totalStudents} students
+                  completed
                 </span>
               )}
-              <span>Avg Score: {data.avgScoreLatestAttempt}</span>
+              {!data.class && <span>Total Attempts: {data.totalAttempts}</span>}
+              <span>Avg Score: {data.avgScoreAllAttempts}</span>
             </div>
 
             {data.deadline && (

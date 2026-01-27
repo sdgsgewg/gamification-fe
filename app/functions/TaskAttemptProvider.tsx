@@ -95,8 +95,6 @@ export const taskAttemptProvider = {
       if (params?.searchText) query.append("searchText", params.searchText);
       if (params?.scope) query.append("scope", params.scope);
 
-      console.log("Constructed query params:", query.toString());
-
       const url = query.toString()
         ? `${API_URL}/analytics?${query}`
         : `${API_URL}/analytics`;
@@ -139,8 +137,6 @@ export const taskAttemptProvider = {
 
       if (params?.searchText) query.append("searchText", params.searchText);
       if (params?.scope) query.append("scope", params.scope);
-
-      console.log("Constructed query params:", query.toString());
 
       const url = query.toString()
         ? `${API_URL}/analytics/student?${query}`

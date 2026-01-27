@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { StudentTaskAttemptDetailAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptDetailAnalyticsResponse";
 import { Bar } from "@ant-design/plots";
 import { StatCard } from "../Cards";
@@ -29,7 +29,7 @@ const StudentTaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     attempts,
   } = data;
 
-  if (!data) return null;
+  // if (!data) return null;
 
   const bestScore = Math.max(...attempts.map((a) => a.score));
 

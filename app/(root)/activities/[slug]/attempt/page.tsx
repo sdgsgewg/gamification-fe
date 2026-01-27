@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import Loading from "@/app/components/shared/Loading";
@@ -67,7 +67,13 @@ const AttemptActivityPageContent = () => {
   /* =========================
    * UI STATE
    * ========================= */
+  const [attemptId, setAttemptId] = useState<string>("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!activityData?.lastAttemptId) return;
+    setAttemptId(activityData.lastAttemptId);
+  }, [activityData?.lastAttemptId]);
 
   const [backModal, setBackModal] = useState({
     visible: false,
@@ -137,6 +143,7 @@ const AttemptActivityPageContent = () => {
 
     if (result?.isSuccess) {
       clearSession();
+      setAttemptId(result.data.id);
     }
 
     if (result?.data?.leveledUp && result.data.levelChangeSummary) {
@@ -167,7 +174,7 @@ const AttemptActivityPageContent = () => {
 
     if (messageModal.type === "submit" && activityData) {
       router.push(
-        `${ROUTES.ROOT.ACTIVITY}/attempts/${activityData.lastAttemptId}/summary`,
+        `${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`,
       );
     } else {
       router.back();
@@ -179,9 +186,9 @@ const AttemptActivityPageContent = () => {
 
     clearSession();
     setLevelUpModal((p) => ({ ...p, visible: false }));
-    
+
     router.push(
-      `${ROUTES.ROOT.ACTIVITY}/attempts/${activityData.lastAttemptId}/summary`,
+      `${ROUTES.ROOT.ACTIVITY}/attempts/${attemptId}/summary`,
     );
   };
 

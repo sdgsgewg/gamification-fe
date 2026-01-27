@@ -8,6 +8,7 @@ export interface TaskAttemptDetailAnalyticsResponse {
   };
 
   averageScoreAllStudents: number;
+  totalAttempts: number;
   averageAttempts: number;
 
   attempts: AttemptAnalyticsResponse[];

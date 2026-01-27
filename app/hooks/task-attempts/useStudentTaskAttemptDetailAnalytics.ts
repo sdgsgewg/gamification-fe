@@ -17,6 +17,7 @@ export const useStudentTaskAttemptDetailAnalytics = (
       taskSlug,
       values,
     ],
+    enabled: !!taskSlug,
     queryFn: async () => {
       const res =
         await taskAttemptProvider.getStudentTaskAttemptDetailAnalytics(
@@ -24,6 +25,7 @@ export const useStudentTaskAttemptDetailAnalytics = (
           classSlug,
           values,
         );
+
       if (!res.isSuccess || !res.data)
         throw new Error("Gagal memuat detail data percobaan tugas.");
 

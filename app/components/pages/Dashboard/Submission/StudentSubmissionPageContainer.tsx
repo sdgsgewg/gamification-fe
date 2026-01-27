@@ -5,22 +5,22 @@ import { useSearchParams } from "next/navigation";
 import DashboardTitle from "@/app/components/pages/Dashboard/DashboardTitle";
 import Loading from "@/app/components/shared/Loading";
 import NotFound from "@/app/components/shared/not-found/NotFound";
-import OverviewTaskList from "@/app/components/pages/Dashboard/Submission/sections/OverviewTaskList";
-import TaskDetailAnalyticsView from "@/app/components/pages/Dashboard/Submission/sections/TaskDetailAnalyticsView";
 import FilterBar from "@/app/components/shared/FilterBar";
 import { SubmissionOverviewScope } from "@/app/types/SubmissionOverviewScope";
-import { useTaskAttemptDetailAnalytics } from "@/app/hooks/task-attempts/useTaskAttemptDetailAnalytics";
 import { FilterTaskAttemptAnalyticsRequest } from "@/app/interface/task-attempts/requests/IFilterTaskAttemptAnalyticsRequest";
 import { TaskAttemptScope } from "@/app/enums/TaskAttemptScope";
-import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
+import { useStudentTaskAttemptDetailAnalytics } from "@/app/hooks/task-attempts/useStudentTaskAttemptDetailAnalytics";
+import StudentTaskDetailAnalyticsView from "./sections/StudentTaskDetailAnalyticsView";
+import OverviewStudentTaskList from "./sections/OverviewStudentTaskList";
+import { StudentTaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentTaskAttemptAnalyticsResponse";
 
-export interface SubmissionPageConfig {
+export interface StudentSubmissionPageConfig {
   scopes: { value: SubmissionOverviewScope; label: string }[];
 
   overview: Partial<
     Record<
       SubmissionOverviewScope,
-      { data: TaskAttemptAnalyticsResponse[]; isLoading: boolean }
+      { data: StudentTaskAttemptAnalyticsResponse[]; isLoading: boolean }
     >
   >;
 
@@ -35,10 +35,10 @@ export interface SubmissionPageConfig {
 }
 
 type Props = {
-  config: SubmissionPageConfig;
+  config: StudentSubmissionPageConfig;
 };
 
-const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
+const StudentSubmissionPageContainer: React.FC<Props> = ({ config }) => {
   const searchParams = useSearchParams();
 
   const [scope, setScope] = useState<SubmissionOverviewScope>(
@@ -59,14 +59,22 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
     scope: TaskAttemptScope.CLASS,
   });
 
-  const classDetail = useTaskAttemptDetailAnalytics(taskSlug, classSlug, {
-    ...filters,
-    scope: TaskAttemptScope.CLASS,
-  });
-  const activityDetail = useTaskAttemptDetailAnalytics(taskSlug, undefined, {
-    ...filters,
-    scope: TaskAttemptScope.ACTIVITY,
-  });
+  const classDetail = useStudentTaskAttemptDetailAnalytics(
+    taskSlug,
+    classSlug,
+    {
+      ...filters,
+      scope: TaskAttemptScope.CLASS,
+    },
+  );
+  const activityDetail = useStudentTaskAttemptDetailAnalytics(
+    taskSlug,
+    undefined,
+    {
+      ...filters,
+      scope: TaskAttemptScope.ACTIVITY,
+    },
+  );
 
   const overviewState = config.overview[scope];
   const detailState = scope === "class" ? classDetail : activityDetail;
@@ -84,7 +92,7 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
         ) : !detailState.data ? (
           <NotFound text="Task analytics not found" />
         ) : (
-          <TaskDetailAnalyticsView data={detailState.data} />
+          <StudentTaskDetailAnalyticsView data={detailState.data} />
         )
       ) : (
         <>
@@ -101,7 +109,7 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
           ) : overviewState.data.length === 0 ? (
             <NotFound text="No task submissions found" />
           ) : (
-            <OverviewTaskList data={overviewState.data} />
+            <OverviewStudentTaskList data={overviewState.data} />
           )}
         </>
       )}
@@ -109,10 +117,10 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
   );
 };
 
-export default function SubmissionPage(props: Props) {
+export default function StudentSubmissionPage(props: Props) {
   return (
     <Suspense fallback={<Loading />}>
-      <SubmissionPageContainer {...props} />
+      <StudentSubmissionPageContainer {...props} />
     </Suspense>
   );
 }

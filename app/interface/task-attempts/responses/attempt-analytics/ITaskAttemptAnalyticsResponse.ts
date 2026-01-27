@@ -5,6 +5,7 @@ export interface TaskAttemptAnalyticsResponse {
     isRepeatable: boolean;
   };
 
+  totalAttempts: number;
   studentsAttempted: number;
   studentsCompleted: number;
 

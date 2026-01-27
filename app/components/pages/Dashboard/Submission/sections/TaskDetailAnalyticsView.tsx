@@ -16,6 +16,7 @@ import { TaskAttemptDetailAnalyticsResponse } from "@/app/interface/task-attempt
 import { StudentAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/IStudentAttemptAnalyticsResponse";
 import ChartWrapper from "../ChartWrapper";
 import SubmissionRowActions from "@/app/components/shared/table/SubmissionRowActions";
+import { StatCard } from "../Cards";
 
 type Props = {
   data: TaskAttemptDetailAnalyticsResponse;
@@ -190,12 +191,22 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
           <p className="text-sm text-tx-secondary">{data.class.name}</p>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-          <Stat label="Students" value={data.students.length} />
-          <Stat label="Avg Attempts / Student" value={data.averageAttempts} />
-          <Stat
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <StatCard label="Students" value={data.students.length} />
+          <StatCard
+            label="Total Attempts"
+            value={data.totalAttempts}
+            tooltip="Total attempts that has been attempted by all students"
+          />
+          <StatCard
+            label="Avg Attempts / Student"
+            value={data.averageAttempts}
+            tooltip="Average attempt that has been attempted by each students"
+          />
+          <StatCard
             label="Avg Score (All Attempts)"
             value={data.averageScoreAllStudents}
+            tooltip="Average score of all attempts that has been attempted by students"
           />
         </div>
       </div>
@@ -203,7 +214,7 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
       {/* ===== AVERAGE ATTEMPT CHART ===== */}
       {averageAttemptChartData.length > 0 && (
         <ChartWrapper
-          title="Average Scre per Attempt"
+          title="Average Score per Attempt"
           description="This chart shows the average score distribution of all students per attempts"
         >
           <Line {...averageAttemptChartConfig} />
@@ -228,12 +239,5 @@ const TaskDetailAnalyticsView: React.FC<Props> = ({ data }) => {
     </div>
   );
 };
-
-const Stat = ({ label, value }: { label: string; value: number }) => (
-  <div className="rounded-lg bg-background p-3 text-center">
-    <p className="text-sm text-tx-secondary">{label}</p>
-    <p className="text-xl font-semibold text-dark">{value}</p>
-  </div>
-);
 
 export default TaskDetailAnalyticsView;

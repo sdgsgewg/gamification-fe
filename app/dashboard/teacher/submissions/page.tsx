@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Button from "@/app/components/shared/Button";
 import {
   TaskSubmissionStatus,
@@ -14,8 +14,9 @@ import { TaskSubmissionCard } from "@/app/components/pages/Dashboard/Submission/
 import TaskSubmissionCardSkeleton from "@/app/components/pages/Dashboard/Submission/Cards/TaskSubmissionCard/Skeleton";
 import NotFound from "@/app/components/shared/not-found/NotFound";
 import { useTaskSubmissions } from "@/app/hooks/task-submissions/useTaskSubmissions";
+import Loading from "@/app/components/shared/Loading";
 
-const SubmissionsPage = () => {
+const SubmissionsPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -139,4 +140,10 @@ const SubmissionsPage = () => {
   );
 };
 
-export default SubmissionsPage;
+export default function SubmissionsPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <SubmissionsPageContent />
+    </Suspense>
+  );
+}

@@ -82,7 +82,7 @@ const StudentSubmissionPageContainer: React.FC<Props> = ({ config }) => {
   return (
     <>
       <DashboardTitle
-        title={isDetailView ? "Task Analytics" : "Submission Overview"}
+        title={isDetailView ? "Task Analytics" : "Analytics Overview"}
         showBackButton={isDetailView}
       />
 

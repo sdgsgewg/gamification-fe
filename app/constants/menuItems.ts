@@ -12,6 +12,7 @@ import {
   History,
   FileUp,
   Shapes,
+  BarChart3,
 } from "lucide-react";
 
 import { Role } from "../enums/Role";
@@ -223,7 +224,7 @@ export const getSidebarMainMenuItems = (role: Role): MenuItem[] => [
   {
     menu: "Analytics",
     url: resolveDashboardRoute(role, "/analytics"),
-    icon: FileUp,
+    icon: BarChart3,
     roles: [Role.STUDENT, Role.TEACHER, Role.ADMIN],
   },
   // {

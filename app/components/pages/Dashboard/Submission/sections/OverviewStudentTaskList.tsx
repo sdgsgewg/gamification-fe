@@ -34,8 +34,8 @@ const OverviewStudentTaskList: React.FC<Props> = ({ data }) => {
             onClick={() =>
               router.push(
                 classData
-                  ? `${ROUTES.DASHBOARD.STUDENT.SUBMISSIONS}?class=${classData.slug}&task=${task.slug}`
-                  : `${ROUTES.DASHBOARD.STUDENT.SUBMISSIONS}?task=${task.slug}`,
+                  ? `${ROUTES.DASHBOARD.STUDENT.ANALYTICS}?class=${classData.slug}&task=${task.slug}`
+                  : `${ROUTES.DASHBOARD.STUDENT.ANALYTICS}?task=${task.slug}`,
               )
             }
           >

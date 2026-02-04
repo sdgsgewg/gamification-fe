@@ -107,7 +107,7 @@ const StudentSubmissionPageContainer: React.FC<Props> = ({ config }) => {
           ) : overviewState.isLoading ? (
             <Loading />
           ) : overviewState.data.length === 0 ? (
-            <NotFound text="No task submissions found" />
+            <NotFound text="No task analytics found" />
           ) : (
             <OverviewStudentTaskList data={overviewState.data} />
           )}

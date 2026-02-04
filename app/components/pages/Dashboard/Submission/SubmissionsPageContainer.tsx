@@ -99,7 +99,7 @@ const SubmissionPageContainer: React.FC<Props> = ({ config }) => {
           ) : overviewState.isLoading ? (
             <Loading />
           ) : overviewState.data.length === 0 ? (
-            <NotFound text="No task submissions found" />
+            <NotFound text="No task analytics found" />
           ) : (
             <OverviewTaskList data={overviewState.data} />
           )}

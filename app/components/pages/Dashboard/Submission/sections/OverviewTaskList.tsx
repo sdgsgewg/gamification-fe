@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/app/constants/routes";
 import { TaskAttemptAnalyticsResponse } from "@/app/interface/task-attempts/responses/attempt-analytics/ITaskAttemptAnalyticsResponse";
+import { useGetCachedUser } from "@/app/hooks/useGetCachedUser";
+import { Role } from "@/app/enums/Role";
 
 type Props = {
   data: TaskAttemptAnalyticsResponse[];
@@ -11,6 +13,27 @@ type Props = {
 
 const OverviewTaskList: React.FC<Props> = ({ data }) => {
   const router = useRouter();
+
+  const { user, role } = useGetCachedUser();
+
+  const [userRole, setUserRole] = useState<Role>(Role.STUDENT);
+  const [baseRoute, setBaseRoute] = useState<string>("");
+
+  useEffect(() => {
+    if (user && role) {
+      setUserRole(role);
+      switch (role) {
+        case Role.ADMIN:
+          setBaseRoute(`${ROUTES.DASHBOARD.ADMIN.ANALYTICS}`);
+          break;
+        case Role.TEACHER:
+          setBaseRoute(`${ROUTES.DASHBOARD.TEACHER.ANALYTICS}`);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [user, role]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -27,8 +50,8 @@ const OverviewTaskList: React.FC<Props> = ({ data }) => {
             onClick={() =>
               router.push(
                 data.class
-                  ? `${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?class=${data.class.slug}&task=${data.task.slug}`
-                  : `${ROUTES.DASHBOARD.TEACHER.SUBMISSIONS}?task=${data.task.slug}`,
+                  ? `${baseRoute}?class=${data.class.slug}&task=${data.task.slug}`
+                  : `${baseRoute}?task=${data.task.slug}`,
               )
             }
           >

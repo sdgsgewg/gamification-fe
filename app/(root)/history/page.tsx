@@ -87,30 +87,32 @@ const HistoryPage = () => {
           ))}
         </HistoryCardWrapper>
       ) : groupedAttempts && groupedAttempts.length > 0 ? (
-        groupedAttempts.map((groupedAttempt, idx) => {
-          const { dateLabel, dayLabel, attempts } = groupedAttempt;
+        <div className="flex flex-col gap-6">
+          {groupedAttempts.map((groupedAttempt, idx) => {
+            const { dateLabel, dayLabel, attempts } = groupedAttempt;
 
-          return (
-            <div key={idx} className="flex flex-col gap-4">
-              <div className="flex gap-2">
-                <p className="text-dark text-lg font-semibold">{dateLabel}</p>
-                <p className="text-tx-tertiary text-lg">{dayLabel}</p>
+            return (
+              <div key={idx} className="flex flex-col gap-4">
+                <div className="flex gap-2">
+                  <p className="text-dark text-lg font-semibold">{dateLabel}</p>
+                  <p className="text-tx-tertiary text-lg">{dayLabel}</p>
+                </div>
+
+                <HistoryCardWrapper>
+                  {attempts.map((attempt, idx) => (
+                    <HistoryCard
+                      key={idx}
+                      attempt={attempt}
+                      onClick={() =>
+                        handleNavigateToHistoryDetailPage(attempt.id)
+                      }
+                    />
+                  ))}
+                </HistoryCardWrapper>
               </div>
-
-              <HistoryCardWrapper>
-                {attempts.map((attempt, idx) => (
-                  <HistoryCard
-                    key={idx}
-                    attempt={attempt}
-                    onClick={() =>
-                      handleNavigateToHistoryDetailPage(attempt.id)
-                    }
-                  />
-                ))}
-              </HistoryCardWrapper>
-            </div>
-          );
-        })
+            );
+          })}
+        </div>
       ) : (
         <NotFound text="Task Not Found" />
       )}

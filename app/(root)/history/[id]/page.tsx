@@ -68,7 +68,7 @@ const HistoryDetailPage = () => {
   }, [attemptDetailData]);
 
   const handleNavigateToActivityAttemptPage = () => {
-    router.push(`${ROUTES.ROOT}/${attemptDetailData?.slug}/attempt`);
+    router.push(`${ROUTES.ROOT.ACTIVITY}/${attemptDetailData?.slug}/attempt`);
   };
 
   if (!attemptDetailData) return <Loading />;

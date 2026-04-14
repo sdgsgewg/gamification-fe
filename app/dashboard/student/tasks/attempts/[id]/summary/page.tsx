@@ -79,7 +79,7 @@ const StudentTaskSummaryPageContent = () => {
 
     const additionalText = gradingProgress
       ? `Graded by ${teacherName} from class '${className}'`
-      : `Graded by SYSTEM from class '${className}'`;
+      : `Graded by SYSTEM ${className ? `from class '${className}` : ""}`;
 
     return (
       <>

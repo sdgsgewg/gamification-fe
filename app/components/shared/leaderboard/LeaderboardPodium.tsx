@@ -32,8 +32,7 @@ export default function LeaderboardPodium({
               key={cl.id ?? idx}
               tone={idx === 0 ? "gold" : idx === 1 ? "silver" : "bronze"}
               title1={cl.name?.split(" ")[0] ?? ""}
-              // title2={cl.name?.split(" ").slice(1).join(" ") ?? ""}
-              title2={""}
+              title2={cl.name?.split(" ").slice(1).join(" ") ?? ""}
               points={cl.point ?? 0}
               image={cl.image ?? defaultImage}
             />

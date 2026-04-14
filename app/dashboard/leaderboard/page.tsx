@@ -12,14 +12,16 @@ import { LeaderboardScopeEnum } from "@/app/enums/LeaderboardSopeEnum";
 
 const LeaderboardPage = () => {
   const [filter, setFilter] = useState<LeaderboardScope>(
-    LeaderboardScopeEnum.CLASS.toLowerCase() as LeaderboardScope
+    LeaderboardScopeEnum.CLASS.toLowerCase() as LeaderboardScope,
   );
 
   const { data: classLeaderboard = [], isLoading: isClassLoading } =
     useClassLeaderboard();
 
   const { data: studentLeaderboard = [], isLoading: isStudentLoading } =
-    useStudentLeaderboard();
+    useStudentLeaderboard({
+      scope: LeaderboardScopeEnum.CLASS,
+    });
 
   const isLoading = filter === "class" ? isClassLoading : isStudentLoading;
   const leaderboard =
@@ -32,7 +34,11 @@ const LeaderboardPage = () => {
     <>
       <DashboardTitle title="Leaderboard" />
 
-      <LeaderboardFilters module="dashboard" filter={filter} setFilter={setFilter} />
+      <LeaderboardFilters
+        module="dashboard"
+        filter={filter}
+        setFilter={setFilter}
+      />
 
       <LeaderboardViewComponent
         leaderboardData={leaderboard}

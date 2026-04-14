@@ -15,16 +15,16 @@ import { scopeDescription } from "@/app/utils/leaderboard/scopeDescription";
 
 const LeaderboardPage = () => {
   const [scopeFilter, setScopeFilter] = useState<LeaderboardScope>(
-    LeaderboardScopeEnum.GLOBAL.toLowerCase() as LeaderboardScope
+    LeaderboardScopeEnum.GLOBAL.toLowerCase() as LeaderboardScope,
   );
   const [filters, setFilters] = useState<FilterStudentLeaderboardRequest>({
-    scope: scopeFilter,
+    scope: scopeFilter.toLocaleUpperCase() as LeaderboardScopeEnum,
   });
 
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
-      scope: scopeFilter.toUpperCase(),
+      scope: scopeFilter.toUpperCase() as LeaderboardScopeEnum,
     }));
   }, [scopeFilter]);
 
@@ -41,7 +41,7 @@ const LeaderboardPage = () => {
   if (!leaderboard || leaderboard.length === 0)
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
-        Tidak ada data leaderboard.
+        No leaderboard data.
       </div>
     );
 
@@ -50,7 +50,7 @@ const LeaderboardPage = () => {
   const rest = leaderboard.slice(3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-300">
+    <div className="min-h-screen bg-linear-to-b from-blue-100 to-blue-300">
       <main className="container mx-auto flex-1 flex flex-col items-center justify-center py-12 px-6">
         <h1 className="text-4xl font-extrabold text-center text-blue-800 mb-10">
           🌟 Leaderboard
@@ -81,8 +81,8 @@ const LeaderboardPage = () => {
                   index === 0
                     ? "h-64 w-40 border-4 border-yellow-400"
                     : index === 1
-                    ? "h-56 w-36 border-4 border-gray-300"
-                    : "h-52 w-32 border-4 border-amber-600"
+                      ? "h-56 w-36 border-4 border-gray-300"
+                      : "h-52 w-32 border-4 border-amber-600"
                 }`}
               >
                 <span className="text-4xl mb-2">
@@ -110,10 +110,10 @@ const LeaderboardPage = () => {
         <div className="w-full bg-white/70 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden">
           <table className="w-full border-collapse text-gray-800">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+              <tr className="bg-linear-to-r from-blue-600 to-blue-500 text-white">
                 <th className="py-3 px-4 text-left font-semibold">🏅 Rank</th>
-                <th className="py-3 px-4 text-left font-semibold">👤 Nama</th>
-                <th className="py-3 px-4 text-left font-semibold">🔥 Poin</th>
+                <th className="py-3 px-4 text-left font-semibold">👤 Name</th>
+                <th className="py-3 px-4 text-left font-semibold">🔥 Points</th>
               </tr>
             </thead>
             <tbody>

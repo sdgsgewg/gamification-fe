@@ -60,7 +60,7 @@ export default function LeaderboardTable({
 
                   <div className="flex min-w-0 items-center gap-3">
                     <span
-                      className="h-7 w-7 flex-shrink-0 rounded-full border border-br-secondary bg-card"
+                      className="h-7 w-7 shrink-0 rounded-full border border-br-secondary bg-card"
                       style={{
                         backgroundImage: `url("${cl.image ?? defaultImage}")`,
                         backgroundSize: "cover",
